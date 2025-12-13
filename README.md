@@ -1,109 +1,128 @@
-<h1 align="center">
-  <a href="https://movary.org"><img src="https://github.com/leepeuker/movary/raw/main/public/images/movary-logo-192x192.png" height="160px" width="160px"></a>
-  <br>
-  Movary
-  <br>
-</h1>
+# Movies
 
-<h4 align="center">The central hub to track, rate and explore your movie watch history</h4>
-
-<p align="center">
-<a href="https://github.com/benjaminmue/movies/pkgs/container/movies" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/GHCR-movies-blue?logo=github" ></a>
-<a href="https://github.com/leepeuker/movary" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/stars/leepeuker/movary?style=flat&color=yellow&label=github%20stars" ></a>
-<a href="https://github.com/leepeuker/movary/issues" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/issues/leepeuker/movary?color=eba434&label=github%20issues" ></a>
-<a href="https://discord.gg/KbcSqggrgW" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/discord/1125830398715363399" ></a>
-<a href="https://github.com/leepeuker/movary/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/license/leepeuker/movary" ></a>
-</p>
-
-<p align="center">
-<a href="https://movary.org" target="_blank" rel="noopener noreferrer">Website</a> •
-<a href="https://docs.movary.org/install/docker/" target="_blank" rel="noopener noreferrer">Installation</a> •
-<a href="https://docs.movary.org/" target="_blank" rel="noopener noreferrer">Docs</a> •
-<a href="https://api.movary.org/" target="_blank" rel="noopener noreferrer">Api</a> •
-<a href="https://demo.movary.org/" target="_blank" rel="noopener noreferrer">Demo</a>
-</p>
-
-Movary is a free and open source web application to track, rate and explore your movie watch history.
-You can host it for yourself and others.
-It offers detailed statistics, 
-third-party integrations for importing and exporting your history from platforms like Trakt, Letterboxd, or Netflix,
-automated play tracking for Plex, Jellyfin, Emby or Kodi and much [more](#features).
-
-![Movary Dashboard Example](https://raw.githubusercontent.com/leepeuker/movary/main/docs/images/dashboard-screenshot.png)
-
-
-**Disclaimer:** This project is still in an experimental (but usable) state.
-There are plans to add more and improve existing features before creating the 1.0 Release,
-which can lead to sudden breaking changes from time to time, so keep the release notes in mind when updating until then.
+A fork of [Movary](https://github.com/leepeuker/movary) for group movie tracking. Track movies with friends, import metadata from TMDB, and rate films using a 1-7 popcorn scale. Self-hosted via Docker with MySQL or SQLite.
 
 ## Features
 
-- Movie watch history: Collect and manage your watch history and ratings
-- Statistics: Analyze your movie watching behavior and history, like e.g. most watched actors/directors/genres/languages/years
-- Customization: You decide how your dashboard should look like, what format to use when displaying dates and more
-- Third party integrations: Import and export your history and ratings from/to platforms like Trakt, Letterboxd, or Netflix
-- Scrobbler: Automatically add new plays and ratings from Plex, Jellyfin, Emby or Kodi.
-- Own your personal data: Users can decide who can see their data and export/import/delete the data and their accounts at any time
-- Locally stored metadata: Using e.g. themoviedb.org and imdb as sources, all metadata movary uses for your history entries can be stored locally
-- PWA: Can be installed as a smartphone app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
-- User-management: Use Movary alone or with others
-- Completely free, no ads, no tracking and open source! :)
+- **Public home page** - Poster grid showing the 20 most recently added movies
+- **Movie details** - View global average rating, individual user ratings, and comments
+- **Popcorn rating** - Rate movies on a 1-7 scale with optional comments
+- **Persistent login** - Stay logged in until cookies are cleared
+- **Movie search** - Search local library first, fallback to TMDB, add new movies
+- **All movies list** - Browse library with sorting (title, year, rating) and filtering (genre, year, rating)
+- **Profile management** - Update name, email, and profile picture
 
 ## Quick Start with Docker
 
-Pull the latest image from GitHub Container Registry:
+```bash
+docker run -d \
+  --name movies \
+  -p 8080:80 \
+  -e TMDB_API_KEY=your-api-key \
+  -e DATABASE_MODE=mysql \
+  -e DATABASE_MYSQL_HOST=your-mysql-host \
+  -e DATABASE_MYSQL_NAME=movies \
+  -e DATABASE_MYSQL_USER=movies \
+  -e DATABASE_MYSQL_PASSWORD=your-password \
+  -v movies_storage:/app/storage \
+  ghcr.io/benjaminmue/movies:latest
+```
+
+Database migrations run automatically on container start.
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `TMDB_API_KEY` | Yes | [Get one here](https://www.themoviedb.org/settings/api) |
+| `DATABASE_MODE` | No | `mysql` or `sqlite` (default: sqlite) |
+| `DATABASE_MYSQL_HOST` | If mysql | MySQL hostname |
+| `DATABASE_MYSQL_NAME` | If mysql | Database name |
+| `DATABASE_MYSQL_USER` | If mysql | Database user |
+| `DATABASE_MYSQL_PASSWORD` | If mysql | Database password |
+
+## Docker Compose
+
+```yaml
+services:
+  movies:
+    image: ghcr.io/benjaminmue/movies:latest
+    ports:
+      - "8080:80"
+    environment:
+      TMDB_API_KEY: "your-api-key"
+      DATABASE_MODE: "mysql"
+      DATABASE_MYSQL_HOST: "mysql"
+      DATABASE_MYSQL_NAME: "movies"
+      DATABASE_MYSQL_USER: "movies"
+      DATABASE_MYSQL_PASSWORD: "your-password"
+    volumes:
+      - movies_storage:/app/storage
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: "movies"
+      MYSQL_USER: "movies"
+      MYSQL_PASSWORD: "your-password"
+      MYSQL_ROOT_PASSWORD: "root-password"
+    volumes:
+      - movies_db:/var/lib/mysql
+
+volumes:
+  movies_storage:
+  movies_db:
+```
+
+## Image Tags
+
+Pull from GitHub Container Registry:
 
 ```bash
-# Latest stable release
+# Latest stable
 docker pull ghcr.io/benjaminmue/movies:latest
 
 # Specific version
 docker pull ghcr.io/benjaminmue/movies:v0.1.0-alpha.1
+
+# Specific commit
+docker pull ghcr.io/benjaminmue/movies:sha-abc1234
 ```
 
-Run with MySQL:
+| Tag | Description |
+|-----|-------------|
+| `latest` | Latest stable release (recommended) |
+| `main` | Latest build from main branch |
+| `vX.Y.Z` | Specific version tag |
+| `sha-XXXXXXX` | Specific commit |
+
+> **Note:** GHCR package must be set to "Public" in repository settings for anonymous pulls.
+
+## Development
 
 ```bash
-docker run -d \
-  --name movary \
-  -p 8080:80 \
-  -e DATABASE_MODE=mysql \
-  -e DATABASE_MYSQL_HOST=your-mysql-host \
-  -e DATABASE_MYSQL_NAME=movary \
-  -e DATABASE_MYSQL_USER=movary \
-  -e DATABASE_MYSQL_PASSWORD=your-password \
-  -e TMDB_API_KEY=your-tmdb-api-key \
-  -v movary_storage:/app/storage \
-  ghcr.io/benjaminmue/movies:latest
+# Install dependencies
+composer install
+
+# Start development environment
+docker compose -f docker-compose.yml -f docker-compose.development.yml up -d
+
+# Run migrations
+docker compose exec app php bin/console.php database:migration:migrate
+
+# Run tests
+composer test
 ```
 
-### Available Tags
+## Security
 
-- `latest` - Latest stable release (recommended)
-- `main` - Latest build from main branch
-- `vX.Y.Z` - Specific version (e.g., `v0.1.0-alpha.1`)
-- `sha-XXXXXXX` - Specific commit
+- Never commit secrets to the repository
+- Configure all credentials via environment variables
+- Rotate API keys immediately if leaked
+- Use Docker secrets for sensitive values in production
 
-> **Note:** After the first push, the GHCR package visibility may need to be set to "Public" in the repository's package settings for anonymous pulls.
+## License
 
-## Demo
-
-A demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`).
-
-## Documentation
-
-The documentation for the latest release is located [here](https://docs.movary.org). Please report missing or wrong information.
-
-## Support
-
-- Please report bugs and request features/changes via [Github issues](https://github.com/leepeuker/movary/issues/new/choose)
-- Ask for help or discuss related topics via [Github discussions](https://github.com/leepeuker/movary/discussions)
-- Join our [Discord server](https://discord.gg/KbcSqggrgW)
-
-## Contributors
-
-* [@leepeuker](https://github.com/leepeuker) as Lee Peuker
-* [@JVT038](https://github.com/JVT038) as JVT038
-* [@pbogre](https://github.com/pbogre) as Pietro Bonaldo Gregori
-* [@alifeee](https://github.com/alifeee) as alifeee
-
+See [LICENSE](LICENSE) file.
