@@ -69,7 +69,22 @@ class Request
 
     private static function extractHeaders() : array
     {
-        return getallheaders();
+        $headers = getallheaders();
+
+        // Normalize header names to handle case-insensitivity
+        // HTTP headers are case-insensitive per RFC 7230, but PHP array keys are not
+        // This ensures headers work correctly behind reverse proxies that may alter casing
+        $normalized = [];
+        foreach ($headers as $name => $value) {
+            // Store with original case
+            $normalized[$name] = $value;
+            // Also store common variations for known headers that may be case-altered by proxies
+            if (strtolower($name) === 'x-movary-client') {
+                $normalized['X-Movary-Client'] = $value;
+            }
+        }
+
+        return $normalized;
     }
 
     private static function extractPath(string $uri) : string
