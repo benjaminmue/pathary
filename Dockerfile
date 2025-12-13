@@ -68,36 +68,14 @@ LABEL org.opencontainers.image.title="Movary" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.revision="${VCS_REF}"
 
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libicu72 \
-    libzip4 \
-    libfreetype6 \
-    libjpeg62-turbo \
-    libpng16-16 \
-    libcurl4 \
-    libonig5 \
-    && rm -rf /var/lib/apt/lists/*
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Install PHP extensions
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libicu-dev \
-    libzip-dev \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libpng-dev \
-    libcurl4-openssl-dev \
-    libonig-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
-        pdo_mysql \
-        intl \
-        gd \
-        zip \
-        opcache \
-        mbstring \
-        curl \
-    && apt-get purge -y --auto-remove \
+# Install build dependencies, compile PHP extensions, then clean up
+# Using -dev packages for compilation, runtime libs are kept automatically
+RUN set -eux; \
+    apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 update --allow-releaseinfo-change; \
+    apt-get install -y --no-install-recommends \
         libicu-dev \
         libzip-dev \
         libfreetype6-dev \
@@ -105,7 +83,31 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libpng-dev \
         libcurl4-openssl-dev \
         libonig-dev \
-    && rm -rf /var/lib/apt/lists/*
+    ; \
+    docker-php-ext-configure gd --with-freetype --with-jpeg; \
+    docker-php-ext-install -j"$(nproc)" \
+        pdo_mysql \
+        intl \
+        gd \
+        zip \
+        opcache \
+        mbstring \
+        curl \
+    ; \
+    # Remove build dependencies but keep runtime libs
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+        libicu-dev \
+        libzip-dev \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+        libcurl4-openssl-dev \
+        libonig-dev \
+    ; \
+    rm -rf /var/lib/apt/lists/*; \
+    # Verify extensions are loaded
+    php -m | grep -i intl; \
+    php -m | grep -i gd
 
 # Configure Apache
 ENV APACHE_DOCUMENT_ROOT=/app/public
