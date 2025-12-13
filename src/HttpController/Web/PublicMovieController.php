@@ -42,7 +42,7 @@ class PublicMovieController
 
         // Get current user's rating if logged in
         $userRating = null;
-        if ($this->authenticationService->isUserAuthenticated() === true) {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
             $userId = $this->authenticationService->getCurrentUserId();
             $userRating = $this->movieRepository->findUserRatingWithComment($movieId, $userId);
         }
