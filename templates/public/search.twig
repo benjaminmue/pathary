@@ -141,6 +141,53 @@
     .source-indicator span {
         font-size: 0.9rem;
     }
+
+    .search-actions {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .btn-tmdb {
+        background: #01b4e4;
+        border-color: #01b4e4;
+        color: #fff;
+    }
+
+    .btn-tmdb:hover {
+        background: #0199c4;
+        border-color: #0199c4;
+        color: #fff;
+    }
+
+    .btn-tmdb:disabled {
+        background: #6c757d;
+        border-color: #6c757d;
+        opacity: 0.65;
+    }
+
+    .btn-library {
+        background: var(--pathe-yellow);
+        border-color: var(--pathe-yellow);
+        color: var(--pathe-dark);
+    }
+
+    .btn-library:hover {
+        background: #e0a808;
+        border-color: #e0a808;
+        color: var(--pathe-dark);
+    }
+
+    @media (max-width: 576px) {
+        .search-actions {
+            flex-direction: column;
+        }
+
+        .search-actions .btn {
+            width: 100%;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -159,12 +206,26 @@
                     <i class="bi bi-search"></i>
                 </button>
             </div>
+
+            <div class="search-actions">
+                {% if forceTmdb %}
+                    <a href="{{ applicationUrl }}/search?q={{ searchTerm|url_encode }}" class="btn btn-library">
+                        <i class="bi bi-database"></i> Search Library
+                    </a>
+                {% else %}
+                    <a href="{{ applicationUrl }}/search?q={{ searchTerm|url_encode }}&source=tmdb"
+                       class="btn btn-tmdb {% if not searchTerm %}disabled{% endif %}"
+                       {% if not searchTerm %}aria-disabled="true" tabindex="-1"{% endif %}>
+                        <i class="bi bi-cloud"></i> Search TMDB
+                    </a>
+                {% endif %}
+            </div>
         </form>
     </section>
 
     {% if searchTerm %}
         <section class="results-section">
-            {% if localResults|length > 0 %}
+            {% if localResults|length > 0 and not forceTmdb %}
                 <div class="source-indicator">
                     <i class="bi bi-database"></i>
                     <span>Found {{ localResults|length }} movie{{ localResults|length != 1 ? 's' : '' }} in your library</span>
@@ -192,7 +253,13 @@
                 {% if tmdbResults|length > 0 %}
                     <div class="source-indicator tmdb">
                         <i class="bi bi-cloud"></i>
-                        <span>No local results. Showing {{ tmdbResults|length }} result{{ tmdbResults|length != 1 ? 's' : '' }} from TMDB</span>
+                        <span>
+                            {% if forceTmdb %}
+                                TMDB results for "{{ searchTerm }}" ({{ tmdbResults|length }} found)
+                            {% else %}
+                                No local results. Showing {{ tmdbResults|length }} result{{ tmdbResults|length != 1 ? 's' : '' }} from TMDB
+                            {% endif %}
+                        </span>
                     </div>
 
                     <div class="movie-grid">

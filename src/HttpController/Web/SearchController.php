@@ -23,6 +23,8 @@ class SearchController
     public function search(Request $request) : Response
     {
         $searchTerm = trim((string)($request->getGetParameters()['q'] ?? ''));
+        $source = $request->getGetParameters()['source'] ?? '';
+        $forceTmdb = $source === 'tmdb';
 
         if ($searchTerm === '') {
             return Response::create(
@@ -32,19 +34,23 @@ class SearchController
                     'localResults' => [],
                     'tmdbResults' => [],
                     'showTmdbResults' => false,
+                    'forceTmdb' => false,
                 ]),
             );
         }
 
-        // Search local movies first
-        $localResults = $this->movieRepository->searchByTitle($searchTerm);
-        $localResults = $this->imageUrlService->replacePosterPathWithImageSrcUrl($localResults);
+        // Search local movies first (unless forcing TMDB)
+        $localResults = [];
+        if ($forceTmdb === false) {
+            $localResults = $this->movieRepository->searchByTitle($searchTerm);
+            $localResults = $this->imageUrlService->replacePosterPathWithImageSrcUrl($localResults);
+        }
 
         $tmdbResults = [];
         $showTmdbResults = false;
 
-        // If no local results, search TMDB
-        if (count($localResults) === 0) {
+        // Search TMDB if no local results OR if explicitly requested
+        if (count($localResults) === 0 || $forceTmdb) {
             $tmdbResponse = $this->tmdbApi->searchMovie($searchTerm);
             $tmdbResults = $tmdbResponse['results'] ?? [];
             $showTmdbResults = true;
@@ -57,6 +63,7 @@ class SearchController
                 'localResults' => $localResults,
                 'tmdbResults' => $tmdbResults,
                 'showTmdbResults' => $showTmdbResults,
+                'forceTmdb' => $forceTmdb,
             ]),
         );
     }
