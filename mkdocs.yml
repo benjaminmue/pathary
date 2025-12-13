@@ -36,6 +36,7 @@ nav:
       - Docker (recommended): install/docker.md
       - Manual: install/manual.md
   - Getting started: 'getting-started.md'
+  - Initial user setup: 'initial-user-setup.md'
   - Configuration: 'configuration.md'
   - Features:
       - TMDB Data: features/tmdb-data.md
