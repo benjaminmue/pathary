@@ -24,6 +24,7 @@ use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\ImdbRating;
 use Movary\ValueObject\PersonalRating;
+use Movary\ValueObject\PopcornRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 use RuntimeException;
@@ -510,6 +511,11 @@ class MovieApi
         return $this->repository->findUserRating($movieId, $userId);
     }
 
+    public function findUserPopcornRating(int $movieId, int $userId) : ?PopcornRating
+    {
+        return $this->repository->findUserPopcornRating($movieId, $userId);
+    }
+
     public function replaceHistoryForMovieByDate(
         int $movieId,
         int $userId,
@@ -714,5 +720,22 @@ class MovieApi
         }
 
         $this->repository->updateUserRating($movieId, $userId, $rating);
+    }
+
+    public function updateUserPopcornRating(int $movieId, int $userId, ?PopcornRating $rating) : void
+    {
+        if ($rating === null) {
+            $this->movieRepository->deleteUserPopcornRating($movieId, $userId);
+
+            return;
+        }
+
+        $currentRating = $this->repository->findUserPopcornRating($movieId, $userId);
+
+        if ($currentRating !== null && $currentRating->isEqual($rating) === true) {
+            return;
+        }
+
+        $this->repository->upsertUserPopcornRating($movieId, $userId, $rating);
     }
 }

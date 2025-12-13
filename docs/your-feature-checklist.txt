@@ -1,0 +1,212 @@
+================================================================================
+                        FEATURE CHECKLIST - MANUAL TESTING
+================================================================================
+
+This document contains manual testing steps to verify all features implemented
+in the custom group movie tracking system (Prompts 1-12).
+
+--------------------------------------------------------------------------------
+1. PUBLIC HOME PAGE - Latest 20 Movies
+--------------------------------------------------------------------------------
+Route: GET /
+
+[ ] Navigate to the home page (/)
+[ ] Verify 20 movies are displayed (or fewer if less than 20 in library)
+[ ] Verify movies are sorted by last_added_at descending (most recent first)
+[ ] Verify each movie card shows:
+    - Poster image (or placeholder with title)
+    - Movie title
+    - Release year
+    - Average popcorn rating (if rated)
+[ ] Verify clicking a movie card navigates to /movie/{id}
+[ ] Add a new movie to the library and refresh - it should appear first
+
+--------------------------------------------------------------------------------
+2. PUBLIC MOVIE DETAIL - Global + Individual Ratings
+--------------------------------------------------------------------------------
+Route: GET /movie/{id}
+
+[ ] Navigate to a movie detail page
+[ ] Verify movie info is displayed:
+    - Title, poster, release year, runtime
+    - Genres (if available)
+    - Synopsis/overview
+[ ] Verify "Community Rating" section shows:
+    - Popcorn icons reflecting average rating
+    - Text showing "avg: X.X / 7 (N ratings)"
+[ ] Verify "Individual Ratings" section shows user ratings
+[ ] Refresh the page multiple times
+[ ] Verify individual ratings appear in RANDOM ORDER each refresh
+[ ] Verify each rating card shows:
+    - User name
+    - Popcorn rating (or "Unrated")
+    - Comment (if provided)
+    - Last update date
+
+--------------------------------------------------------------------------------
+3. PERSISTENT LOGIN - Remember Me
+--------------------------------------------------------------------------------
+Route: POST /api/authentication/token
+
+[ ] Log in to the application
+[ ] Close the browser completely (not just the tab)
+[ ] Reopen the browser and navigate to the app
+[ ] Verify you are STILL LOGGED IN (no login prompt)
+[ ] Verify the navbar shows authenticated state (All Movies, Profile, Logout)
+[ ] Check browser cookies - verify auth token cookie exists with long expiry
+[ ] Log out and verify cookie is cleared
+[ ] Verify you are redirected to home and see public navbar
+
+--------------------------------------------------------------------------------
+4. SEARCH - Local First, TMDB Fallback, Add to Library
+--------------------------------------------------------------------------------
+Route: GET /search
+
+[ ] Log in and navigate to /search (or use navbar search)
+[ ] Search for a movie that EXISTS in your local library
+[ ] Verify local results appear with database icon indicator
+[ ] Verify NO TMDB results are shown when local results exist
+[ ] Search for a movie that does NOT exist locally
+[ ] Verify TMDB results appear with cloud icon indicator
+[ ] Verify TMDB results show "TMDB" badge
+[ ] Click on a TMDB result
+[ ] Verify TMDB movie detail page shows:
+    - Title, poster, tagline, release year, runtime
+    - TMDB rating and vote count
+    - Overview/synopsis
+    - "Add to library" button
+[ ] If movie already exists locally, verify "View in library" button instead
+[ ] Click "Add to library" button
+[ ] Verify you are redirected to the local movie detail page
+[ ] Verify the movie now appears in local search results
+[ ] Verify the movie appears on the home page (as most recently added)
+
+--------------------------------------------------------------------------------
+5. RATING UPDATE - Overwrites Previous Value
+--------------------------------------------------------------------------------
+Route: POST /movie/{id}/rate
+
+[ ] Log in and navigate to a movie detail page
+[ ] Verify "Your Rating" section appears (only when logged in)
+[ ] Set a popcorn rating (e.g., 5 popcorns)
+[ ] Add a comment (e.g., "Great movie!")
+[ ] Submit the rating
+[ ] Verify redirect to /movie/{id}#ratings
+[ ] Verify your rating appears in Individual Ratings section
+[ ] Verify Community Rating average is updated
+[ ] Change your rating to a different value (e.g., 3 popcorns)
+[ ] Change your comment
+[ ] Submit again
+[ ] Verify your OLD rating is OVERWRITTEN (not duplicated)
+[ ] Verify only ONE entry exists for your user
+[ ] Verify the new rating/comment values are shown
+[ ] Verify Community Rating average reflects the change
+
+--------------------------------------------------------------------------------
+6. ALL MOVIES - Sorting and Filters
+--------------------------------------------------------------------------------
+Route: GET /movies
+
+[ ] Log in and navigate to /movies
+[ ] Verify movie grid displays all movies in library
+[ ] Verify movie count is shown in subtitle
+
+SORTING:
+[ ] Select "Recently Added" - verify newest added movies first
+[ ] Select "Oldest Added" - verify oldest added movies first
+[ ] Select "Title A-Z" - verify alphabetical order
+[ ] Select "Title Z-A" - verify reverse alphabetical order
+[ ] Select "Newest Release" - verify by release year descending
+[ ] Select "Oldest Release" - verify by release year ascending
+[ ] Select "Highest Rated" - verify by avg popcorn rating descending
+[ ] Select "Lowest Rated" - verify by avg popcorn rating ascending
+[ ] Select "My Rating (High)" - verify by your rating descending
+[ ] Select "My Rating (Low)" - verify by your rating ascending
+
+FILTERS:
+[ ] Select a genre from dropdown - verify only movies of that genre shown
+[ ] Set minimum rating (e.g., 4) - verify only movies with avg >= 4 shown
+[ ] Set maximum rating (e.g., 6) - verify only movies with avg <= 6 shown
+[ ] Set year range (e.g., 2000-2010) - verify only movies in range shown
+[ ] Combine multiple filters - verify all filters apply together
+[ ] Verify active filter badges appear at top of page
+[ ] Click "Clear" to remove all filters
+[ ] Verify all movies appear again after clearing
+
+MOBILE:
+[ ] Resize browser to mobile width (or use device)
+[ ] Verify filter sidebar is hidden
+[ ] Verify "Filters" button appears
+[ ] Click "Filters" button - verify offcanvas opens
+[ ] Apply filters from offcanvas - verify they work correctly
+
+--------------------------------------------------------------------------------
+7. PROFILE - Edits Persist
+--------------------------------------------------------------------------------
+Route: GET/POST /profile
+
+[ ] Log in and navigate to /profile (or click Profile in navbar)
+[ ] Note current display name and email
+
+DISPLAY NAME:
+[ ] Change display name to a new value
+[ ] Click "Save Changes"
+[ ] Verify success message appears
+[ ] Refresh the page
+[ ] Verify new name PERSISTS (still shows new value)
+[ ] Verify navbar shows updated name (if displayed)
+
+EMAIL:
+[ ] Change email to a new value
+[ ] Click "Save Changes"
+[ ] Verify success message appears
+[ ] Refresh the page
+[ ] Verify new email PERSISTS
+
+PROFILE IMAGE:
+[ ] Click "Upload Photo" and select a valid image (JPEG/PNG/GIF/WebP)
+[ ] Verify image preview updates immediately
+[ ] Click "Save Changes"
+[ ] Verify image is saved and displays
+[ ] Refresh the page
+[ ] Verify image PERSISTS
+[ ] Click "Remove" button
+[ ] Verify image is removed and placeholder shows
+[ ] Try uploading invalid file type - verify error
+[ ] Try uploading file > 5MB - verify error
+
+LOGOUT:
+[ ] Click "Logout" button in profile page
+[ ] Verify you are logged out and redirected
+[ ] Verify auth cookie is cleared
+
+--------------------------------------------------------------------------------
+8. ADDITIONAL CHECKS
+--------------------------------------------------------------------------------
+
+NAVBAR (Authenticated):
+[ ] Verify brand links to home (/)
+[ ] Verify search form submits to /search
+[ ] Verify "All Movies" links to /movies
+[ ] Verify "Profile" links to /profile
+[ ] Verify "Logout" button works
+
+NAVBAR (Unauthenticated):
+[ ] Verify brand links to home (/)
+[ ] Verify "Login" button links to /login
+
+RESPONSIVE DESIGN:
+[ ] Test all pages on mobile viewport
+[ ] Verify movie grids adapt to screen size
+[ ] Verify forms are usable on mobile
+[ ] Verify navigation works on mobile (hamburger menu)
+
+ERROR HANDLING:
+[ ] Navigate to /movie/99999 (non-existent) - verify 404
+[ ] Navigate to /tmdb/movie/99999 (non-existent) - verify 404
+[ ] Try to access /movies without auth - verify redirect to login
+[ ] Try to access /profile without auth - verify redirect to login
+
+================================================================================
+                              END OF CHECKLIST
+================================================================================

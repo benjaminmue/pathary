@@ -17,7 +17,37 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 {
     $routes = RouteList::create();
 
-    $routes->add('GET', '/', [Web\LandingPageController::class, 'render'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
+    ###############
+    # Public Home #
+    ###############
+    $routes->add('GET', '/', [Web\PublicHomeController::class, 'index']);
+    $routes->add('GET', '/movie/{id:[0-9]+}', [Web\PublicMovieController::class, 'detail']);
+    $routes->add('POST', '/movie/{id:[0-9]+}/rate', [Web\RateMovieController::class, 'rate'], [Web\Middleware\UserIsAuthenticated::class]);
+
+    ##########
+    # Search #
+    ##########
+    $routes->add('GET', '/search', [Web\SearchController::class, 'search'], [Web\Middleware\UserIsAuthenticated::class]);
+
+    ##############
+    # All Movies #
+    ##############
+    $routes->add('GET', '/movies', [Web\AllMoviesController::class, 'index'], [Web\Middleware\UserIsAuthenticated::class]);
+
+    ###########
+    # Profile #
+    ###########
+    $routes->add('GET', '/profile', [Web\ProfileController::class, 'show'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/profile', [Web\ProfileController::class, 'update'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/profile-images/{filename:.+}', [Web\ProfileController::class, 'serveImage']);
+
+    ################
+    # TMDB Movies  #
+    ################
+    $routes->add('GET', '/tmdb/movie/{tmdbId:[0-9]+}', [Web\TmdbMovieController::class, 'detail'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/tmdb/movie/{tmdbId:[0-9]+}/add', [Web\TmdbMovieController::class, 'add'], [Web\Middleware\UserIsAuthenticated::class]);
+
+    $routes->add('GET', '/landing', [Web\LandingPageController::class, 'render'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
     $routes->add('POST', '/create-user', [Web\CreateUserController::class, 'createUser'], [
         Web\Middleware\UserIsUnauthenticated::class,

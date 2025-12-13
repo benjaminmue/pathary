@@ -539,4 +539,19 @@ class UserApi
     {
         $this->repository->updateWatchlistAutomaticRemovalEnabled($userId, $watchlistAutomaticRemovalEnabled);
     }
+
+    public function findProfileImage(int $userId) : ?string
+    {
+        return $this->repository->findProfileImage($userId);
+    }
+
+    public function updateProfileImage(int $userId, ?string $profileImage) : void
+    {
+        $this->repository->updateProfileImage($userId, $profileImage);
+    }
+
+    public function findUserEmail(int $userId) : ?string
+    {
+        return $this->repository->findUserEmail($userId);
+    }
 }

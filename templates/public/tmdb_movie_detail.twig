@@ -1,0 +1,273 @@
+{% extends 'layouts/app_base.twig' %}
+
+{% block title %}{{ title }} - TMDB{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .movie-hero {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+        padding: 2rem 0;
+    }
+
+    @media (max-width: 768px) {
+        .movie-hero {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .movie-poster-container {
+        position: relative;
+    }
+
+    .movie-poster {
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .movie-poster-placeholder {
+        width: 100%;
+        aspect-ratio: 2/3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
+        color: #888;
+        font-size: 1rem;
+        text-align: center;
+        padding: 2rem;
+        border-radius: 12px;
+    }
+
+    .movie-details {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .movie-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .movie-tagline {
+        font-size: 1.1rem;
+        font-style: italic;
+        color: var(--bs-secondary-color);
+        margin: 0;
+    }
+
+    .movie-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        color: var(--bs-secondary-color);
+        font-size: 0.95rem;
+    }
+
+    .movie-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .tmdb-rating {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(1, 180, 228, 0.15);
+        border: 1px solid rgba(1, 180, 228, 0.3);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+    }
+
+    .tmdb-rating-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #01b4e4;
+    }
+
+    .tmdb-rating-label {
+        font-size: 0.85rem;
+        color: var(--bs-secondary-color);
+    }
+
+    .movie-overview {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--bs-body-color);
+    }
+
+    .movie-overview h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn-add-library {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--pathe-yellow);
+        border-color: var(--pathe-yellow);
+        color: var(--pathe-dark);
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .btn-add-library:hover {
+        background: #e0a808;
+        border-color: #e0a808;
+        color: var(--pathe-dark);
+    }
+
+    .btn-view-existing {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--accent-purple);
+        border-color: var(--accent-purple);
+        color: #fff;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .btn-view-existing:hover {
+        background: #5a24a0;
+        border-color: #5a24a0;
+        color: #fff;
+    }
+
+    .existing-notice {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: rgba(111, 45, 189, 0.1);
+        border: 1px solid rgba(111, 45, 189, 0.3);
+        border-radius: 8px;
+        color: var(--bs-body-color);
+        font-size: 0.9rem;
+    }
+
+    .existing-notice i {
+        color: var(--accent-purple);
+    }
+
+    .tmdb-badge {
+        display: inline-block;
+        background: #01b4e4;
+        color: #fff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        color: var(--bs-secondary-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .back-link:hover {
+        color: var(--pathe-yellow);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <a href="{{ applicationUrl }}/search" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        Back to search
+    </a>
+
+    <div class="movie-hero">
+        <div class="movie-poster-container">
+            {% if posterUrl %}
+                <img src="{{ posterUrl }}" alt="{{ title }}" class="movie-poster">
+            {% else %}
+                <div class="movie-poster-placeholder">{{ title }}</div>
+            {% endif %}
+            <span class="tmdb-badge" style="position: absolute; top: 1rem; left: 1rem;">TMDB</span>
+        </div>
+
+        <div class="movie-details">
+            <h1 class="movie-title">{{ title }}</h1>
+
+            {% if tagline %}
+                <p class="movie-tagline">"{{ tagline }}"</p>
+            {% endif %}
+
+            <div class="movie-meta">
+                {% if releaseDate %}
+                    <span class="movie-meta-item">
+                        <i class="bi bi-calendar3"></i>
+                        {{ releaseDate|date('Y') }}
+                    </span>
+                {% endif %}
+                {% if runtime %}
+                    <span class="movie-meta-item">
+                        <i class="bi bi-clock"></i>
+                        {{ runtime }} min
+                    </span>
+                {% endif %}
+            </div>
+
+            {% if voteAverage %}
+                <div class="tmdb-rating">
+                    <span class="tmdb-rating-value">{{ voteAverage|number_format(1) }}</span>
+                    <span class="tmdb-rating-label">TMDB rating{% if voteCount %} ({{ voteCount|number_format }} votes){% endif %}</span>
+                </div>
+            {% endif %}
+
+            {% if overview %}
+                <div class="movie-overview">
+                    <h3>Overview</h3>
+                    <p>{{ overview }}</p>
+                </div>
+            {% endif %}
+
+            {% if existingMovieId %}
+                <div class="existing-notice">
+                    <i class="bi bi-check-circle-fill"></i>
+                    This movie is already in your library
+                </div>
+                <div class="action-buttons">
+                    <a href="{{ applicationUrl }}/movie/{{ existingMovieId }}" class="btn btn-view-existing">
+                        <i class="bi bi-film"></i>
+                        View in library
+                    </a>
+                </div>
+            {% else %}
+                <div class="action-buttons">
+                    <form action="{{ applicationUrl }}/tmdb/movie/{{ tmdbId }}/add" method="post">
+                        <button type="submit" class="btn btn-add-library">
+                            <i class="bi bi-plus-circle"></i>
+                            Add to library
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

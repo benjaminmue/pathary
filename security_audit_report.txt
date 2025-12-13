@@ -1,0 +1,542 @@
+================================================================================
+                    SECURITY AUDIT REPORT - MOVARY
+================================================================================
+
+Audit Date: 2025-12-13
+Auditor: Claude Code Security Audit
+Repository: /Users/benjamin/Documents/GitHub/movary
+
+================================================================================
+EXECUTIVE SUMMARY
+================================================================================
+
+Total Issues Found: 5
+- Critical: 1
+- High: 1
+- Medium: 2
+- Low: 1
+
+All issues have been fixed or documented with mitigation recommendations.
+
+================================================================================
+BASELINE INVENTORY
+================================================================================
+
+Framework/Stack:
+- PHP 8.4 with strict types
+- Twig templating engine (autoescape enabled by default)
+- Doctrine DBAL for database access
+- FastRoute for routing
+- PHP-DI for dependency injection
+
+Database Layer:
+- Doctrine DBAL with prepared statements
+- SQLite and MySQL support
+
+Authentication:
+- Custom token-based authentication with cookie storage
+- Session management via custom SessionWrapper
+- SHA-256 hashed auth tokens stored in database
+- Password hashing via password_hash/password_verify
+
+Template Rendering:
+- Twig with autoescape enabled by default (secure)
+- No use of |raw filter found in templates
+
+Tooling Results:
+- composer audit: Unable to run (composer not in PATH)
+- npm audit: No package-lock.json found
+- Twig autoescape: Enabled by default (verified in Factory.php)
+- roave/security-advisories: Present in require-dev (good)
+
+================================================================================
+DETAILED FINDINGS
+================================================================================
+
+--------------------------------------------------------------------------------
+ISSUE ID: SEC-001
+--------------------------------------------------------------------------------
+Severity: CRITICAL
+Category: SQLi (SQL Injection)
+File: src/Service/GroupMovieService.php
+Line: 238
+
+ROOT CAUSE:
+User ID was directly interpolated into SQL query string instead of using
+prepared statement parameter binding.
+
+EXPLOIT SCENARIO:
+Although $userId comes from authenticated session, direct string interpolation
+into SQL creates a pattern that could be exploited if the codebase evolves or
+similar patterns are copied elsewhere.
+
+BEFORE:
+```php
+// Add userId param for own_rating subquery
+$userIdParam = $userId;
+
+$movies = $this->dbConnection->fetchAllAssociative(
+    <<<SQL
+    ...
+    WHERE mur2.movie_id = m.id AND mur2.user_id = $userIdParam
+    ...
+    SQL,
+    $params,
+);
+```
+
+AFTER:
+```php
+// Add userId param for own_rating subquery - use prepared statement parameter
+array_unshift($params, $userId);
+
+$movies = $this->dbConnection->fetchAllAssociative(
+    <<<SQL
+    ...
+    WHERE mur2.movie_id = m.id AND mur2.user_id = ?
+    ...
+    SQL,
+    $params,
+);
+```
+
+FIX SUMMARY:
+Changed from string interpolation to prepared statement parameter binding.
+
+VALIDATION:
+- Code review confirms ? placeholder is now used
+- Parameter array properly includes userId at the beginning
+- Maintains query functionality while eliminating injection vector
+
+--------------------------------------------------------------------------------
+ISSUE ID: SEC-002
+--------------------------------------------------------------------------------
+Severity: HIGH
+Category: XSS (Cross-Site Scripting)
+File: public/js/settings-server-users.js
+Lines: 242-245
+
+ROOT CAUSE:
+User data (id, name, email, isAdmin) was inserted into DOM via innerHTML,
+allowing potential XSS if user-provided data contains malicious HTML/JavaScript.
+
+EXPLOIT SCENARIO:
+An admin user creates a user with a malicious name like:
+<img src=x onerror="alert(document.cookie)">
+When viewing the users table, the script would execute.
+
+BEFORE:
+```javascript
+users.forEach((user) => {
+    let row = document.createElement('tr');
+    row.innerHTML = '<td>' + user.id + '</td>';
+    row.innerHTML += '<td>' + user.name + '</td>';
+    row.innerHTML += '<td>' + user.email + '</td>';
+    row.innerHTML += '<td>' + user.isAdmin + '</td>';
+    ...
+});
+```
+
+AFTER:
+```javascript
+users.forEach((user) => {
+    let row = document.createElement('tr');
+
+    // Use textContent to prevent XSS
+    let tdId = document.createElement('td');
+    tdId.textContent = user.id;
+    row.appendChild(tdId);
+
+    let tdName = document.createElement('td');
+    tdName.textContent = user.name;
+    row.appendChild(tdName);
+
+    let tdEmail = document.createElement('td');
+    tdEmail.textContent = user.email;
+    row.appendChild(tdEmail);
+
+    let tdIsAdmin = document.createElement('td');
+    tdIsAdmin.textContent = user.isAdmin;
+    row.appendChild(tdIsAdmin);
+
+    ...
+});
+```
+
+FIX SUMMARY:
+Replaced innerHTML with textContent via DOM element creation, which safely
+encodes all user data as text rather than parsing as HTML.
+
+VALIDATION:
+- Code review confirms textContent is used for all user-provided data
+- DOM elements are created programmatically
+
+--------------------------------------------------------------------------------
+ISSUE ID: SEC-003
+--------------------------------------------------------------------------------
+Severity: MEDIUM
+Category: Headers (Missing Security Headers)
+File: public/index.php
+Lines: N/A (headers not present)
+
+ROOT CAUSE:
+HTTP security headers were not being set on responses, leaving the application
+vulnerable to clickjacking, MIME-type sniffing, and other attacks.
+
+EXPLOIT SCENARIO:
+- Clickjacking: Attacker embeds Movary in iframe on malicious site
+- MIME sniffing: Browser interprets uploaded files as different content type
+- Information leakage: Referrer headers sent to external sites
+
+BEFORE:
+No security headers set.
+
+AFTER (added to public/index.php):
+```php
+// Security headers - applied to all responses
+$securityHeaders = [
+    'X-Content-Type-Options' => 'nosniff',
+    'X-Frame-Options' => 'SAMEORIGIN',
+    'Referrer-Policy' => 'strict-origin-when-cross-origin',
+    'Permissions-Policy' => 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
+    'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' https://image.tmdb.org data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-ancestors 'self';",
+];
+
+// Apply security headers
+foreach ($securityHeaders as $name => $value) {
+    header($name . ': ' . $value);
+}
+```
+
+FIX SUMMARY:
+Added comprehensive security headers including CSP, X-Frame-Options,
+X-Content-Type-Options, Referrer-Policy, and Permissions-Policy.
+
+CSP POLICY EXPLANATION:
+- default-src 'self': Only load resources from same origin
+- script-src 'self' 'unsafe-inline': Allow inline scripts (needed for Twig)
+- style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net: Bootstrap CDN
+- img-src 'self' https://image.tmdb.org data:: TMDB images and data URIs
+- font-src 'self' https://cdn.jsdelivr.net: Bootstrap icons
+- frame-ancestors 'self': Prevent clickjacking
+
+VALIDATION:
+- Headers are applied to all responses via index.php
+
+--------------------------------------------------------------------------------
+ISSUE ID: SEC-004
+--------------------------------------------------------------------------------
+Severity: MEDIUM
+Category: Auth (Session Fixation)
+File: src/Domain/User/Service/Authentication.php
+Line: 239-262
+
+ROOT CAUSE:
+Session ID was not regenerated after successful authentication, potentially
+allowing session fixation attacks.
+
+EXPLOIT SCENARIO:
+Attacker obtains a valid session ID, tricks user into using it (via URL or
+cookie), user logs in, attacker hijacks the now-authenticated session.
+
+BEFORE:
+```php
+public function setAuthenticationCookieAndNewSession(...) : void
+{
+    $this->sessionWrapper->destroy();
+    $this->sessionWrapper->start();
+    // No session ID regeneration
+    ...
+}
+```
+
+AFTER:
+```php
+public function setAuthenticationCookieAndNewSession(...) : void
+{
+    $this->sessionWrapper->destroy();
+    $this->sessionWrapper->start();
+
+    // Regenerate session ID to prevent session fixation
+    $this->sessionWrapper->regenerateId();
+    ...
+}
+```
+
+ADDITIONAL FIX in src/Util/SessionWrapper.php:
+```php
+public function regenerateId() : void
+{
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
+    }
+}
+
+public function start() : void
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+
+        session_set_cookie_params([
+            'lifetime' => 0,
+            'path' => '/',
+            'secure' => $isSecure,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
+        session_start();
+    }
+}
+```
+
+FIX SUMMARY:
+- Added session ID regeneration on login
+- Added secure session cookie parameters (HttpOnly, Secure, SameSite)
+
+VALIDATION:
+- Session ID regeneration occurs after authentication
+- Session cookies have secure attributes
+
+--------------------------------------------------------------------------------
+ISSUE ID: SEC-005
+--------------------------------------------------------------------------------
+Severity: LOW
+Category: Upload (File Upload Hardening)
+File: src/HttpController/Web/ProfileController.php
+Lines: 112-165
+
+ROOT CAUSE:
+While basic MIME type validation existed, additional validation was needed to
+ensure uploaded files are genuine images and not disguised malicious files.
+
+EXPLOIT SCENARIO:
+Attacker uploads a PHP file disguised with image headers. If the file is served
+with incorrect content type, it could be executed or interpreted incorrectly.
+
+BEFORE:
+```php
+// Validate MIME type
+$finfo = new \finfo(FILEINFO_MIME_TYPE);
+$mimeType = $finfo->file($file['tmp_name']);
+
+if (in_array($mimeType, self::ALLOWED_MIME_TYPES, true) === false) {
+    throw new RuntimeException('Invalid image type...');
+}
+```
+
+AFTER:
+```php
+// Validate MIME type using file contents (not just extension)
+$finfo = new \finfo(FILEINFO_MIME_TYPE);
+$mimeType = $finfo->file($file['tmp_name']);
+
+if (in_array($mimeType, self::ALLOWED_MIME_TYPES, true) === false) {
+    throw new RuntimeException('Invalid image type...');
+}
+
+// Additional validation: verify it's actually an image by getting image info
+$imageInfo = @getimagesize($file['tmp_name']);
+if ($imageInfo === false) {
+    throw new RuntimeException('File does not appear to be a valid image.');
+}
+
+// Verify the detected image type matches the MIME type
+$expectedMimeFromImage = image_type_to_mime_type($imageInfo[2]);
+if ($expectedMimeFromImage !== $mimeType) {
+    throw new RuntimeException('Image content does not match file type.');
+}
+```
+
+ADDITIONAL FIX for image serving:
+```php
+return Response::create(
+    StatusCode::createOk(),
+    $content,
+    [
+        Header::createContentType($mimeType),
+        Header::createCache(31536000),
+        Header::createNoSniff(),
+    ],
+);
+```
+
+FIX SUMMARY:
+- Added getimagesize() validation to verify file is genuine image
+- Added MIME type consistency check between finfo and image_type_to_mime_type
+- Added X-Content-Type-Options: nosniff header when serving images
+- Created Header::createNoSniff() helper method
+
+EXISTING GOOD PRACTICES (verified):
+- Random filenames via bin2hex(random_bytes(16))
+- Files stored outside webroot (storage/profile-images/)
+- Served via controlled route with proper Content-Type
+- Size limit enforced (5MB)
+- MIME type allowlist (jpeg, png, gif, webp)
+
+VALIDATION:
+- Multiple layers of image validation now in place
+- Image serving includes nosniff header
+
+================================================================================
+ITEMS REVIEWED BUT NO ACTION REQUIRED
+================================================================================
+
+1. CSRF PROTECTION
+   Status: Infrastructure created (CsrfTokenService.php)
+   Note: The application primarily uses API-style endpoints with auth tokens.
+         Forms that need CSRF protection should integrate the new service.
+         The service is available for use but full integration requires
+         template and controller updates beyond the scope of this audit.
+
+2. IDOR (Insecure Direct Object Reference)
+   Status: No issues found
+   Review: Controllers consistently use getCurrentUserId() from authenticated
+           session. Profile updates verify user ownership. Movie ratings use
+           authenticated user ID. Admin-only routes have middleware protection.
+
+3. OPEN REDIRECT
+   Status: Mitigated
+   Review: The login page passes redirect parameter to template, but the
+           client-side JavaScript (login.js) validates redirects using
+           getSafeRedirect() which parses URLs and ensures they stay within
+           the application domain.
+
+4. SECRET LEAKS
+   Status: No hardcoded secrets found
+   Review: TMDB_API_KEY loaded from environment variables. Database passwords
+           loaded from environment. No secrets in committed code. .env.example
+           contains placeholders only.
+
+5. DEBUG OUTPUTS
+   Status: None found
+   Review: No var_dump(), print_r(), dd(), or dump() calls in production code.
+
+6. COMMAND INJECTION
+   Status: Not applicable
+   Review: No exec(), system(), shell_exec(), passthru(), popen(), or
+           proc_open() calls found in codebase.
+
+7. UNSAFE DESERIALIZATION
+   Status: Not applicable
+   Review: No unserialize() calls found. JSON is used for data serialization.
+
+8. TWIG AUTOESCAPE
+   Status: Secure
+   Review: Twig Environment created without disabling autoescape. No |raw
+           filter usage found in templates.
+
+9. PASSWORD STORAGE
+   Status: Secure
+   Review: password_hash() with PASSWORD_DEFAULT used for hashing.
+           password_verify() used for validation.
+
+10. AUTH TOKENS
+    Status: Secure
+    Review: 32-byte random tokens generated via bin2hex(random_bytes(32)).
+            Tokens hashed with SHA-256 before storage. Constant-time
+            comparison via hash_equals() used. Tokens cleared on logout.
+
+================================================================================
+DEPENDENCY AUDIT
+================================================================================
+
+Composer Dependencies (from composer.json):
+- roave/security-advisories: dev-latest (actively blocks vulnerable packages)
+
+Note: composer audit could not be run (composer not in PATH). Recommend running:
+  composer audit
+
+The presence of roave/security-advisories in require-dev is good practice as it
+prevents installation of packages with known vulnerabilities.
+
+================================================================================
+FILES CHANGED
+================================================================================
+
+1. src/Service/GroupMovieService.php
+   - Fixed SQL injection vulnerability (SEC-001)
+
+2. public/js/settings-server-users.js
+   - Fixed XSS vulnerability via innerHTML (SEC-002)
+
+3. public/index.php
+   - Added security headers (SEC-003)
+
+4. src/Domain/User/Service/Authentication.php
+   - Added session ID regeneration on login (SEC-004)
+
+5. src/Util/SessionWrapper.php
+   - Added secure session cookie parameters
+   - Added regenerateId() method
+
+6. src/HttpController/Web/ProfileController.php
+   - Enhanced file upload validation (SEC-005)
+   - Added nosniff header for image serving
+
+7. src/ValueObject/Http/Header.php
+   - Added createContentType() method
+   - Added createNoSniff() method
+
+8. src/Service/CsrfTokenService.php (NEW)
+   - Created CSRF token service for future use
+
+================================================================================
+RECOMMENDATIONS
+================================================================================
+
+1. CSRF PROTECTION INTEGRATION
+   Priority: Medium
+   The CsrfTokenService has been created but needs to be integrated into:
+   - State-changing forms (profile update, rating submission, etc.)
+   - Consider adding as Twig global for easy form inclusion
+   - Add validation middleware for POST/PUT/DELETE routes
+
+2. RATE LIMITING
+   Priority: Medium
+   Consider implementing rate limiting for:
+   - Login endpoint (prevent brute force)
+   - API endpoints (prevent abuse)
+   Options: PHP libraries like ratelimiter/ratelimiter or database-based
+
+3. CONTENT SECURITY POLICY
+   Priority: Low
+   Current CSP uses 'unsafe-inline' for scripts. Consider:
+   - Migrating to nonce-based CSP
+   - Moving inline scripts to external files
+
+4. HSTS HEADER
+   Priority: Low
+   When HTTPS is guaranteed in production, add:
+   Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+5. DEPENDENCY UPDATES
+   Priority: Medium
+   Regularly run:
+   - composer audit
+   - composer update
+
+================================================================================
+CONCLUSION
+================================================================================
+
+This security audit identified 5 vulnerabilities ranging from Critical to Low
+severity. All identified issues have been fixed:
+
+- 1 Critical SQL injection fixed with prepared statements
+- 1 High XSS vulnerability fixed with safe DOM manipulation
+- 2 Medium issues fixed (security headers, session fixation)
+- 1 Low file upload hardening implemented
+
+The codebase demonstrates generally good security practices:
+- Prepared statements used throughout Doctrine DBAL
+- Twig autoescape enabled by default
+- Password hashing with modern algorithms
+- Secure authentication token handling
+
+Recommended follow-up actions include integrating the new CSRF service and
+implementing rate limiting for authentication endpoints.
+
+================================================================================
+                           END OF SECURITY AUDIT REPORT
+================================================================================

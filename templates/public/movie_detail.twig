@@ -1,0 +1,467 @@
+{% extends 'layouts/public_base.twig' %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .movie-hero {
+        padding: 2rem 0;
+    }
+
+    .movie-header {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+    }
+
+    .movie-poster {
+        flex-shrink: 0;
+        width: 200px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .movie-poster img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .movie-poster-placeholder {
+        width: 100%;
+        aspect-ratio: 2/3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
+        color: #888;
+        font-size: 0.875rem;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .movie-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .movie-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--bs-body-color);
+    }
+
+    .movie-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        margin-bottom: 1rem;
+        color: var(--bs-secondary-color);
+        font-size: 0.9rem;
+    }
+
+    .movie-genres {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .genre-badge {
+        background: var(--bs-tertiary-bg);
+        color: var(--bs-body-color);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+    }
+
+    .movie-synopsis {
+        margin-bottom: 2rem;
+    }
+
+    .movie-synopsis h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+
+    .movie-synopsis p {
+        color: var(--bs-secondary-color);
+        line-height: 1.7;
+    }
+
+    /* Global Rating Section */
+    .global-rating-section {
+        background: var(--bs-tertiary-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .global-rating-section h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .global-rating-display {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .global-rating-stats {
+        color: var(--bs-secondary-color);
+        font-size: 0.9rem;
+    }
+
+    /* Individual Ratings Section */
+    .individual-ratings-section {
+        margin-bottom: 2rem;
+    }
+
+    .individual-ratings-section h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .rating-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+    }
+
+    .rating-card {
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .rating-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+
+    .rating-user-name {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .rating-user-popcorn {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .rating-user-popcorn .popcorn-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .rating-user-popcorn .popcorn-on .popcorn-icon {
+        fill: var(--pathe-yellow);
+    }
+
+    .rating-user-popcorn .popcorn-off .popcorn-icon {
+        fill: #9ca3af;
+    }
+
+    .rating-unrated {
+        color: var(--bs-secondary-color);
+        font-size: 0.85rem;
+        font-style: italic;
+    }
+
+    .rating-comment {
+        color: var(--bs-secondary-color);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 0.5rem;
+    }
+
+    .rating-date {
+        font-size: 0.75rem;
+        color: var(--bs-tertiary-color);
+    }
+
+    .no-ratings-message {
+        text-align: center;
+        padding: 2rem;
+        color: var(--bs-secondary-color);
+    }
+
+    /* Rating Form */
+    .rating-form-section {
+        background: var(--bs-tertiary-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .rating-form-section h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .rating-form-group {
+        margin-bottom: 1rem;
+    }
+
+    .rating-form-group label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .rating-form-group textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 0.75rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 8px;
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        font-family: inherit;
+        font-size: 0.9rem;
+        resize: vertical;
+    }
+
+    .rating-form-group textarea:focus {
+        outline: none;
+        border-color: var(--accent-purple);
+        box-shadow: 0 0 0 3px rgba(111, 45, 189, 0.1);
+    }
+
+    .rating-form-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .btn-submit-rating {
+        background: var(--pathe-yellow);
+        border-color: var(--pathe-yellow);
+        color: var(--pathe-dark);
+        font-weight: 600;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn-submit-rating:hover {
+        background: #e0a808;
+        border-color: #e0a808;
+        color: var(--pathe-dark);
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--bs-secondary-color);
+        text-decoration: none;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+        color: var(--accent-purple);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .movie-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .movie-poster {
+            width: 160px;
+        }
+
+        .movie-title {
+            font-size: 1.5rem;
+        }
+
+        .movie-meta {
+            justify-content: center;
+        }
+
+        .movie-genres {
+            justify-content: center;
+        }
+
+        .global-rating-display {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .rating-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <a href="{{ applicationUrl }}/" class="back-link">
+        <i class="bi bi-arrow-left"></i> Back to Home
+    </a>
+
+    <div class="movie-hero">
+        <div class="movie-header">
+            <div class="movie-poster">
+                {% if movie.posterPath %}
+                    <img src="{{ movie.posterPath }}" alt="{{ movie.title }}">
+                {% else %}
+                    <div class="movie-poster-placeholder">
+                        {{ movie.title }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="movie-info">
+                <h1 class="movie-title">{{ movie.title }}</h1>
+
+                <div class="movie-meta">
+                    {% if movie.releaseDate %}
+                        <span>{{ movie.releaseDate|date('Y') }}</span>
+                    {% endif %}
+                    {% if movie.runtime %}
+                        <span>{{ movie.runtime }}</span>
+                    {% endif %}
+                    {% if movie.originalLanguage %}
+                        <span>{{ movie.originalLanguage }}</span>
+                    {% endif %}
+                </div>
+
+                {% if genres and genres|length > 0 %}
+                    <div class="movie-genres">
+                        {% for genre in genres %}
+                            <span class="genre-badge">{{ genre.name }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if movie.tagline %}
+                    <p class="text-muted fst-italic mb-3">"{{ movie.tagline }}"</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if movie.overview %}
+        <section class="movie-synopsis">
+            <h2>Synopsis</h2>
+            <p>{{ movie.overview }}</p>
+        </section>
+    {% endif %}
+
+    <section class="global-rating-section">
+        <h2>Community Rating</h2>
+        <div class="global-rating-display">
+            {% include 'components/popcorn_rating.twig' with {
+                valueInt: displayPopcorn,
+                mode: 'display',
+                readonly: true
+            } %}
+            <div class="global-rating-stats">
+                {% if stats.rating_count > 0 %}
+                    avg: {{ stats.avg_popcorn|number_format(1) }} / 7
+                    ({{ stats.rating_count }} rating{{ stats.rating_count != 1 ? 's' : '' }})
+                {% else %}
+                    No ratings yet
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    {% if loggedIn %}
+        <section class="rating-form-section">
+            <h2>Your Rating</h2>
+            <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate" method="post">
+                <div class="rating-form-group">
+                    <label>Rating</label>
+                    {% include 'components/popcorn_rating.twig' with {
+                        valueInt: userRating.rating_popcorn ?? 0,
+                        mode: 'input',
+                        name: 'rating_popcorn',
+                        readonly: false
+                    } %}
+                </div>
+
+                <div class="rating-form-group">
+                    <label for="comment">Comment (optional)</label>
+                    <textarea id="comment" name="comment" placeholder="Share your thoughts about this movie...">{{ userRating.comment ?? '' }}</textarea>
+                </div>
+
+                <div class="rating-form-actions">
+                    <button type="submit" class="btn btn-submit-rating">
+                        {{ userRating ? 'Update Rating' : 'Submit Rating' }}
+                    </button>
+                </div>
+            </form>
+        </section>
+    {% endif %}
+
+    <section id="ratings" class="individual-ratings-section">
+        <h2>Individual Ratings</h2>
+
+        {% if individualRatings|length > 0 %}
+            <div class="rating-cards">
+                {% for rating in individualRatings %}
+                    <div class="rating-card">
+                        <div class="rating-card-header">
+                            <span class="rating-user-name">{{ rating.user_name }}</span>
+
+                            <div class="rating-user-popcorn">
+                                {% if rating.rating_popcorn %}
+                                    {% for i in 1..7 %}
+                                        <span class="{{ i <= rating.rating_popcorn ? 'popcorn-on' : 'popcorn-off' }}">
+                                            <svg viewBox="0 0 24 24" class="popcorn-icon" aria-hidden="true">
+                                                <path d="M7 22l1-9H4c-.8 0-1.3-.9-.8-1.5l3-4C5.5 5.5 5 4.3 5 3c0-1.7 1.3-3 3-3 .8 0 1.5.3 2 .8C10.5.3 11.2 0 12 0s1.5.3 2 .8c.5-.5 1.2-.8 2-.8 1.7 0 3 1.3 3 3 0 1.3-.5 2.5-1.2 3.5l3 4c.5.6 0 1.5-.8 1.5h-4l1 9H7z"/>
+                                                <circle cx="9" cy="4" r="1.5"/>
+                                                <circle cx="15" cy="4" r="1.5"/>
+                                                <circle cx="12" cy="6" r="1.5"/>
+                                            </svg>
+                                        </span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="rating-unrated">Unrated</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if rating.comment %}
+                            <p class="rating-comment">"{{ rating.comment }}"</p>
+                        {% endif %}
+
+                        {% if rating.updated_at %}
+                            <div class="rating-date">
+                                Last update: {{ rating.updated_at|date('Y-m-d') }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-ratings-message">
+                <p>No individual ratings yet. Be the first to rate this movie!</p>
+                {% if not loggedIn %}
+                    <a href="{{ applicationUrl }}/login" class="btn btn-warning mt-2" style="background-color: var(--pathe-yellow); border-color: var(--pathe-yellow); color: var(--pathe-dark);">
+                        Login to Rate
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

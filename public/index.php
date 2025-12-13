@@ -10,6 +10,15 @@ use Psr\Log\LoggerInterface;
 $container = require(__DIR__ . '/../bootstrap.php');
 $httpRequest = $container->get(Request::class);
 
+// Security headers - applied to all responses
+$securityHeaders = [
+    'X-Content-Type-Options' => 'nosniff',
+    'X-Frame-Options' => 'SAMEORIGIN',
+    'Referrer-Policy' => 'strict-origin-when-cross-origin',
+    'Permissions-Policy' => 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
+    'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' https://image.tmdb.org data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-ancestors 'self';",
+];
+
 try {
     $dispatcher = FastRoute\simpleDispatcher(
         require(__DIR__ . '/../settings/routes.php'),
@@ -64,6 +73,12 @@ try {
 }
 
 header((string)$response->getStatusCode());
+
+// Apply security headers
+foreach ($securityHeaders as $name => $value) {
+    header($name . ': ' . $value);
+}
+
 foreach ($response->getHeaders() as $header) {
     header((string)$header);
 }

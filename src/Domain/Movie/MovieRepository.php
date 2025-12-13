@@ -11,6 +11,7 @@ use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\ImdbRating;
 use Movary\ValueObject\PersonalRating;
+use Movary\ValueObject\PopcornRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 use RuntimeException;
@@ -1104,6 +1105,20 @@ class MovieRepository
         return $data === false ? null : MovieEntity::createFromArray($data);
     }
 
+    public function searchByTitle(string $searchTerm, int $limit = 20) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT m.id, m.title, m.release_date, m.tmdb_poster_path, m.poster_path, m.overview
+            FROM movie m
+            WHERE m.title LIKE ?
+            ORDER BY m.title ASC
+            LIMIT ?
+            SQL,
+            ["%{$searchTerm}%", $limit],
+        );
+    }
+
     public function findByTmdbId(int $movieIds) : ?MovieEntity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE tmdb_id = ?', [$movieIds]);
@@ -1176,6 +1191,16 @@ class MovieRepository
         )[0] ?? null;
 
         return $userRating !== null ? PersonalRating::create($userRating) : null;
+    }
+
+    public function findUserPopcornRating(int $movieId, int $userId) : ?PopcornRating
+    {
+        $popcornRating = $this->dbConnection->fetchFirstColumn(
+            'SELECT rating_popcorn FROM `movie_user_rating` WHERE movie_id = ? AND user_id = ?',
+            [$movieId, $userId],
+        )[0] ?? null;
+
+        return $popcornRating !== null ? PopcornRating::create((int)$popcornRating) : null;
     }
 
     public function insertUserRating(int $movieId, int $userId, PersonalRating $rating) : void
@@ -1267,6 +1292,68 @@ class MovieRepository
         $this->dbConnection->executeQuery(
             'UPDATE movie_user_rating SET rating = ?, updated_at = ? WHERE movie_id = ? AND user_id = ?',
             [$rating->asInt(), (string)DateTime::create(), $movieId, $userId],
+        );
+    }
+
+    public function upsertUserPopcornRating(int $movieId, int $userId, PopcornRating $rating) : void
+    {
+        $existingRow = $this->dbConnection->fetchAssociative(
+            'SELECT movie_id FROM movie_user_rating WHERE movie_id = ? AND user_id = ?',
+            [$movieId, $userId],
+        );
+
+        if ($existingRow === false) {
+            $this->dbConnection->executeQuery(
+                'INSERT INTO movie_user_rating (movie_id, user_id, rating_popcorn, created_at) VALUES (?, ?, ?, ?)',
+                [$movieId, $userId, $rating->asInt(), (string)DateTime::create()],
+            );
+
+            return;
+        }
+
+        $this->dbConnection->executeQuery(
+            'UPDATE movie_user_rating SET rating_popcorn = ?, updated_at = ? WHERE movie_id = ? AND user_id = ?',
+            [$rating->asInt(), (string)DateTime::create(), $movieId, $userId],
+        );
+    }
+
+    public function deleteUserPopcornRating(int $movieId, int $userId) : void
+    {
+        $this->dbConnection->executeQuery(
+            'UPDATE movie_user_rating SET rating_popcorn = NULL, updated_at = ? WHERE movie_id = ? AND user_id = ?',
+            [(string)DateTime::create(), $movieId, $userId],
+        );
+    }
+
+    public function findUserRatingWithComment(int $movieId, int $userId) : ?array
+    {
+        $data = $this->dbConnection->fetchAssociative(
+            'SELECT rating_popcorn, comment FROM movie_user_rating WHERE movie_id = ? AND user_id = ?',
+            [$movieId, $userId],
+        );
+
+        return $data === false ? null : $data;
+    }
+
+    public function upsertUserRatingWithComment(int $movieId, int $userId, ?PopcornRating $rating, ?string $comment) : void
+    {
+        $existingRow = $this->dbConnection->fetchAssociative(
+            'SELECT movie_id FROM movie_user_rating WHERE movie_id = ? AND user_id = ?',
+            [$movieId, $userId],
+        );
+
+        if ($existingRow === false) {
+            $this->dbConnection->executeQuery(
+                'INSERT INTO movie_user_rating (movie_id, user_id, rating_popcorn, comment, created_at) VALUES (?, ?, ?, ?, ?)',
+                [$movieId, $userId, $rating?->asInt(), $comment, (string)DateTime::create()],
+            );
+
+            return;
+        }
+
+        $this->dbConnection->executeQuery(
+            'UPDATE movie_user_rating SET rating_popcorn = ?, comment = ?, updated_at = ? WHERE movie_id = ? AND user_id = ?',
+            [$rating?->asInt(), $comment, (string)DateTime::create(), $movieId, $userId],
         );
     }
 

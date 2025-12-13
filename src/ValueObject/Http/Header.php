@@ -35,6 +35,16 @@ class Header
         return new self('Cache-Control', 'public, max-age=' . $maxAgeInSeconds);
     }
 
+    public static function createContentType(string $mimeType) : self
+    {
+        return new self('Content-Type', $mimeType);
+    }
+
+    public static function createNoSniff() : self
+    {
+        return new self('X-Content-Type-Options', 'nosniff');
+    }
+
     public function __toString() : string
     {
         return $this->name . ': ' . $this->value;

@@ -28,11 +28,14 @@ class UserRepository
 
     public function createAuthToken(int $userId, string $token, string $deviceName, string $userAgent, DateTime $expirationDate) : void
     {
+        $tokenHash = hash('sha256', $token);
+
         $this->dbConnection->insert(
             'user_auth_token',
             [
                 'user_id' => $userId,
                 'token' => $token,
+                'token_hash' => $tokenHash,
                 'expiration_date' => (string)$expirationDate,
                 'device_name' => $deviceName,
                 'user_agent' => $userAgent,
@@ -67,11 +70,12 @@ class UserRepository
 
     public function deleteAuthToken(string $token) : void
     {
-        $this->dbConnection->delete(
-            'user_auth_token',
-            [
-                'token' => $token,
-            ],
+        $tokenHash = hash('sha256', $token);
+
+        // Delete by token_hash or plaintext token for backwards compatibility
+        $this->dbConnection->executeStatement(
+            'DELETE FROM `user_auth_token` WHERE `token_hash` = ? OR `token` = ?',
+            [$tokenHash, $token],
         );
     }
 
@@ -194,7 +198,13 @@ class UserRepository
 
     public function findAuthTokenExpirationDate(string $token) : ?DateTime
     {
-        $expirationDate = $this->dbConnection->fetchOne('SELECT `expiration_date` FROM `user_auth_token` WHERE `token` = ?', [$token]);
+        $tokenHash = hash('sha256', $token);
+
+        // Try to find by token_hash first (new method), fallback to plaintext token for backwards compatibility
+        $expirationDate = $this->dbConnection->fetchOne(
+            'SELECT `expiration_date` FROM `user_auth_token` WHERE `token_hash` = ? OR `token` = ?',
+            [$tokenHash, $token],
+        );
 
         if ($expirationDate === false) {
             return null;
@@ -386,13 +396,32 @@ class UserRepository
 
     public function findUserIdByAuthToken(string $token) : ?int
     {
-        $id = $this->dbConnection->fetchOne('SELECT `user_id` FROM `user_auth_token` WHERE `token` = ?', [$token]);
+        $tokenHash = hash('sha256', $token);
 
-        if ($id === false) {
+        // Try to find by token_hash first (new method), fallback to plaintext token for backwards compatibility
+        $result = $this->dbConnection->fetchAssociative(
+            'SELECT `id`, `user_id` FROM `user_auth_token` WHERE `token_hash` = ? OR `token` = ?',
+            [$tokenHash, $token],
+        );
+
+        if ($result === false) {
             return null;
         }
 
-        return (int)$id;
+        // Update last_used_at timestamp
+        $this->dbConnection->update(
+            'user_auth_token',
+            ['last_used_at' => (string)DateTime::create()],
+            ['id' => $result['id']],
+        );
+
+        // If token_hash was not set, update it now (migration for old tokens)
+        $this->dbConnection->executeStatement(
+            'UPDATE `user_auth_token` SET `token_hash` = ? WHERE `id` = ? AND `token_hash` IS NULL',
+            [$tokenHash, $result['id']],
+        );
+
+        return (int)$result['user_id'];
     }
 
     public function findUserIdByEmbyWebhookId(string $webhookId) : ?int
@@ -1018,5 +1047,40 @@ class UserRepository
                 'id' => $userId,
             ],
         );
+    }
+
+    public function findProfileImage(int $userId) : ?string
+    {
+        $profileImage = $this->dbConnection->fetchOne('SELECT `profile_image` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($profileImage === false) {
+            return null;
+        }
+
+        return $profileImage;
+    }
+
+    public function updateProfileImage(int $userId, ?string $profileImage) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'profile_image' => $profileImage,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function findUserEmail(int $userId) : ?string
+    {
+        $email = $this->dbConnection->fetchOne('SELECT `email` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($email === false) {
+            return null;
+        }
+
+        return $email;
     }
 }

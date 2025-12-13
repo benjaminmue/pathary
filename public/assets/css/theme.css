@@ -1,0 +1,91 @@
+:root {
+    --pathe-dark: #231F20;
+    --pathe-yellow: #FBBC09;
+    --accent-purple: #6F2DBD;
+}
+
+[data-bs-theme="dark"] {
+    --pathe-dark: #231F20;
+    --pathe-yellow: #FBBC09;
+    --accent-purple: #6F2DBD;
+}
+
+/* ==========================================================================
+   Popcorn Rating Component
+   ========================================================================== */
+
+.popcorn-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.popcorn-rating__item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.25rem;
+    border: none;
+    background: transparent;
+    cursor: default;
+    transition: transform 0.15s ease;
+}
+
+/* Input mode styles */
+.popcorn-rating--input .popcorn-rating__item {
+    cursor: pointer;
+}
+
+.popcorn-rating--input .popcorn-rating__item:hover {
+    transform: scale(1.15);
+}
+
+.popcorn-rating--input .popcorn-rating__item:focus {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.popcorn-rating--input .popcorn-rating__item:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.popcorn-rating--input .popcorn-rating__item:focus-visible {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.popcorn-rating--input .popcorn-rating__item:active {
+    transform: scale(0.95);
+}
+
+/* Popcorn icon states */
+.popcorn-icon {
+    display: block;
+}
+
+.popcorn-off .popcorn-icon {
+    fill: #9ca3af;
+    stroke: #6b7280;
+    stroke-width: 0.5;
+}
+
+.popcorn-on .popcorn-icon {
+    fill: var(--pathe-yellow);
+    stroke: #d4a006;
+    stroke-width: 0.5;
+}
+
+/* Hover preview for input mode - highlight icons up to hovered */
+.popcorn-rating--input .popcorn-rating__item:hover .popcorn-icon,
+.popcorn-rating--input .popcorn-rating__item:hover ~ .popcorn-rating__item .popcorn-icon {
+    /* Siblings after hover stay as-is, only hovered and previous change */
+}
+
+.popcorn-rating--input:hover .popcorn-rating__item.popcorn-off .popcorn-icon {
+    fill: #d1d5db;
+    stroke: #9ca3af;
+}

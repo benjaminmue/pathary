@@ -1,0 +1,376 @@
+{% extends 'layouts/app_base.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .profile-header {
+        padding: 2rem 0;
+        border-bottom: 1px solid var(--bs-border-color);
+        margin-bottom: 2rem;
+    }
+
+    .profile-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .profile-card {
+        background: var(--bs-tertiary-bg);
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 600px;
+    }
+
+    .profile-image-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--bs-border-color);
+    }
+
+    .profile-image-container {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin-bottom: 1rem;
+    }
+
+    .profile-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--pathe-yellow);
+    }
+
+    .profile-image-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--pathe-yellow);
+        font-size: 3rem;
+        font-weight: 700;
+        border: 4px solid var(--pathe-yellow);
+    }
+
+    .profile-image-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn-upload {
+        position: relative;
+        overflow: hidden;
+        background: var(--pathe-yellow);
+        border-color: var(--pathe-yellow);
+        color: var(--pathe-dark);
+        font-weight: 600;
+    }
+
+    .btn-upload:hover {
+        background: #e0a808;
+        border-color: #e0a808;
+        color: var(--pathe-dark);
+    }
+
+    .btn-upload input[type="file"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .btn-remove-image {
+        background: transparent;
+        border: 1px solid var(--bs-border-color);
+        color: var(--bs-secondary-color);
+    }
+
+    .btn-remove-image:hover {
+        background: rgba(220, 53, 69, 0.1);
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+    .image-requirements {
+        font-size: 0.8rem;
+        color: var(--bs-secondary-color);
+        text-align: center;
+        margin-top: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 8px;
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        font-size: 1rem;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: var(--accent-purple);
+        box-shadow: 0 0 0 3px rgba(111, 45, 189, 0.1);
+    }
+
+    .form-group .form-hint {
+        font-size: 0.8rem;
+        color: var(--bs-secondary-color);
+        margin-top: 0.25rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--bs-border-color);
+    }
+
+    .btn-save {
+        background: var(--pathe-yellow);
+        border-color: var(--pathe-yellow);
+        color: var(--pathe-dark);
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+    }
+
+    .btn-save:hover {
+        background: #e0a808;
+        border-color: #e0a808;
+        color: var(--pathe-dark);
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background: rgba(25, 135, 84, 0.1);
+        border: 1px solid rgba(25, 135, 84, 0.3);
+        color: #198754;
+    }
+
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        color: #dc3545;
+    }
+
+    .logout-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--bs-border-color);
+    }
+
+    .logout-section h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .logout-section p {
+        color: var(--bs-secondary-color);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-logout {
+        background: transparent;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        font-weight: 600;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn-logout:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    @media (max-width: 576px) {
+        .profile-card {
+            padding: 1.5rem;
+        }
+
+        .profile-image-container {
+            width: 120px;
+            height: 120px;
+        }
+
+        .profile-image,
+        .profile-image-placeholder {
+            width: 120px;
+            height: 120px;
+        }
+
+        .profile-image-placeholder {
+            font-size: 2.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <header class="profile-header">
+        <h1 class="profile-title">Profile Settings</h1>
+    </header>
+
+    <div class="profile-card">
+        {% if success %}
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle"></i> {{ success }}
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-circle"></i> {{ error }}
+            </div>
+        {% endif %}
+
+        <form action="{{ applicationUrl }}/profile" method="post" enctype="multipart/form-data" id="profileForm">
+            <div class="profile-image-section">
+                <div class="profile-image-container">
+                    {% if profileImage %}
+                        <img src="{{ applicationUrl }}/profile-images/{{ profileImage }}" alt="{{ userName }}" class="profile-image" id="profileImagePreview">
+                    {% else %}
+                        <div class="profile-image-placeholder" id="profileImagePlaceholder">
+                            {{ userName|first|upper }}
+                        </div>
+                        <img src="" alt="" class="profile-image" id="profileImagePreview" style="display: none;">
+                    {% endif %}
+                </div>
+
+                <div class="profile-image-actions">
+                    <label class="btn btn-upload">
+                        <i class="bi bi-camera"></i> Upload Photo
+                        <input type="file" name="profile_image" accept="image/jpeg,image/png,image/gif,image/webp" id="profileImageInput">
+                    </label>
+                    {% if profileImage %}
+                        <button type="button" class="btn btn-remove-image" id="removeImageBtn">
+                            <i class="bi bi-trash"></i> Remove
+                        </button>
+                    {% endif %}
+                </div>
+                <p class="image-requirements">JPEG, PNG, GIF, or WebP. Max 5MB.</p>
+                <input type="hidden" name="remove_image" id="removeImageFlag" value="0">
+            </div>
+
+            <div class="form-group">
+                <label for="name">Display Name</label>
+                <input type="text" id="name" name="name" value="{{ userName }}" required pattern="[a-zA-Z0-9]+" minlength="2" maxlength="24">
+                <p class="form-hint">Only letters and numbers, 2-24 characters.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" value="{{ userEmail }}">
+                <p class="form-hint">Used for account recovery and notifications.</p>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-save">
+                    <i class="bi bi-check-lg"></i> Save Changes
+                </button>
+            </div>
+        </form>
+
+        <div class="logout-section">
+            <h3>Sign Out</h3>
+            <p>Sign out of your account on this device.</p>
+            <button type="button" class="btn btn-logout" onclick="logoutAndRedirect()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Profile image preview
+document.getElementById('profileImageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image file is too large. Maximum size is 5MB.');
+            e.target.value = '';
+            return;
+        }
+
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Invalid image type. Allowed types: JPEG, PNG, GIF, WebP.');
+            e.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const preview = document.getElementById('profileImagePreview');
+            const placeholder = document.getElementById('profileImagePlaceholder');
+
+            preview.src = event.target.result;
+            preview.style.display = 'block';
+
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+        };
+        reader.readAsDataURL(file);
+
+        // Clear remove flag
+        document.getElementById('removeImageFlag').value = '0';
+    }
+});
+
+// Remove image button
+const removeImageBtn = document.getElementById('removeImageBtn');
+if (removeImageBtn) {
+    removeImageBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to remove your profile image?')) {
+            document.getElementById('removeImageFlag').value = '1';
+            document.getElementById('profileForm').submit();
+        }
+    });
+}
+
+// Logout function
+async function logoutAndRedirect() {
+    await fetch('{{ applicationUrl }}/api/authentication/token', {
+        method: 'DELETE',
+    });
+    window.location.href = '{{ applicationUrl }}/';
+}
+</script>
+{% endblock %}

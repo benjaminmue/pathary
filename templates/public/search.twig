@@ -1,0 +1,231 @@
+{% extends 'layouts/app_base.twig' %}
+
+{% block title %}Search{% if searchTerm %} - {{ searchTerm }}{% endif %}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .search-header {
+        padding: 2rem 0;
+    }
+
+    .search-form {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .search-input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .search-input-group input {
+        flex: 1;
+    }
+
+    .results-section {
+        padding: 1rem 0 2rem;
+    }
+
+    .results-section h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--bs-body-color);
+    }
+
+    .results-info {
+        color: var(--bs-secondary-color);
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .movie-card {
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .movie-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .movie-poster {
+        width: 100%;
+        aspect-ratio: 2/3;
+        object-fit: cover;
+    }
+
+    .movie-poster-placeholder {
+        width: 100%;
+        aspect-ratio: 2/3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
+        color: #888;
+        font-size: 0.75rem;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .movie-info {
+        padding: 0.75rem;
+    }
+
+    .movie-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .movie-year {
+        font-size: 0.8rem;
+        color: var(--bs-secondary-color);
+    }
+
+    .tmdb-badge {
+        display: inline-block;
+        background: #01b4e4;
+        color: #fff;
+        padding: 0.125rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--bs-secondary-color);
+    }
+
+    .no-results h3 {
+        margin-bottom: 0.5rem;
+    }
+
+    .source-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        background: var(--bs-tertiary-bg);
+        border-radius: 8px;
+    }
+
+    .source-indicator.tmdb {
+        background: rgba(1, 180, 228, 0.1);
+        border: 1px solid rgba(1, 180, 228, 0.3);
+    }
+
+    .source-indicator i {
+        font-size: 1.25rem;
+    }
+
+    .source-indicator span {
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <section class="search-header">
+        <form class="search-form" action="{{ applicationUrl }}/search" method="get">
+            <div class="search-input-group">
+                <input type="search"
+                       name="q"
+                       class="form-control form-control-lg"
+                       placeholder="Search for movies..."
+                       value="{{ searchTerm }}"
+                       autofocus>
+                <button type="submit" class="btn btn-warning btn-lg" style="background-color: var(--pathe-yellow); border-color: var(--pathe-yellow); color: var(--pathe-dark);">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    {% if searchTerm %}
+        <section class="results-section">
+            {% if localResults|length > 0 %}
+                <div class="source-indicator">
+                    <i class="bi bi-database"></i>
+                    <span>Found {{ localResults|length }} movie{{ localResults|length != 1 ? 's' : '' }} in your library</span>
+                </div>
+
+                <div class="movie-grid">
+                    {% for movie in localResults %}
+                        <a href="{{ applicationUrl }}/movie/{{ movie.id }}" class="movie-card">
+                            {% if movie.posterPath %}
+                                <img src="{{ movie.posterPath }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
+                            {% else %}
+                                <div class="movie-poster-placeholder">{{ movie.title }}</div>
+                            {% endif %}
+                            <div class="movie-info">
+                                <div class="movie-title" title="{{ movie.title }}">{{ movie.title }}</div>
+                                {% if movie.release_date %}
+                                    <div class="movie-year">{{ movie.release_date|date('Y') }}</div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+
+            {% elseif showTmdbResults %}
+                {% if tmdbResults|length > 0 %}
+                    <div class="source-indicator tmdb">
+                        <i class="bi bi-cloud"></i>
+                        <span>No local results. Showing {{ tmdbResults|length }} result{{ tmdbResults|length != 1 ? 's' : '' }} from TMDB</span>
+                    </div>
+
+                    <div class="movie-grid">
+                        {% for movie in tmdbResults %}
+                            <a href="{{ applicationUrl }}/tmdb/movie/{{ movie.id }}" class="movie-card">
+                                {% if movie.poster_path %}
+                                    <img src="https://image.tmdb.org/t/p/w300{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
+                                {% else %}
+                                    <div class="movie-poster-placeholder">{{ movie.title }}</div>
+                                {% endif %}
+                                <div class="movie-info">
+                                    <div class="movie-title" title="{{ movie.title }}">{{ movie.title }}</div>
+                                    {% if movie.release_date %}
+                                        <div class="movie-year">{{ movie.release_date|date('Y') }}</div>
+                                    {% endif %}
+                                    <span class="tmdb-badge">TMDB</span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-results">
+                        <h3>No movies found</h3>
+                        <p>Try a different search term</p>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </section>
+    {% else %}
+        <div class="no-results">
+            <h3>Search for movies</h3>
+            <p>Enter a movie title above to search your library or discover new movies from TMDB</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -19,7 +19,7 @@ class Authentication
 {
     private const string AUTHENTICATION_COOKIE_NAME = 'id';
 
-    private const int MAX_EXPIRATION_AGE_IN_DAYS = 30;
+    private const int MAX_EXPIRATION_AGE_IN_DAYS = 3650; // 10 years for persistent login
 
     public function __construct(
         private readonly UserRepository $repository,
@@ -132,7 +132,20 @@ class Authentication
 
         if (empty($token) === false) {
             unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
+
+            $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+
+            setcookie(
+                self::AUTHENTICATION_COOKIE_NAME,
+                '',
+                [
+                    'expires' => 1,
+                    'path' => '/',
+                    'secure' => $isSecure,
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ],
+            );
         }
 
         return false;
@@ -202,7 +215,21 @@ class Authentication
         if ($token !== '') {
             $this->deleteToken($token);
             unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
+
+            $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+
+            // Clear cookie with same options used when setting it
+            setcookie(
+                self::AUTHENTICATION_COOKIE_NAME,
+                '',
+                [
+                    'expires' => 1, // Past timestamp to delete
+                    'path' => '/',
+                    'secure' => $isSecure,
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ],
+            );
         }
 
         $this->sessionWrapper->destroy();
@@ -213,12 +240,22 @@ class Authentication
     {
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
+
+        // Regenerate session ID to prevent session fixation
+        $this->sessionWrapper->regenerateId();
+
+        $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+
         setcookie(
             self::AUTHENTICATION_COOKIE_NAME,
             $token,
-            (int)$expirationDate->format('U'),
-            '/',
-            httponly: true,
+            [
+                'expires' => (int)$expirationDate->format('U'),
+                'path' => '/',
+                'secure' => $isSecure,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ],
         );
 
         $this->sessionWrapper->set('userId', $userId);
@@ -261,7 +298,8 @@ class Authentication
 
     private function setAuthenticationToken(int $userId, string $deviceName, string $userAgent, DateTime $expirationDate) : string
     {
-        $token = bin2hex(random_bytes(16));
+        // Use 32 bytes (256 bits) for strong security
+        $token = bin2hex(random_bytes(32));
 
         $this->repository->createAuthToken($userId, $token, $deviceName, $userAgent, $expirationDate);
 

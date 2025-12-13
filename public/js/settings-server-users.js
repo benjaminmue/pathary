@@ -239,10 +239,24 @@ async function reloadTable() {
 
     users.forEach((user) => {
         let row = document.createElement('tr');
-        row.innerHTML = '<td>' + user.id + '</td>';
-        row.innerHTML += '<td>' + user.name + '</td>';
-        row.innerHTML += '<td>' + user.email + '</td>';
-        row.innerHTML += '<td>' + user.isAdmin + '</td>';
+
+        // Use textContent to prevent XSS
+        let tdId = document.createElement('td');
+        tdId.textContent = user.id;
+        row.appendChild(tdId);
+
+        let tdName = document.createElement('td');
+        tdName.textContent = user.name;
+        row.appendChild(tdName);
+
+        let tdEmail = document.createElement('td');
+        tdEmail.textContent = user.email;
+        row.appendChild(tdEmail);
+
+        let tdIsAdmin = document.createElement('td');
+        tdIsAdmin.textContent = user.isAdmin;
+        row.appendChild(tdIsAdmin);
+
         row.style.cursor = 'pointer'
 
         table.getElementsByTagName('tbody')[0].appendChild(row);

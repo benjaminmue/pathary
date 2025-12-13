@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-lg" style="background-color: var(--pathe-dark);">
+    <div class="container">
+        <a class="navbar-brand text-white" href="{{ applicationUrl }}/">{{ applicationName ?? 'Movary' }}</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAppContent" aria-controls="navbarAppContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarAppContent">
+            <form class="d-flex mx-auto my-2 my-lg-0" role="search" style="max-width: 400px; width: 100%;" action="{{ applicationUrl }}/search" method="get">
+                <input class="form-control" type="search" name="q" placeholder="Search movies..." aria-label="Search">
+            </form>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ applicationUrl }}/movies">All Movies</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ applicationUrl }}/profile">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link text-white btn btn-link" onclick="logoutAndRedirect()" style="cursor: pointer;">Logout</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script>
+async function logoutAndRedirect() {
+    await fetch('{{ applicationUrl }}/api/authentication/token', {
+        method: 'DELETE',
+    });
+    window.location.href = '{{ applicationUrl }}/';
+}
+</script>

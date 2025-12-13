@@ -1,0 +1,323 @@
+{% extends 'layouts/public_base.twig' %}
+
+{% block title %}Home{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem 0;
+    }
+
+    .movie-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .movie-card {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--bs-body-bg);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .movie-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .movie-poster-wrapper {
+        position: relative;
+        aspect-ratio: 2/3;
+        overflow: hidden;
+    }
+
+    .movie-poster {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .movie-poster-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
+        color: #888;
+        font-size: 0.75rem;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    /* Desktop hover overlay */
+    .movie-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+        padding: 2rem 0.75rem 0.75rem;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .movie-card:hover .movie-overlay {
+        opacity: 1;
+    }
+
+    .movie-stats {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #fff;
+    }
+
+    .popcorn-display {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .popcorn-display .popcorn-icon {
+        width: 20px;
+        height: 20px;
+        fill: var(--pathe-yellow);
+    }
+
+    .popcorn-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--pathe-yellow);
+    }
+
+    .stats-text {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.2;
+    }
+
+    .movie-title {
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+        color: var(--bs-body-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Mobile stats (shown below poster) */
+    .mobile-stats {
+        display: none;
+        padding: 0.5rem 0.75rem;
+        background: var(--bs-tertiary-bg);
+        border-top: 1px solid var(--bs-border-color);
+    }
+
+    .mobile-stats .stats-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.75rem;
+    }
+
+    .mobile-stats .popcorn-display {
+        color: var(--pathe-yellow);
+    }
+
+    .mobile-stats .popcorn-display .popcorn-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .mobile-stats .popcorn-value {
+        font-size: 1rem;
+    }
+
+    .mobile-stats .rating-count {
+        color: var(--bs-secondary-color);
+    }
+
+    /* Mobile toggle button */
+    .mobile-toggle {
+        display: none;
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0.5rem;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.6);
+        border: none;
+        color: #fff;
+        font-size: 0.75rem;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    .mobile-toggle:focus {
+        outline: 2px solid var(--accent-purple);
+        outline-offset: 2px;
+    }
+
+    /* Responsive: hide desktop overlay on mobile, show mobile stats */
+    @media (max-width: 768px) {
+        .movie-overlay {
+            display: none;
+        }
+
+        .mobile-stats {
+            display: block;
+        }
+
+        .movie-grid {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+    }
+
+    /* Alternative: tap-to-toggle overlay on mobile */
+    @media (hover: none) and (pointer: coarse) {
+        .movie-overlay {
+            display: none;
+        }
+
+        .mobile-stats {
+            display: block;
+        }
+
+        .mobile-toggle {
+            display: none; /* Using always-visible stats instead of toggle */
+        }
+    }
+
+    .no-movies {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--bs-secondary-color);
+    }
+
+    .no-movies h2 {
+        margin-bottom: 1rem;
+    }
+
+    .hero-section {
+        padding: 2rem 0;
+        text-align: center;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-section p {
+        color: var(--bs-secondary-color);
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <section class="hero-section">
+        <h1>Recently Added</h1>
+        <p>Movies our community has been watching</p>
+    </section>
+
+    {% if movies|length > 0 %}
+        <div class="movie-grid">
+            {% for item in movies %}
+                {% set movie = item.movie %}
+                {% set stats = item.stats %}
+                {% set avgRounded = stats.avg_popcorn ? stats.avg_popcorn|round(0, 'floor') : 0 %}
+
+                <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="movie-card-link">
+                <article class="movie-card">
+                    <div class="movie-poster-wrapper">
+                        {% if movie.posterPath or movie.tmdb_poster_path %}
+                            <img
+                                src="{{ movie.posterPath ?: (applicationUrl ~ '/images/placeholder/' ~ (movie.title|url_encode|base64_encode)) }}"
+                                alt="{{ movie.title }}"
+                                class="movie-poster"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="movie-poster-placeholder">
+                                {{ movie.title }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Desktop hover overlay -->
+                        <div class="movie-overlay">
+                            {% if stats.rating_count > 0 %}
+                                <div class="movie-stats">
+                                    <div class="popcorn-display">
+                                        <svg viewBox="0 0 24 24" class="popcorn-icon" aria-hidden="true">
+                                            <path d="M7 22l1-9H4c-.8 0-1.3-.9-.8-1.5l3-4C5.5 5.5 5 4.3 5 3c0-1.7 1.3-3 3-3 .8 0 1.5.3 2 .8C10.5.3 11.2 0 12 0s1.5.3 2 .8c.5-.5 1.2-.8 2-.8 1.7 0 3 1.3 3 3 0 1.3-.5 2.5-1.2 3.5l3 4c.5.6 0 1.5-.8 1.5h-4l1 9H7z"/>
+                                            <circle cx="9" cy="4" r="1.5"/>
+                                            <circle cx="15" cy="4" r="1.5"/>
+                                            <circle cx="12" cy="6" r="1.5"/>
+                                        </svg>
+                                        <span class="popcorn-value">{{ avgRounded }}</span>
+                                    </div>
+                                    <div class="stats-text">
+                                        avg: {{ stats.avg_popcorn|number_format(1) }} / 7<br>
+                                        {{ stats.rating_count }} rating{{ stats.rating_count != 1 ? 's' : '' }}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="stats-text">No ratings yet</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="movie-title" title="{{ movie.title }}">
+                        {{ movie.title }}
+                    </div>
+
+                    <!-- Mobile stats (always visible on mobile) -->
+                    <div class="mobile-stats">
+                        {% if stats.rating_count > 0 %}
+                            <div class="stats-row">
+                                <div class="popcorn-display">
+                                    <svg viewBox="0 0 24 24" class="popcorn-icon" aria-hidden="true">
+                                        <path d="M7 22l1-9H4c-.8 0-1.3-.9-.8-1.5l3-4C5.5 5.5 5 4.3 5 3c0-1.7 1.3-3 3-3 .8 0 1.5.3 2 .8C10.5.3 11.2 0 12 0s1.5.3 2 .8c.5-.5 1.2-.8 2-.8 1.7 0 3 1.3 3 3 0 1.3-.5 2.5-1.2 3.5l3 4c.5.6 0 1.5-.8 1.5h-4l1 9H7z"/>
+                                        <circle cx="9" cy="4" r="1.5"/>
+                                        <circle cx="15" cy="4" r="1.5"/>
+                                        <circle cx="12" cy="6" r="1.5"/>
+                                    </svg>
+                                    <span class="popcorn-value">{{ avgRounded }}</span>
+                                    <span style="color: var(--bs-secondary-color); margin-left: 0.25rem;">/ 7</span>
+                                </div>
+                                <span class="rating-count">{{ stats.rating_count }} rating{{ stats.rating_count != 1 ? 's' : '' }}</span>
+                            </div>
+                        {% else %}
+                            <div class="stats-row">
+                                <span class="rating-count">No ratings yet</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-movies">
+            <h2>No movies yet</h2>
+            <p>Be the first to add a movie to the collection!</p>
+            <a href="{{ applicationUrl }}/login" class="btn btn-warning mt-3" style="background-color: var(--pathe-yellow); border-color: var(--pathe-yellow); color: var(--pathe-dark);">
+                Get Started
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
