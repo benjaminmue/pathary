@@ -3,6 +3,7 @@
 namespace Movary\Domain\Movie;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\Domain\Movie\History\MovieHistoryEntity;
@@ -1116,6 +1117,7 @@ class MovieRepository
             LIMIT ?
             SQL,
             ["%{$searchTerm}%", $limit],
+            [ParameterType::STRING, ParameterType::INTEGER],
         );
     }
 

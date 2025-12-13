@@ -3,6 +3,7 @@
 namespace Movary\Service;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 
 class GroupMovieService
@@ -46,6 +47,7 @@ class GroupMovieService
             LIMIT ?
             SQL,
             [$limit],
+            [ParameterType::INTEGER],
         );
 
         return $this->imageUrlService->replacePosterPathWithImageSrcUrl($movies);
