@@ -243,9 +243,9 @@
                 <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="movie-card-link">
                 <article class="movie-card">
                     <div class="movie-poster-wrapper">
-                        {% if movie.posterPath or movie.tmdb_poster_path %}
+                        {% if movie.poster_path %}
                             <img
-                                src="{{ movie.posterPath ?: (applicationUrl ~ '/images/placeholder/' ~ (movie.title|url_encode|base64_encode)) }}"
+                                src="{{ movie.poster_path }}"
                                 alt="{{ movie.title }}"
                                 class="movie-poster"
                                 loading="lazy"

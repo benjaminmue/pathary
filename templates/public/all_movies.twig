@@ -422,8 +422,8 @@
                 {% if movies|length > 0 %}
                     {% for movie in movies %}
                         <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="movie-card">
-                            {% if movie.posterPath %}
-                                <img src="{{ movie.posterPath }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
+                            {% if movie.poster_path %}
+                                <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
                             {% else %}
                                 <div class="movie-poster-placeholder">{{ movie.title }}</div>
                             {% endif %}

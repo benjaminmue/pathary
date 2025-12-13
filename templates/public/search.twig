@@ -173,8 +173,8 @@
                 <div class="movie-grid">
                     {% for movie in localResults %}
                         <a href="{{ applicationUrl }}/movie/{{ movie.id }}" class="movie-card">
-                            {% if movie.posterPath %}
-                                <img src="{{ movie.posterPath }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
+                            {% if movie.poster_path %}
+                                <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
                             {% else %}
                                 <div class="movie-poster-placeholder">{{ movie.title }}</div>
                             {% endif %}
