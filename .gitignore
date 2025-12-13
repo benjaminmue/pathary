@@ -7,3 +7,8 @@ docker-compose.override.yml
 tmp/*
 .vscode
 http-client.private.env.json
+
+# Local development data (not committed)
+/docker/mysql-data
+/storage
+.DS_Store
