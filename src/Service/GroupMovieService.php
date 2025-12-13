@@ -197,25 +197,16 @@ class GroupMovieService
         // Sort order validation
         $sortOrderSql = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
 
-        // Sort field mapping
+        // Sort field mapping with NULLS LAST emulation
+        // Neither MySQL nor SQLite supports NULLS LAST natively, so we use "column IS NULL" trick
+        // This puts NULL values at the end regardless of sort direction
         $orderByClause = match ($sortBy) {
             'title' => "LOWER(m.title) $sortOrderSql",
-            'release_date' => "m.release_date $sortOrderSql NULLS LAST, LOWER(m.title) ASC",
-            'global_rating' => "avg_popcorn $sortOrderSql NULLS LAST, LOWER(m.title) ASC",
-            'own_rating' => "own_rating $sortOrderSql NULLS LAST, LOWER(m.title) ASC",
+            'release_date' => "m.release_date IS NULL, m.release_date $sortOrderSql, LOWER(m.title) ASC",
+            'global_rating' => "avg_popcorn IS NULL, avg_popcorn $sortOrderSql, LOWER(m.title) ASC",
+            'own_rating' => "own_rating IS NULL, own_rating $sortOrderSql, LOWER(m.title) ASC",
             default => "last_added_at $sortOrderSql, LOWER(m.title) ASC", // 'added'
         };
-
-        // Handle NULLS LAST for SQLite (doesn't support it natively)
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
-            $orderByClause = match ($sortBy) {
-                'title' => "LOWER(m.title) $sortOrderSql",
-                'release_date' => "m.release_date IS NULL, m.release_date $sortOrderSql, LOWER(m.title) ASC",
-                'global_rating' => "avg_popcorn IS NULL, avg_popcorn $sortOrderSql, LOWER(m.title) ASC",
-                'own_rating' => "own_rating IS NULL, own_rating $sortOrderSql, LOWER(m.title) ASC",
-                default => "last_added_at $sortOrderSql, LOWER(m.title) ASC",
-            };
-        }
 
         // Add userId param for own_rating subquery - use prepared statement parameter
         array_unshift($params, $userId);

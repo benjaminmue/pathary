@@ -4,9 +4,11 @@
 
 {% block stylesheets %}
 <style>
+    /* Movie grid - centered with consistent card widths */
     .movie-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 1.5rem;
         padding: 1rem 0;
     }
@@ -15,6 +17,8 @@
         text-decoration: none;
         color: inherit;
         display: block;
+        width: 160px;
+        flex-shrink: 0;
     }
 
     .movie-card {
@@ -175,8 +179,21 @@
             display: block;
         }
 
+        .movie-card-link {
+            width: 140px;
+        }
+
         .movie-grid {
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .movie-card-link {
+            width: calc(50% - 0.5rem);
+        }
+
+        .movie-grid {
             gap: 1rem;
         }
     }

@@ -11,7 +11,14 @@
                 <input class="form-control" type="search" name="q" placeholder="Search movies..." aria-label="Search">
             </form>
 
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <li class="nav-item me-2">
+                    <div class="form-check form-switch mb-0" title="Toggle dark mode">
+                        <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle" style="cursor: pointer;">
+                        <label class="form-check-label text-white visually-hidden" for="darkModeToggle">Dark mode</label>
+                        <span class="text-white" id="themeIcon" style="font-size: 1.1rem;">🌙</span>
+                    </div>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link text-white" href="{{ applicationUrl }}/movies">All Movies</a>
                 </li>

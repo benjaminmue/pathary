@@ -157,14 +157,17 @@
         margin-top: 0.25rem;
     }
 
-    /* Movie grid */
+    /* Movie grid - centered with consistent card widths */
     .movie-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 1.5rem;
     }
 
     .movie-card {
+        width: 160px;
+        flex-shrink: 0;
         background: var(--bs-body-bg);
         border: 1px solid var(--bs-border-color);
         border-radius: 8px;
@@ -241,7 +244,7 @@
         text-align: center;
         padding: 3rem 2rem;
         color: var(--bs-secondary-color);
-        grid-column: 1 / -1;
+        width: 100%;
     }
 
     .active-filters {
@@ -277,8 +280,11 @@
             display: none;
         }
 
+        .movie-card {
+            width: 140px;
+        }
+
         .movie-grid {
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 1rem;
         }
     }
@@ -299,8 +305,11 @@
             min-width: 120px;
         }
 
+        .movie-card {
+            width: calc(50% - 0.375rem);
+        }
+
         .movie-grid {
-            grid-template-columns: repeat(2, 1fr);
             gap: 0.75rem;
         }
     }
