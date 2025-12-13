@@ -49,6 +49,32 @@ which can lead to sudden breaking changes from time to time, so keep the release
 - User-management: Use Movary alone or with others
 - Completely free, no ads, no tracking and open source! :)
 
+## Quick Start with Docker
+
+Pull the latest image from GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/benjaminmue/movies:latest
+```
+
+Run with MySQL:
+
+```bash
+docker run -d \
+  --name movary \
+  -p 8080:80 \
+  -e DATABASE_MODE=mysql \
+  -e DATABASE_MYSQL_HOST=your-mysql-host \
+  -e DATABASE_MYSQL_NAME=movary \
+  -e DATABASE_MYSQL_USER=movary \
+  -e DATABASE_MYSQL_PASSWORD=your-password \
+  -e TMDB_API_KEY=your-tmdb-api-key \
+  -v movary_storage:/app/storage \
+  ghcr.io/benjaminmue/movies:latest
+```
+
+> **Note:** After the first push, the GHCR package visibility may need to be set to "Public" in the repository's package settings for anonymous pulls to work.
+
 ## Demo
 
 A demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`).
