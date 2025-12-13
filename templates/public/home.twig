@@ -85,10 +85,9 @@
         gap: 0.25rem;
     }
 
-    .popcorn-display .popcorn-icon {
-        width: 20px;
-        height: 20px;
-        fill: var(--pathe-yellow);
+    .popcorn-emoji {
+        font-size: 1.25rem;
+        line-height: 1;
     }
 
     .popcorn-value {
@@ -132,9 +131,8 @@
         color: var(--pathe-yellow);
     }
 
-    .mobile-stats .popcorn-display .popcorn-icon {
-        width: 16px;
-        height: 16px;
+    .mobile-stats .popcorn-emoji {
+        font-size: 1rem;
     }
 
     .mobile-stats .popcorn-value {
@@ -261,12 +259,7 @@
                             {% if stats.rating_count > 0 %}
                                 <div class="movie-stats">
                                     <div class="popcorn-display">
-                                        <svg viewBox="0 0 24 24" class="popcorn-icon" aria-hidden="true">
-                                            <path d="M7 22l1-9H4c-.8 0-1.3-.9-.8-1.5l3-4C5.5 5.5 5 4.3 5 3c0-1.7 1.3-3 3-3 .8 0 1.5.3 2 .8C10.5.3 11.2 0 12 0s1.5.3 2 .8c.5-.5 1.2-.8 2-.8 1.7 0 3 1.3 3 3 0 1.3-.5 2.5-1.2 3.5l3 4c.5.6 0 1.5-.8 1.5h-4l1 9H7z"/>
-                                            <circle cx="9" cy="4" r="1.5"/>
-                                            <circle cx="15" cy="4" r="1.5"/>
-                                            <circle cx="12" cy="6" r="1.5"/>
-                                        </svg>
+                                        <span class="popcorn-emoji" aria-hidden="true">🍿</span>
                                         <span class="popcorn-value">{{ avgRounded }}</span>
                                     </div>
                                     <div class="stats-text">
@@ -289,12 +282,7 @@
                         {% if stats.rating_count > 0 %}
                             <div class="stats-row">
                                 <div class="popcorn-display">
-                                    <svg viewBox="0 0 24 24" class="popcorn-icon" aria-hidden="true">
-                                        <path d="M7 22l1-9H4c-.8 0-1.3-.9-.8-1.5l3-4C5.5 5.5 5 4.3 5 3c0-1.7 1.3-3 3-3 .8 0 1.5.3 2 .8C10.5.3 11.2 0 12 0s1.5.3 2 .8c.5-.5 1.2-.8 2-.8 1.7 0 3 1.3 3 3 0 1.3-.5 2.5-1.2 3.5l3 4c.5.6 0 1.5-.8 1.5h-4l1 9H7z"/>
-                                        <circle cx="9" cy="4" r="1.5"/>
-                                        <circle cx="15" cy="4" r="1.5"/>
-                                        <circle cx="12" cy="6" r="1.5"/>
-                                    </svg>
+                                    <span class="popcorn-emoji" aria-hidden="true">🍿</span>
                                     <span class="popcorn-value">{{ avgRounded }}</span>
                                     <span style="color: var(--bs-secondary-color); margin-left: 0.25rem;">/ 7</span>
                                 </div>
