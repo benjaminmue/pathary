@@ -23,8 +23,10 @@ class RateMovieController
 
         $postData = $request->getPostParameters();
 
-        $ratingPopcorn = isset($postData['rating_popcorn']) && $postData['rating_popcorn'] !== ''
-            ? PopcornRating::create((int)$postData['rating_popcorn'])
+        $ratingValue = isset($postData['rating_popcorn']) ? (int)$postData['rating_popcorn'] : 0;
+        // Rating of 0 means "unrated" - treat as null
+        $ratingPopcorn = ($ratingValue >= 1 && $ratingValue <= 7)
+            ? PopcornRating::create($ratingValue)
             : null;
 
         $comment = isset($postData['comment']) && trim($postData['comment']) !== ''

@@ -11,26 +11,41 @@
 }
 
 /* ==========================================================================
-   Popcorn Rating Component
+   Popcorn Rating Component (Emoji Version)
    ========================================================================== */
 
 .popcorn-rating {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.125rem;
 }
 
 .popcorn-rating__item {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
-    min-height: 44px;
-    padding: 0.25rem;
+    width: 36px;
+    height: 36px;
+    padding: 0;
     border: none;
     background: transparent;
     cursor: default;
-    transition: transform 0.15s ease;
+    font-size: 1.5rem;
+    line-height: 1;
+    transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Emoji states */
+.popcorn-off {
+    filter: grayscale(1);
+    opacity: 0.35;
+}
+
+.popcorn-on {
+    filter: none;
+    opacity: 1;
 }
 
 /* Input mode styles */
@@ -39,7 +54,7 @@
 }
 
 .popcorn-rating--input .popcorn-rating__item:hover {
-    transform: scale(1.15);
+    transform: scale(1.2);
 }
 
 .popcorn-rating--input .popcorn-rating__item:focus {
@@ -62,30 +77,9 @@
     transform: scale(0.95);
 }
 
-/* Popcorn icon states */
-.popcorn-icon {
-    display: block;
-}
-
-.popcorn-off .popcorn-icon {
-    fill: #9ca3af;
-    stroke: #6b7280;
-    stroke-width: 0.5;
-}
-
-.popcorn-on .popcorn-icon {
-    fill: var(--pathe-yellow);
-    stroke: #d4a006;
-    stroke-width: 0.5;
-}
-
-/* Hover preview for input mode - highlight icons up to hovered */
-.popcorn-rating--input .popcorn-rating__item:hover .popcorn-icon,
-.popcorn-rating--input .popcorn-rating__item:hover ~ .popcorn-rating__item .popcorn-icon {
-    /* Siblings after hover stay as-is, only hovered and previous change */
-}
-
-.popcorn-rating--input:hover .popcorn-rating__item.popcorn-off .popcorn-icon {
-    fill: #d1d5db;
-    stroke: #9ca3af;
+/* Small display variant (for rating cards) */
+.popcorn-rating--small .popcorn-rating__item {
+    width: 20px;
+    height: 20px;
+    font-size: 0.9rem;
 }

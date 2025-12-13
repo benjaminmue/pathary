@@ -71,8 +71,7 @@ LABEL org.opencontainers.image.title="Pathary" \
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install build dependencies, compile PHP extensions, then clean up
-# Using -dev packages for compilation, runtime libs are kept automatically
+# Install dependencies and compile PHP extensions
 RUN set -eux; \
     apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 update --allow-releaseinfo-change; \
     apt-get install -y --no-install-recommends \
@@ -93,16 +92,6 @@ RUN set -eux; \
         opcache \
         mbstring \
         curl \
-    ; \
-    # Remove build dependencies but keep runtime libs
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-        libicu-dev \
-        libzip-dev \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libpng-dev \
-        libcurl4-openssl-dev \
-        libonig-dev \
     ; \
     rm -rf /var/lib/apt/lists/*; \
     # Verify extensions are loaded
@@ -160,7 +149,8 @@ COPY --from=builder /build /app
 
 # Create writable directories and set permissions
 RUN mkdir -p /app/storage/logs /app/storage/app/public /app/storage/profile-images \
-    && chown -R www-data:www-data /app/storage \
+    && chown -R www-data:www-data /app \
+    && chmod -R 755 /app \
     && chmod -R 775 /app/storage
 
 # Copy entrypoint script

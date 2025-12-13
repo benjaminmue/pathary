@@ -1,5 +1,6 @@
 /**
  * Popcorn Rating Component - Interactive rating input
+ * Supports click selection, hover preview (desktop), and keyboard navigation
  */
 (function() {
     'use strict';
@@ -11,54 +12,77 @@
 
             if (!buttons.length || !hiddenInput) return;
 
+            // Store the selected value on the container
+            var initialValue = parseInt(hiddenInput.value, 10) || 0;
+            container.setAttribute('data-selected', initialValue);
+
             buttons.forEach(function(button) {
-                button.addEventListener('click', function() {
+                // Click to select rating
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
                     var value = parseInt(this.getAttribute('data-value'), 10);
-                    setRating(container, hiddenInput, buttons, value);
+                    var currentSelected = parseInt(container.getAttribute('data-selected'), 10) || 0;
+
+                    // Toggle off if clicking same value, otherwise set new value
+                    var newValue = (currentSelected === value) ? 0 : value;
+
+                    container.setAttribute('data-selected', newValue);
+                    hiddenInput.value = newValue;
+                    updateDisplay(buttons, newValue);
+
+                    // Dispatch change event for form integration
+                    hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
                 });
 
-                // Keyboard support (Enter/Space handled natively by button)
+                // Hover preview (desktop)
+                button.addEventListener('mouseenter', function() {
+                    var hoverValue = parseInt(this.getAttribute('data-value'), 10);
+                    updateDisplay(buttons, hoverValue);
+                });
+
+                // Keyboard support
                 button.addEventListener('keydown', function(e) {
+                    var currentSelected = parseInt(container.getAttribute('data-selected'), 10) || 0;
+                    var newValue = currentSelected;
+
                     if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
                         e.preventDefault();
-                        var currentValue = parseInt(hiddenInput.value, 10) || 0;
-                        var newValue = Math.min(currentValue + 1, 7);
-                        setRating(container, hiddenInput, buttons, newValue);
-                        focusButton(buttons, newValue);
+                        newValue = Math.min(currentSelected + 1, 7);
                     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
                         e.preventDefault();
-                        var currentValue = parseInt(hiddenInput.value, 10) || 0;
-                        var newValue = Math.max(currentValue - 1, 0);
-                        setRating(container, hiddenInput, buttons, newValue);
+                        newValue = Math.max(currentSelected - 1, 0);
+                    }
+
+                    if (newValue !== currentSelected) {
+                        container.setAttribute('data-selected', newValue);
+                        hiddenInput.value = newValue;
+                        updateDisplay(buttons, newValue);
                         focusButton(buttons, newValue || 1);
+                        hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 });
             });
+
+            // Restore selected value when leaving the widget
+            container.addEventListener('mouseleave', function() {
+                var selectedValue = parseInt(container.getAttribute('data-selected'), 10) || 0;
+                updateDisplay(buttons, selectedValue);
+            });
+
+            // Initial display
+            updateDisplay(buttons, initialValue);
         });
     }
 
-    function setRating(container, hiddenInput, buttons, value) {
-        // Toggle off if clicking same value
-        var currentValue = parseInt(hiddenInput.value, 10) || 0;
-        if (currentValue === value) {
-            value = 0;
-        }
-
-        hiddenInput.value = value;
-
+    function updateDisplay(buttons, value) {
         buttons.forEach(function(btn) {
             var btnValue = parseInt(btn.getAttribute('data-value'), 10);
-            var isOn = btnValue <= value;
+            var isOn = btnValue <= value && value > 0;
 
             btn.classList.toggle('popcorn-on', isOn);
             btn.classList.toggle('popcorn-off', !isOn);
             btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
         });
-
-        container.setAttribute('aria-label', 'Rating: ' + value + ' out of 7');
-
-        // Dispatch change event for form integration
-        hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
     function focusButton(buttons, value) {
