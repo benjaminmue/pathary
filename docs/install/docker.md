@@ -1,6 +1,6 @@
 ## Introduction
 
-It is recommended to host Movary with the [official Docker image](https://hub.docker.com/r/leepeuker/movary).
+It is recommended to host Movary with the [official Docker image](https://github.com/benjaminmue/movies/pkgs/container/movies) from GitHub Container Registry.
 
 The official docker image extends the `TrafeX/docker-php-nginx` image, checkout
 their [docs](https://github.com/TrafeX/docker-php-nginx) for more configuration information.
@@ -62,7 +62,7 @@ $ docker run --rm -d \
   -e TMDB_API_KEY="<tmdb_key>" \
   -e DATABASE_MODE="sqlite" \
   -v movary-storage:/app/storage \
-  leepeuker/movary:latest
+  ghcr.io/benjaminmue/movies:latest
 ```
 
 ### With MySQL
@@ -79,7 +79,7 @@ $ docker run --rm -d \
   -e DATABASE_MYSQL_USER="<db_user>" \
   -e DATABASE_MYSQL_PASSWORD="<db_password>" \
   -v movary-storage:/app/storage \
-  leepeuker/movary:latest
+  ghcr.io/benjaminmue/movies:latest
 ```
 
 ### docker-compose.yml with MySQL
@@ -89,7 +89,7 @@ version: "3.5"
 
 services:
   movary:
-    image: leepeuker/movary:latest
+    image: ghcr.io/benjaminmue/movies:latest
     container_name: movary
     ports:
       - "80:8080"
@@ -125,7 +125,7 @@ version: "3.5"
 
 services:
   movary:
-    image: leepeuker/movary:latest
+    image: ghcr.io/benjaminmue/movies:latest
     container_name: movary
     ports:
       - "80:8080"

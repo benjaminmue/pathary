@@ -8,7 +8,7 @@
 <h4 align="center">The central hub to track, rate and explore your movie watch history</h4>
 
 <p align="center">
-<a href="https://hub.docker.com/r/leepeuker/movary" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/docker/pulls/leepeuker/movary" ></a>
+<a href="https://github.com/benjaminmue/movies/pkgs/container/movies" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/GHCR-movies-blue?logo=github" ></a>
 <a href="https://github.com/leepeuker/movary" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/stars/leepeuker/movary?style=flat&color=yellow&label=github%20stars" ></a>
 <a href="https://github.com/leepeuker/movary/issues" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/issues/leepeuker/movary?color=eba434&label=github%20issues" ></a>
 <a href="https://discord.gg/KbcSqggrgW" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/discord/1125830398715363399" ></a>
@@ -54,7 +54,11 @@ which can lead to sudden breaking changes from time to time, so keep the release
 Pull the latest image from GitHub Container Registry:
 
 ```bash
+# Latest stable release
 docker pull ghcr.io/benjaminmue/movies:latest
+
+# Specific version
+docker pull ghcr.io/benjaminmue/movies:v0.1.0-alpha.1
 ```
 
 Run with MySQL:
@@ -73,7 +77,14 @@ docker run -d \
   ghcr.io/benjaminmue/movies:latest
 ```
 
-> **Note:** After the first push, the GHCR package visibility may need to be set to "Public" in the repository's package settings for anonymous pulls to work.
+### Available Tags
+
+- `latest` - Latest stable release (recommended)
+- `main` - Latest build from main branch
+- `vX.Y.Z` - Specific version (e.g., `v0.1.0-alpha.1`)
+- `sha-XXXXXXX` - Specific commit
+
+> **Note:** After the first push, the GHCR package visibility may need to be set to "Public" in the repository's package settings for anonymous pulls.
 
 ## Demo
 

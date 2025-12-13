@@ -9,7 +9,7 @@
 <h4 align="center">The central hub to track, rate and explore your movie watch history</h4>
 
 <p align="center">
-<a href="https://hub.docker.com/r/leepeuker/movary" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/docker/pulls/leepeuker/movary" ></a>
+<a href="https://github.com/benjaminmue/movies/pkgs/container/movies" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/GHCR-movies-blue?logo=github" ></a>
 <a href="https://github.com/leepeuker/movary" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/stars/leepeuker/movary?color=yellow&label=github%20stars" ></a>
 <a href="https://github.com/leepeuker/movary/issues" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/issues/leepeuker/movary?color=eba434&label=github%20issues" ></a>
 <a href="https://discord.gg/KbcSqggrgW" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/discord/1125830398715363399" ></a>
