@@ -10,5 +10,19 @@ http-client.private.env.json
 
 # Local development data (not committed)
 /docker/mysql-data
-/storage
+
+# Storage directory - ignore contents but keep structure via .gitkeep
+/storage/*
+!/storage/.gitkeep
+!/storage/app
+/storage/app/*
+!/storage/app/.gitkeep
+!/storage/app/public
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+!/storage/logs
+/storage/logs/*
+!/storage/logs/.gitkeep
+
+# macOS
 .DS_Store
