@@ -95,16 +95,33 @@ wait_for_mysql() {
 # Run database migrations
 # -----------------------------------------------------------------------------
 run_migrations() {
+    # Check if migrations are enabled (default: enabled)
+    if [ "${MIGRATIONS_AUTO_RUN:-1}" = "0" ]; then
+        echo "[DB] Migrations disabled (MIGRATIONS_AUTO_RUN=0)"
+        return 0
+    fi
+
     echo "[DB] Running database migrations..."
 
     if [ -f "/app/bin/console.php" ]; then
         php /app/bin/console.php database:migration:migrate --no-interaction || {
-            echo "[DB] ERROR: Migration failed"
+            echo "[DB] ERROR: Migration failed!"
+            echo "[DB] Container startup aborted to prevent running with broken schema."
             exit 1
         }
         echo "[DB] Migrations completed successfully"
     else
-        echo "[DB] No console.php found, skipping migrations"
+        # Fallback to phinx if console.php doesn't have the command
+        if [ -f "/app/vendor/bin/phinx" ] && [ -f "/app/settings/phinx.php" ]; then
+            php /app/vendor/bin/phinx migrate -c /app/settings/phinx.php || {
+                echo "[DB] ERROR: Migration failed!"
+                echo "[DB] Container startup aborted to prevent running with broken schema."
+                exit 1
+            }
+            echo "[DB] Migrations completed successfully"
+        else
+            echo "[DB] No migration tool found, skipping migrations"
+        fi
     fi
 }
 

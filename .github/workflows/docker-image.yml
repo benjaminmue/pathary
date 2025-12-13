@@ -14,8 +14,125 @@ env:
   IMAGE_NAME: ${{ github.repository_owner }}/pathary
 
 jobs:
-  build-and-push:
+  build:
+    name: Build Docker Image
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    outputs:
+      image-tag: ${{ steps.build.outputs.imageid }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (local)
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: pathary:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VCS_REF=${{ github.sha }}
+            VERSION=${{ github.ref_name }}
+
+  validate-migrations:
+    name: Validate Migrations
+    runs-on: ubuntu-latest
+    needs: build
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: pathary
+          MYSQL_USER: pathary_user
+          MYSQL_PASSWORD: pathary_pass_123!
+          MYSQL_ROOT_PASSWORD: root_pass_123!
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot_pass_123!"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image for migration test
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: pathary:migration-test
+          cache-from: type=gha
+
+      - name: Wait for MySQL to be ready
+        run: |
+          echo "Waiting for MySQL to be fully ready..."
+          for i in {1..30}; do
+            if mysqladmin ping -h 127.0.0.1 -proot_pass_123! --silent 2>/dev/null; then
+              echo "MySQL is ready!"
+              break
+            fi
+            echo "Waiting for MySQL... attempt $i/30"
+            sleep 2
+          done
+
+      - name: Run migrations
+        run: |
+          echo "Running database migrations..."
+          docker run --rm \
+            --network host \
+            -e DATABASE_MODE=mysql \
+            -e DATABASE_MYSQL_HOST=127.0.0.1 \
+            -e DATABASE_MYSQL_PORT=3306 \
+            -e DATABASE_MYSQL_NAME=pathary \
+            -e DATABASE_MYSQL_USER=pathary_user \
+            -e DATABASE_MYSQL_PASSWORD=pathary_pass_123! \
+            -e TMDB_API_KEY=dummy_key_for_ci \
+            -e MIGRATIONS_AUTO_RUN=1 \
+            pathary:migration-test \
+            sh -c "php /app/vendor/bin/phinx migrate -c /app/settings/phinx.php"
+          echo "Migrations completed successfully!"
+
+      - name: Verify migration status
+        run: |
+          echo "Checking migration status..."
+          docker run --rm \
+            --network host \
+            -e DATABASE_MODE=mysql \
+            -e DATABASE_MYSQL_HOST=127.0.0.1 \
+            -e DATABASE_MYSQL_PORT=3306 \
+            -e DATABASE_MYSQL_NAME=pathary \
+            -e DATABASE_MYSQL_USER=pathary_user \
+            -e DATABASE_MYSQL_PASSWORD=pathary_pass_123! \
+            -e TMDB_API_KEY=dummy_key_for_ci \
+            pathary:migration-test \
+            sh -c "php /app/vendor/bin/phinx status -c /app/settings/phinx.php"
+
+  push:
+    name: Push to GHCR
+    runs-on: ubuntu-latest
+    needs: [build, validate-migrations]
 
     permissions:
       contents: read
@@ -72,6 +189,8 @@ jobs:
       - name: Summary
         run: |
           echo "## Docker Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Migration Validation: ✅ Passed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Pushed Tags:" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
