@@ -1,4 +1,4 @@
-# Movies
+# Pathary
 
 A fork of [Movary](https://github.com/leepeuker/movary) for group movie tracking. Track movies with friends, import metadata from TMDB, and rate films using a 1-7 popcorn scale. Self-hosted via Docker with MySQL or SQLite.
 
@@ -16,16 +16,16 @@ A fork of [Movary](https://github.com/leepeuker/movary) for group movie tracking
 
 ```bash
 docker run -d \
-  --name movies \
+  --name pathary \
   -p 8080:80 \
   -e TMDB_API_KEY=your-api-key \
   -e DATABASE_MODE=mysql \
   -e DATABASE_MYSQL_HOST=your-mysql-host \
-  -e DATABASE_MYSQL_NAME=movies \
-  -e DATABASE_MYSQL_USER=movies \
+  -e DATABASE_MYSQL_NAME=pathary \
+  -e DATABASE_MYSQL_USER=pathary \
   -e DATABASE_MYSQL_PASSWORD=your-password \
-  -v movies_storage:/app/storage \
-  ghcr.io/benjaminmue/movies:latest
+  -v pathary_storage:/app/storage \
+  ghcr.io/benjaminkomen/pathary:latest
 ```
 
 Database migrations run automatically on container start.
@@ -45,35 +45,35 @@ Database migrations run automatically on container start.
 
 ```yaml
 services:
-  movies:
-    image: ghcr.io/benjaminmue/movies:latest
+  pathary:
+    image: ghcr.io/benjaminkomen/pathary:latest
     ports:
       - "8080:80"
     environment:
       TMDB_API_KEY: "your-api-key"
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "mysql"
-      DATABASE_MYSQL_NAME: "movies"
-      DATABASE_MYSQL_USER: "movies"
+      DATABASE_MYSQL_NAME: "pathary"
+      DATABASE_MYSQL_USER: "pathary"
       DATABASE_MYSQL_PASSWORD: "your-password"
     volumes:
-      - movies_storage:/app/storage
+      - pathary_storage:/app/storage
     depends_on:
       - mysql
 
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_DATABASE: "movies"
-      MYSQL_USER: "movies"
+      MYSQL_DATABASE: "pathary"
+      MYSQL_USER: "pathary"
       MYSQL_PASSWORD: "your-password"
       MYSQL_ROOT_PASSWORD: "root-password"
     volumes:
-      - movies_db:/var/lib/mysql
+      - pathary_db:/var/lib/mysql
 
 volumes:
-  movies_storage:
-  movies_db:
+  pathary_storage:
+  pathary_db:
 ```
 
 ## Image Tags
@@ -82,13 +82,13 @@ Pull from GitHub Container Registry:
 
 ```bash
 # Latest stable
-docker pull ghcr.io/benjaminmue/movies:latest
+docker pull ghcr.io/benjaminkomen/pathary:latest
 
 # Specific version
-docker pull ghcr.io/benjaminmue/movies:v0.1.0-alpha.1
+docker pull ghcr.io/benjaminkomen/pathary:v0.1.0-alpha.1
 
 # Specific commit
-docker pull ghcr.io/benjaminmue/movies:sha-abc1234
+docker pull ghcr.io/benjaminkomen/pathary:sha-abc1234
 ```
 
 | Tag | Description |

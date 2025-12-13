@@ -60,10 +60,10 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION=latest
 
-LABEL org.opencontainers.image.title="Movary" \
-      org.opencontainers.image.description="Self-hosted movie tracking web application" \
-      org.opencontainers.image.url="https://github.com/leepeuker/movary" \
-      org.opencontainers.image.source="https://github.com/leepeuker/movary" \
+LABEL org.opencontainers.image.title="Pathary" \
+      org.opencontainers.image.description="Self-hosted group movie tracking web application (fork of Movary)" \
+      org.opencontainers.image.url="https://github.com/benjaminkomen/movary" \
+      org.opencontainers.image.source="https://github.com/benjaminkomen/movary" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.revision="${VCS_REF}"
@@ -125,8 +125,8 @@ RUN { \
     echo '    AllowOverride All'; \
     echo '    Require all granted'; \
     echo '</Directory>'; \
-} > /etc/apache2/conf-available/movary.conf \
-    && a2enconf movary
+} > /etc/apache2/conf-available/pathary.conf \
+    && a2enconf pathary
 
 # Configure PHP for production
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
@@ -150,7 +150,7 @@ RUN { \
     echo 'memory_limit=256M'; \
     echo 'max_execution_time=120'; \
     echo 'expose_php=Off'; \
-} > /usr/local/etc/php/conf.d/movary.ini
+} > /usr/local/etc/php/conf.d/pathary.ini
 
 # Set working directory
 WORKDIR /app

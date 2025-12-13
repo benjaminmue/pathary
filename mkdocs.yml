@@ -1,6 +1,6 @@
-site_name: Movary Documentation
-site_description: Movary Documentation
-repo_url: https://github.com/leepeuker/movary/
+site_name: Pathary Documentation
+site_description: Pathary Documentation (fork of Movary)
+repo_url: https://github.com/benjaminkomen/movary/
 edit_uri: edit/main/docs
 
 theme:

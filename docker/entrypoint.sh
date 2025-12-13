@@ -2,11 +2,11 @@
 set -e
 
 # =============================================================================
-# Movary Docker Entrypoint
+# Pathary Docker Entrypoint
 # =============================================================================
 
 echo "=========================================="
-echo "Movary Container Starting..."
+echo "Pathary Container Starting..."
 echo "=========================================="
 
 # -----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ main() {
     setup_symlinks
 
     echo "=========================================="
-    echo "Movary is ready!"
+    echo "Pathary is ready!"
     echo "=========================================="
 
     # Execute the main command (apache2-foreground)

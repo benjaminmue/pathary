@@ -10,7 +10,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  # Override repository name to use 'pathary' branding
+  IMAGE_NAME: ${{ github.repository_owner }}/pathary
 
 jobs:
   build-and-push:

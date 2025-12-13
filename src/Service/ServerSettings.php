@@ -77,7 +77,7 @@ class ServerSettings
 
     public function getJellyfinAppName() : string
     {
-        return $this->getByKey(self::JELLYFIN_APP_NAME) ?? 'Movary';
+        return $this->getByKey(self::JELLYFIN_APP_NAME) ?? 'Pathary';
     }
 
     public function getJellyfinDeviceId() : ?string
@@ -87,7 +87,7 @@ class ServerSettings
 
     public function getPlexAppName() : string
     {
-        return $this->getByKey(self::PLEX_APP_NAME) ?? 'Movary';
+        return $this->getByKey(self::PLEX_APP_NAME) ?? 'Pathary';
     }
 
     public function getPlexIdentifier() : ?string
@@ -137,7 +137,7 @@ class ServerSettings
 
     public function getTotpIssuer() : string
     {
-        return $this->getByKey(self::TOTP_ISSUER) ?? 'Movary';
+        return $this->getByKey(self::TOTP_ISSUER) ?? 'Pathary';
     }
 
     public function isApplicationNameSetInEnvironment() : bool
