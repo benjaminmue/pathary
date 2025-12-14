@@ -176,6 +176,25 @@
         color: var(--bs-tertiary-color);
     }
 
+    .rating-meta {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.8rem;
+        color: var(--bs-secondary-color);
+    }
+
+    .rating-meta i {
+        margin-right: 0.25rem;
+        opacity: 0.7;
+    }
+
+    .rating-watched-date,
+    .rating-location {
+        display: flex;
+        align-items: center;
+    }
+
     .no-ratings-message {
         text-align: center;
         padding: 2rem;
@@ -194,6 +213,84 @@
         font-size: 1.25rem;
         font-weight: 600;
         margin-bottom: 1rem;
+    }
+
+    .rating-form-row {
+        display: flex;
+        gap: 0;
+        margin-bottom: 1rem;
+    }
+
+    .rating-form-col {
+        flex: 1;
+        padding: 0 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .rating-form-col:first-child {
+        padding-left: 0;
+    }
+
+    .rating-form-col:last-child {
+        padding-right: 0;
+    }
+
+    .rating-form-divider {
+        width: 2px;
+        background: linear-gradient(180deg, transparent, var(--accent-purple), transparent);
+        box-shadow: 0 0 8px rgba(111, 45, 189, 0.3);
+        flex-shrink: 0;
+    }
+
+    .rating-form-col label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .rating-form-col select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 6px;
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+
+    .rating-form-col select:focus {
+        outline: none;
+        border-color: var(--accent-purple);
+        box-shadow: 0 0 0 3px rgba(111, 45, 189, 0.1);
+    }
+
+    .rating-form-col select:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .date-dropdowns {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .date-dropdowns select {
+        flex: 1;
+    }
+
+    .date-dropdowns select.day-select {
+        flex: 0.8;
+    }
+
+    .date-dropdowns select.month-select {
+        flex: 1.2;
+    }
+
+    .date-dropdowns select.year-select {
+        flex: 1;
     }
 
     .rating-form-group {
@@ -243,6 +340,21 @@
         background: #e0a808;
         border-color: #e0a808;
         color: var(--pathe-dark);
+    }
+
+    @media (max-width: 768px) {
+        .rating-form-row {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .rating-form-col {
+            padding: 0;
+        }
+
+        .rating-form-divider {
+            display: none;
+        }
     }
 
     .back-link {
@@ -377,15 +489,57 @@
     {% if loggedIn %}
         <section class="rating-form-section">
             <h2>Your Rating</h2>
-            <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate" method="post">
-                <div class="rating-form-group">
-                    <label>Rating</label>
-                    {% include 'components/popcorn_rating.twig' with {
-                        valueInt: userRating.rating_popcorn ?? 0,
-                        mode: 'input',
-                        name: 'rating_popcorn',
-                        readonly: false
-                    } %}
+            <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate" method="post" id="ratingForm">
+                <div class="rating-form-row">
+                    <div class="rating-form-col">
+                        <label>Rating</label>
+                        {% include 'components/popcorn_rating.twig' with {
+                            valueInt: userRating.rating_popcorn ?? 0,
+                            mode: 'input',
+                            name: 'rating_popcorn',
+                            readonly: false
+                        } %}
+                    </div>
+
+                    <div class="rating-form-divider"></div>
+
+                    <div class="rating-form-col">
+                        <label>Watched Date</label>
+                        <div class="date-dropdowns">
+                            <select name="watched_day" id="watched_day" class="day-select">
+                                <option value="">Day</option>
+                                {% for d in 1..31 %}
+                                    <option value="{{ d }}" {{ (userRating.watched_day ?? '') == d ? 'selected' : '' }}>{{ d }}</option>
+                                {% endfor %}
+                            </select>
+                            <select name="watched_month" id="watched_month" class="month-select">
+                                <option value="">Month</option>
+                                {% set months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                                {% for m in 1..12 %}
+                                    <option value="{{ m }}" {{ (userRating.watched_month ?? '') == m ? 'selected' : '' }}>{{ months[m - 1] }}</option>
+                                {% endfor %}
+                            </select>
+                            <select name="watched_year" id="watched_year" class="year-select">
+                                <option value="">Year</option>
+                                {% set currentYear = "now"|date("Y") + 1 %}
+                                {% for y in currentYear..1950 %}
+                                    <option value="{{ y }}" {{ (userRating.watched_year ?? '') == y ? 'selected' : '' }}>{{ y }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="rating-form-divider"></div>
+
+                    <div class="rating-form-col">
+                        <label>Location</label>
+                        <select name="location_id" id="location_id">
+                            <option value="">Select location</option>
+                            <option value="1" {{ (userRating.location_id ?? '') == 1 ? 'selected' : '' }}>Cinema</option>
+                            <option value="2" {{ (userRating.location_id ?? '') == 2 ? 'selected' : '' }}>At Home</option>
+                            <option value="3" {{ (userRating.location_id ?? '') == 3 ? 'selected' : '' }}>Other</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="rating-form-group">
@@ -400,7 +554,7 @@
                 </div>
             </form>
 
-            {% if userRating and (userRating.rating_popcorn or userRating.comment) %}
+            {% if userRating and (userRating.rating_popcorn or userRating.comment or userRating.watched_year or userRating.location_id) %}
                 <hr class="my-3">
                 <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate/delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete your rating? This action cannot be undone.');">
                     <button type="submit" class="btn btn-outline-danger btn-sm">
@@ -409,6 +563,68 @@
                 </form>
             {% endif %}
         </section>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const yearSelect = document.getElementById('watched_year');
+            const monthSelect = document.getElementById('watched_month');
+            const daySelect = document.getElementById('watched_day');
+
+            function updateDateDropdowns() {
+                const year = yearSelect.value;
+                const month = monthSelect.value;
+
+                // Month requires year
+                if (!year) {
+                    monthSelect.disabled = true;
+                    monthSelect.value = '';
+                    daySelect.disabled = true;
+                    daySelect.value = '';
+                } else {
+                    monthSelect.disabled = false;
+
+                    // Day requires month
+                    if (!month) {
+                        daySelect.disabled = true;
+                        daySelect.value = '';
+                    } else {
+                        daySelect.disabled = false;
+                        updateDayOptions(parseInt(year), parseInt(month));
+                    }
+                }
+            }
+
+            function updateDayOptions(year, month) {
+                const currentDay = daySelect.value;
+                const daysInMonth = new Date(year, month, 0).getDate();
+
+                // Clear options except first
+                while (daySelect.options.length > 1) {
+                    daySelect.remove(1);
+                }
+
+                // Add day options
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const option = document.createElement('option');
+                    option.value = d;
+                    option.text = d;
+                    if (d == currentDay) option.selected = true;
+                    daySelect.add(option);
+                }
+
+                // Reset if current day exceeds max
+                if (currentDay && parseInt(currentDay) > daysInMonth) {
+                    daySelect.value = '';
+                }
+            }
+
+            yearSelect.addEventListener('change', updateDateDropdowns);
+            monthSelect.addEventListener('change', updateDateDropdowns);
+
+            // Initialize state
+            updateDateDropdowns();
+        });
+        </script>
     {% endif %}
 
     <section id="ratings" class="individual-ratings-section">
@@ -437,6 +653,28 @@
                         {% if rating.comment %}
                             <p class="rating-comment">"{{ rating.comment }}"</p>
                         {% endif %}
+
+                        <div class="rating-meta">
+                            {% if rating.watched_year %}
+                                <span class="rating-watched-date">
+                                    <i class="bi bi-calendar-event"></i>
+                                    {% if rating.watched_day and rating.watched_month %}
+                                        {{ '%02d'|format(rating.watched_day) }}.{{ '%02d'|format(rating.watched_month) }}.{{ rating.watched_year }}
+                                    {% elseif rating.watched_month %}
+                                        {{ '%02d'|format(rating.watched_month) }}.{{ rating.watched_year }}
+                                    {% else %}
+                                        {{ rating.watched_year }}
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+
+                            {% if rating.location_id %}
+                                <span class="rating-location">
+                                    <i class="bi bi-geo-alt"></i>
+                                    {% if rating.location_id == 1 %}Cinema{% elseif rating.location_id == 2 %}At Home{% else %}Other{% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
 
                         {% if rating.updated_at %}
                             <div class="rating-date">

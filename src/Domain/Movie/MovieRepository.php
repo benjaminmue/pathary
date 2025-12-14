@@ -1330,15 +1330,23 @@ class MovieRepository
     public function findUserRatingWithComment(int $movieId, int $userId) : ?array
     {
         $data = $this->dbConnection->fetchAssociative(
-            'SELECT rating_popcorn, comment FROM movie_user_rating WHERE movie_id = ? AND user_id = ?',
+            'SELECT rating_popcorn, comment, watched_year, watched_month, watched_day, location_id FROM movie_user_rating WHERE movie_id = ? AND user_id = ?',
             [$movieId, $userId],
         );
 
         return $data === false ? null : $data;
     }
 
-    public function upsertUserRatingWithComment(int $movieId, int $userId, ?PopcornRating $rating, ?string $comment) : void
-    {
+    public function upsertUserRatingWithComment(
+        int $movieId,
+        int $userId,
+        ?PopcornRating $rating,
+        ?string $comment,
+        ?int $watchedYear = null,
+        ?int $watchedMonth = null,
+        ?int $watchedDay = null,
+        ?int $locationId = null,
+    ) : void {
         $existingRow = $this->dbConnection->fetchAssociative(
             'SELECT movie_id FROM movie_user_rating WHERE movie_id = ? AND user_id = ?',
             [$movieId, $userId],
@@ -1346,16 +1354,16 @@ class MovieRepository
 
         if ($existingRow === false) {
             $this->dbConnection->executeQuery(
-                'INSERT INTO movie_user_rating (movie_id, user_id, rating_popcorn, comment, created_at) VALUES (?, ?, ?, ?, ?)',
-                [$movieId, $userId, $rating?->asInt(), $comment, (string)DateTime::create()],
+                'INSERT INTO movie_user_rating (movie_id, user_id, rating_popcorn, comment, watched_year, watched_month, watched_day, location_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [$movieId, $userId, $rating?->asInt(), $comment, $watchedYear, $watchedMonth, $watchedDay, $locationId, (string)DateTime::create()],
             );
 
             return;
         }
 
         $this->dbConnection->executeQuery(
-            'UPDATE movie_user_rating SET rating_popcorn = ?, comment = ?, updated_at = ? WHERE movie_id = ? AND user_id = ?',
-            [$rating?->asInt(), $comment, (string)DateTime::create(), $movieId, $userId],
+            'UPDATE movie_user_rating SET rating_popcorn = ?, comment = ?, watched_year = ?, watched_month = ?, watched_day = ?, location_id = ?, updated_at = ? WHERE movie_id = ? AND user_id = ?',
+            [$rating?->asInt(), $comment, $watchedYear, $watchedMonth, $watchedDay, $locationId, (string)DateTime::create(), $movieId, $userId],
         );
     }
 

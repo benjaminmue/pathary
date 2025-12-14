@@ -103,6 +103,10 @@ class GroupMovieService
      *     user_name: string,
      *     rating_popcorn: ?int,
      *     comment: ?string,
+     *     watched_year: ?int,
+     *     watched_month: ?int,
+     *     watched_day: ?int,
+     *     location_id: ?int,
      *     updated_at: ?string
      * }>
      */
@@ -114,10 +118,14 @@ class GroupMovieService
                 u.name AS user_name,
                 mur.rating_popcorn,
                 mur.comment,
+                mur.watched_year,
+                mur.watched_month,
+                mur.watched_day,
+                mur.location_id,
                 COALESCE(mur.updated_at, mur.created_at) AS updated_at
             FROM movie_user_rating mur
             JOIN user u ON u.id = mur.user_id
-            WHERE mur.movie_id = ? AND (mur.rating_popcorn IS NOT NULL OR mur.comment IS NOT NULL)
+            WHERE mur.movie_id = ? AND (mur.rating_popcorn IS NOT NULL OR mur.comment IS NOT NULL OR mur.watched_year IS NOT NULL OR mur.location_id IS NOT NULL)
             SQL,
             [$movieId],
         );
