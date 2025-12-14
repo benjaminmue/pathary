@@ -1,4 +1,4 @@
-in<p align="center">
+<p align="center">
   <img src="public/images/pathary-logo-384x384.png" alt="Pathary Logo" width="128" height="128">
 </p>
 
@@ -6,6 +6,12 @@ in<p align="center">
 
 <p align="center">
   Self-hosted group movie tracking with popcorn ratings
+</p>
+
+<p align="center">
+  <span style="background-color: #f97316; color: #ffffff; padding: 8px 16px; border-radius: 6px; font-weight: 500;">
+    ⚠️ This repository is in heavy development and will be updated frequently.
+  </span>
 </p>
 
 ---
@@ -51,7 +57,7 @@ docker run -d \
   -e TMDB_API_KEY=your-api-key \
   -e DATABASE_MODE=sqlite \
   -v pathary_storage:/app/storage \
-  ghcr.io/benjaminkomen/pathary:latest
+  ghcr.io/benjaminmue/pathary:latest
 ```
 
 ### Option 3: Docker Compose
@@ -59,7 +65,7 @@ docker run -d \
 ```yaml
 services:
   pathary:
-    image: ghcr.io/benjaminkomen/pathary:latest
+    image: ghcr.io/benjaminmue/pathary:latest
     ports:
       - "8080:80"
     environment:
@@ -168,3 +174,9 @@ MIT License. See [LICENSE](LICENSE).
 
 **Original project:** [Movary](https://github.com/leepeuker/movary) by Lee Peuker
 **Fork:** Pathary by Benjamin Müller
+
+---
+
+## Notes
+
+⚠️ Most of the code was reviewed with Claude Code and ChatGPT to support development.
