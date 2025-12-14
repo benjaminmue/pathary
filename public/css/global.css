@@ -1,3 +1,10 @@
+/* Navbar logo styling */
+.navbar-logo {
+  width: auto;
+  height: 32px;
+  object-fit: contain;
+}
+
 /* remove underline on cards */
 a.card,
 a.card:visited,

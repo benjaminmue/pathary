@@ -1,6 +1,9 @@
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--pathe-dark);">
     <div class="container">
-        <a class="navbar-brand" href="{{ applicationUrl }}/">{{ applicationName ?? 'Pathary' }}</a>
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ applicationUrl }}/">
+            <img src="{{ applicationUrl }}/images/pathary-logo.svg" alt="" height="32" class="navbar-logo">
+            <span>{{ applicationName ?? 'Pathary' }}</span>
+        </a>
         <div class="d-flex align-items-center gap-3">
             <div class="form-check form-switch mb-0" title="Toggle dark mode">
                 <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle" style="cursor: pointer;">
