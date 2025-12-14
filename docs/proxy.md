@@ -4,7 +4,7 @@ Pathary works behind reverse proxies like Nginx, Traefik, Caddy, or HAProxy. Thi
 
 ## Quick Setup
 
-1. Set `APPLICATION_URL` to your public URL (e.g., `https://prediator.tv`)
+1. Set `APPLICATION_URL` to your public URL (e.g., `https://pathary.tv`)
 2. Configure your reverse proxy to forward required headers
 3. Ensure WebSocket/long-polling is not blocked (if using real-time features)
 
@@ -12,14 +12,14 @@ Pathary works behind reverse proxies like Nginx, Traefik, Caddy, or HAProxy. Thi
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `APPLICATION_URL` | Yes | Your public-facing URL (e.g., `https://prediator.tv`). Must match the URL users access in their browser. |
+| `APPLICATION_URL` | Yes | Your public-facing URL (e.g., `https://pathary.tv`). Must match the URL users access in their browser. |
 
 ## Nginx Configuration
 
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name prediator.tv;
+    server_name pathary.tv;
 
     # SSL configuration
     ssl_certificate /path/to/cert.pem;
@@ -56,7 +56,7 @@ services:
   pathary:
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pathary.rule=Host(`prediator.tv`)"
+      - "traefik.http.routers.pathary.rule=Host(`pathary.tv`)"
       - "traefik.http.routers.pathary.entrypoints=websecure"
       - "traefik.http.routers.pathary.tls=true"
       - "traefik.http.services.pathary.loadbalancer.server.port=80"
@@ -65,7 +65,7 @@ services:
 ## Caddy Configuration
 
 ```
-prediator.tv {
+pathary.tv {
     reverse_proxy pathary-app:80
 }
 ```
@@ -115,7 +115,7 @@ If you still see this error:
 ### Redirect loops or wrong URLs
 
 1. Verify `APPLICATION_URL` matches your public URL exactly
-2. Include the protocol: `https://prediator.tv` not just `prediator.tv`
+2. Include the protocol: `https://pathary.tv` not just `pathary.tv`
 3. Do not include a trailing slash
 
 ### Mixed content warnings
@@ -131,7 +131,7 @@ services:
   pathary:
     image: ghcr.io/leepeuker/pathary:latest
     environment:
-      - APPLICATION_URL=https://prediator.tv
+      - APPLICATION_URL=https://pathary.tv
       - DATABASE_MODE=mysql
       - DATABASE_MYSQL_HOST=mysql
       - DATABASE_MYSQL_NAME=pathary
