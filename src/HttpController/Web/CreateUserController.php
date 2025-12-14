@@ -20,7 +20,7 @@ use Twig\Environment;
 
 class CreateUserController
 {
-    public const string MOVARY_WEB_CLIENT = 'Movary Web';
+    public const string PATHARY_WEB_CLIENT = 'Pathary Web';
 
     public function __construct(
         private readonly Environment $twig,
@@ -70,7 +70,7 @@ class CreateUserController
         try {
             $this->userApi->createUser($email, $password, $name, $hasUsers === false);
 
-            $this->authenticationService->login($email, $password, false, self::MOVARY_WEB_CLIENT, $userAgent);
+            $this->authenticationService->login($email, $password, false, self::PATHARY_WEB_CLIENT, $userAgent);
         } catch (PasswordTooShort) {
             $this->sessionWrapper->set('errorPasswordTooShort', true);
         } catch (UsernameInvalidFormat) {

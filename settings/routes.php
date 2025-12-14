@@ -23,6 +23,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/', [Web\PublicHomeController::class, 'index']);
     $routes->add('GET', '/movie/{id:[0-9]+}', [Web\PublicMovieController::class, 'detail']);
     $routes->add('POST', '/movie/{id:[0-9]+}/rate', [Web\RateMovieController::class, 'rate'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/movie/{id:[0-9]+}/rate/delete', [Web\RateMovieController::class, 'deleteRating'], [Web\Middleware\UserIsAuthenticated::class]);
 
     ##########
     # Search #

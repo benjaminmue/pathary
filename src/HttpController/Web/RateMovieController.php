@@ -37,4 +37,15 @@ class RateMovieController
 
         return Response::createSeeOther('/movie/' . $movieId . '#ratings');
     }
+
+    public function deleteRating(Request $request) : Response
+    {
+        $movieId = (int)$request->getRouteParameters()['id'];
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        // Delete the user's rating for this movie (gracefully handles non-existent ratings)
+        $this->movieRepository->deleteUserRating($movieId, $userId);
+
+        return Response::createSeeOther('/movie/' . $movieId . '#ratings');
+    }
 }

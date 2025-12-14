@@ -399,6 +399,15 @@
                     </button>
                 </div>
             </form>
+
+            {% if userRating and (userRating.rating_popcorn or userRating.comment) %}
+                <hr class="my-3">
+                <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate/delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete your rating? This action cannot be undone.');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash"></i> Delete Rating
+                    </button>
+                </form>
+            {% endif %}
         </section>
     {% endif %}
 

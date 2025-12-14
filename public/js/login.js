@@ -1,4 +1,4 @@
-const MOVARY_CLIENT_IDENTIFIER = 'Movary Web';
+const PATHARY_CLIENT_IDENTIFIER = 'Pathary Web';
 
 async function submitCredentials() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -51,7 +51,7 @@ function loginRequest() {
         method: 'POST',
         headers: {
             'Content-type': 'application/json',
-            'X-Movary-Client': MOVARY_CLIENT_IDENTIFIER
+            'X-Movary-Client': PATHARY_CLIENT_IDENTIFIER
         },
         body: JSON.stringify({
             'email': document.getElementById('email').value,

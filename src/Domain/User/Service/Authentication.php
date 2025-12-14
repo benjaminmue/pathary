@@ -199,11 +199,9 @@ class Authentication
 
         $userAndToken = ['user' => $user, 'token' => $token];
 
-        if ($deviceName !== CreateUserController::MOVARY_WEB_CLIENT) {
-            return $userAndToken;
+        if ($deviceName === CreateUserController::PATHARY_WEB_CLIENT) {
+            $this->setAuthenticationCookieAndNewSession($user->getId(), $token, $authTokenExpirationDate);
         }
-
-        $this->setAuthenticationCookieAndNewSession($user->getId(), $token, $authTokenExpirationDate);
 
         return $userAndToken;
     }
