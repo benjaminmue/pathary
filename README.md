@@ -1,47 +1,60 @@
-# Pathary
+<p align="center">
+  <img src="public/images/pathary-logo-384x384.png" alt="Pathary Logo" width="128" height="128">
+</p>
 
-A fork of [Movary](https://github.com/leepeuker/movary) for group movie tracking. Track movies with friends, import metadata from TMDB, and rate films using a 1-7 popcorn scale. Self-hosted via Docker with MySQL or SQLite.
+<h1 align="center">Pathary</h1>
+
+<p align="center">
+  Self-hosted group movie tracking with popcorn ratings
+</p>
+
+---
+
+## What is Pathary?
+
+Pathary is a self-hosted movie tracking app for friend groups. Rate movies on a 1-7 popcorn (🍿) scale, see what others thought, and discover new films via TMDB integration. Fork of [Movary](https://github.com/leepeuker/movary).
 
 ## Features
 
-- **Public home page** - Poster grid showing the 20 most recently added movies
-- **Movie details** - View global average rating, individual user ratings, and comments
-- **Popcorn rating** - Rate movies on a 1-7 scale with optional comments
-- **Persistent login** - Stay logged in until cookies are cleared
-- **Movie search** - Search local library first, fallback to TMDB, add new movies
-- **All movies list** - Browse library with sorting (title, year, rating) and filtering (genre, year, rating)
-- **Profile management** - Update name, email, and profile picture
+- **Public home page** — Poster grid of recently added movies
+- **Movie details** — Global average rating, individual user ratings, and comments
+- **🍿 Popcorn ratings** — Rate movies 1-7 with optional comments
+- **TMDB search** — Search local library first, then TMDB; add new movies instantly
+- **All Movies browser** — Sort by title, year, rating; filter by genre, year range
+- **Dark mode** — Toggle between light and dark themes
+- **Responsive UI** — Works on desktop and mobile (Bootstrap 5)
 
-## Quick Start with Docker
+## 🐳 Quick Start
+
+### Option 1: Local development script
+
+```bash
+# Clone the repo
+git clone https://github.com/leepeuker/pathary.git
+cd pathary
+
+# Set your TMDB API key
+export TMDB_API_KEY=your-api-key
+
+# Start everything
+./bin/local-up.sh
+```
+
+Open http://localhost:8080 — first startup takes 30-60 seconds for MySQL init and migrations.
+
+### Option 2: Docker run
 
 ```bash
 docker run -d \
   --name pathary \
   -p 8080:80 \
   -e TMDB_API_KEY=your-api-key \
-  -e DATABASE_MODE=mysql \
-  -e DATABASE_MYSQL_HOST=your-mysql-host \
-  -e DATABASE_MYSQL_NAME=pathary \
-  -e DATABASE_MYSQL_USER=pathary \
-  -e DATABASE_MYSQL_PASSWORD=your-password \
+  -e DATABASE_MODE=sqlite \
   -v pathary_storage:/app/storage \
   ghcr.io/benjaminkomen/pathary:latest
 ```
 
-Database migrations run automatically on container start.
-
-### Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `TMDB_API_KEY` | Yes | [Get one here](https://www.themoviedb.org/settings/api) |
-| `DATABASE_MODE` | No | `mysql` or `sqlite` (default: sqlite) |
-| `DATABASE_MYSQL_HOST` | If mysql | MySQL hostname |
-| `DATABASE_MYSQL_NAME` | If mysql | Database name |
-| `DATABASE_MYSQL_USER` | If mysql | Database user |
-| `DATABASE_MYSQL_PASSWORD` | If mysql | Database password |
-
-## Docker Compose
+### Option 3: Docker Compose
 
 ```yaml
 services:
@@ -55,7 +68,7 @@ services:
       DATABASE_MYSQL_HOST: "mysql"
       DATABASE_MYSQL_NAME: "pathary"
       DATABASE_MYSQL_USER: "pathary"
-      DATABASE_MYSQL_PASSWORD: "your-password"
+      DATABASE_MYSQL_PASSWORD: "secret"
     volumes:
       - pathary_storage:/app/storage
     depends_on:
@@ -66,8 +79,8 @@ services:
     environment:
       MYSQL_DATABASE: "pathary"
       MYSQL_USER: "pathary"
-      MYSQL_PASSWORD: "your-password"
-      MYSQL_ROOT_PASSWORD: "root-password"
+      MYSQL_PASSWORD: "secret"
+      MYSQL_ROOT_PASSWORD: "rootsecret"
     volumes:
       - pathary_db:/var/lib/mysql
 
@@ -76,53 +89,82 @@ volumes:
   pathary_db:
 ```
 
-## Image Tags
+## Configuration
 
-Pull from GitHub Container Registry:
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `TMDB_API_KEY` | Yes | — | TMDB API key ([get one here](https://www.themoviedb.org/settings/api)) |
+| `DATABASE_MODE` | No | `sqlite` | `sqlite` or `mysql` |
+| `DATABASE_MYSQL_HOST` | If mysql | — | MySQL hostname |
+| `DATABASE_MYSQL_NAME` | If mysql | — | Database name |
+| `DATABASE_MYSQL_USER` | If mysql | — | Database user |
+| `DATABASE_MYSQL_PASSWORD` | If mysql | — | Database password |
+| `APPLICATION_URL` | No | — | Public URL (e.g., `https://movies.example.com`) |
+| `MIGRATIONS_AUTO_RUN` | No | `1` | Set to `0` to disable auto-migrations |
+
+See [.env.example](.env.example) for all options.
+
+## Migrations
+
+Database migrations run automatically when the container starts. To disable:
 
 ```bash
-# Latest stable
-docker pull ghcr.io/benjaminkomen/pathary:latest
-
-# Specific version
-docker pull ghcr.io/benjaminkomen/pathary:v0.1.0-alpha.1
-
-# Specific commit
-docker pull ghcr.io/benjaminkomen/pathary:sha-abc1234
+docker run -e MIGRATIONS_AUTO_RUN=0 ...
 ```
 
-| Tag | Description |
-|-----|-------------|
-| `latest` | Latest stable release (recommended) |
-| `main` | Latest build from main branch |
-| `vX.Y.Z` | Specific version tag |
-| `sha-XXXXXXX` | Specific commit |
+Manual migration commands:
 
-> **Note:** GHCR package must be set to "Public" in repository settings for anonymous pulls.
+```bash
+# Run migrations
+docker exec pathary-app php /app/vendor/bin/phinx migrate -c /app/settings/phinx.php
+
+# Check status
+docker exec pathary-app php /app/vendor/bin/phinx status -c /app/settings/phinx.php
+```
+
+See [docs/migrations.md](docs/migrations.md) for details.
+
+## Reverse Proxy
+
+When running behind Nginx, Traefik, or Caddy:
+
+1. Set `APPLICATION_URL` to your public URL
+2. Forward headers: `X-Forwarded-For`, `X-Forwarded-Proto`, `X-Forwarded-Host`
+
+See [docs/proxy.md](docs/proxy.md) for full configuration examples.
 
 ## Development
 
 ```bash
-# Install dependencies
+# Install PHP dependencies
 composer install
 
-# Start development environment
-docker compose -f docker-compose.yml -f docker-compose.development.yml up -d
-
-# Run migrations
-docker compose exec app php bin/console.php database:migration:migrate
-
-# Run tests
+# Run all checks (code style, static analysis, unit tests)
 composer test
+
+# Individual checks
+composer test-cs       # PHP CodeSniffer
+composer test-phpstan  # PHPStan
+composer test-psalm    # Psalm
+composer test-unit     # PHPUnit
 ```
 
-## Security
+## Image Tags
 
-- Never commit secrets to the repository
-- Configure all credentials via environment variables
-- Rotate API keys immediately if leaked
-- Use Docker secrets for sensitive values in production
+| Tag | Description |
+|-----|-------------|
+| `latest` | Latest stable release |
+| `main` | Latest build from main branch |
+| `vX.Y.Z` | Specific version |
+| `sha-XXXXXXX` | Specific commit |
+
+```bash
+docker pull ghcr.io/benjaminkomen/pathary:latest
+```
 
 ## License
 
-See [LICENSE](LICENSE) file.
+MIT License. See [LICENSE](LICENSE).
+
+**Original project:** [Movary](https://github.com/leepeuker/movary) by Lee Peuker
+**Fork:** Pathary by Benjamin Komen
