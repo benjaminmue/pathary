@@ -34,7 +34,9 @@
 {% block body %}{% endblock %}
 </div>
 
+{% if showFooter is not defined or showFooter %}
 {% include 'partials/footer.twig' %}
+{% endif %}
 
 <script>window.APPLICATION_URL = "{{ applicationUrl  }}";</script>
 <script src="{{ applicationUrl }}/js/jquery-3.3.1.js"></script>
