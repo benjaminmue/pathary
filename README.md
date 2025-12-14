@@ -1,4 +1,4 @@
-<p align="center">
+in<p align="center">
   <img src="public/images/pathary-logo-384x384.png" alt="Pathary Logo" width="128" height="128">
 </p>
 
@@ -159,7 +159,7 @@ composer test-unit     # PHPUnit
 | `sha-XXXXXXX` | Specific commit |
 
 ```bash
-docker pull ghcr.io/benjaminkomen/pathary:latest
+docker pull ghcr.io/benjaminmue/pathary:latest
 ```
 
 ## License
@@ -167,4 +167,4 @@ docker pull ghcr.io/benjaminkomen/pathary:latest
 MIT License. See [LICENSE](LICENSE).
 
 **Original project:** [Movary](https://github.com/leepeuker/movary) by Lee Peuker
-**Fork:** Pathary by Benjamin Komen
+**Fork:** Pathary by Benjamin Müller
