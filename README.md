@@ -1,4 +1,4 @@
-in<p align="center">
+<p align="center">
   <img src="public/images/pathary-logo-384x384.png" alt="Pathary Logo" width="128" height="128">
 </p>
 
