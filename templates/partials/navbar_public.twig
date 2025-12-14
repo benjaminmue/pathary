@@ -1,11 +1,11 @@
-<nav class="navbar navbar-expand-lg" style="background-color: var(--pathe-dark);">
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--pathe-dark);">
     <div class="container">
-        <a class="navbar-brand text-white" href="{{ applicationUrl }}/">{{ applicationName ?? 'Pathary' }}</a>
+        <a class="navbar-brand" href="{{ applicationUrl }}/">{{ applicationName ?? 'Pathary' }}</a>
         <div class="d-flex align-items-center gap-3">
             <div class="form-check form-switch mb-0" title="Toggle dark mode">
                 <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle" style="cursor: pointer;">
-                <label class="form-check-label text-white visually-hidden" for="darkModeToggle">Dark mode</label>
-                <span class="text-white" id="themeIcon" style="font-size: 1.1rem;">🌙</span>
+                <label class="form-check-label visually-hidden" for="darkModeToggle">Dark mode</label>
+                <span id="themeIcon" style="font-size: 1.1rem;">🌙</span>
             </div>
             <a href="{{ applicationUrl }}/login" class="btn btn-warning" style="background-color: var(--pathe-yellow); border-color: var(--pathe-yellow); color: var(--pathe-dark);">
                 Login

@@ -1,6 +1,6 @@
-<nav class="navbar navbar-expand-lg" style="background-color: var(--pathe-dark);">
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--pathe-dark);">
     <div class="container">
-        <a class="navbar-brand text-white" href="{{ applicationUrl }}/">{{ applicationName ?? 'Pathary' }}</a>
+        <a class="navbar-brand" href="{{ applicationUrl }}/">{{ applicationName ?? 'Pathary' }}</a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAppContent" aria-controls="navbarAppContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -15,18 +15,18 @@
                 <li class="nav-item me-2">
                     <div class="form-check form-switch mb-0" title="Toggle dark mode">
                         <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle" style="cursor: pointer;">
-                        <label class="form-check-label text-white visually-hidden" for="darkModeToggle">Dark mode</label>
-                        <span class="text-white" id="themeIcon" style="font-size: 1.1rem;">🌙</span>
+                        <label class="form-check-label visually-hidden" for="darkModeToggle">Dark mode</label>
+                        <span id="themeIcon" style="font-size: 1.1rem;">🌙</span>
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ applicationUrl }}/movies">All Movies</a>
+                    <a class="nav-link" href="{{ applicationUrl }}/movies">All Movies</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ applicationUrl }}/profile">Profile</a>
+                    <a class="nav-link" href="{{ applicationUrl }}/profile">Profile</a>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link text-white btn btn-link" onclick="logoutAndRedirect()" style="cursor: pointer;">Logout</button>
+                    <button class="nav-link btn btn-link" onclick="logoutAndRedirect()" style="cursor: pointer;">Logout</button>
                 </li>
             </ul>
         </div>
