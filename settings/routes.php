@@ -35,6 +35,11 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ##############
     $routes->add('GET', '/movies', [Web\AllMoviesController::class, 'index'], [Web\Middleware\UserIsAuthenticated::class]);
 
+    #######
+    # Dev #
+    #######
+    $routes->add('GET', '/dev/popcorn', [Web\DevController::class, 'renderPopcornTestPage']);
+
     ###########
     # Profile #
     ###########
