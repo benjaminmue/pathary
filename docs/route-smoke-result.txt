@@ -1,0 +1,80 @@
+================================================================================
+PATHARY ROUTE SMOKE TEST REPORT
+================================================================================
+
+Timestamp: 2025-12-14T16:35:36Z
+Image Tag: movary-pathary
+Container IDs:
+  - pathary-app: dd7213e000da
+  - pathary-mysql: 507c3556c7f4
+
+================================================================================
+TEST RESULTS
+================================================================================
+
+PUBLIC ROUTES
+-------------
+| Method | URL                        | Status | Result  |
+|--------|----------------------------|--------|---------|
+| GET    | /                          | 200    | PASS    |
+| GET    | /login                     | 200    | PASS    |
+| GET    | /movie/2                   | 200    | PASS    |
+| GET    | /profile-images/test.jpg   | 404    | PASS*   |
+
+* 404 expected - file doesn't exist but route is functional
+
+AUTHENTICATED ROUTES
+--------------------
+Status: SKIPPED
+
+Reason: PATHARY_TEST_EMAIL and PATHARY_TEST_PASSWORD environment variables not set.
+
+To run authenticated tests, set these environment variables:
+  export PATHARY_TEST_EMAIL="your-test-email"
+  export PATHARY_TEST_PASSWORD="your-test-password"
+
+Routes that would be tested:
+- POST /api/authentication/token (login)
+- GET /search?q=test
+- GET /movies
+- GET /profile
+- GET /tmdb/movie/550
+- DELETE /api/authentication/token (logout)
+
+TMDB INTEGRATION
+----------------
+| Check                    | Status  | Notes                          |
+|--------------------------|---------|--------------------------------|
+| TMDB_API_KEY configured  | YES     | Environment variable is set    |
+| TMDB API errors in logs  | NONE    | No errors found                |
+| API search endpoint      | 403     | Requires auth (expected)       |
+
+================================================================================
+SUMMARY
+================================================================================
+
+| Category           | Total | Passed | Failed | Skipped |
+|--------------------|-------|--------|--------|---------|
+| Public Routes      | 4     | 4      | 0      | 0       |
+| Authenticated      | 6     | 0      | 0      | 6       |
+| TMDB Verification  | 1     | 1      | 0      | 0       |
+|--------------------|-------|--------|--------|---------|
+| TOTAL              | 11    | 5      | 0      | 6       |
+
+Overall Status: PASS (with skipped authenticated tests)
+
+================================================================================
+NOTES
+================================================================================
+
+- All public routes are responding correctly
+- TMDB API key is properly configured in the container
+- No errors found in application logs
+- Authenticated tests require credentials to be provided via environment variables
+
+To run full test suite including authenticated routes:
+  export PATHARY_TEST_EMAIL="user@example.com"
+  export PATHARY_TEST_PASSWORD="password"
+  # Then re-run smoke tests
+
+================================================================================

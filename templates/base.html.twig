@@ -23,14 +23,18 @@
     <link rel="stylesheet" href="{{ applicationUrl }}/css/global.css">
 {% block stylesheets %}{% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 <script>0</script>
 
 <input value="{{ dateFormatJavascript }}" id="dateFormatJavascript" hidden>
 <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
 <input type="hidden" id="currentUserName" value="{{ currentUserName }}">
 
+<div class="flex-grow-1">
 {% block body %}{% endblock %}
+</div>
+
+{% include 'partials/footer.twig' %}
 
 <script>window.APPLICATION_URL = "{{ applicationUrl  }}";</script>
 <script src="{{ applicationUrl }}/js/jquery-3.3.1.js"></script>
