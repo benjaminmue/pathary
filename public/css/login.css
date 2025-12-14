@@ -9,13 +9,25 @@ body {
     overflow-x: hidden;
 }
 
+/* Override base template flex-column to center content */
 body {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important; /* Dynamic viewport height for iOS Safari */
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    position: relative;
+}
+
+/* Make the flex-grow-1 wrapper also center its content */
+body > .flex-grow-1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    position: relative;
+    width: 100%;
+    flex-grow: 0 !important; /* Don't grow, just center */
 }
 
 /* Dark theme background */
