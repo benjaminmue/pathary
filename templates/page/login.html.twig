@@ -9,31 +9,57 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="{{ applicationUrl }}/js/login-bg.js"></script>
     <script src="{{ applicationUrl }}/js/login.js"></script>
 {% endblock %}
 
 {% block body %}
-    <script>
-        if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
-    </script>
-        <main role="main" class="form-signin w-100 m-auto text-center">
+    <div class="login-container">
+        <!-- Centered Logo with Circle Background -->
+        <div class="login-logo-wrapper">
+            <div class="login-logo-circle">
+                <img src="{{ applicationUrl }}/images/pathary-logo-384x384.png"
+                     alt="{{ applicationName ?? 'Pathary' }} logo"
+                     class="login-logo">
+            </div>
+        </div>
+
+        <!-- Login Card -->
+        <div class="login-card">
             <div id="loginForm">
-                <h1 id="header" class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" style="margin-bottom: 1rem">{{ applicationName ?? 'Pathary' }}</h1>
+                <h1 class="text-center">{{ applicationName ?? 'Pathary' }}</h1>
+
                 <div class="form-floating">
-                    <input type="email" value="{{ defaultEmail }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="email"
-                        placeholder="name@example.com" onkeydown="submitCredentialsOnEnter(event)" required>
+                    <input type="email"
+                           value="{{ defaultEmail }}"
+                           class="form-control"
+                           id="email"
+                           placeholder="name@example.com"
+                           onkeydown="submitCredentialsOnEnter(event)"
+                           autocomplete="email"
+                           required>
                     <label for="email">Email address</label>
                 </div>
+
                 <div class="form-floating">
-                    <input type="password" value="{{ defaultPassword }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="password"
-                        placeholder="Password" onkeydown="submitCredentialsOnEnter(event)" required>
+                    <input type="password"
+                           value="{{ defaultPassword }}"
+                           class="form-control"
+                           id="password"
+                           placeholder="Password"
+                           onkeydown="submitCredentialsOnEnter(event)"
+                           autocomplete="current-password"
+                           required>
                     <label for="password">Password</label>
                 </div>
 
-                <div class="checkbox mb-3" style="margin-bottom: 0.7rem!important;">
-                    <label class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">
-                        <input type="checkbox" id="rememberMe" value="true" {{ defaultRememberMe == 'true' ? 'checked' : '' }}> Remember me
-                    </label>
+                <div class="form-check">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           id="rememberMe"
+                           value="true"
+                           {{ defaultRememberMe == 'true' ? 'checked' : '' }}>
+                    <label class="form-check-label" for="rememberMe">Remember me</label>
                 </div>
 
                 <div id="loginErrors"></div>
@@ -42,27 +68,45 @@
                     <div class="alert alert-danger" role="alert" id="forbiddenPageAlert">
                         Sign in to access page
                     </div>
-                    <input type="hidden" value="{{ redirect }}" name="redirect" />
+                    <input type="hidden" value="{{ redirect }}" name="redirect">
                 {% endif %}
-                <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">Sign in</button>
+
+                <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">
+                    Sign in
+                </button>
+
                 {% if registrationEnabled == true %}
-                    <a href="{{ applicationUrl }}/create-user">Create new user</a>
+                    <div class="text-center">
+                        <a href="{{ applicationUrl }}/create-user">Create new user</a>
+                    </div>
                 {% endif %}
             </div>
+
             <div id="totpForm" class="d-none">
-                <p style="margin-bottom: 0">Enter the 6 digit verification code from your authenticator app.</p>
+                <h1 class="text-center">Verification</h1>
+                <p class="text-center">Enter the 6-digit code from your authenticator app.</p>
+
                 <input type="text"
-                    class="form-control form-control-lg text-{{ theme == 'dark' ? 'light' : 'dark' }}"
-                    placeholder="Verification code"
-                    maxlength="6"
-                    autocomplete="off"
-                    style="margin-bottom: .7rem;margin-top: .7rem"
-                    id="totpCode"
-                    onkeydown="submitCredentialsOnEnter(event)"
-                    required>
+                       class="form-control form-control-lg text-center mb-3"
+                       placeholder="000000"
+                       maxlength="6"
+                       autocomplete="one-time-code"
+                       inputmode="numeric"
+                       pattern="[0-9]*"
+                       id="totpCode"
+                       onkeydown="submitCredentialsOnEnter(event)"
+                       required>
+
                 <div id="totpErrors"></div>
-                <button class="w-100 btn btn-lg btn-primary mb-3" type="button" style="margin-bottom: .7rem!important;" onclick="submitCredentials()">Continue</button>
-                <a href="{{ applicationUrl }}/">Back</a>
+
+                <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">
+                    Continue
+                </button>
+
+                <div class="text-center">
+                    <a href="{{ applicationUrl }}/login">Back to login</a>
+                </div>
             </div>
-        </main>
+        </div>
+    </div>
 {% endblock %}
