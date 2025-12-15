@@ -8,7 +8,7 @@ function deleteWatchDate() {
     }
 
     $.ajax({
-        url: APPLICATION_URL + '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history',
+        url: APPLICATION_URL + '/old/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history',
         type: 'DELETE',
         data: JSON.stringify({
             'date': document.getElementById('originalWatchDate').value,
@@ -60,7 +60,7 @@ function getRouteUsername() {
 function saveRating() {
     let newRating = getRatingFromStars('editRatingModal')
 
-    fetch(APPLICATION_URL + '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/rating', {
+    fetch(APPLICATION_URL + '/old/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/rating', {
         method: 'post',
         headers: {
             'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -163,7 +163,7 @@ function editWatchDate() {
     const locationId = document.getElementById('editWatchDateModalLocationInput').value;
     const postToMastodon = document.getElementById('editWatchDateModalPostToMastodonInput').checked;
 
-    const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
+    const apiUrl = '/old/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
 
     $.ajax({
         url: apiUrl,
@@ -230,7 +230,7 @@ function refreshTmdbData() {
 }
 
 async function addToWatchlistRequest() {
-    const response = await fetch(APPLICATION_URL + '/movies/' + getMovieId() + '/add-watchlist')
+    const response = await fetch(APPLICATION_URL + '/old/movies/' + getMovieId() + '/add-watchlist')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -240,7 +240,7 @@ async function addToWatchlistRequest() {
 }
 
 async function removeFromWatchlistRequest() {
-    const response = await fetch(APPLICATION_URL + '/movies/' + getMovieId() + '/remove-watchlist')
+    const response = await fetch(APPLICATION_URL + '/old/movies/' + getMovieId() + '/remove-watchlist')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -250,7 +250,7 @@ async function removeFromWatchlistRequest() {
 }
 
 async function refreshTmdbDataRequest() {
-    const response = await fetch(APPLICATION_URL + '/movies/' + getMovieId() + '/refresh-tmdb')
+    const response = await fetch(APPLICATION_URL + '/old/movies/' + getMovieId() + '/refresh-tmdb')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -281,7 +281,7 @@ function refreshImdbRating() {
 }
 
 async function refreshImdbRatingRequest() {
-    const response = await fetch(APPLICATION_URL + '/movies/' + getMovieId() + '/refresh-imdb')
+    const response = await fetch(APPLICATION_URL + '/old/movies/' + getMovieId() + '/refresh-imdb')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -376,7 +376,7 @@ async function loadWatchProviders(country, streamType) {
 
 async function fetchWatchProviders(country, streamType) {
     const response = await fetch(
-        APPLICATION_URL + '/movies/' + getMovieId() + '/watch-providers?country=' + country + '&streamType=' + streamType,
+        APPLICATION_URL + '/old/movies/' + getMovieId() + '/watch-providers?country=' + country + '&streamType=' + streamType,
         {signal: AbortSignal.timeout(4000)}
     )
 

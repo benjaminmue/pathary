@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function refreshPage() {
     const jobsPerPage = document.getElementById('jobsPerPage').value
 
-    window.location.href = APPLICATION_URL + '/settings/server/jobs?jpp=' + jobsPerPage
+    window.location.href = APPLICATION_URL + '/old/settings/server/jobs?jpp=' + jobsPerPage
 }
 
 async function removeAllJobs() {

@@ -271,7 +271,7 @@ async function selectLogModalTmdbItemForLogging(event) {
     let isWatchedEl = item.dataset.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : ''
     let isOnWatchlistEl = item.dataset.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : ''
     if (item.dataset.movaryId) {
-        movaryUrl = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/movies/" + item.dataset.movaryId
+        movaryUrl = APPLICATION_URL + "/old/users/" + document.getElementById('currentUserName').value + "/movies/" + item.dataset.movaryId
         isWatchedEl = '<a href="' + movaryUrl + '">' + isWatchedEl + '</a>';
         isOnWatchlistEl = '<a href="' + movaryUrl + '">' + isOnWatchlistEl + '</a>';
     }
@@ -325,7 +325,7 @@ function addToWatchlist(context) {
     const tmdbId = document.getElementById(context + 'TmdbIdInput').value
     const postToMastodon = document.getElementById('postToMastodon').checked
 
-    fetch(APPLICATION_URL + '/add-movie-to-watchlist', {
+    fetch(APPLICATION_URL + '/old/add-movie-to-watchlist', {
         method: 'post', headers: {
             'Content-type': 'application/json',
         }, body: JSON.stringify({
@@ -334,7 +334,7 @@ function addToWatchlist(context) {
         })
     }).then(function (response) {
         if (response.status === 200) {
-            window.location = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/watchlist"
+            window.location = APPLICATION_URL + "/old/users/" + document.getElementById('currentUserName').value + "/watchlist"
 
             return
         }
@@ -361,7 +361,7 @@ function logMovie(context) {
         return
     }
 
-    fetch(APPLICATION_URL + '/log-movie', {
+    fetch(APPLICATION_URL + '/old/log-movie', {
         method: 'post', headers: {
             'Content-type': 'application/json',
         }, body: JSON.stringify({
@@ -379,7 +379,7 @@ function logMovie(context) {
             if (document.getElementById("openedFromMoviePage").getAttribute("value") == "1") {
                 window.location.reload()
             }else {
-                window.location = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/history"
+                window.location = APPLICATION_URL + "/old/users/" + document.getElementById('currentUserName').value + "/history"
             }
 
             return
@@ -484,7 +484,7 @@ function getCurrentDate() {
  * Rating star logic starting here
  */
 async function fetchRating(tmdbId) {
-    const response = await fetch(APPLICATION_URL + '/fetchMovieRatingByTmdbdId?tmdbId=' + tmdbId)
+    const response = await fetch(APPLICATION_URL + '/old/fetchMovieRatingByTmdbdId?tmdbId=' + tmdbId)
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -563,7 +563,7 @@ async function logout() {
 
 async function fetchLocations() {
     const response = await fetch(
-        APPLICATION_URL + '/settings/locations',
+        APPLICATION_URL + '/old/settings/locations',
         {signal: AbortSignal.timeout(4000)}
     )
 

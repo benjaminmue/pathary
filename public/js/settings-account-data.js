@@ -67,19 +67,19 @@ document.getElementById('deleteAccountButton').addEventListener('click', async (
 });
 
 function deleteUserAccount() {
-    return fetch(APPLICATION_URL + '/settings/account/delete-account', {
+    return fetch(APPLICATION_URL + '/old/settings/account/delete-account', {
         method: 'DELETE',
     })
 }
 
 function deleteUserHistory() {
-    return fetch(APPLICATION_URL + '/settings/account/delete-history', {
+    return fetch(APPLICATION_URL + '/old/settings/account/delete-history', {
         method: 'DELETE',
     })
 }
 
 function deleteUserRatings() {
-    return fetch(APPLICATION_URL + '/settings/account/delete-ratings', {
+    return fetch(APPLICATION_URL + '/old/settings/account/delete-ratings', {
         method: 'DELETE',
     })
 }

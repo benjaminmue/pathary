@@ -14,40 +14,42 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                    <a class="dropdown-item {% if requestUrlPath matches '#^\/[^\/]+\/[^\/]+$#' %}active{% endif %}"
-                       href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}">
+                    <a class="dropdown-item {% if requestUrlPath matches '#^\/old\/[^\/]+\/[^\/]+$#' %}active{% endif %}"
+                       href="{{ applicationUrl }}/old/users/{{ routeUsername ?: currentUserName }}">
                         Dashboard
                     </a>
                 </li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/history#' %}active{% endif %}"
-                       href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}/history">
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/old\/.+\/history#' %}active{% endif %}"
+                       href="{{ applicationUrl }}/old/users/{{ routeUsername ?: currentUserName }}/history">
                         History
                     </a>
                 </li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/watchlist#' %}active{% endif %}"
-                       href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}/watchlist">
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/old\/.+\/watchlist#' %}active{% endif %}"
+                       href="{{ applicationUrl }}/old/users/{{ routeUsername ?: currentUserName }}/watchlist">
                         Watchlist
                     </a>
                 </li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/movies#' %}active{% endif %}"
-                       href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}/movies">
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/old\/.+\/movies#' %}active{% endif %}"
+                       href="{{ applicationUrl }}/old/users/{{ routeUsername ?: currentUserName }}/movies">
                         All Movies</a>
                 </li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/actors#' %}active{% endif %}"
-                       href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}/actors">
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/old\/.+\/actors#' %}active{% endif %}"
+                       href="{{ applicationUrl }}/old/users/{{ routeUsername ?: currentUserName }}/actors">
                         Top Actors
                     </a>
                 </li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/directors#' %}active{% endif %}"
-                       href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}/directors">
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/old\/.+\/directors#' %}active{% endif %}"
+                       href="{{ applicationUrl }}/old/users/{{ routeUsername ?: currentUserName }}/directors">
                         Top Directors
                     </a>
                 </li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
+                {% if loggedIn == true and currentUserIsAdmin == true %}
+                    <li><a class="dropdown-item {% if requestUrlPath starts with '/old/settings/' %}active{% endif %}" href="{{ applicationUrl }}/old/settings/account/general">Old Settings (Debug)</a></li>
+                {% endif %}
                 {% if loggedIn == true %}
-                    <li><a class="dropdown-item {% if requestUrlPath starts with '/settings/' %}active{% endif %}" href="{{ applicationUrl }}/settings/account/general">Settings</a></li>
                     <li><button class="dropdown-item" onclick="logout()" style="cursor: pointer">Logout</button></li>
                 {% else %}
                     <li><a class="dropdown-item" href="{{ applicationUrl }}/login">Login</a></li>

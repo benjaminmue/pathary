@@ -45,7 +45,7 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
 });
 
 function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchlistRemoval, country, displayCharacterNames, displayTmdbRatings, displayImdbRatings) {
-    return fetch(APPLICATION_URL + '/settings/account', {
+    return fetch(APPLICATION_URL + '/old/settings/account', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -96,7 +96,7 @@ function regenerateApiToken() {
 }
 
 async function deleteApiTokenRequest() {
-    const response = await fetch(APPLICATION_URL + '/settings/account/general/api-token', {'method': 'delete'})
+    const response = await fetch(APPLICATION_URL + '/old/settings/account/general/api-token', {'method': 'delete'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -104,7 +104,7 @@ async function deleteApiTokenRequest() {
 }
 
 async function regenerateApiTokenRequest() {
-    const response = await fetch(APPLICATION_URL + '/settings/account/general/api-token', {'method': 'put'})
+    const response = await fetch(APPLICATION_URL + '/old/settings/account/general/api-token', {'method': 'put'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -120,7 +120,7 @@ function setApiToken(apiToken) {
 }
 
 fetch(
-    APPLICATION_URL + '/settings/account/general/api-token'
+    APPLICATION_URL + '/old/settings/account/general/api-token'
 ).then(async function (response) {
     if (response.status === 200) {
         const responseData = await response.json();

@@ -126,7 +126,7 @@
                         {% for movieAsActor in moviesAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <a class="card h-100 position-relative" style="cursor: pointer"
-                                     href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}-{{ movieAsActor.title|slugify }}">
+                                     href="{{ applicationUrl }}/old/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}-{{ movieAsActor.title|slugify }}">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
@@ -147,7 +147,7 @@
                         {% for movieAsActor in moviesFromWatchlistAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <a class="card h-100 position-relative" style="cursor: pointer"
-                                     href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}">
+                                     href="{{ applicationUrl }}/old/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
@@ -170,7 +170,7 @@
                     {% for movieAsDirector in moviesAsDirector %}
                         <div class="col position-relative" style="padding-bottom: 1rem">
                             <a class="card h-100 position-relative" style="cursor: pointer"
-                                 href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}">
+                                 href="{{ applicationUrl }}/old/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}">
                                 <div class="position-relative">
                                     <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 
@@ -191,7 +191,7 @@
                       {% for movieAsDirector in moviesFromWatchlistAsDirector %}
                           <div class="col position-relative" style="padding-bottom: 1rem">
                               <a class="card h-100 position-relative" style="cursor: pointer"
-                                   href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}">
+                                   href="{{ applicationUrl }}/old/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}">
                                   <div class="position-relative">
                                       <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 

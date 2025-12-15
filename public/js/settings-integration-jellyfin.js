@@ -34,7 +34,7 @@ function deleteJellyfinWebhook() {
 }
 
 async function regenerateJellyfinWebhookRequest() {
-    const response = await fetch(APPLICATION_URL + '/settings/jellyfin/webhook', {'method': 'put'})
+    const response = await fetch(APPLICATION_URL + '/old/settings/jellyfin/webhook', {'method': 'put'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -45,7 +45,7 @@ async function regenerateJellyfinWebhookRequest() {
 }
 
 async function deleteJellyfinWebhookRequest() {
-    const response = await fetch(APPLICATION_URL + '/settings/jellyfin/webhook', {'method': 'delete'})
+    const response = await fetch(APPLICATION_URL + '/old/settings/jellyfin/webhook', {'method': 'delete'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -69,7 +69,7 @@ function setJellyfinWebhookUrl(webhookUrl) {
 async function updateScrobbleOptions() {
     removeAlert('alertWebhookOptionsDiv')
 
-    await fetch(APPLICATION_URL + '/settings/jellyfin', {
+    await fetch(APPLICATION_URL + '/old/settings/jellyfin', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
@@ -97,7 +97,7 @@ async function saveJellyfinServerUrl() {
 
     const jellyfinServerUrl = document.getElementById('jellyfinServerUrlInput').value;
 
-    await fetch(APPLICATION_URL + '/settings/jellyfin/server-url-save', {
+    await fetch(APPLICATION_URL + '/old/settings/jellyfin/server-url-save', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ async function verifyJellyfinServerUrl() {
     removeAlert('alertJellyfinServerUrlDiv');
 
     const response = await fetch(
-        APPLICATION_URL + '/settings/jellyfin/server-url-verify', {
+        APPLICATION_URL + '/old/settings/jellyfin/server-url-verify', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ async function authenticateJellyfinAccount() {
     removeAlert('alertJellyfinAuthenticationModalDiv')
 
     const response = await fetch(
-        APPLICATION_URL + '/settings/jellyfin/authenticate', {
+        APPLICATION_URL + '/old/settings/jellyfin/authenticate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -219,7 +219,7 @@ async function authenticateJellyfinAccount() {
 }
 
 async function removeJellyfinAuthentication() {
-    await fetch(APPLICATION_URL + '/settings/jellyfin/remove-authentication', {
+    await fetch(APPLICATION_URL + '/old/settings/jellyfin/remove-authentication', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -242,7 +242,7 @@ async function removeJellyfinAuthentication() {
 async function updateSyncOptions() {
     removeAlert('alertJellyfinSyncDiv')
 
-    await fetch(APPLICATION_URL + '/settings/jellyfin/sync', {
+    await fetch(APPLICATION_URL + '/old/settings/jellyfin/sync', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
@@ -266,7 +266,7 @@ async function updateSyncOptions() {
 
 async function exportJellyfin() {
     const response = await fetch(
-        APPLICATION_URL + '/jobs/schedule/jellyfin-export-history',
+        APPLICATION_URL + '/old/jobs/schedule/jellyfin-export-history',
         {'method': 'POST'}
     ).catch(function (error) {
         addAlert('alertJellyfinExportHistoryDiv', 'History export could not be scheduled', 'danger')
@@ -296,7 +296,7 @@ async function exportJellyfin() {
 
 async function importJellyfin() {
     const response = await fetch(
-        APPLICATION_URL + '/jobs/schedule/jellyfin-import-history',
+        APPLICATION_URL + '/old/jobs/schedule/jellyfin-import-history',
         {'method': 'POST'}
     ).catch(function (error) {
         addAlert('alertJellyfinImportHistoryDiv', 'History import could not be scheduled', 'danger')
