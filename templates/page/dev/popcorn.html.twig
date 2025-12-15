@@ -1,7 +1,13 @@
 {% extends 'base.html.twig' %}
 
+{% set showFooter = false %}
+
 {% block title %}
     Popcorn Easter Egg Test
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ applicationUrl }}/css/popcorn-easter-egg.css">
 {% endblock %}
 
 {% block body %}
@@ -98,4 +104,28 @@ function toggleTheme() {
     html.setAttribute('data-bs-theme', currentTheme === 'dark' ? 'light' : 'dark');
 }
 </script>
+
+{# Custom footer with popcorn bucket for this dev page only #}
+<footer class="footer mt-auto py-3 bg-body-tertiary border-top footer-bucket-wrapper">
+    <button id="popcorn-bucket-btn" type="button" aria-label="Click for a popcorn surprise!">
+        <img src="{{ applicationUrl }}/images/pathary-logo.svg" alt="" class="popcorn-bucket-img">
+    </button>
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-center gap-3 small">
+            <a href="https://github.com/benjaminmue/pathary" target="_blank" rel="noopener noreferrer" class="text-body-secondary text-decoration-none">
+                <i class="bi bi-github me-1"></i>GitHub
+            </a>
+            <a href="https://github.com/benjaminmue/pathary/wiki" target="_blank" rel="noopener noreferrer" class="text-body-secondary text-decoration-none">
+                <i class="bi bi-book me-1"></i>Wiki
+            </a>
+            <a href="https://github.com/benjaminmue/pathary/issues/new" target="_blank" rel="noopener noreferrer" class="text-body-secondary text-decoration-none">
+                <i class="bi bi-bug me-1"></i>Report Issue
+            </a>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ applicationUrl }}/js/popcorn-easter-egg.js"></script>
 {% endblock %}
