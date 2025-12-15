@@ -1,6 +1,7 @@
 .idea
 .phpunit.result.cache
 .env
+.env.local
 /vendor
 /public/storage
 docker-compose.override.yml
