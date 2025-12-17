@@ -1,0 +1,250 @@
+<div class="profile-card">
+    <style>
+        .security-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+
+        .security-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .security-section h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .security-section p {
+            color: var(--bs-secondary-color);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-badge.enabled {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+
+        .status-badge.disabled {
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+        }
+
+        .device-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .device-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .device-info p {
+            font-size: 0.85rem;
+            color: var(--bs-secondary-color);
+            margin: 0;
+        }
+
+        .event-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .event-item {
+            padding: 0.75rem;
+            background: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .event-type {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .event-time {
+            font-size: 0.8rem;
+            color: var(--bs-secondary-color);
+        }
+
+        .event-details {
+            font-size: 0.85rem;
+            color: var(--bs-secondary-color);
+        }
+    </style>
+
+    <!-- Password Section -->
+    <div class="security-section">
+        <h3><i class="bi bi-key"></i> Password</h3>
+        <p>Change your password regularly to keep your account secure.</p>
+        <button type="button" class="btn btn-primary" id="changePasswordBtn">
+            <i class="bi bi-key"></i> Change Password
+        </button>
+    </div>
+
+    <!-- Two-Factor Authentication Section -->
+    <div class="security-section">
+        <h3><i class="bi bi-shield-check"></i> Two-Factor Authentication</h3>
+        <p>Add an extra layer of security to your account with 2FA using an authenticator app.</p>
+
+        {% if totpEnabled %}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="status-badge enabled">
+                    <i class="bi bi-check-circle-fill"></i> Enabled
+                </span>
+                <button type="button" class="btn btn-sm btn-outline-danger" id="disable2FABtn">
+                    <i class="bi bi-x-circle"></i> Disable 2FA
+                </button>
+            </div>
+        {% else %}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="status-badge disabled">
+                    <i class="bi bi-circle"></i> Disabled
+                </span>
+                <button type="button" class="btn btn-primary" id="enable2FABtn">
+                    <i class="bi bi-shield-plus"></i> Enable 2FA
+                </button>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Recovery Codes Section -->
+    {% if totpEnabled %}
+        <div class="security-section">
+            <h3><i class="bi bi-life-preserver"></i> Recovery Codes</h3>
+            <p>Use recovery codes to access your account if you lose your authenticator device.</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted">{{ recoveryCodesCount }} unused codes remaining</span>
+                <button type="button" class="btn btn-outline-primary" id="regenerateCodesBtn">
+                    <i class="bi bi-arrow-clockwise"></i> Regenerate Codes
+                </button>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Trusted Devices Section -->
+    {% if totpEnabled %}
+        <div class="security-section">
+            <h3><i class="bi bi-laptop"></i> Trusted Devices</h3>
+            <p>Devices you've marked as trusted will not require 2FA for 30 days.</p>
+
+            {% if trustedDevices is not empty %}
+                <ul class="device-list">
+                    {% for device in trustedDevices %}
+                        <li class="device-item">
+                            <div class="device-info">
+                                <h4><i class="bi bi-laptop"></i> {{ device.device_name }}</h4>
+                                <p>
+                                    Added: {{ device.created_at }}
+                                    {% if device.last_used_at %}
+                                        | Last used: {{ device.last_used_at }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger revoke-device-btn" data-device-id="{{ device.id }}">
+                                <i class="bi bi-x-circle"></i> Revoke
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No trusted devices. Check "Trust this device" when logging in to add one.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Security Activity Log Section -->
+    <div class="security-section">
+        <h3><i class="bi bi-clock-history"></i> Security Activity</h3>
+        <p>Recent security-related events on your account.</p>
+
+        {% if securityEvents is not empty %}
+            <ul class="event-list">
+                {% for event in securityEvents %}
+                    <li class="event-item">
+                        <div class="event-header">
+                            <span class="event-type">
+                                {% if event.event_type == 'totp_enabled' %}
+                                    <i class="bi bi-shield-plus"></i>
+                                {% elseif event.event_type == 'totp_disabled' %}
+                                    <i class="bi bi-shield-x"></i>
+                                {% elseif event.event_type == 'password_changed' %}
+                                    <i class="bi bi-key"></i>
+                                {% elseif event.event_type == 'login_success' %}
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                {% elseif event.event_type starts with 'login_failed' %}
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                {% else %}
+                                    <i class="bi bi-info-circle"></i>
+                                {% endif %}
+                                {% if event.event_type == 'totp_enabled' %}2FA Enabled
+                                {% elseif event.event_type == 'totp_disabled' %}2FA Disabled
+                                {% elseif event.event_type == 'password_changed' %}Password Changed
+                                {% elseif event.event_type == 'recovery_codes_generated' %}Recovery Codes Generated
+                                {% elseif event.event_type == 'recovery_code_used' %}Recovery Code Used
+                                {% elseif event.event_type == 'trusted_device_added' %}Trusted Device Added
+                                {% elseif event.event_type == 'trusted_device_removed' %}Trusted Device Removed
+                                {% elseif event.event_type == 'login_success' %}Login Success
+                                {% elseif event.event_type == 'login_failed_password' %}Login Failed (Password)
+                                {% elseif event.event_type == 'login_failed_totp' %}Login Failed (2FA)
+                                {% elseif event.event_type == 'logout' %}Logout
+                                {% else %}{{ event.event_type }}
+                                {% endif %}
+                            </span>
+                            <span class="event-time">{{ event.created_at }}</span>
+                        </div>
+                        {% if event.ip_address or event.user_agent %}
+                            <div class="event-details">
+                                {% if event.ip_address %}
+                                    IP: {{ event.ip_address }}
+                                {% endif %}
+                                {% if event.user_agent %}
+                                    | {{ event.user_agent|slice(0, 60) }}{% if event.user_agent|length > 60 %}...{% endif %}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No security events recorded yet.</p>
+        {% endif %}
+    </div>
+</div>

@@ -47,6 +47,18 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/profile', [Web\ProfileController::class, 'update'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/profile-images/{filename:.+}', [Web\ProfileController::class, 'serveImage']);
 
+    #####################
+    # Profile Security  #
+    #####################
+    $routes->add('GET', '/profile/security', [Web\ProfileSecurityController::class, 'show'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/profile/security/password', [Web\ProfileSecurityController::class, 'changePassword'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/profile/security/totp/enable', [Web\ProfileSecurityController::class, 'enableTotp'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/profile/security/totp/verify', [Web\ProfileSecurityController::class, 'verifyAndSaveTotp'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/profile/security/totp/disable', [Web\ProfileSecurityController::class, 'disableTotp'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/profile/security/recovery-codes/regenerate', [Web\ProfileSecurityController::class, 'regenerateRecoveryCodes'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/profile/security/trusted-devices/{deviceId:[0-9]+}/revoke', [Web\ProfileSecurityController::class, 'revokeTrustedDevice'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/profile/security/events', [Web\ProfileSecurityController::class, 'getSecurityEvents'], [Web\Middleware\UserIsAuthenticated::class]);
+
     ################
     # TMDB Movies  #
     ################

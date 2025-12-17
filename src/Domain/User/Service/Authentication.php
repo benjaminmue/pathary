@@ -6,6 +6,8 @@ use Movary\Domain\User\Exception\EmailNotFound;
 use Movary\Domain\User\Exception\InvalidPassword;
 use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\MissingTotpCode;
+use Movary\Domain\User\Repository\RecoveryCodeRepository;
+use Movary\Domain\User\Repository\TrustedDeviceRepository;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
@@ -18,6 +20,7 @@ use RuntimeException;
 class Authentication
 {
     private const string AUTHENTICATION_COOKIE_NAME = 'id';
+    private const string TRUSTED_DEVICE_COOKIE_NAME = 'trusted_device';
 
     private const int MAX_EXPIRATION_AGE_IN_DAYS = 3650; // 10 years for persistent login
 
@@ -26,6 +29,9 @@ class Authentication
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
+        private readonly RecoveryCodeService $recoveryCodeService,
+        private readonly TrustedDeviceService $trustedDeviceService,
+        private readonly SecurityAuditService $securityAuditService,
     ) {
     }
 
@@ -49,31 +55,107 @@ class Authentication
         string $email,
         string $password,
         ?int $userTotpCode = null,
+        ?string $recoveryCode = null,
+        ?string $trustedDeviceToken = null,
     ) : UserEntity {
         $user = $this->repository->findUserByEmail($email);
 
         if ($user === null) {
+            $this->securityAuditService->log(
+                0, // User ID unknown at this point
+                SecurityAuditService::EVENT_LOGIN_FAILED_PASSWORD,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            );
             throw EmailNotFound::create();
         }
 
         if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
+            $this->securityAuditService->log(
+                $user->getId(),
+                SecurityAuditService::EVENT_LOGIN_FAILED_PASSWORD,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            );
             throw InvalidPassword::create();
         }
 
         $totpUri = $this->userApi->findTotpUri($user->getId());
         if ($totpUri === null) {
+            // No 2FA configured, login successful
+            $this->securityAuditService->log(
+                $user->getId(),
+                SecurityAuditService::EVENT_LOGIN_SUCCESS,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            );
             return $user;
         }
 
-        if ($userTotpCode === null) {
+        // 2FA is enabled - check for trusted device first
+        if ($trustedDeviceToken !== null) {
+            $trustedDevice = $this->trustedDeviceService->verifyTrustedDevice($trustedDeviceToken);
+            if ($trustedDevice !== null && (int)$trustedDevice['user_id'] === $user->getId()) {
+                // Trusted device is valid, skip 2FA
+                $this->securityAuditService->log(
+                    $user->getId(),
+                    SecurityAuditService::EVENT_LOGIN_SUCCESS,
+                    $_SERVER['REMOTE_ADDR'] ?? null,
+                    $_SERVER['HTTP_USER_AGENT'] ?? null,
+                    ['trusted_device' => true]
+                );
+                return $user;
+            }
+        }
+
+        // No trusted device or invalid - require 2FA or recovery code
+        if ($userTotpCode === null && $recoveryCode === null) {
             throw MissingTotpCode::create();
         }
 
-        if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpCode) === false) {
+        // Try recovery code first if provided
+        if ($recoveryCode !== null && $this->recoveryCodeService->verifyRecoveryCode($user->getId(), $recoveryCode) === true) {
+            $this->securityAuditService->log(
+                $user->getId(),
+                SecurityAuditService::EVENT_RECOVERY_CODE_USED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            );
+            return $user;
+        }
+
+        if ($recoveryCode !== null) {
+            $this->securityAuditService->log(
+                $user->getId(),
+                SecurityAuditService::EVENT_LOGIN_FAILED_RECOVERY_CODE,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            );
+        }
+
+        // Try TOTP code
+        if ($userTotpCode !== null && $this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpCode) === false) {
+            $this->securityAuditService->log(
+                $user->getId(),
+                SecurityAuditService::EVENT_LOGIN_FAILED_TOTP,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            );
             throw InvalidTotpCode::create();
         }
 
-        return $user;
+        if ($userTotpCode !== null) {
+            $this->securityAuditService->log(
+                $user->getId(),
+                SecurityAuditService::EVENT_LOGIN_SUCCESS,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            );
+            return $user;
+        }
+
+        // Neither recovery code nor TOTP was valid
+        throw InvalidTotpCode::create();
     }
 
     public function getCurrentUser() : UserEntity
@@ -187,8 +269,16 @@ class Authentication
         string $deviceName,
         string $userAgent,
         ?int $userTotpInput = null,
+        ?string $recoveryCode = null,
+        bool $trustDevice = false,
     ) : array {
-        $user = $this->findUserAndVerifyAuthentication($email, $password, $userTotpInput);
+        // Check for existing trusted device token
+        $trustedDeviceToken = (string)filter_input(INPUT_COOKIE, self::TRUSTED_DEVICE_COOKIE_NAME);
+        if ($trustedDeviceToken === '') {
+            $trustedDeviceToken = null;
+        }
+
+        $user = $this->findUserAndVerifyAuthentication($email, $password, $userTotpInput, $recoveryCode, $trustedDeviceToken);
 
         $authTokenExpirationDate = $this->createExpirationDate();
         if ($rememberMe === true) {
@@ -201,6 +291,25 @@ class Authentication
 
         if ($deviceName === CreateUserController::PATHARY_WEB_CLIENT) {
             $this->setAuthenticationCookieAndNewSession($user->getId(), $token, $authTokenExpirationDate);
+
+            // Create trusted device if requested and 2FA is enabled
+            if ($trustDevice === true && $this->userApi->findTotpUri($user->getId()) !== null) {
+                $deviceToken = $this->trustedDeviceService->createTrustedDevice(
+                    $user->getId(),
+                    $deviceName,
+                    $userAgent,
+                    $_SERVER['REMOTE_ADDR'] ?? null
+                );
+                $this->setTrustedDeviceCookie($deviceToken);
+
+                $this->securityAuditService->log(
+                    $user->getId(),
+                    SecurityAuditService::EVENT_TRUSTED_DEVICE_ADDED,
+                    $_SERVER['REMOTE_ADDR'] ?? null,
+                    $userAgent,
+                    ['device_name' => $deviceName]
+                );
+            }
         }
 
         return $userAndToken;
@@ -208,6 +317,13 @@ class Authentication
 
     public function logout() : void
     {
+        $userId = null;
+        try {
+            $userId = $this->getCurrentUserId();
+        } catch (RuntimeException) {
+            // User not logged in, ignore
+        }
+
         $token = (string)filter_input(INPUT_COOKIE, 'id');
 
         if ($token !== '') {
@@ -227,6 +343,15 @@ class Authentication
                     'httponly' => true,
                     'samesite' => 'Lax',
                 ],
+            );
+        }
+
+        if ($userId !== null) {
+            $this->securityAuditService->log(
+                $userId,
+                SecurityAuditService::EVENT_LOGOUT,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
             );
         }
 
@@ -302,5 +427,25 @@ class Authentication
         $this->repository->createAuthToken($userId, $token, $deviceName, $userAgent, $expirationDate);
 
         return $token;
+    }
+
+    private function setTrustedDeviceCookie(string $deviceToken) : void
+    {
+        $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+
+        // Trusted device expires in 30 days
+        $expirationDate = DateTime::create()->modify('+30 days');
+
+        setcookie(
+            self::TRUSTED_DEVICE_COOKIE_NAME,
+            $deviceToken,
+            [
+                'expires' => (int)$expirationDate->format('U'),
+                'path' => '/',
+                'secure' => $isSecure,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ],
+        );
     }
 }

@@ -88,24 +88,64 @@
 
             <div id="totpForm" class="d-none">
                 <h1 class="text-center">Verification</h1>
-                <p class="text-center">Enter the 6-digit code from your authenticator app.</p>
 
-                <input type="text"
-                       class="form-control form-control-lg text-center mb-3"
-                       placeholder="000000"
-                       maxlength="6"
-                       autocomplete="one-time-code"
-                       inputmode="numeric"
-                       pattern="[0-9]*"
-                       id="totpCode"
-                       onkeydown="submitCredentialsOnEnter(event)"
-                       required>
+                <!-- Mode Switch -->
+                <div class="text-center mb-3">
+                    <div class="btn-group" role="group" aria-label="Verification mode">
+                        <input type="radio" class="btn-check" name="verificationMode" id="modeAuthenticator" value="totp" checked autocomplete="off" onchange="switchVerificationMode('totp')">
+                        <label class="btn btn-outline-primary" for="modeAuthenticator">Authenticator code</label>
+
+                        <input type="radio" class="btn-check" name="verificationMode" id="modeRecovery" value="recovery" autocomplete="off" onchange="switchVerificationMode('recovery')">
+                        <label class="btn btn-outline-primary" for="modeRecovery">Recovery code</label>
+                    </div>
+                </div>
+
+                <!-- Authenticator Code Input -->
+                <div id="authenticatorModeContent">
+                    <p class="text-center">Enter the 6-digit code from your authenticator app.</p>
+
+                    <input type="text"
+                           class="form-control form-control-lg text-center mb-3"
+                           placeholder="000000"
+                           maxlength="6"
+                           autocomplete="one-time-code"
+                           inputmode="numeric"
+                           pattern="[0-9]*"
+                           id="totpCode"
+                           onkeydown="submitCredentialsOnEnter(event)"
+                           required>
+                </div>
+
+                <!-- Recovery Code Input -->
+                <div id="recoveryModeContent" class="d-none">
+                    <p class="text-center">Enter one of your recovery codes.</p>
+                    <p class="text-center text-muted small">Format: XXXX-XXXX-XX (case-insensitive, spaces/dashes optional)</p>
+
+                    <input type="text"
+                           class="form-control form-control-lg text-center mb-3"
+                           placeholder="XXXX-XXXX-XX"
+                           maxlength="12"
+                           autocomplete="off"
+                           id="recoveryCode"
+                           onkeydown="submitCredentialsOnEnter(event)"
+                           oninput="formatRecoveryCodeInput(event)">
+                </div>
 
                 <div id="totpErrors"></div>
 
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">
                     Continue
                 </button>
+
+                <!-- Help Section -->
+                <div class="alert alert-info small">
+                    <strong>Help:</strong>
+                    <ul class="mb-0 ps-3">
+                        <li><strong>No access to your authenticator app?</strong> Select "Recovery code" and enter one recovery code.</li>
+                        <li>Each recovery code works once.</li>
+                        <li>After login, go to <strong>Profile → Security</strong> to regenerate codes.</li>
+                    </ul>
+                </div>
 
                 <div class="text-center">
                     <a href="{{ applicationUrl }}/login">Back to login</a>

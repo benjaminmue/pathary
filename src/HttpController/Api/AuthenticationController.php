@@ -47,6 +47,7 @@ class AuthenticationController
 
         $requestClient = $headers['X-Movary-Client'];
         $totpCode = empty($tokenRequestBody['totpCode']) === true ? null : (int)$tokenRequestBody['totpCode'];
+        $recoveryCode = empty($tokenRequestBody['recoveryCode']) === true ? null : trim($tokenRequestBody['recoveryCode']);
         $rememberMe = $tokenRequestBody['rememberMe'] ?? false;
 
         try {
@@ -57,6 +58,7 @@ class AuthenticationController
                 $requestClient,
                 $request->getUserAgent(),
                 $totpCode,
+                $recoveryCode,
             );
         } catch (MissingTotpCode) {
             return Response::createBadRequest(

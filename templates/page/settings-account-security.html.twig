@@ -69,28 +69,16 @@
 
             <hr>
 
-            <h5 style="margin-bottom: .7rem">Two-Factor Authentication</h5>
-            {% if twoFactorAuthenticationEnabled == true %}
-                <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 0">
-                    Two-Factor authentication has been enabled.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <h5 style="margin-bottom: .7rem">Security Settings</h5>
+            <div class="alert alert-info" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                <i class="bi bi-info-circle"></i> <strong>Security settings have moved!</strong><br>
+                Two-Factor Authentication, Recovery Codes, and Trusted Devices are now available in your <a href="{{ applicationUrl }}/profile" class="alert-link">Profile Settings</a> under the Security tab.
+                <div style="margin-top: 1rem">
+                    <a href="{{ applicationUrl }}/profile" class="btn btn-sm btn-primary">
+                        <i class="bi bi-shield-lock"></i> Go to Profile Security Settings
+                    </a>
                 </div>
-            {% elseif twoFactorAuthenticationDisabled == true %}
-                <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                    Two-Factor authentication has been disabled.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
-            <div class="mb-3">
-                {% if totpEnabled == true %}
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTwoFactorAuthenticationModal">Disable Two-Factor Authentication
-                    </button>
-                {% else %}
-                    <button type="button" class="btn btn-primary" onclick="showAddTwoFactorAuthenticationModal()">Enable Two-Factor Authentication</button>
-                {% endif %}
             </div>
         </div>
     </main>
-    {{ include('component/modal-add-two-factor-authentication.html.twig') }}
-    {{ include('component/modal-delete-two-factor-authentication.html.twig') }}
 {% endblock %}

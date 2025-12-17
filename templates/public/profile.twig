@@ -1,6 +1,6 @@
 {% extends 'layouts/app_base.twig' %}
 
-{% block title %}Profile{% endblock %}
+{% block title %}Profile Settings{% endblock %}
 
 {% block stylesheets %}
 <style>
@@ -16,11 +16,37 @@
         margin: 0;
     }
 
+    /* Bootstrap Tabs Styling */
+    .nav-tabs {
+        border-bottom: 2px solid var(--bs-border-color);
+        margin-bottom: 2rem;
+    }
+
+    .nav-tabs .nav-link {
+        color: var(--bs-secondary-color);
+        border: none;
+        border-bottom: 2px solid transparent;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: var(--pathe-yellow);
+        border-bottom-color: var(--pathe-yellow);
+    }
+
+    .nav-tabs .nav-link.active {
+        color: var(--pathe-yellow);
+        background: transparent;
+        border-bottom-color: var(--pathe-yellow);
+    }
+
     .profile-card {
         background: var(--bs-tertiary-bg);
         border-radius: 12px;
         padding: 2rem;
-        max-width: 600px;
+        max-width: 800px;
     }
 
     .profile-image-section {
@@ -243,72 +269,97 @@
         <h1 class="profile-title">Profile Settings</h1>
     </header>
 
-    <div class="profile-card">
-        {% if success %}
-            <div class="alert alert-success">
-                <i class="bi bi-check-circle"></i> {{ success }}
-            </div>
-        {% endif %}
-
-        {% if error %}
-            <div class="alert alert-danger">
-                <i class="bi bi-exclamation-circle"></i> {{ error }}
-            </div>
-        {% endif %}
-
-        <form action="{{ applicationUrl }}/profile" method="post" enctype="multipart/form-data" id="profileForm">
-            <div class="profile-image-section">
-                <div class="profile-image-container">
-                    {% if profileImage %}
-                        <img src="{{ applicationUrl }}/profile-images/{{ profileImage }}" alt="{{ userName }}" class="profile-image" id="profileImagePreview">
-                    {% else %}
-                        <div class="profile-image-placeholder" id="profileImagePlaceholder">
-                            {{ userName|first|upper }}
-                        </div>
-                        <img src="" alt="" class="profile-image" id="profileImagePreview" style="display: none;">
-                    {% endif %}
-                </div>
-
-                <div class="profile-image-actions">
-                    <label class="btn btn-upload">
-                        <i class="bi bi-camera"></i> Upload Photo
-                        <input type="file" name="profile_image" accept="image/jpeg,image/png,image/gif,image/webp" id="profileImageInput">
-                    </label>
-                    {% if profileImage %}
-                        <button type="button" class="btn btn-remove-image" id="removeImageBtn">
-                            <i class="bi bi-trash"></i> Remove
-                        </button>
-                    {% endif %}
-                </div>
-                <p class="image-requirements">JPEG, PNG, GIF, or WebP. Max 5MB.</p>
-                <input type="hidden" name="remove_image" id="removeImageFlag" value="0">
-            </div>
-
-            <div class="form-group">
-                <label for="name">Display Name</label>
-                <input type="text" id="name" name="name" value="{{ userName }}" required pattern="[a-zA-Z0-9]+" minlength="2" maxlength="24">
-                <p class="form-hint">Only letters and numbers, 2-24 characters.</p>
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" value="{{ userEmail }}">
-                <p class="form-hint">Used for account recovery and notifications.</p>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn btn-save">
-                    <i class="bi bi-check-lg"></i> Save Changes
-                </button>
-            </div>
-        </form>
-
-        <div class="logout-section">
-            <h3>Sign Out</h3>
-            <p>Sign out of your account on this device.</p>
-            <button type="button" class="btn btn-logout" onclick="logoutAndRedirect()">
-                <i class="bi bi-box-arrow-right"></i> Logout
+    <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
+                <i class="bi bi-person"></i> Profile
             </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
+                <i class="bi bi-shield-lock"></i> Security
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="profileTabsContent">
+        <!-- Profile Tab -->
+        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="profile-card">
+                {% if success %}
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle"></i> {{ success }}
+                    </div>
+                {% endif %}
+
+                {% if error %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-circle"></i> {{ error }}
+                    </div>
+                {% endif %}
+
+                <form action="{{ applicationUrl }}/profile" method="post" enctype="multipart/form-data" id="profileForm">
+                    <div class="profile-image-section">
+                        <div class="profile-image-container">
+                            {% if profileImage %}
+                                <img src="{{ applicationUrl }}/profile-images/{{ profileImage }}" alt="{{ userName }}" class="profile-image" id="profileImagePreview">
+                            {% else %}
+                                <div class="profile-image-placeholder" id="profileImagePlaceholder">
+                                    {{ userName|first|upper }}
+                                </div>
+                                <img src="" alt="" class="profile-image" id="profileImagePreview" style="display: none;">
+                            {% endif %}
+                        </div>
+
+                        <div class="profile-image-actions">
+                            <label class="btn btn-upload">
+                                <i class="bi bi-camera"></i> Upload Photo
+                                <input type="file" name="profile_image" accept="image/jpeg,image/png,image/gif,image/webp" id="profileImageInput">
+                            </label>
+                            {% if profileImage %}
+                                <button type="button" class="btn btn-remove-image" id="removeImageBtn">
+                                    <i class="bi bi-trash"></i> Remove
+                                </button>
+                            {% endif %}
+                        </div>
+                        <p class="image-requirements">JPEG, PNG, GIF, or WebP. Max 5MB.</p>
+                        <input type="hidden" name="remove_image" id="removeImageFlag" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Display Name</label>
+                        <input type="text" id="name" name="name" value="{{ userName }}" required pattern="[a-zA-Z0-9]+" minlength="2" maxlength="24">
+                        <p class="form-hint">Only letters and numbers, 2-24 characters.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" value="{{ userEmail }}">
+                        <p class="form-hint">Used for account recovery and notifications.</p>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-save">
+                            <i class="bi bi-check-lg"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+
+                <div class="logout-section">
+                    <h3>Sign Out</h3>
+                    <p>Sign out of your account on this device.</p>
+                    <button type="button" class="btn btn-logout" onclick="logoutAndRedirect()">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Tab -->
+        <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
+            <div id="securityTabContent">
+                <p class="text-center"><i class="bi bi-hourglass-split"></i> Loading security settings...</p>
+            </div>
         </div>
     </div>
 </div>
@@ -372,5 +423,40 @@ async function logoutAndRedirect() {
     });
     window.location.href = '{{ applicationUrl }}/';
 }
+</script>
+<script>
+// Define global APPLICATION_URL for profile-security.js
+window.APPLICATION_URL = "{{ applicationUrl }}";
+
+// Debug: Check if Bootstrap is loaded
+console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
+console.log('jQuery available:', typeof $ !== 'undefined');
+</script>
+<script src="{{ applicationUrl }}/js/qrcode.min.js"></script>
+<script src="{{ applicationUrl }}/js/profile-security.js"></script>
+<script>
+// Initialize security tab loader
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded fired');
+    const securityTab = document.getElementById('security-tab');
+    console.log('Security tab element:', securityTab);
+
+    if (securityTab) {
+        // Manually initialize Bootstrap tab if needed
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+            const tabInstance = new bootstrap.Tab(securityTab);
+            console.log('Bootstrap Tab instance created:', tabInstance);
+        }
+
+        // Listen for the Bootstrap tab shown event
+        securityTab.addEventListener('shown.bs.tab', function(e) {
+            console.log('shown.bs.tab event fired');
+            const content = document.getElementById('securityTabContent');
+            if (content && content.innerHTML.includes('Loading security settings')) {
+                loadSecurityTab();
+            }
+        });
+    }
+});
 </script>
 {% endblock %}
