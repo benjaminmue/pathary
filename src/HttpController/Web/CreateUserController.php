@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Exception\EmailNotUnique;
+use Movary\Domain\User\Exception\PasswordPolicyViolation;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
@@ -73,6 +74,8 @@ class CreateUserController
             $this->authenticationService->login($email, $password, false, self::PATHARY_WEB_CLIENT, $userAgent);
         } catch (PasswordTooShort) {
             $this->sessionWrapper->set('errorPasswordTooShort', true);
+        } catch (PasswordPolicyViolation $e) {
+            $this->sessionWrapper->set('errorPasswordPolicyViolation', $e->getMessage());
         } catch (UsernameInvalidFormat) {
             $this->sessionWrapper->set('errorUsernameInvalidFormat', true);
         } catch (UsernameNotUnique) {
@@ -95,6 +98,7 @@ class CreateUserController
         $hasUsers = $this->userApi->hasUsers();
 
         $errorPasswordTooShort = $this->sessionWrapper->find('errorPasswordTooShort');
+        $errorPasswordPolicyViolation = $this->sessionWrapper->find('errorPasswordPolicyViolation');
         $errorPasswordNotEqual = $this->sessionWrapper->find('errorPasswordNotEqual');
         $errorUsernameInvalidFormat = $this->sessionWrapper->find('errorUsernameInvalidFormat');
         $errorUsernameUnique = $this->sessionWrapper->find('errorUsernameUnique');
@@ -104,6 +108,7 @@ class CreateUserController
 
         $this->sessionWrapper->unset(
             'errorPasswordTooShort',
+            'errorPasswordPolicyViolation',
             'errorPasswordNotEqual',
             'errorUsernameInvalidFormat',
             'errorUsernameUnique',
@@ -117,6 +122,7 @@ class CreateUserController
             $this->twig->render('page/create-user.html.twig', [
                 'subtitle' => $hasUsers === false ? 'Create initial admin user' : 'Create new user',
                 'errorPasswordTooShort' => $errorPasswordTooShort,
+                'errorPasswordPolicyViolation' => $errorPasswordPolicyViolation,
                 'errorPasswordNotEqual' => $errorPasswordNotEqual,
                 'errorUsernameInvalidFormat' => $errorUsernameInvalidFormat,
                 'errorUsernameUnique' => $errorUsernameUnique,

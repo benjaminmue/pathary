@@ -21,12 +21,19 @@
                     </div>
                     <div class="mb-3">
                         <label for="userModalPasswordInput" class="form-label">Password <span class="text-danger" id="userModalPasswordInputRequiredStar">*</span></label>
-                        <input type="password" class="form-control" id="userModalPasswordInput" minlength="8" required>
-                        <div id="userModalPasswordInput" class="form-text">Must be at least 8 characters long</div>
+                        <input type="password" class="form-control" id="userModalPasswordInput" minlength="10" required>
+                        <div class="form-text small">
+                            <div class="text-muted mb-1">Password must contain:</div>
+                            <div class="text-muted">• At least 10 characters</div>
+                            <div class="text-muted">• One uppercase letter</div>
+                            <div class="text-muted">• One lowercase letter</div>
+                            <div class="text-muted">• One number</div>
+                            <div class="text-muted">• One special character</div>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="userModalRepeatPasswordInput" class="form-label">Repeat Password <span class="text-danger" id="userModalRepeatPasswordInputRequiredStar">*</span></label>
-                        <input type="password" class="form-control" id="userModalRepeatPasswordInput" minlength="8" required>
+                        <input type="password" class="form-control" id="userModalRepeatPasswordInput" minlength="10" required>
                         <div id="userModalRepeatPasswordInput" class="form-text">Must match entered password</div>
                     </div>
                     <div class="mb-3">

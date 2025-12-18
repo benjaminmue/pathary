@@ -25,11 +25,19 @@
                 <label for="floatingName">Username <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating" style="margin-bottom: 0.3rem">
-                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" minlength="8" required>
+                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" minlength="10" required>
                 <label for="floatingPassword">Password <span class="text-danger">*</span></label>
             </div>
+            <div id="passwordRequirements" class="small text-start mb-2 px-3">
+                <div class="text-muted mb-1">Password must contain:</div>
+                <div id="req-length" class="text-muted"><i class="bi bi-circle"></i> At least 10 characters</div>
+                <div id="req-uppercase" class="text-muted"><i class="bi bi-circle"></i> One uppercase letter</div>
+                <div id="req-lowercase" class="text-muted"><i class="bi bi-circle"></i> One lowercase letter</div>
+                <div id="req-number" class="text-muted"><i class="bi bi-circle"></i> One number</div>
+                <div id="req-special" class="text-muted"><i class="bi bi-circle"></i> One special character</div>
+            </div>
             <div class="form-floating" style="margin-bottom: 1rem">
-                <input type="password" name="repeatPassword" class="form-control" id="floatingRepeatPassword" placeholder="Repeat password" minlength="8" required>
+                <input type="password" name="repeatPassword" class="form-control" id="floatingRepeatPassword" placeholder="Repeat password" minlength="10" required>
                 <label for="floatingRepeatPassword">Repeat password <span class="text-danger">*</span></label>
             </div>
             {% if errorPasswordNotEqual == true %}
@@ -39,7 +47,12 @@
             {% endif %}
             {% if errorPasswordTooShort == true %}
                 <div class="alert alert-danger" role="alert">
-                    Password must be at least 8 characters
+                    Password must be at least 10 characters
+                </div>
+            {% endif %}
+            {% if errorPasswordPolicyViolation %}
+                <div class="alert alert-danger" role="alert">
+                    {{ errorPasswordPolicyViolation }}
                 </div>
             {% endif %}
             {% if errorUsernameInvalidFormat == true %}
@@ -65,4 +78,42 @@
             <button class="w-100 btn btn-lg btn-primary" type="submit">Create</button>
         </form>
     </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('floatingPassword');
+
+            function validatePasswordPolicy() {
+                const password = passwordInput.value;
+
+                // Check each requirement
+                const hasLength = password.length >= 10;
+                const hasUppercase = /[A-Z]/.test(password);
+                const hasLowercase = /[a-z]/.test(password);
+                const hasNumber = /[0-9]/.test(password);
+                const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+
+                // Update visual indicators
+                updateRequirement('req-length', hasLength);
+                updateRequirement('req-uppercase', hasUppercase);
+                updateRequirement('req-lowercase', hasLowercase);
+                updateRequirement('req-number', hasNumber);
+                updateRequirement('req-special', hasSpecial);
+            }
+
+            function updateRequirement(elementId, isMet) {
+                const element = document.getElementById(elementId);
+                if (isMet) {
+                    element.classList.remove('text-muted', 'text-danger');
+                    element.classList.add('text-success');
+                    element.querySelector('i').className = 'bi bi-check-circle-fill';
+                } else {
+                    element.classList.remove('text-success');
+                    element.classList.add('text-muted');
+                    element.querySelector('i').className = 'bi bi-circle';
+                }
+            }
+
+            passwordInput.addEventListener('input', validatePasswordPolicy);
+        });
+    </script>
 {% endblock %}

@@ -2,12 +2,14 @@
 
 namespace Movary\HttpController\Web;
 
+use Movary\Domain\User\Exception\PasswordPolicyViolation;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\RecoveryCodeService;
 use Movary\Domain\User\Service\SecurityAuditService;
 use Movary\Domain\User\Service\TrustedDeviceService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\Service\TwoFactorAuthenticationFactory;
+use Movary\Domain\User\Service\Validator;
 use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
@@ -27,6 +29,7 @@ class ProfileSecurityController
         private readonly RecoveryCodeService $recoveryCodeService,
         private readonly TrustedDeviceService $trustedDeviceService,
         private readonly SecurityAuditService $securityAuditService,
+        private readonly Validator $validator,
     ) {
     }
 
@@ -277,10 +280,12 @@ class ProfileSecurityController
             );
         }
 
-        // Validate new password
-        if (strlen($newPassword) < 8) {
+        // Validate new password against comprehensive policy
+        try {
+            $this->validator->ensurePasswordIsValid($newPassword);
+        } catch (PasswordPolicyViolation $e) {
             return Response::createJson(
-                Json::encode(['error' => 'New password must be at least 8 characters.']),
+                Json::encode(['error' => $e->getMessage()]),
                 StatusCode::createBadRequest()
             );
         }

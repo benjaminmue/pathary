@@ -84,26 +84,47 @@ function showChangePasswordModal() {
                         <h5 class="modal-title">Change Password</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
-                        <div id="changePasswordAlert"></div>
-                        <div class="mb-3">
-                            <label for="currentPassword" class="form-label">Current Password</label>
-                            <input type="password" class="form-control" id="currentPassword" required>
+                    <form id="changePasswordForm" novalidate>
+                        <div class="modal-body">
+                            <div id="changePasswordAlert"></div>
+                            <div class="mb-3">
+                                <label for="currentPassword" class="form-label">Current Password</label>
+                                <input type="password" class="form-control" id="currentPassword" required>
+                                <div class="invalid-feedback">
+                                    Current password is required.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="newPassword" required minlength="10">
+                                <div id="passwordRequirements" class="small mt-1">
+                                    <div class="text-muted mb-1">Password must contain:</div>
+                                    <div id="req-length" class="text-muted"><i class="bi bi-circle"></i> At least 10 characters</div>
+                                    <div id="req-uppercase" class="text-muted"><i class="bi bi-circle"></i> One uppercase letter</div>
+                                    <div id="req-lowercase" class="text-muted"><i class="bi bi-circle"></i> One lowercase letter</div>
+                                    <div id="req-number" class="text-muted"><i class="bi bi-circle"></i> One number</div>
+                                    <div id="req-special" class="text-muted"><i class="bi bi-circle"></i> One special character</div>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Password does not meet policy requirements.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" required>
+                                <div class="invalid-feedback" id="confirmPasswordInvalid">
+                                    Confirm password is required.
+                                </div>
+                                <div class="valid-feedback" id="confirmPasswordValid">
+                                    Passwords match.
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="newPassword" class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="newPassword" required minlength="8">
-                            <small class="text-muted">At least 8 characters</small>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Change Password</button>
                         </div>
-                        <div class="mb-3">
-                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirmPassword" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" onclick="submitPasswordChange()">Change Password</button>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -113,46 +134,153 @@ function showChangePasswordModal() {
     const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
     modal.show();
 
+    // Initialize password validation listeners
+    initializePasswordValidation();
+
     document.getElementById('changePasswordModal').addEventListener('hidden.bs.modal', function() {
         this.remove();
     });
 }
 
-async function submitPasswordChange() {
-    const currentPassword = document.getElementById('currentPassword').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const alertDiv = document.getElementById('changePasswordAlert');
+// Initialize password validation and Enter key prevention
+function initializePasswordValidation() {
+    const form = document.getElementById('changePasswordForm');
+    const currentPassword = document.getElementById('currentPassword');
+    const newPassword = document.getElementById('newPassword');
+    const confirmPassword = document.getElementById('confirmPassword');
 
-    if (newPassword !== confirmPassword) {
-        alertDiv.innerHTML = '<div class="alert alert-danger">Passwords do not match.</div>';
-        return;
-    }
-
-    if (newPassword.length < 8) {
-        alertDiv.innerHTML = '<div class="alert alert-danger">Password must be at least 8 characters.</div>';
-        return;
-    }
-
-    try {
-        const response = await fetch(APPLICATION_URL + '/profile/security/password', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({currentPassword, newPassword})
+    // Prevent Enter key from submitting the form when in password inputs
+    const passwordInputs = [currentPassword, newPassword, confirmPassword];
+    passwordInputs.forEach(input => {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // Optionally focus next field or do nothing
+                const nextInput = passwordInputs[passwordInputs.indexOf(input) + 1];
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
         });
+    });
 
-        const data = await response.json();
+    // Live validation for password policy
+    function validatePasswordPolicy() {
+        const password = newPassword.value;
 
-        if (data.success) {
-            bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
-            showAlert('Password changed successfully.', 'success');
-            loadSecurityTab();
-        } else {
-            alertDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
-        }
-    } catch (error) {
-        alertDiv.innerHTML = '<div class="alert alert-danger">Failed to change password.</div>';
+        // Check each requirement
+        const hasLength = password.length >= 10;
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+
+        // Update visual indicators
+        updateRequirement('req-length', hasLength);
+        updateRequirement('req-uppercase', hasUppercase);
+        updateRequirement('req-lowercase', hasLowercase);
+        updateRequirement('req-number', hasNumber);
+        updateRequirement('req-special', hasSpecial);
+
+        // Return true if all requirements met
+        return hasLength && hasUppercase && hasLowercase && hasNumber && hasSpecial;
     }
+
+    function updateRequirement(elementId, isMet) {
+        const element = document.getElementById(elementId);
+        if (isMet) {
+            element.classList.remove('text-muted', 'text-danger');
+            element.classList.add('text-success');
+            element.querySelector('i').className = 'bi bi-check-circle-fill';
+        } else {
+            element.classList.remove('text-success');
+            element.classList.add('text-muted');
+            element.querySelector('i').className = 'bi bi-circle';
+        }
+    }
+
+    // Live validation for password matching
+    function validatePasswordMatch() {
+        const newPass = newPassword.value;
+        const confirmPass = confirmPassword.value;
+
+        // Only show match feedback if both fields have values
+        if (newPass && confirmPass) {
+            if (newPass === confirmPass) {
+                // Passwords match
+                confirmPassword.classList.remove('is-invalid');
+                confirmPassword.classList.add('is-valid');
+                document.getElementById('confirmPasswordInvalid').textContent = 'Confirm password is required.';
+            } else {
+                // Passwords don't match
+                confirmPassword.classList.remove('is-valid');
+                confirmPassword.classList.add('is-invalid');
+                document.getElementById('confirmPasswordInvalid').textContent = 'Passwords do not match.';
+            }
+        } else {
+            // Clear validation if fields are empty
+            confirmPassword.classList.remove('is-valid', 'is-invalid');
+        }
+    }
+
+    // Add input listeners for live validation
+    newPassword.addEventListener('input', function() {
+        validatePasswordPolicy();
+        validatePasswordMatch();
+    });
+    confirmPassword.addEventListener('input', validatePasswordMatch);
+
+    // Form submit handler
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const alertDiv = document.getElementById('changePasswordAlert');
+        alertDiv.innerHTML = '';
+
+        // Validate form
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+
+        const currentPass = currentPassword.value;
+        const newPass = newPassword.value;
+        const confirmPass = confirmPassword.value;
+
+        // Final check: passwords must match
+        if (newPass !== confirmPass) {
+            confirmPassword.classList.add('is-invalid');
+            document.getElementById('confirmPasswordInvalid').textContent = 'Passwords do not match.';
+            return;
+        }
+
+        // Final check: password policy
+        if (!validatePasswordPolicy()) {
+            newPassword.classList.add('is-invalid');
+            alertDiv.innerHTML = '<div class="alert alert-danger">Password does not meet policy requirements.</div>';
+            return;
+        }
+
+        try {
+            const response = await fetch(APPLICATION_URL + '/profile/security/password', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({currentPassword: currentPass, newPassword: newPass})
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+                showAlert('Password changed successfully.', 'success');
+                loadSecurityTab();
+            } else {
+                alertDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            }
+        } catch (error) {
+            alertDiv.innerHTML = '<div class="alert alert-danger">Failed to change password.</div>';
+        }
+    });
 }
 
 // Enable 2FA

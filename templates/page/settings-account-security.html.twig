@@ -28,7 +28,7 @@
                            class="form-control"
                            id="currentPassword"
                            required
-                           minlength="8"
+                           minlength="10"
                            {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                            style="text-align: center;">
                     <div id="currentPassword" class="form-text">Enter your current password</div>
@@ -40,10 +40,17 @@
                            class="form-control"
                            id="newPassword"
                            required
-                           minlength="8"
+                           minlength="10"
                            {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                            style="text-align: center;">
-                    <div id="currentPassword" class="form-text">Must be at least 8 characters long</div>
+                    <div class="form-text small">
+                        <div class="text-muted mb-1">Password must contain:</div>
+                        <div class="text-muted">• At least 10 characters</div>
+                        <div class="text-muted">• One uppercase letter</div>
+                        <div class="text-muted">• One lowercase letter</div>
+                        <div class="text-muted">• One number</div>
+                        <div class="text-muted">• One special character</div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -51,7 +58,7 @@
                     <input type="password"
                            class="form-control"
                            id="newPasswordRepeat"
-                           required minlength="8"
+                           required minlength="10"
                            {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                            style="text-align: center;">
                     <div id="newPasswordRepeat" class="form-text">Must match new password</div>
