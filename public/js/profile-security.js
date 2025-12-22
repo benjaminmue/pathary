@@ -271,6 +271,11 @@ function initializePasswordValidation() {
             const data = await response.json();
 
             if (data.success) {
+                // Remove focus from submit button before closing modal
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
+
                 bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
                 showAlert('Password changed successfully.', 'success');
                 loadSecurityTab();
@@ -375,9 +380,18 @@ async function verify2FACode() {
         const data = await response.json();
 
         if (data.success) {
+            // Remove focus from the verify button before closing modal
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+
             bootstrap.Modal.getInstance(document.getElementById('setup2FAModal')).hide();
-            showRecoveryCodesModal(data.recoveryCodes);
-            loadSecurityTab();
+
+            // Small delay to ensure first modal is fully hidden before showing next
+            setTimeout(() => {
+                showRecoveryCodesModal(data.recoveryCodes);
+                loadSecurityTab();
+            }, 100);
         } else {
             alertDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
         }
@@ -388,27 +402,58 @@ async function verify2FACode() {
 
 function showRecoveryCodesModal(codes) {
     const codesHtml = codes.map(code => `<li><code>${code}</code></li>`).join('');
+
+    // Detect if dark mode is active
+    const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    const headerBg = isDarkMode ? 'background-color: var(--bs-secondary-bg); border-bottom: 2px solid var(--pathe-yellow);' : 'background-color: var(--pathe-yellow);';
+    const titleColor = isDarkMode ? 'color: #ffffff !important;' : 'color: var(--pathe-dark) !important;';
+    const iconColor = isDarkMode ? 'color: var(--pathe-yellow) !important;' : 'color: var(--pathe-dark) !important;';
+
     const modalHtml = `
-        <div class="modal fade" id="recoveryCodesModal" tabindex="-1">
+        <div class="modal fade" id="recoveryCodesModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header bg-warning">
-                        <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Save Your Recovery Codes</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <div class="modal-header" style="${headerBg}">
+                        <h5 class="modal-title" style="${titleColor}"><i class="bi bi-exclamation-triangle" style="${iconColor}"></i> Save Your Recovery Codes</h5>
+                        <button type="button" class="btn-close" id="recoveryCodesCloseBtn" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="alert alert-warning">
-                            <strong>Important:</strong> Save these recovery codes in a safe place. Each code can be used once if you lose access to your authenticator app.
+                        <div id="criticalWarning" class="alert alert-danger">
+                            <strong><i class="bi bi-exclamation-triangle-fill"></i> Critical:</strong> These codes will only be shown once. If you lose them, you may lose access to your account.
                         </div>
-                        <ul class="list-unstyled">
+                        <ul class="list-unstyled" id="recoveryCodesList" style="background: var(--bs-tertiary-bg); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
                             ${codesHtml}
                         </ul>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="copyRecoveryCodes()">
-                            <i class="bi bi-clipboard"></i> Copy All
+                        <div id="codesHiddenMessage" class="alert alert-info mb-3 d-none">
+                            <i class="bi bi-eye-slash"></i> Codes hidden. Uncheck to show them again.
+                        </div>
+                        <div id="copyFeedback" style="margin-bottom: 1rem;"></div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" id="copyAllBtn">
+                            <i class="bi bi-clipboard"></i> Copy All Codes
                         </button>
+
+                        <div id="checkboxSection" class="mb-3 p-3" style="background: var(--bs-tertiary-bg); border-radius: 0.5rem;">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="confirmSavedCheckbox">
+                                <label class="form-check-label" for="confirmSavedCheckbox">
+                                    <strong>I have saved these recovery codes in a secure location</strong>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="verificationSection" class="d-none">
+                            <div class="alert alert-info">
+                                <strong>Verification:</strong> To confirm you've saved the codes, please enter code #<span id="verifyCodeNumber"></span>:
+                            </div>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="verifyCodeInput" placeholder="Enter recovery code" autocomplete="off">
+                                <button class="btn btn-outline-primary" type="button" id="verifyCodeBtn">Verify</button>
+                            </div>
+                            <div id="verificationFeedback"></div>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I've Saved My Codes</button>
+                        <button type="button" class="btn btn-primary" id="confirmSavedBtn" disabled aria-disabled="true">I've Saved My Codes</button>
                     </div>
                 </div>
             </div>
@@ -416,25 +461,454 @@ function showRecoveryCodesModal(codes) {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    const modal = new bootstrap.Modal(document.getElementById('recoveryCodesModal'));
+    const modalElement = document.getElementById('recoveryCodesModal');
+    const modal = new bootstrap.Modal(modalElement);
     modal.show();
 
-    // Store codes globally for copying
+    // Store codes globally for copying and verification
     window.currentRecoveryCodes = codes;
+    window.recoveryCodesState = {
+        copied: false,
+        confirmed: false,
+        verified: false,
+        verifyAttempts: 0,
+        selectedCodeIndex: Math.floor(Math.random() * codes.length)
+    };
 
-    document.getElementById('recoveryCodesModal').addEventListener('hidden.bs.modal', function() {
+    // Initialize event listeners
+    initializeRecoveryCodesListeners(modal);
+
+    modalElement.addEventListener('hidden.bs.modal', function() {
         this.remove();
         delete window.currentRecoveryCodes;
+        delete window.recoveryCodesState;
     });
 }
 
-function copyRecoveryCodes() {
-    if (window.currentRecoveryCodes) {
-        const text = window.currentRecoveryCodes.join('\n');
-        navigator.clipboard.writeText(text).then(() => {
-            showAlert('Recovery codes copied to clipboard.', 'success');
+function initializeRecoveryCodesListeners(modal) {
+    const copyAllBtn = document.getElementById('copyAllBtn');
+    const checkbox = document.getElementById('confirmSavedCheckbox');
+    const confirmBtn = document.getElementById('confirmSavedBtn');
+    const closeBtn = document.getElementById('recoveryCodesCloseBtn');
+    const verifyBtn = document.getElementById('verifyCodeBtn');
+    const verifyInput = document.getElementById('verifyCodeInput');
+
+    // Copy All button - track copy action
+    if (copyAllBtn) {
+        copyAllBtn.addEventListener('click', function() {
+            copyRecoveryCodes();
+            window.recoveryCodesState.copied = true;
+            updateConfirmButtonState();
         });
     }
+
+    // Checkbox acknowledgment
+    if (checkbox) {
+        checkbox.addEventListener('change', function() {
+            window.recoveryCodesState.confirmed = this.checked;
+            updateConfirmButtonState();
+
+            // Toggle codes visibility
+            const codesList = document.getElementById('recoveryCodesList');
+            const copyBtn = document.getElementById('copyAllBtn');
+            const hiddenMessage = document.getElementById('codesHiddenMessage');
+            const verifySection = document.getElementById('verificationSection');
+
+            if (this.checked) {
+                // Hide codes and copy button, show message
+                if (codesList) codesList.classList.add('d-none');
+                if (copyBtn) copyBtn.classList.add('d-none');
+                if (hiddenMessage) hiddenMessage.classList.remove('d-none');
+
+                // Show verification challenge
+                showVerificationChallenge();
+
+                // Ensure verification section is accessible
+                if (verifySection) {
+                    verifySection.setAttribute('aria-hidden', 'false');
+                }
+            } else {
+                // Show codes and copy button, hide message
+                if (codesList) codesList.classList.remove('d-none');
+                if (copyBtn) copyBtn.classList.remove('d-none');
+                if (hiddenMessage) hiddenMessage.classList.add('d-none');
+
+                // Hide and reset verification section
+                hideVerificationSection();
+            }
+        });
+    }
+
+    // Confirm button - validate before closing
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function() {
+            if (!window.recoveryCodesState.verified) {
+                // Verification not complete
+                const verifySection = document.getElementById('verificationSection');
+                if (verifySection && verifySection.classList.contains('d-none')) {
+                    showVerificationChallenge();
+                }
+                return;
+            }
+
+            // All checks passed, allow modal to close
+            modal.hide();
+            showAlert('success', 'Recovery codes confirmed. Your 2FA setup is complete!');
+        });
+    }
+
+    // Close button - warn user
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showCloseWarningDialog(modal);
+        });
+    }
+
+    // Verification submit
+    if (verifyBtn) {
+        verifyBtn.addEventListener('click', function() {
+            verifyRecoveryCode();
+        });
+    }
+
+    // Allow Enter key in verification input
+    if (verifyInput) {
+        verifyInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyRecoveryCode();
+            }
+        });
+    }
+}
+
+function updateConfirmButtonState() {
+    const confirmBtn = document.getElementById('confirmSavedBtn');
+    if (!confirmBtn) return;
+
+    const state = window.recoveryCodesState;
+
+    // Enable button only if checkbox is checked AND verification succeeded
+    if (state.confirmed && state.verified) {
+        confirmBtn.disabled = false;
+        confirmBtn.removeAttribute('aria-disabled');
+    } else {
+        confirmBtn.disabled = true;
+        confirmBtn.setAttribute('aria-disabled', 'true');
+    }
+}
+
+function showVerificationChallenge() {
+    const verifySection = document.getElementById('verificationSection');
+    const verifyNumberSpan = document.getElementById('verifyCodeNumber');
+    const verifyInput = document.getElementById('verifyCodeInput');
+    const verifyBtn = document.getElementById('verifyCodeBtn');
+    const confirmBtn = document.getElementById('confirmSavedBtn');
+
+    if (!verifySection || !verifyNumberSpan) return;
+
+    const codeIndex = window.recoveryCodesState.selectedCodeIndex;
+    const displayNumber = codeIndex + 1; // 1-indexed for user
+
+    verifyNumberSpan.textContent = displayNumber;
+    verifySection.classList.remove('d-none');
+    verifySection.setAttribute('aria-hidden', 'false');
+
+    // Enable and reset input
+    if (verifyInput) {
+        verifyInput.value = '';
+        verifyInput.disabled = false;
+        verifyInput.removeAttribute('aria-disabled');
+        verifyInput.classList.remove('is-invalid');
+        verifyInput.focus();
+    }
+
+    // Enable verify button
+    if (verifyBtn) {
+        verifyBtn.disabled = false;
+        verifyBtn.removeAttribute('aria-disabled');
+    }
+
+    // Change button text to indicate verification is needed and ensure it's disabled
+    if (confirmBtn) {
+        confirmBtn.textContent = 'Verify & Close';
+        // Button will be disabled until verification succeeds
+        confirmBtn.disabled = true;
+        confirmBtn.setAttribute('aria-disabled', 'true');
+        confirmBtn.classList.remove('btn-success');
+        confirmBtn.classList.add('btn-primary');
+    }
+}
+
+function hideVerificationSection() {
+    const verifySection = document.getElementById('verificationSection');
+    const verifyInput = document.getElementById('verifyCodeInput');
+    const verifyBtn = document.getElementById('verifyCodeBtn');
+    const confirmBtn = document.getElementById('confirmSavedBtn');
+
+    if (!verifySection) return;
+
+    // Hide the section
+    verifySection.classList.add('d-none');
+    verifySection.setAttribute('aria-hidden', 'true');
+
+    // Reset verification input and remove validation state
+    if (verifyInput) {
+        verifyInput.value = '';
+        verifyInput.classList.remove('is-invalid');
+        verifyInput.disabled = true;
+        verifyInput.setAttribute('aria-disabled', 'true');
+
+        // Remove any invalid feedback
+        const feedback = verifyInput.nextElementSibling;
+        if (feedback && feedback.classList.contains('invalid-feedback')) {
+            feedback.style.display = 'none';
+        }
+    }
+
+    // Disable verify button
+    if (verifyBtn) {
+        verifyBtn.disabled = true;
+        verifyBtn.setAttribute('aria-disabled', 'true');
+    }
+
+    // Reset confirm button to original state if it was changed
+    if (confirmBtn && !window.recoveryCodesState.verified) {
+        confirmBtn.textContent = "I've Saved My Codes";
+        confirmBtn.classList.remove('btn-success');
+        confirmBtn.classList.add('btn-primary');
+        confirmBtn.disabled = true;
+    }
+
+    // Reset verification state (but keep other state)
+    if (window.recoveryCodesState) {
+        window.recoveryCodesState.verified = false;
+        window.recoveryCodesState.verifyAttempts = 0;
+    }
+
+    // Restore initial UI elements when unchecking
+    showInitialUIElements();
+}
+
+function verifyRecoveryCode() {
+    const verifyInput = document.getElementById('verifyCodeInput');
+    const verifySection = document.getElementById('verificationSection');
+    const confirmBtn = document.getElementById('confirmSavedBtn');
+
+    if (!verifyInput || !window.currentRecoveryCodes) return;
+
+    const userInput = verifyInput.value.trim();
+    const expectedCode = window.currentRecoveryCodes[window.recoveryCodesState.selectedCodeIndex];
+
+    window.recoveryCodesState.verifyAttempts++;
+
+    // Check if input matches
+    if (userInput === expectedCode) {
+        // Success
+        window.recoveryCodesState.verified = true;
+
+        // Show success feedback
+        const successHtml = `
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle-fill"></i> <strong>Verified!</strong> You're all set.
+            </div>
+        `;
+        verifySection.innerHTML = successHtml;
+
+        // Update confirm button state (will be enabled now that verified = true)
+        updateConfirmButtonState();
+
+        // Change button style to success
+        if (confirmBtn) {
+            confirmBtn.classList.remove('btn-primary');
+            confirmBtn.classList.add('btn-success');
+            confirmBtn.innerHTML = '<i class="bi bi-check-lg"></i> Close';
+        }
+
+        // Hide unneeded UI elements after successful verification
+        hideUnneededElementsAfterVerification();
+    } else {
+        // Failed verification
+        if (window.recoveryCodesState.verifyAttempts >= 3) {
+            // Too many attempts - show error
+            const errorHtml = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i> <strong>Too many incorrect attempts.</strong> Please copy your codes again and try a different code.
+                </div>
+                <button class="btn btn-outline-primary" type="button" onclick="resetVerificationChallenge()">Try Again</button>
+            `;
+            verifySection.innerHTML = errorHtml;
+            if (confirmBtn) confirmBtn.disabled = true;
+        } else {
+            // Show error but allow retry
+            verifyInput.classList.add('is-invalid');
+            const remainingAttempts = 3 - window.recoveryCodesState.verifyAttempts;
+
+            // Add or update invalid feedback
+            let feedback = verifyInput.nextElementSibling;
+            if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+                feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback';
+                verifyInput.parentNode.insertBefore(feedback, verifyInput.nextSibling);
+            }
+            feedback.textContent = `Incorrect code. ${remainingAttempts} attempt(s) remaining.`;
+            feedback.style.display = 'block';
+        }
+    }
+}
+
+function resetVerificationChallenge() {
+    // Reset state
+    window.recoveryCodesState.verifyAttempts = 0;
+    window.recoveryCodesState.selectedCodeIndex = Math.floor(Math.random() * window.currentRecoveryCodes.length);
+    window.recoveryCodesState.verified = false;
+
+    // Restore initial UI elements
+    showInitialUIElements();
+
+    // Re-show challenge
+    showVerificationChallenge();
+}
+
+function hideUnneededElementsAfterVerification() {
+    // Hide critical warning
+    const criticalWarning = document.getElementById('criticalWarning');
+    if (criticalWarning) {
+        criticalWarning.classList.add('d-none');
+        criticalWarning.setAttribute('aria-hidden', 'true');
+    }
+
+    // Hide codes-hidden message
+    const codesHiddenMessage = document.getElementById('codesHiddenMessage');
+    if (codesHiddenMessage) {
+        codesHiddenMessage.classList.add('d-none');
+        codesHiddenMessage.setAttribute('aria-hidden', 'true');
+    }
+
+    // Hide checkbox section
+    const checkboxSection = document.getElementById('checkboxSection');
+    if (checkboxSection) {
+        checkboxSection.classList.add('d-none');
+        checkboxSection.setAttribute('aria-hidden', 'true');
+    }
+}
+
+function showInitialUIElements() {
+    // Show critical warning
+    const criticalWarning = document.getElementById('criticalWarning');
+    if (criticalWarning) {
+        criticalWarning.classList.remove('d-none');
+        criticalWarning.setAttribute('aria-hidden', 'false');
+    }
+
+    // Show checkbox section
+    const checkboxSection = document.getElementById('checkboxSection');
+    if (checkboxSection) {
+        checkboxSection.classList.remove('d-none');
+        checkboxSection.setAttribute('aria-hidden', 'false');
+    }
+
+    // Note: codesHiddenMessage visibility is controlled by checkbox state
+}
+
+function showCloseWarningDialog(modal) {
+    const state = window.recoveryCodesState;
+
+    // If already verified, allow close
+    if (state.verified) {
+        modal.hide();
+        return;
+    }
+
+    // Show warning
+    const confirmed = confirm(
+        'WARNING: You have not verified that you saved your recovery codes.\n\n' +
+        'If you close this window without saving these codes, you may lose access to your account if you lose your authenticator device.\n\n' +
+        'Are you ABSOLUTELY SURE you want to close without verifying?'
+    );
+
+    if (confirmed) {
+        modal.hide();
+    }
+}
+
+function copyRecoveryCodes() {
+    const feedbackDiv = document.getElementById('copyFeedback');
+
+    if (!window.currentRecoveryCodes) {
+        showCopyFeedback(feedbackDiv, 'error', 'No recovery codes available.');
+        return;
+    }
+
+    const text = window.currentRecoveryCodes.join('\n');
+
+    // Try modern Clipboard API first
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                showCopyFeedback(feedbackDiv, 'success', 'Recovery codes copied to clipboard.');
+            })
+            .catch((err) => {
+                console.error('Clipboard API failed:', err);
+                // Try fallback method
+                fallbackCopyToClipboard(text, feedbackDiv);
+            });
+    } else {
+        // Clipboard API not available, use fallback
+        fallbackCopyToClipboard(text, feedbackDiv);
+    }
+}
+
+function fallbackCopyToClipboard(text, feedbackDiv) {
+    try {
+        // Create temporary textarea
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+
+        textarea.focus();
+        textarea.select();
+
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textarea);
+
+        if (successful) {
+            showCopyFeedback(feedbackDiv, 'success', 'Recovery codes copied to clipboard.');
+        } else {
+            showCopyFeedback(feedbackDiv, 'error', 'Copy failed. Please select and copy manually.');
+        }
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+        showCopyFeedback(feedbackDiv, 'error', 'Copy failed. Please select and copy manually.');
+    }
+}
+
+function showCopyFeedback(feedbackDiv, type, message) {
+    if (!feedbackDiv) return;
+
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    const iconClass = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill';
+
+    feedbackDiv.innerHTML = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            <i class="bi ${iconClass}"></i> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        const alert = feedbackDiv.querySelector('.alert');
+        if (alert) {
+            alert.classList.remove('show');
+            setTimeout(() => {
+                feedbackDiv.innerHTML = '';
+            }, 150);
+        }
+    }, 3000);
 }
 
 // Disable 2FA
@@ -489,6 +963,11 @@ async function submitDisable2FA() {
         const data = await response.json();
 
         if (data.success) {
+            // Remove focus from button before closing modal
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+
             bootstrap.Modal.getInstance(document.getElementById('disable2FAModal')).hide();
             showAlert('2FA has been disabled.', 'success');
             loadSecurityTab();
@@ -548,18 +1027,80 @@ async function revokeTrustedDevice(deviceId) {
     }
 }
 
-// Show alert in security tab
-function showAlert(message, type) {
-    const container = document.getElementById('securityTabContent');
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type} alert-dismissible fade show`;
-    alert.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    container.insertBefore(alert, container.firstChild);
+// Show centered notification popup
+let currentNotification = null;
 
+function showAlert(message, type) {
+    // Remove existing notification if present
+    if (currentNotification) {
+        closeNotification();
+    }
+
+    // Determine icon based on type
+    const iconClass = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill';
+    const iconTypeClass = type === 'success' ? 'notification-popup__icon--success' : 'notification-popup__icon--error';
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'notification-overlay';
+    overlay.innerHTML = `
+        <div class="notification-popup" role="alert" aria-live="polite">
+            <button type="button" class="notification-popup__close" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="notification-popup__content">
+                <div class="notification-popup__icon ${iconTypeClass}">
+                    <i class="bi ${iconClass}"></i>
+                </div>
+                <div class="notification-popup__text">${message}</div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    currentNotification = overlay;
+
+    // Trigger animation after a brief delay
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            overlay.classList.add('show');
+        });
+    });
+
+    // Setup event listeners
+    const closeBtn = overlay.querySelector('.notification-popup__close');
+    closeBtn.addEventListener('click', closeNotification);
+
+    // Close on overlay click
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+            closeNotification();
+        }
+    });
+
+    // Close on ESC key
+    const handleEscape = function(e) {
+        if (e.key === 'Escape') {
+            closeNotification();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+
+    // Auto-close after 3 seconds
     setTimeout(() => {
-        alert.remove();
-    }, 5000);
+        closeNotification();
+    }, 3000);
+}
+
+function closeNotification() {
+    if (!currentNotification) return;
+
+    currentNotification.classList.remove('show');
+    setTimeout(() => {
+        if (currentNotification && currentNotification.parentNode) {
+            currentNotification.remove();
+        }
+        currentNotification = null;
+    }, 300);
 }

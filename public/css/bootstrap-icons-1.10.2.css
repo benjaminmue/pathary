@@ -65,6 +65,8 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-shield-x::before { content: "\f53e"; }
 .bi-box-arrow-in-right::before { content: "\f1be"; }
 .bi-exclamation-triangle::before { content: "\f33b"; }
+.bi-exclamation-triangle-fill::before { content: "\f33a"; }
+.bi-exclamation-circle-fill::before { content: "\f33f"; }
 .bi-info-circle::before { content: "\f431"; }
 .bi-camera::before { content: "\f220"; }
 .bi-trash::before { content: "\f5de"; }

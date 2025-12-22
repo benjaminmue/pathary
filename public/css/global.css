@@ -22,3 +22,174 @@ a.card-header:visited {
 #logPlayModalTitle a, #logPlayModalTitle a:visited {
   color: var(--bs-heading-color);
 }
+
+/* Centered notification popup */
+.notification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.notification-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.notification-popup {
+  position: relative;
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border: 2px solid var(--pathe-yellow);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  max-width: 90%;
+  width: 400px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.notification-overlay.show .notification-popup {
+  transform: scale(1) translateY(0);
+}
+
+.notification-popup__content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.notification-popup__icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pathe-yellow);
+  color: var(--pathe-dark);
+  border-radius: 50%;
+  font-size: 1.5rem;
+}
+
+.notification-popup__icon--success {
+  background: var(--pathe-yellow);
+}
+
+.notification-popup__icon--error {
+  background: #dc3545;
+  color: #fff;
+}
+
+.notification-popup__text {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.notification-popup__close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--bs-secondary-color);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.notification-popup__close:hover {
+  opacity: 1;
+}
+
+.notification-popup__close:focus {
+  outline: 2px solid var(--accent-purple);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Dark mode adjustments */
+[data-bs-theme="dark"] .notification-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+[data-bs-theme="dark"] .notification-popup {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Recovery Codes Modal - Header Text Contrast */
+/* Light mode: Yellow background with dark text */
+#recoveryCodesModal .modal-header.bg-warning {
+  background-color: var(--pathe-yellow) !important;
+  color: var(--pathe-dark) !important;
+}
+
+#recoveryCodesModal .modal-header.bg-warning .modal-title {
+  color: var(--pathe-dark) !important;
+}
+
+#recoveryCodesModal .modal-header.bg-warning .modal-title i {
+  color: var(--pathe-dark) !important;
+}
+
+#recoveryCodesModal .modal-header.bg-warning .btn-close {
+  filter: invert(1) grayscale(100%) brightness(0%);
+  opacity: 1;
+}
+
+/* Dark mode: Dark background with white text for better contrast */
+[data-bs-theme="dark"] #recoveryCodesModal .modal-header.bg-warning {
+  background-color: var(--bs-secondary-bg) !important;
+  border-bottom: 2px solid var(--pathe-yellow);
+  color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] #recoveryCodesModal .modal-header.bg-warning h5.modal-title {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] #recoveryCodesModal .modal-header.bg-warning .modal-title i {
+  color: var(--pathe-yellow) !important;
+}
+
+[data-bs-theme="dark"] #recoveryCodesModal .modal-header.bg-warning .btn-close {
+  filter: none;
+  opacity: 1;
+}
+
+[data-bs-theme="dark"] #recoveryCodesModal .modal-body {
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] #recoveryCodesModal .alert-warning {
+  background-color: rgba(251, 188, 9, 0.15);
+  border-color: rgba(251, 188, 9, 0.3);
+  color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] #recoveryCodesModal .alert-warning strong {
+  color: var(--pathe-yellow);
+}
+
+[data-bs-theme="dark"] #recoveryCodesModal code {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--bs-emphasis-color);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+}
