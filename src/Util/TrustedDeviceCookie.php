@@ -35,7 +35,16 @@ class TrustedDeviceCookie
         $isSecure = self::isHttps();
         $expirationTimestamp = time() + (self::EXPIRATION_DAYS * 24 * 60 * 60);
 
-        setcookie(
+        // DEBUG: Log HTTPS detection
+        $httpsSource = 'none';
+        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            $httpsSource = 'X-Forwarded-Proto: ' . $_SERVER['HTTP_X_FORWARDED_PROTO'];
+        } elseif (isset($_SERVER['HTTPS'])) {
+            $httpsSource = 'HTTPS: ' . $_SERVER['HTTPS'];
+        }
+        error_log('[TRUSTED_DEVICE_DEBUG] HTTPS detection - Source: ' . $httpsSource . ', Secure flag: ' . ($isSecure ? 'YES' : 'NO'));
+
+        $result = setcookie(
             self::COOKIE_NAME,
             $token,
             [
@@ -46,6 +55,9 @@ class TrustedDeviceCookie
                 'samesite' => 'Lax',
             ],
         );
+
+        error_log('[TRUSTED_DEVICE_DEBUG] setcookie() result: ' . ($result ? 'SUCCESS' : 'FAILED'));
+        error_log('[TRUSTED_DEVICE_DEBUG] Cookie name: ' . self::COOKIE_NAME . ', Expires: ' . date('Y-m-d H:i:s', $expirationTimestamp));
     }
 
     /**

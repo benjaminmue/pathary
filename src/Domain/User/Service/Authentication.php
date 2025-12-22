@@ -292,22 +292,40 @@ class Authentication
         if ($deviceName === CreateUserController::PATHARY_WEB_CLIENT) {
             $this->setAuthenticationCookieAndNewSession($user->getId(), $token, $authTokenExpirationDate);
 
-            // Create trusted device if requested and 2FA is enabled
-            if ($trustDevice === true && $this->userApi->findTotpUri($user->getId()) !== null) {
-                $deviceToken = $this->trustedDeviceService->createTrustedDevice(
-                    $user->getId(),
-                    null, // Let service auto-generate device name from user agent
-                    $userAgent,
-                    $_SERVER['REMOTE_ADDR'] ?? null
-                );
-                TrustedDeviceCookie::set($deviceToken);
+            // DEBUG: Log trusted device flow
+            error_log('[TRUSTED_DEVICE_DEBUG] trustDevice parameter: ' . ($trustDevice ? 'YES' : 'NO'));
 
-                $this->securityAuditService->log(
-                    $user->getId(),
-                    SecurityAuditService::EVENT_TRUSTED_DEVICE_ADDED,
-                    $_SERVER['REMOTE_ADDR'] ?? null,
-                    $userAgent,
-                );
+            $totpUri = $this->userApi->findTotpUri($user->getId());
+            error_log('[TRUSTED_DEVICE_DEBUG] 2FA enabled: ' . ($totpUri !== null ? 'YES' : 'NO'));
+
+            // Create trusted device if requested and 2FA is enabled
+            if ($trustDevice === true && $totpUri !== null) {
+                error_log('[TRUSTED_DEVICE_DEBUG] Creating trusted device...');
+
+                try {
+                    $deviceToken = $this->trustedDeviceService->createTrustedDevice(
+                        $user->getId(),
+                        null, // Let service auto-generate device name from user agent
+                        $userAgent,
+                        $_SERVER['REMOTE_ADDR'] ?? null
+                    );
+                    error_log('[TRUSTED_DEVICE_DEBUG] Device token generated: YES');
+
+                    TrustedDeviceCookie::set($deviceToken);
+                    error_log('[TRUSTED_DEVICE_DEBUG] Cookie set called: YES');
+
+                    $this->securityAuditService->log(
+                        $user->getId(),
+                        SecurityAuditService::EVENT_TRUSTED_DEVICE_ADDED,
+                        $_SERVER['REMOTE_ADDR'] ?? null,
+                        $userAgent,
+                    );
+                    error_log('[TRUSTED_DEVICE_DEBUG] Audit log created: YES');
+                } catch (\Throwable $e) {
+                    error_log('[TRUSTED_DEVICE_DEBUG] ERROR: ' . $e->getMessage());
+                }
+            } else {
+                error_log('[TRUSTED_DEVICE_DEBUG] Trusted device NOT created - condition not met');
             }
         }
 
