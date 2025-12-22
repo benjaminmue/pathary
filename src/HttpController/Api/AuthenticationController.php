@@ -49,6 +49,7 @@ class AuthenticationController
         $totpCode = empty($tokenRequestBody['totpCode']) === true ? null : (int)$tokenRequestBody['totpCode'];
         $recoveryCode = empty($tokenRequestBody['recoveryCode']) === true ? null : trim($tokenRequestBody['recoveryCode']);
         $rememberMe = $tokenRequestBody['rememberMe'] ?? false;
+        $trustDevice = $tokenRequestBody['trustDevice'] ?? false;
 
         try {
             $userAndAuthToken = $this->authenticationService->login(
@@ -59,6 +60,7 @@ class AuthenticationController
                 $request->getUserAgent(),
                 $totpCode,
                 $recoveryCode,
+                (bool)$trustDevice,
             );
         } catch (MissingTotpCode) {
             return Response::createBadRequest(

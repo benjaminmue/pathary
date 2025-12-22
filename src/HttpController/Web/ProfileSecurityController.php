@@ -12,6 +12,7 @@ use Movary\Domain\User\Service\TwoFactorAuthenticationFactory;
 use Movary\Domain\User\Service\Validator;
 use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
+use Movary\Util\TrustedDeviceCookie;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -178,6 +179,7 @@ class ProfileSecurityController
         // Delete all recovery codes and trusted devices
         $this->recoveryCodeService->deleteAllRecoveryCodes($userId);
         $this->trustedDeviceService->revokeAllTrustedDevices($userId);
+        TrustedDeviceCookie::clear();
 
         // Log security event
         $this->securityAuditService->log(
@@ -225,24 +227,40 @@ class ProfileSecurityController
         $userId = $this->authenticationService->getCurrentUserId();
         $deviceId = (int)$request->getRouteParameters()['deviceId'];
 
-        // Verify the device belongs to the user
+        // Verify the device belongs to the user and get the device entity
         $devices = $this->trustedDeviceService->getTrustedDevices($userId);
-        $deviceBelongsToUser = false;
+        $deviceToRevoke = null;
         foreach ($devices as $device) {
-            if ((int)$device['id'] === $deviceId) {
-                $deviceBelongsToUser = true;
+            if ($device->getId() === $deviceId) {
+                $deviceToRevoke = $device;
                 break;
             }
         }
 
-        if ($deviceBelongsToUser === false) {
+        if ($deviceToRevoke === null) {
             return Response::createJson(
                 Json::encode(['error' => 'Device not found.']),
                 StatusCode::createNotFound()
             );
         }
 
+        // Check if the current request has a cookie that matches this device
+        $cookieToken = TrustedDeviceCookie::get();
+        $isCurrentDevice = false;
+        if ($cookieToken !== null) {
+            // Verify if the cookie token matches the device being revoked
+            if (password_verify($cookieToken, $deviceToRevoke->getTokenHash()) === true) {
+                $isCurrentDevice = true;
+            }
+        }
+
+        // Revoke the device
         $this->trustedDeviceService->revokeTrustedDevice($deviceId);
+
+        // If this is the current device, clear the cookie
+        if ($isCurrentDevice === true) {
+            TrustedDeviceCookie::clear();
+        }
 
         // Log security event
         $this->securityAuditService->log(
@@ -250,10 +268,37 @@ class ProfileSecurityController
             SecurityAuditService::EVENT_TRUSTED_DEVICE_REMOVED,
             $_SERVER['REMOTE_ADDR'] ?? null,
             $_SERVER['HTTP_USER_AGENT'] ?? null,
-            ['device_id' => $deviceId]
+            ['device_id' => $deviceId, 'is_current_device' => $isCurrentDevice]
         );
 
-        return Response::createJson(Json::encode(['success' => true]));
+        return Response::createJson(Json::encode([
+            'success' => true,
+            'message' => 'Trusted device has been removed.',
+        ]));
+    }
+
+    public function revokeAllTrustedDevices(Request $request) : Response
+    {
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        // Revoke all trusted devices for this user
+        $this->trustedDeviceService->revokeAllTrustedDevices($userId);
+
+        // Clear the trusted device cookie
+        TrustedDeviceCookie::clear();
+
+        // Log security event
+        $this->securityAuditService->log(
+            $userId,
+            SecurityAuditService::EVENT_ALL_TRUSTED_DEVICES_REMOVED,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+        );
+
+        return Response::createJson(Json::encode([
+            'success' => true,
+            'message' => 'All trusted devices have been removed.',
+        ]));
     }
 
     public function changePassword(Request $request) : Response
@@ -292,6 +337,10 @@ class ProfileSecurityController
 
         // Update password
         $this->userApi->updatePassword($userId, $newPassword);
+
+        // Revoke all trusted devices after password change (security best practice)
+        $this->trustedDeviceService->revokeAllTrustedDevices($userId);
+        TrustedDeviceCookie::clear();
 
         // Log security event
         $this->securityAuditService->log(

@@ -72,6 +72,12 @@ function initializeSecurityListeners() {
             revokeTrustedDevice(deviceId);
         });
     });
+
+    // Revoke All Trusted Devices
+    const revokeAllBtn = document.getElementById('revokeAllDevicesBtn');
+    if (revokeAllBtn) {
+        revokeAllBtn.addEventListener('click', revokeAllTrustedDevices);
+    }
 }
 
 // Change Password
@@ -1024,6 +1030,30 @@ async function revokeTrustedDevice(deviceId) {
         }
     } catch (error) {
         showAlert('Failed to remove trusted device.', 'danger');
+    }
+}
+
+// Revoke All Trusted Devices
+async function revokeAllTrustedDevices() {
+    if (!confirm('Remove ALL trusted devices? You will need to enter a 2FA code next time you log in from any device.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(APPLICATION_URL + '/profile/security/trusted-devices/revoke-all', {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showAlert('All trusted devices removed.', 'success');
+            loadSecurityTab();
+        } else {
+            showAlert(data.error || 'Failed to remove trusted devices.', 'danger');
+        }
+    } catch (error) {
+        showAlert('Failed to remove trusted devices.', 'danger');
     }
 }
 

@@ -13,6 +13,7 @@ use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\Util\SessionWrapper;
+use Movary\Util\TrustedDeviceCookie;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
 use RuntimeException;
@@ -20,7 +21,6 @@ use RuntimeException;
 class Authentication
 {
     private const string AUTHENTICATION_COOKIE_NAME = 'id';
-    private const string TRUSTED_DEVICE_COOKIE_NAME = 'trusted_device';
 
     private const int MAX_EXPIRATION_AGE_IN_DAYS = 3650; // 10 years for persistent login
 
@@ -94,8 +94,8 @@ class Authentication
 
         // 2FA is enabled - check for trusted device first
         if ($trustedDeviceToken !== null) {
-            $trustedDevice = $this->trustedDeviceService->verifyTrustedDevice($trustedDeviceToken);
-            if ($trustedDevice !== null && (int)$trustedDevice['user_id'] === $user->getId()) {
+            $trustedDevice = $this->trustedDeviceService->verifyTrustedDevice($trustedDeviceToken, $user->getId());
+            if ($trustedDevice !== null) {
                 // Trusted device is valid, skip 2FA
                 $this->securityAuditService->log(
                     $user->getId(),
@@ -272,11 +272,11 @@ class Authentication
         ?string $recoveryCode = null,
         bool $trustDevice = false,
     ) : array {
+        // Opportunistic cleanup of expired trusted devices
+        $this->trustedDeviceService->cleanupExpiredDevices();
+
         // Check for existing trusted device token
-        $trustedDeviceToken = (string)filter_input(INPUT_COOKIE, self::TRUSTED_DEVICE_COOKIE_NAME);
-        if ($trustedDeviceToken === '') {
-            $trustedDeviceToken = null;
-        }
+        $trustedDeviceToken = TrustedDeviceCookie::get();
 
         $user = $this->findUserAndVerifyAuthentication($email, $password, $userTotpInput, $recoveryCode, $trustedDeviceToken);
 
@@ -296,18 +296,17 @@ class Authentication
             if ($trustDevice === true && $this->userApi->findTotpUri($user->getId()) !== null) {
                 $deviceToken = $this->trustedDeviceService->createTrustedDevice(
                     $user->getId(),
-                    $deviceName,
+                    null, // Let service auto-generate device name from user agent
                     $userAgent,
                     $_SERVER['REMOTE_ADDR'] ?? null
                 );
-                $this->setTrustedDeviceCookie($deviceToken);
+                TrustedDeviceCookie::set($deviceToken);
 
                 $this->securityAuditService->log(
                     $user->getId(),
                     SecurityAuditService::EVENT_TRUSTED_DEVICE_ADDED,
                     $_SERVER['REMOTE_ADDR'] ?? null,
                     $userAgent,
-                    ['device_name' => $deviceName]
                 );
             }
         }
@@ -345,6 +344,9 @@ class Authentication
                 ],
             );
         }
+
+        // Do NOT clear trusted device cookie - it should persist across logout/login
+        // Users can revoke devices manually from their profile if needed
 
         if ($userId !== null) {
             $this->securityAuditService->log(
@@ -427,25 +429,5 @@ class Authentication
         $this->repository->createAuthToken($userId, $token, $deviceName, $userAgent, $expirationDate);
 
         return $token;
-    }
-
-    private function setTrustedDeviceCookie(string $deviceToken) : void
-    {
-        $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-
-        // Trusted device expires in 30 days
-        $expirationDate = DateTime::create()->modify('+30 days');
-
-        setcookie(
-            self::TRUSTED_DEVICE_COOKIE_NAME,
-            $deviceToken,
-            [
-                'expires' => (int)$expirationDate->format('U'),
-                'path' => '/',
-                'secure' => $isSecure,
-                'httponly' => true,
-                'samesite' => 'Lax',
-            ],
-        );
     }
 }

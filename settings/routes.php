@@ -57,6 +57,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/profile/security/totp/disable', [Web\ProfileSecurityController::class, 'disableTotp'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/profile/security/recovery-codes/regenerate', [Web\ProfileSecurityController::class, 'regenerateRecoveryCodes'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/profile/security/trusted-devices/{deviceId:[0-9]+}/revoke', [Web\ProfileSecurityController::class, 'revokeTrustedDevice'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/profile/security/trusted-devices/revoke-all', [Web\ProfileSecurityController::class, 'revokeAllTrustedDevices'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/profile/security/events', [Web\ProfileSecurityController::class, 'getSecurityEvents'], [Web\Middleware\UserIsAuthenticated::class]);
 
     ################

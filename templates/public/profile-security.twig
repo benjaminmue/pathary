@@ -177,12 +177,13 @@
                     {% for device in trustedDevices %}
                         <li class="device-item">
                             <div class="device-info">
-                                <h4><i class="bi bi-laptop"></i> {{ device.device_name }}</h4>
+                                <h4><i class="bi bi-laptop"></i> {{ device.deviceName }}</h4>
                                 <p>
-                                    Added: {{ device.created_at }}
-                                    {% if device.last_used_at %}
-                                        | Last used: {{ device.last_used_at }}
+                                    Added: {{ device.createdAt|date('Y-m-d H:i') }}
+                                    {% if device.lastUsedAt %}
+                                        | Last used: {{ device.lastUsedAt|date('Y-m-d H:i') }}
                                     {% endif %}
+                                    | Expires: {{ device.expiresAt|date('Y-m-d H:i') }}
                                 </p>
                             </div>
                             <button type="button" class="btn btn-sm btn-outline-danger revoke-device-btn" data-device-id="{{ device.id }}">
@@ -191,8 +192,17 @@
                         </li>
                     {% endfor %}
                 </ul>
+                <div class="mt-3">
+                    <button type="button" class="btn btn-outline-danger" id="revokeAllDevicesBtn">
+                        <i class="bi bi-x-circle"></i> Revoke All Trusted Devices
+                    </button>
+                </div>
             {% else %}
-                <p class="text-muted">No trusted devices. Check "Trust this device" when logging in to add one.</p>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>No trusted devices yet.</strong>
+                    <p class="mb-0 mt-2">When logging in with 2FA, check "Trust this device" to skip verification on this device for 30 days.</p>
+                </div>
             {% endif %}
         </div>
     {% endif %}

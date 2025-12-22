@@ -71,6 +71,14 @@ class DateTime implements JsonSerializable
         return $this->format(self::DEFAULT_STRING_FORMAT);
     }
 
+    public function modify(string $modifier) : self
+    {
+        $dateTime = new \DateTime($this->dateTime);
+        $dateTime->modify($modifier);
+
+        return new self($dateTime);
+    }
+
     public function subSeconds(int $seconds) : self
     {
         $dateTime = new \DateTime($this->dateTime);

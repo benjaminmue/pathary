@@ -114,6 +114,18 @@
                            id="totpCode"
                            onkeydown="submitCredentialsOnEnter(event)"
                            required>
+
+                    <!-- Trust This Device Checkbox -->
+                    <div class="form-check mb-3">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               id="trustDevice"
+                               value="1">
+                        <label class="form-check-label" for="trustDevice">
+                            Trust this device
+                            <small class="text-muted d-block">Skip verification on this device for 30 days</small>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Recovery Code Input -->

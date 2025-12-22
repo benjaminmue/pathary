@@ -3,67 +3,18 @@
 namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\Repository\TrustedDeviceRepository;
+use Movary\Domain\User\TrustedDeviceEntity;
+use Movary\Util\DeviceNameParser;
 use Movary\ValueObject\DateTime;
 
 class TrustedDeviceService
 {
     private const TRUSTED_DEVICE_EXPIRATION_DAYS = 30;
+    private const MAX_TRUSTED_DEVICES_PER_USER = 10;
 
     public function __construct(
         private readonly TrustedDeviceRepository $trustedDeviceRepository,
     ) {
-    }
-
-    public function createTrustedDevice(int $userId, string $deviceName, string $userAgent, ?string $ipAddress = null) : string
-    {
-        // Generate unique device token
-        $deviceToken = bin2hex(random_bytes(32));
-
-        // Generate device fingerprint from user agent and IP
-        $deviceFingerprint = $this->generateDeviceFingerprint($userAgent, $ipAddress);
-
-        // Set expiration to 30 days from now
-        $expiresAt = DateTime::create()->modify('+' . self::TRUSTED_DEVICE_EXPIRATION_DAYS . ' days');
-
-        $this->trustedDeviceRepository->create($userId, $deviceToken, $deviceName, $deviceFingerprint, $expiresAt);
-
-        return $deviceToken;
-    }
-
-    public function verifyTrustedDevice(string $deviceToken) : ?array
-    {
-        $device = $this->trustedDeviceRepository->findByToken($deviceToken);
-
-        if ($device === null) {
-            return null;
-        }
-
-        // Check if device is expired
-        $expiresAt = DateTime::createFromString($device['expires_at']);
-        if ($expiresAt->isInPast() === true) {
-            $this->trustedDeviceRepository->delete((int)$device['id']);
-            return null;
-        }
-
-        // Update last used timestamp
-        $this->trustedDeviceRepository->updateLastUsed((int)$device['id']);
-
-        return $device;
-    }
-
-    public function getTrustedDevices(int $userId) : array
-    {
-        return $this->trustedDeviceRepository->findAllByUserId($userId);
-    }
-
-    public function revokeTrustedDevice(int $deviceId) : void
-    {
-        $this->trustedDeviceRepository->delete($deviceId);
-    }
-
-    public function revokeAllTrustedDevices(int $userId) : void
-    {
-        $this->trustedDeviceRepository->deleteAllByUserId($userId);
     }
 
     public function cleanupExpiredDevices() : void
@@ -71,10 +22,87 @@ class TrustedDeviceService
         $this->trustedDeviceRepository->deleteExpired();
     }
 
-    private function generateDeviceFingerprint(string $userAgent, ?string $ipAddress) : string
+    public function createTrustedDevice(int $userId, ?string $deviceName = null, ?string $userAgent = null, ?string $ipAddress = null) : string
     {
-        // Create a fingerprint from user agent and IP address
-        $data = $userAgent . '|' . ($ipAddress ?? 'unknown');
-        return hash('sha256', $data);
+        // Generate unique random token
+        $token = bin2hex(random_bytes(32));
+
+        // Hash the token for storage (never store plaintext)
+        $tokenHash = password_hash($token, PASSWORD_DEFAULT);
+
+        // Parse device name from user agent if not provided
+        if ($deviceName === null || $deviceName === '') {
+            $deviceName = DeviceNameParser::parse($userAgent);
+        }
+
+        // Set expiration to 30 days from now
+        $expiresAt = DateTime::create()->modify('+' . self::TRUSTED_DEVICE_EXPIRATION_DAYS . ' days');
+
+        // Create the trusted device record
+        $this->trustedDeviceRepository->create($userId, $tokenHash, $deviceName, $userAgent, $ipAddress, $expiresAt);
+
+        // Enforce limit on trusted devices per user
+        $this->enforceTrustedDeviceLimit($userId);
+
+        // Return the plaintext token (only time it's accessible)
+        return $token;
+    }
+
+    public function getTrustedDevices(int $userId) : array
+    {
+        return $this->trustedDeviceRepository->findAllByUserId($userId);
+    }
+
+    public function revokeAllTrustedDevices(int $userId) : void
+    {
+        $this->trustedDeviceRepository->deleteAllByUserId($userId);
+    }
+
+    public function revokeTrustedDevice(int $deviceId) : void
+    {
+        $this->trustedDeviceRepository->delete($deviceId);
+    }
+
+    public function verifyTrustedDevice(string $token, int $userId) : ?TrustedDeviceEntity
+    {
+        // Get all devices for this user
+        $devices = $this->trustedDeviceRepository->findAllByUserId($userId);
+
+        foreach ($devices as $device) {
+            // Verify the token against the hash
+            if (password_verify($token, $device->getTokenHash()) === false) {
+                continue;
+            }
+
+            // Check if device is expired
+            if ($device->isExpired() === true) {
+                $this->trustedDeviceRepository->delete($device->getId());
+                return null;
+            }
+
+            // Update last used timestamp
+            $this->trustedDeviceRepository->updateLastUsed($device->getId());
+
+            return $device;
+        }
+
+        return null;
+    }
+
+    private function enforceTrustedDeviceLimit(int $userId) : void
+    {
+        $devices = $this->trustedDeviceRepository->findAllByUserId($userId);
+
+        if (count($devices) <= self::MAX_TRUSTED_DEVICES_PER_USER) {
+            return;
+        }
+
+        // Delete oldest devices beyond the limit
+        // Devices are already ordered by created_at DESC, so take from the end
+        $devicesToDelete = array_slice($devices, self::MAX_TRUSTED_DEVICES_PER_USER);
+
+        foreach ($devicesToDelete as $device) {
+            $this->trustedDeviceRepository->delete($device->getId());
+        }
     }
 }

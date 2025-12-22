@@ -3,6 +3,7 @@
 namespace Movary\Domain\User\Repository;
 
 use Doctrine\DBAL\Connection;
+use Movary\Domain\User\TrustedDeviceEntity;
 use Movary\ValueObject\DateTime;
 
 class TrustedDeviceRepository
@@ -11,54 +12,28 @@ class TrustedDeviceRepository
     {
     }
 
-    public function create(int $userId, string $deviceToken, string $deviceName, string $deviceFingerprint, DateTime $expiresAt) : void
-    {
+    public function create(
+        int $userId,
+        string $tokenHash,
+        string $deviceName,
+        ?string $userAgent,
+        ?string $ipAddress,
+        DateTime $expiresAt
+    ) : int {
         $this->dbConnection->insert(
             'user_trusted_devices',
             [
                 'user_id' => $userId,
-                'device_token' => $deviceToken,
+                'token_hash' => $tokenHash,
                 'device_name' => $deviceName,
-                'device_fingerprint' => $deviceFingerprint,
+                'user_agent' => $userAgent,
+                'ip_address' => $ipAddress,
                 'expires_at' => (string)$expiresAt,
                 'created_at' => (string)DateTime::create(),
             ],
         );
-    }
 
-    public function findByToken(string $deviceToken) : ?array
-    {
-        $result = $this->dbConnection->fetchAssociative(
-            'SELECT * FROM `user_trusted_devices` WHERE `device_token` = ?',
-            [$deviceToken],
-        );
-
-        if ($result === false) {
-            return null;
-        }
-
-        return $result;
-    }
-
-    public function findAllByUserId(int $userId) : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            'SELECT * FROM `user_trusted_devices` WHERE `user_id` = ? ORDER BY `created_at` DESC',
-            [$userId],
-        );
-    }
-
-    public function updateLastUsed(int $deviceId) : void
-    {
-        $this->dbConnection->update(
-            'user_trusted_devices',
-            [
-                'last_used_at' => (string)DateTime::create(),
-            ],
-            [
-                'id' => $deviceId,
-            ],
-        );
+        return (int)$this->dbConnection->lastInsertId();
     }
 
     public function delete(int $deviceId) : void
@@ -71,6 +46,16 @@ class TrustedDeviceRepository
         );
     }
 
+    public function deleteAllByUserId(int $userId) : void
+    {
+        $this->dbConnection->delete(
+            'user_trusted_devices',
+            [
+                'user_id' => $userId,
+            ],
+        );
+    }
+
     public function deleteExpired() : void
     {
         $this->dbConnection->executeStatement(
@@ -79,12 +64,44 @@ class TrustedDeviceRepository
         );
     }
 
-    public function deleteAllByUserId(int $userId) : void
+    public function findAllByUserId(int $userId) : array
     {
-        $this->dbConnection->delete(
+        $rows = $this->dbConnection->fetchAllAssociative(
+            'SELECT * FROM `user_trusted_devices` WHERE `user_id` = ? ORDER BY `created_at` DESC',
+            [$userId],
+        );
+
+        $devices = [];
+        foreach ($rows as $row) {
+            $devices[] = TrustedDeviceEntity::createFromArray($row);
+        }
+
+        return $devices;
+    }
+
+    public function findByTokenHash(string $tokenHash) : ?TrustedDeviceEntity
+    {
+        $result = $this->dbConnection->fetchAssociative(
+            'SELECT * FROM `user_trusted_devices` WHERE `token_hash` = ?',
+            [$tokenHash],
+        );
+
+        if ($result === false) {
+            return null;
+        }
+
+        return TrustedDeviceEntity::createFromArray($result);
+    }
+
+    public function updateLastUsed(int $deviceId) : void
+    {
+        $this->dbConnection->update(
             'user_trusted_devices',
             [
-                'user_id' => $userId,
+                'last_used_at' => (string)DateTime::create(),
+            ],
+            [
+                'id' => $deviceId,
             ],
         );
     }

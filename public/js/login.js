@@ -96,6 +96,12 @@ function loginRequest() {
     } else {
         const totpCodeInput = document.getElementById('totpCode');
         requestBody['totpCode'] = totpCodeInput ? totpCodeInput.value : '';
+
+        // Add trustDevice flag if checkbox is checked (only in TOTP mode)
+        const trustDeviceCheckbox = document.getElementById('trustDevice');
+        if (trustDeviceCheckbox && trustDeviceCheckbox.checked) {
+            requestBody['trustDevice'] = true;
+        }
     }
 
     return fetch(APPLICATION_URL + '/api/authentication/token', {
@@ -104,6 +110,7 @@ function loginRequest() {
             'Content-type': 'application/json',
             'X-Movary-Client': PATHARY_CLIENT_IDENTIFIER
         },
+        credentials: 'include',
         body: JSON.stringify(requestBody)
     });
 }

@@ -15,6 +15,7 @@ class SecurityAuditService
     public const EVENT_RECOVERY_CODE_USED = 'recovery_code_used';
     public const EVENT_TRUSTED_DEVICE_ADDED = 'trusted_device_added';
     public const EVENT_TRUSTED_DEVICE_REMOVED = 'trusted_device_removed';
+    public const EVENT_ALL_TRUSTED_DEVICES_REMOVED = 'all_trusted_devices_removed';
     public const EVENT_LOGIN_SUCCESS = 'login_success';
     public const EVENT_LOGIN_FAILED_PASSWORD = 'login_failed_password';
     public const EVENT_LOGIN_FAILED_TOTP = 'login_failed_totp';
@@ -33,7 +34,11 @@ class SecurityAuditService
         ?string $userAgent = null,
         ?array $metadata = null
     ) : void {
-        $metadataJson = $metadata !== null ? json_encode($metadata) : null;
+        $metadataJson = null;
+        if ($metadata !== null) {
+            $encoded = json_encode($metadata);
+            $metadataJson = $encoded !== false ? $encoded : null;
+        }
 
         $this->securityAuditRepository->create(
             $userId,
@@ -79,6 +84,7 @@ class SecurityAuditService
             self::EVENT_RECOVERY_CODE_USED => 'Recovery Code Used',
             self::EVENT_TRUSTED_DEVICE_ADDED => 'Trusted Device Added',
             self::EVENT_TRUSTED_DEVICE_REMOVED => 'Trusted Device Removed',
+            self::EVENT_ALL_TRUSTED_DEVICES_REMOVED => 'All Trusted Devices Removed',
             self::EVENT_LOGIN_SUCCESS => 'Login Success',
             self::EVENT_LOGIN_FAILED_PASSWORD => 'Login Failed (Password)',
             self::EVENT_LOGIN_FAILED_TOTP => 'Login Failed (2FA)',

@@ -16,9 +16,10 @@ final class CreateTrustedDevicesTable extends AbstractMigration
             CREATE TABLE `user_trusted_devices` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                 `user_id` INTEGER NOT NULL,
-                `device_token` TEXT NOT NULL UNIQUE,
+                `token_hash` TEXT NOT NULL UNIQUE,
                 `device_name` TEXT NOT NULL,
-                `device_fingerprint` TEXT NOT NULL,
+                `user_agent` TEXT DEFAULT NULL,
+                `ip_address` TEXT DEFAULT NULL,
                 `expires_at` TEXT NOT NULL,
                 `created_at` TEXT NOT NULL,
                 `last_used_at` TEXT DEFAULT NULL,
@@ -32,7 +33,11 @@ final class CreateTrustedDevicesTable extends AbstractMigration
         );
 
         $this->execute(
-            'CREATE UNIQUE INDEX idx_user_trusted_devices_device_token ON user_trusted_devices(device_token)',
+            'CREATE UNIQUE INDEX idx_user_trusted_devices_token_hash ON user_trusted_devices(token_hash)',
+        );
+
+        $this->execute(
+            'CREATE INDEX idx_user_trusted_devices_expires_at ON user_trusted_devices(expires_at)',
         );
     }
 }
