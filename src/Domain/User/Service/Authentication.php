@@ -272,6 +272,10 @@ class Authentication
         ?string $recoveryCode = null,
         bool $trustDevice = false,
     ) : array {
+        error_log('[TRUSTED_DEVICE_DEBUG] ===== LOGIN METHOD CALLED =====');
+        error_log('[TRUSTED_DEVICE_DEBUG] Device name: ' . $deviceName);
+        error_log('[TRUSTED_DEVICE_DEBUG] Trust device param: ' . ($trustDevice ? 'YES' : 'NO'));
+
         // Opportunistic cleanup of expired trusted devices
         $this->trustedDeviceService->cleanupExpiredDevices();
 

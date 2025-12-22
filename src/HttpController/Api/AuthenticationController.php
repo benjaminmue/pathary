@@ -51,6 +51,8 @@ class AuthenticationController
         $rememberMe = $tokenRequestBody['rememberMe'] ?? false;
         $trustDevice = $tokenRequestBody['trustDevice'] ?? false;
 
+        error_log('[TRUSTED_DEVICE_DEBUG] API endpoint received - Client: ' . $requestClient . ', trustDevice: ' . ($trustDevice ? 'YES' : 'NO'));
+
         try {
             $userAndAuthToken = $this->authenticationService->login(
                 $tokenRequestBody['email'],

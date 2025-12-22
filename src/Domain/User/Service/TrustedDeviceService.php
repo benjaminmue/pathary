@@ -42,7 +42,7 @@ class TrustedDeviceService
 
         // Set expiration to 30 days from now
         $expiresAt = DateTime::create()->modify('+' . self::TRUSTED_DEVICE_EXPIRATION_DAYS . ' days');
-        error_log('[TRUSTED_DEVICE_DEBUG] Expiration set: ' . $expiresAt->format());
+        error_log('[TRUSTED_DEVICE_DEBUG] Expiration set: ' . $expiresAt->format('Y-m-d H:i:s'));
 
         // Create the trusted device record
         try {
