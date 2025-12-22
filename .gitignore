@@ -1,16 +1,43 @@
 .idea
 .phpunit.result.cache
+
+# Environment files (except examples)
 .env
 .env.local
-/vendor
-/public/storage
-docker-compose.override.yml
-tmp/*
-.vscode
+.env.*.local
+*.env.local
 http-client.private.env.json
+http-client.env.json
+
+# Dependencies
+/vendor
+/node_modules
+
+# Public storage
+/public/storage
+
+# Docker overrides and local configs
+docker-compose.override.yml
+docker-compose.local.yml
+
+# Temporary files
+tmp/*
+
+# IDE settings
+.vscode
 
 # Local development data (not committed)
 /docker/mysql-data
+
+# Database dumps and backups
+*.sql
+*.dump
+*.backup
+*.bak
+
+# Log files
+*.log
+logs/
 
 # Storage directory - ignore contents but keep structure via .gitkeep
 /storage/*
