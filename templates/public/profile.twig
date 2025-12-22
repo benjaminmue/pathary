@@ -26,9 +26,25 @@
         color: var(--bs-secondary-color);
         border: none;
         border-bottom: 2px solid transparent;
-        padding: 1rem 1.5rem;
+        padding: 1rem 0.75rem;
         font-weight: 500;
         transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Hide filled icons by default, show on active */
+    .nav-tabs .nav-link .icon-filled {
+        display: none;
+    }
+
+    .nav-tabs .nav-link.active .icon-filled {
+        display: inline-block;
+    }
+
+    .nav-tabs .nav-link.active .icon-outline {
+        display: none;
     }
 
     .nav-tabs .nav-link:hover {
@@ -56,6 +72,19 @@
         margin-bottom: 2rem;
         padding-bottom: 2rem;
         border-bottom: 1px solid var(--bs-border-color);
+    }
+
+    .profile-image-section h3 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .profile-image-section h3 i {
+        font-size: 1.1rem;
     }
 
     .profile-image-container {
@@ -143,9 +172,15 @@
     }
 
     .form-group label {
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
         font-weight: 500;
         margin-bottom: 0.5rem;
+    }
+
+    .form-group label i {
+        font-size: 0.95rem;
     }
 
     .form-group input {
@@ -219,6 +254,13 @@
         font-size: 1.1rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .logout-section h3 i {
+        font-size: 1rem;
     }
 
     .logout-section p {
@@ -272,12 +314,16 @@
     <ul class="nav nav-tabs" id="profileTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
-                <i class="bi bi-person"></i> Profile
+                <i class="bi bi-person icon-outline" aria-hidden="true"></i>
+                <i class="bi bi-person-fill icon-filled" aria-hidden="true"></i>
+                <span>Profile</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
-                <i class="bi bi-shield-lock"></i> Security
+                <i class="bi bi-shield-lock icon-outline" aria-hidden="true"></i>
+                <i class="bi bi-shield-lock-fill icon-filled" aria-hidden="true"></i>
+                <span>Security</span>
             </button>
         </li>
     </ul>
@@ -300,6 +346,7 @@
 
                 <form action="{{ applicationUrl }}/profile" method="post" enctype="multipart/form-data" id="profileForm">
                     <div class="profile-image-section">
+                        <h3><i class="bi bi-person-circle"></i> Profile Photo</h3>
                         <div class="profile-image-container">
                             {% if profileImage %}
                                 <img src="{{ applicationUrl }}/profile-images/{{ profileImage }}" alt="{{ userName }}" class="profile-image" id="profileImagePreview">
@@ -327,13 +374,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="name">Display Name</label>
+                        <label for="name"><i class="bi bi-person-badge"></i> Display Name</label>
                         <input type="text" id="name" name="name" value="{{ userName }}" required pattern="[a-zA-Z0-9]+" minlength="2" maxlength="24">
                         <p class="form-hint">Only letters and numbers, 2-24 characters.</p>
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email Address</label>
+                        <label for="email"><i class="bi bi-envelope"></i> Email Address</label>
                         <input type="email" id="email" name="email" value="{{ userEmail }}">
                         <p class="form-hint">Used for account recovery and notifications.</p>
                     </div>
@@ -346,7 +393,7 @@
                 </form>
 
                 <div class="logout-section">
-                    <h3>Sign Out</h3>
+                    <h3><i class="bi bi-box-arrow-right"></i> Sign Out</h3>
                     <p>Sign out of your account on this device.</p>
                     <button type="button" class="btn btn-logout" onclick="logoutAndRedirect()">
                         <i class="bi bi-box-arrow-right"></i> Logout

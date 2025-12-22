@@ -49,3 +49,31 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-filter::before{content:"\f3ca"}
 .bi-pin-map-fill::before{content:"\f64b"}
 .bi-eye-fill::before{ content: "\f33e" }
+.bi-person::before { content: "\f4e1"; }
+.bi-person-fill::before { content: "\f4da"; }
+.bi-shield-lock::before { content: "\f538"; }
+.bi-shield-lock-fill::before { content: "\f537"; }
+.bi-shield-check::before { content: "\f565"; }
+.bi-shield-fill-check::before { content: "\f568"; }
+.bi-key::before { content: "\f44f"; }
+.bi-life-preserver::before { content: "\f467"; }
+.bi-laptop::before { content: "\f456"; }
+.bi-activity::before { content: "\f66b"; }
+.bi-shield-plus::before { content: "\f53a"; }
+.bi-circle::before { content: "\f28a"; }
+.bi-x-circle::before { content: "\f623"; }
+.bi-shield-x::before { content: "\f53e"; }
+.bi-box-arrow-in-right::before { content: "\f1be"; }
+.bi-exclamation-triangle::before { content: "\f33b"; }
+.bi-info-circle::before { content: "\f431"; }
+.bi-camera::before { content: "\f220"; }
+.bi-trash::before { content: "\f5de"; }
+.bi-check-lg::before { content: "\f633"; }
+.bi-clock-history::before { content: "\f292"; }
+.bi-lock-fill::before { content: "\f47a"; }
+.bi-unlock-fill::before { content: "\f5ff"; }
+.bi-person-circle::before { content: "\f4d7"; }
+.bi-person-badge::before { content: "\f4d3"; }
+.bi-envelope::before { content: "\f32f"; }
+.bi-save::before { content: "\f525"; }
+.bi-box-arrow-right::before { content: "\f1c3"; }
