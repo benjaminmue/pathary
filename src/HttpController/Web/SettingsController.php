@@ -556,6 +556,23 @@ class SettingsController
     {
         $requestData = Json::decode($request->getBody());
 
+        // Validate recipient parameter
+        if (empty($requestData['recipient'])) {
+            return Response::createBadRequest('Recipient email address is required');
+        }
+
+        $recipient = trim((string)$requestData['recipient']);
+
+        // Validate email format
+        if (!filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+            return Response::createBadRequest('Invalid recipient email address format');
+        }
+
+        // Validate email length (reasonable maximum)
+        if (strlen($recipient) > 255) {
+            return Response::createBadRequest('Recipient email address is too long (max 255 characters)');
+        }
+
         $smtpConfig = SmtpConfig::create(
             (string)$requestData['smtpHost'],
             (int)$requestData['smtpPort'],
@@ -568,7 +585,7 @@ class SettingsController
 
         try {
             $this->emailService->sendEmail(
-                $requestData['recipient'],
+                $recipient,
                 'Movary: Test Email',
                 'This is a test email sent to check the currently set email settings. It seems to work!',
                 $smtpConfig,
@@ -578,6 +595,142 @@ class SettingsController
         }
 
         return Response::createOk();
+    }
+
+    public function diagnoseSMTP(Request $request) : Response
+    {
+        $requestData = Json::decode($request->getBody());
+
+        $host = trim((string)($requestData['smtpHost'] ?? ''));
+        $port = (int)($requestData['smtpPort'] ?? 0);
+        $encryption = trim((string)($requestData['smtpEncryption'] ?? ''));
+
+        $diagnostics = [
+            'host' => $host,
+            'port' => $port,
+            'encryption' => $encryption,
+            'tests' => [],
+        ];
+
+        // Test 1: Validate host format
+        if (empty($host)) {
+            $diagnostics['tests']['host_format'] = [
+                'status' => 'error',
+                'message' => 'SMTP host is required',
+            ];
+            return Response::create(
+                StatusCode::createOk(),
+                Json::encode($diagnostics),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        $diagnostics['tests']['host_format'] = [
+            'status' => 'success',
+            'message' => 'Host format valid',
+        ];
+
+        // Test 2: DNS resolution
+        $startTime = microtime(true);
+        $dnsResult = @gethostbyname($host);
+        $dnsLatency = (int)round((microtime(true) - $startTime) * 1000);
+
+        if ($dnsResult === $host || filter_var($dnsResult, FILTER_VALIDATE_IP) === false) {
+            $diagnostics['tests']['dns'] = [
+                'status' => 'error',
+                'message' => 'DNS resolution failed - hostname could not be resolved',
+                'latency_ms' => $dnsLatency,
+            ];
+            return Response::create(
+                StatusCode::createOk(),
+                Json::encode($diagnostics),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        $diagnostics['tests']['dns'] = [
+            'status' => 'success',
+            'message' => "Resolved to IP: {$dnsResult}",
+            'latency_ms' => $dnsLatency,
+            'ip' => $dnsResult,
+        ];
+
+        // Test 3: TCP connection
+        $startTime = microtime(true);
+        $errno = 0;
+        $errstr = '';
+        $socket = @fsockopen($host, $port, $errno, $errstr, 10);
+        $connectLatency = (int)round((microtime(true) - $startTime) * 1000);
+
+        if ($socket === false) {
+            $diagnostics['tests']['tcp'] = [
+                'status' => 'error',
+                'message' => "TCP connection failed: {$errstr} (errno: {$errno})",
+                'latency_ms' => $connectLatency,
+                'hint' => 'Check firewall rules and verify port is correct (587 for TLS, 465 for SSL)',
+            ];
+            return Response::create(
+                StatusCode::createOk(),
+                Json::encode($diagnostics),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        $diagnostics['tests']['tcp'] = [
+            'status' => 'success',
+            'message' => 'TCP connection established',
+            'latency_ms' => $connectLatency,
+        ];
+
+        // Test 4: SMTP banner (optional)
+        $banner = @fgets($socket, 512);
+        if ($banner !== false) {
+            $diagnostics['tests']['smtp_banner'] = [
+                'status' => 'success',
+                'message' => 'SMTP banner received: ' . trim($banner),
+            ];
+        }
+
+        @fclose($socket);
+
+        // Test 5: Encryption/port recommendation
+        $portEncryptionMatch = true;
+        $recommendation = '';
+
+        if ($port === 587 && $encryption !== 'tls') {
+            $portEncryptionMatch = false;
+            $recommendation = 'Port 587 typically requires TLS (STARTTLS) encryption';
+        } elseif ($port === 465 && $encryption !== 'ssl') {
+            $portEncryptionMatch = false;
+            $recommendation = 'Port 465 typically requires SSL encryption';
+        } elseif ($port === 25 && $encryption !== '') {
+            $portEncryptionMatch = false;
+            $recommendation = 'Port 25 typically does not use encryption (may not be allowed for submission)';
+        }
+
+        $diagnostics['tests']['encryption_port_match'] = [
+            'status' => $portEncryptionMatch ? 'success' : 'warning',
+            'message' => $portEncryptionMatch
+                ? 'Port and encryption settings appear compatible'
+                : $recommendation,
+        ];
+
+        // Overall status
+        $hasError = false;
+        foreach ($diagnostics['tests'] as $test) {
+            if ($test['status'] === 'error') {
+                $hasError = true;
+                break;
+            }
+        }
+
+        $diagnostics['overall_status'] = $hasError ? 'failed' : 'passed';
+
+        return Response::create(
+            StatusCode::createOk(),
+            Json::encode($diagnostics),
+            [Header::createContentTypeJson()],
+        );
     }
 
     public function traktVerifyCredentials(Request $request) : Response
@@ -796,7 +949,7 @@ class SettingsController
         if ($smtpUser !== null) {
             $this->serverSettings->setSmtpUser($smtpUser);
         }
-        if ($smtpPassword !== null) {
+        if ($smtpPassword !== null && trim($smtpPassword) !== '') {
             $this->serverSettings->setSmtpPassword($smtpPassword);
         }
 

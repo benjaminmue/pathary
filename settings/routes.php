@@ -158,6 +158,10 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class
     ]);
+    $routes->add('POST', '/old/settings/server/email-diagnose', [Web\SettingsController::class, 'diagnoseSMTP'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
     $routes->add('POST', '/old/settings/account', [Web\SettingsController::class, 'updateGeneral'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('POST', '/old/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('POST', '/old/settings/account/security/create-totp-uri', [

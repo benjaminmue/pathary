@@ -96,20 +96,22 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="smtpHost" class="form-label">SMTP Host</label>
-                            <input type="text" class="form-control" id="smtpHost" placeholder="smtp.gmail.com">
+                            <input type="text" class="form-control" id="smtpHost" placeholder="smtp.gmail.com"
+                                   value="{{ smtpHost ?? '' }}">
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label for="smtpPort" class="form-label">Port</label>
-                            <input type="number" class="form-control" id="smtpPort" value="587">
+                            <input type="number" class="form-control" id="smtpPort"
+                                   value="{{ smtpPort ?? 587 }}" placeholder="587">
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label for="smtpEncryption" class="form-label">Encryption</label>
                             <select class="form-select" id="smtpEncryption">
-                                <option value="tls">TLS</option>
-                                <option value="ssl">SSL</option>
-                                <option value="none">None</option>
+                                <option value="tls" {{ smtpEncryption == 'tls' ? 'selected' : '' }}>TLS (STARTTLS)</option>
+                                <option value="ssl" {{ smtpEncryption == 'ssl' ? 'selected' : '' }}>SSL</option>
+                                <option value="" {{ smtpEncryption == '' ? 'selected' : '' }}>None</option>
                             </select>
                         </div>
                     </div>
@@ -117,23 +119,40 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="smtpUsername" class="form-label">Username / Email</label>
-                            <input type="text" class="form-control" id="smtpUsername" placeholder="your-email@gmail.com">
+                            <input type="text" class="form-control" id="smtpUsername" placeholder="your-email@gmail.com"
+                                   value="{{ smtpUsername ?? '' }}">
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label for="smtpPassword" class="form-label">Password / App Password</label>
+                            <label for="smtpPassword" class="form-label">
+                                Password / App Password
+                                {% if smtpPasswordConfigured %}
+                                    <span class="badge bg-success ms-2">
+                                        <i class="bi bi-check-circle-fill"></i> Configured
+                                    </span>
+                                {% endif %}
+                            </label>
                             <div class="input-group">
-                                <input type="password" class="form-control" id="smtpPassword" placeholder="•••••••••••">
+                                <input type="password" class="form-control" id="smtpPassword"
+                                       placeholder="{% if smtpPasswordConfigured %}Saved (leave blank to keep current){% else %}Enter password{% endif %}">
                                 <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('smtpPassword')">
                                     <i class="bi bi-eye"></i>
                                 </button>
+                            </div>
+                            <div class="form-text">
+                                {% if smtpPasswordConfigured %}
+                                    Password is saved. Leave blank to keep current password.
+                                {% else %}
+                                    Enter your SMTP password or app-specific password
+                                {% endif %}
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="smtpFromAddress" class="form-label">From Address</label>
-                        <input type="email" class="form-control" id="smtpFromAddress" placeholder="noreply@pathary.local">
+                        <input type="email" class="form-control" id="smtpFromAddress" placeholder="noreply@pathary.local"
+                               value="{{ smtpFromAddress ?? '' }}">
                         <div class="form-text">Email address shown as sender</div>
                     </div>
 
@@ -144,8 +163,23 @@
                         <button type="button" class="btn btn-outline-secondary" onclick="sendTestEmail()">
                             <i class="bi bi-send me-1"></i>Send Test Email
                         </button>
+                        <button type="button" class="btn btn-outline-info" onclick="runSMTPDiagnostics()">
+                            <i class="bi bi-tools me-1"></i>Run Diagnostics
+                        </button>
                     </div>
                 </form>
+
+                <!-- SMTP Diagnostics Results -->
+                <div id="smtpDiagnosticsResults" class="mt-4" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-tools me-2"></i>SMTP Diagnostics</h5>
+                        </div>
+                        <div class="card-body" id="diagnosticsContent">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                </div>
 
                 <!-- OAuth SMTP Placeholder -->
                 <div class="alert alert-info mt-4" role="alert">
@@ -154,6 +188,36 @@
                         OAuth-based SMTP authentication (Gmail, Outlook) is planned for a future release.
                         For now, use app-specific passwords.
                     </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Email Modal -->
+    <div class="modal fade" id="testEmailModal" tabindex="-1" aria-labelledby="testEmailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="testEmailModalLabel">
+                        <i class="bi bi-send me-2"></i>Send Test Email
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="testEmailRecipient" class="form-label">Recipient Email Address</label>
+                        <input type="email" class="form-control" id="testEmailRecipient"
+                               placeholder="user@example.com" required>
+                        <div class="form-text">Enter the address that should receive the test email.</div>
+                        <div id="testEmailRecipientError" class="invalid-feedback" style="display: none;"></div>
+                    </div>
+                    <div id="testEmailError" class="alert alert-danger" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="sendTestEmailBtn" onclick="sendTestEmailSubmit()" disabled>
+                        <i class="bi bi-send me-1"></i>Send Test Email
+                    </button>
                 </div>
             </div>
         </div>
@@ -541,14 +605,21 @@
     }
 
     async function saveEmailSettings() {
+        const password = document.getElementById('smtpPassword').value.trim();
+
         const settings = {
-            host: document.getElementById('smtpHost').value,
-            port: document.getElementById('smtpPort').value,
-            encryption: document.getElementById('smtpEncryption').value,
-            username: document.getElementById('smtpUsername').value,
-            password: document.getElementById('smtpPassword').value,
-            fromAddress: document.getElementById('smtpFromAddress').value,
+            smtpHost: document.getElementById('smtpHost').value,
+            smtpPort: parseInt(document.getElementById('smtpPort').value),
+            smtpEncryption: document.getElementById('smtpEncryption').value,
+            smtpUser: document.getElementById('smtpUsername').value,
+            smtpFromAddress: document.getElementById('smtpFromAddress').value,
+            smtpWithAuthentication: true, // Enable auth when credentials provided
         };
+
+        // Only include password if user entered a new one
+        if (password !== '') {
+            settings.smtpPassword = password;
+        }
 
         try {
             const response = await fetch('{{ applicationUrl }}/old/settings/server/email', {
@@ -560,12 +631,23 @@
             if (!response.ok) throw new Error('Failed to save email settings');
 
             showToast('Email settings saved successfully', 'success');
+
+            // Clear password field after save and reload page to show updated status
+            document.getElementById('smtpPassword').value = '';
+
+            // Reload page after 1 second to show updated "Configured" status
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } catch (error) {
             showToast('Error saving email settings: ' + error.message, 'danger');
         }
     }
 
-    async function sendTestEmail() {
+    // Track last used recipient (session only, not persisted)
+    let lastTestEmailRecipient = '';
+
+    function sendTestEmail() {
         const fromAddress = document.getElementById('smtpFromAddress').value;
 
         if (!fromAddress) {
@@ -573,23 +655,226 @@
             return;
         }
 
-        showConfirmModal(
-            `Send a test email to ${fromAddress}?`,
-            async () => {
-                try {
-                    const response = await fetch('{{ applicationUrl }}/old/settings/server/email-test', {
-                        method: 'POST',
-                    });
+        // Reset modal state
+        const recipientInput = document.getElementById('testEmailRecipient');
+        const errorDiv = document.getElementById('testEmailError');
+        const recipientError = document.getElementById('testEmailRecipientError');
+        const sendBtn = document.getElementById('sendTestEmailBtn');
 
-                    if (!response.ok) throw new Error('Failed to send test email');
+        // Clear previous values and errors
+        recipientInput.value = '';
+        recipientInput.classList.remove('is-invalid');
+        errorDiv.style.display = 'none';
+        recipientError.style.display = 'none';
+        sendBtn.disabled = true;
 
-                    showToast('Test email sent successfully', 'success');
-                } catch (error) {
-                    showToast('Error sending test email: ' + error.message, 'danger');
-                }
-            }
-        );
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('testEmailModal'));
+        modal.show();
     }
+
+    function validateTestEmailRecipient() {
+        const recipientInput = document.getElementById('testEmailRecipient');
+        const sendBtn = document.getElementById('sendTestEmailBtn');
+        const recipientError = document.getElementById('testEmailRecipientError');
+        const email = recipientInput.value.trim();
+
+        // Basic email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (email === '') {
+            sendBtn.disabled = true;
+            recipientInput.classList.remove('is-invalid');
+            recipientError.style.display = 'none';
+            return false;
+        }
+
+        if (!emailRegex.test(email) || email.length > 255) {
+            sendBtn.disabled = true;
+            recipientInput.classList.add('is-invalid');
+            recipientError.textContent = 'Please enter a valid email address';
+            recipientError.style.display = 'block';
+            return false;
+        }
+
+        sendBtn.disabled = false;
+        recipientInput.classList.remove('is-invalid');
+        recipientError.style.display = 'none';
+        return true;
+    }
+
+    async function sendTestEmailSubmit() {
+        const recipientInput = document.getElementById('testEmailRecipient');
+        const errorDiv = document.getElementById('testEmailError');
+        const sendBtn = document.getElementById('sendTestEmailBtn');
+        const originalHtml = sendBtn.innerHTML;
+
+        if (!validateTestEmailRecipient()) {
+            return;
+        }
+
+        const recipient = recipientInput.value.trim();
+        const settings = {
+            smtpHost: document.getElementById('smtpHost').value,
+            smtpPort: parseInt(document.getElementById('smtpPort').value),
+            smtpFromAddress: document.getElementById('smtpFromAddress').value,
+            smtpEncryption: document.getElementById('smtpEncryption').value,
+            smtpWithAuthentication: true,
+            smtpUser: document.getElementById('smtpUsername').value,
+            smtpPassword: document.getElementById('smtpPassword').value,
+            recipient: recipient,
+        };
+
+        // Show loading state
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Sending...';
+        errorDiv.style.display = 'none';
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/old/settings/server/email-test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Failed to send test email');
+            }
+
+            // Success - remember recipient for this session
+            lastTestEmailRecipient = recipient;
+
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('testEmailModal'));
+            modal.hide();
+
+            showToast(`Test email sent successfully to ${recipient}`, 'success');
+        } catch (error) {
+            // Show error in modal so user can correct recipient
+            errorDiv.textContent = error.message;
+            errorDiv.style.display = 'block';
+        } finally {
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = originalHtml;
+        }
+    }
+
+    async function runSMTPDiagnostics() {
+        const settings = {
+            smtpHost: document.getElementById('smtpHost').value,
+            smtpPort: parseInt(document.getElementById('smtpPort').value),
+            smtpEncryption: document.getElementById('smtpEncryption').value,
+        };
+
+        const resultsDiv = document.getElementById('smtpDiagnosticsResults');
+        const contentDiv = document.getElementById('diagnosticsContent');
+
+        // Show loading state
+        resultsDiv.style.display = 'block';
+        contentDiv.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Running diagnostics...</span>
+                </div>
+                <p class="mt-2">Running SMTP diagnostics...</p>
+            </div>
+        `;
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/old/settings/server/email-diagnose', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to run diagnostics');
+            }
+
+            const results = await response.json();
+            displayDiagnosticsResults(results);
+        } catch (error) {
+            contentDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Error running diagnostics: ${error.message}
+                </div>
+            `;
+        }
+    }
+
+    function displayDiagnosticsResults(results) {
+        const contentDiv = document.getElementById('diagnosticsContent');
+        const tests = results.tests || {};
+
+        let html = `
+            <div class="mb-3">
+                <strong>Configuration:</strong>
+                <span class="ms-2">Host: ${results.host}</span>
+                <span class="ms-2">Port: ${results.port}</span>
+                <span class="ms-2">Encryption: ${results.encryption || 'None'}</span>
+            </div>
+            <div class="mb-3">
+                <strong>Overall Status:</strong>
+                <span class="badge ${results.overall_status === 'passed' ? 'bg-success' : 'bg-danger'} ms-2">
+                    ${results.overall_status === 'passed' ? 'PASSED' : 'FAILED'}
+                </span>
+            </div>
+            <hr>
+            <h6>Diagnostic Tests:</h6>
+        `;
+
+        const getStatusBadge = (status) => {
+            if (status === 'success') return '<span class="badge bg-success">✓ PASS</span>';
+            if (status === 'warning') return '<span class="badge bg-warning">⚠ WARNING</span>';
+            return '<span class="badge bg-danger">✗ FAIL</span>';
+        };
+
+        for (const [testName, testResult] of Object.entries(tests)) {
+            const testLabel = testName.replace(/_/g, ' ').toUpperCase();
+            html += `
+                <div class="card mb-2">
+                    <div class="card-body py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${testLabel}</strong>
+                                <div class="small text-muted">${testResult.message}</div>
+                                ${testResult.hint ? `<div class="small text-info mt-1"><i class="bi bi-lightbulb"></i> ${testResult.hint}</div>` : ''}
+                            </div>
+                            <div class="text-end">
+                                ${getStatusBadge(testResult.status)}
+                                ${testResult.latency_ms ? `<div class="small text-muted">${testResult.latency_ms}ms</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        html += `
+            <div class="mt-3">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('smtpDiagnosticsResults').style.display='none'">
+                    <i class="bi bi-x-circle me-1"></i>Close
+                </button>
+            </div>
+        `;
+
+        contentDiv.innerHTML = html;
+    }
+
+    // Add event listener for recipient input validation
+    document.addEventListener('DOMContentLoaded', () => {
+        const recipientInput = document.getElementById('testEmailRecipient');
+        if (recipientInput) {
+            recipientInput.addEventListener('input', validateTestEmailRecipient);
+            recipientInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !document.getElementById('sendTestEmailBtn').disabled) {
+                    sendTestEmailSubmit();
+                }
+            });
+        }
+    });
 
     // Health Check Functions
     document.addEventListener('DOMContentLoaded', async () => {

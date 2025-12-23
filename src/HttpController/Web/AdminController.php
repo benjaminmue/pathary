@@ -4,6 +4,7 @@ namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Service\CsrfTokenService;
+use Movary\Service\ServerSettings;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -51,6 +52,7 @@ class AdminController
         private readonly Environment $twig,
         private readonly Authentication $authenticationService,
         private readonly CsrfTokenService $csrfTokenService,
+        private readonly ServerSettings $serverSettings,
     ) {
     }
 
@@ -88,8 +90,24 @@ class AdminController
      */
     public function renderServerTab(Request $request) : Response
     {
+        // Load SMTP settings from database/environment
+        $smtpHost = $this->serverSettings->getSmtpHost();
+        $smtpPort = $this->serverSettings->getSmtpPort();
+        $smtpEncryption = $this->serverSettings->getSmtpEncryption();
+        $smtpFromAddress = $this->serverSettings->getFromAddress();
+        $smtpUsername = $this->serverSettings->getSmtpUser();
+        $smtpPassword = $this->serverSettings->getSmtpPassword();
+        $smtpWithAuth = $this->serverSettings->getSmtpWithAuthentication();
+
         return $this->renderTab('server', [
             'csrf' => $this->csrfTokenService->generateToken(),
+            'smtpHost' => $smtpHost,
+            'smtpPort' => $smtpPort,
+            'smtpEncryption' => $smtpEncryption ?? '',
+            'smtpFromAddress' => $smtpFromAddress,
+            'smtpUsername' => $smtpUsername,
+            'smtpPasswordConfigured' => !empty($smtpPassword),
+            'smtpWithAuth' => $smtpWithAuth,
         ]);
     }
 
