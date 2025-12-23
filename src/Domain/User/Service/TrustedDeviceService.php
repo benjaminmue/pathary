@@ -24,38 +24,25 @@ class TrustedDeviceService
 
     public function createTrustedDevice(int $userId, ?string $deviceName = null, ?string $userAgent = null, ?string $ipAddress = null) : string
     {
-        error_log('[TRUSTED_DEVICE_DEBUG] TrustedDeviceService::createTrustedDevice called for user: ' . $userId);
-
         // Generate unique random token
         $token = bin2hex(random_bytes(32));
-        error_log('[TRUSTED_DEVICE_DEBUG] Token generated: YES (length: ' . strlen($token) . ')');
 
         // Hash the token for storage (never store plaintext)
         $tokenHash = password_hash($token, PASSWORD_DEFAULT);
-        error_log('[TRUSTED_DEVICE_DEBUG] Token hashed: YES');
 
         // Parse device name from user agent if not provided
         if ($deviceName === null || $deviceName === '') {
             $deviceName = DeviceNameParser::parse($userAgent);
         }
-        error_log('[TRUSTED_DEVICE_DEBUG] Device name: ' . ($deviceName ?? 'null'));
 
         // Set expiration to 30 days from now
         $expiresAt = DateTime::create()->modify('+' . self::TRUSTED_DEVICE_EXPIRATION_DAYS . ' days');
-        error_log('[TRUSTED_DEVICE_DEBUG] Expiration set: ' . $expiresAt->format('Y-m-d H:i:s'));
 
         // Create the trusted device record
-        try {
-            $this->trustedDeviceRepository->create($userId, $tokenHash, $deviceName, $userAgent, $ipAddress, $expiresAt);
-            error_log('[TRUSTED_DEVICE_DEBUG] Database insert: SUCCESS');
-        } catch (\Throwable $e) {
-            error_log('[TRUSTED_DEVICE_DEBUG] Database insert FAILED: ' . $e->getMessage());
-            throw $e;
-        }
+        $this->trustedDeviceRepository->create($userId, $tokenHash, $deviceName, $userAgent, $ipAddress, $expiresAt);
 
         // Enforce limit on trusted devices per user
         $this->enforceTrustedDeviceLimit($userId);
-        error_log('[TRUSTED_DEVICE_DEBUG] Device limit enforced');
 
         // Return the plaintext token (only time it's accessible)
         return $token;
