@@ -38,10 +38,12 @@ class HealthCheckController
         $cachedData = $this->getCachedHealth();
 
         if ($cachedData === null) {
-            // No cached data, return unknown status
+            // No cached data, return unknown status with enabled flags
             $cachedData = [
-                'database' => $this->createUnknownStatus('Database'),
-                'tmdb' => $this->createUnknownStatus('TMDB API'),
+                'database' => $this->createUnknownStatus('Database', true),
+                'tmdb' => $this->createUnknownStatus('TMDB API', $this->isTmdbEnabled()),
+                'integration1' => $this->createUnknownStatus('Integration 1', false),
+                'integration2' => $this->createUnknownStatus('Integration 2', false),
                 'overall' => ['status' => 'unknown'],
             ];
         }
@@ -81,6 +83,8 @@ class HealthCheckController
         $results = [
             'database' => $dbHealth,
             'tmdb' => $tmdbHealth,
+            'integration1' => $this->createUnknownStatus('Integration 1', false),
+            'integration2' => $this->createUnknownStatus('Integration 2', false),
             'overall' => ['status' => $overallStatus],
         ];
 
@@ -91,6 +95,44 @@ class HealthCheckController
         return Response::create(
             StatusCode::createOk(),
             Json::encode($results),
+            [Header::createContentTypeJson()],
+        );
+    }
+
+    /**
+     * POST /admin/health/db - Run database health check only
+     */
+    public function runDatabaseCheck(Request $request) : Response
+    {
+        $dbHealth = $this->checkDatabaseHealth();
+
+        // Update cache with this result
+        $cachedData = $this->getCachedHealth() ?? [];
+        $cachedData['database'] = $dbHealth;
+        $this->cacheHealth($cachedData);
+
+        return Response::create(
+            StatusCode::createOk(),
+            Json::encode(['database' => $dbHealth]),
+            [Header::createContentTypeJson()],
+        );
+    }
+
+    /**
+     * POST /admin/health/tmdb - Run TMDB health check only
+     */
+    public function runTmdbCheck(Request $request) : Response
+    {
+        $tmdbHealth = $this->checkTmdbHealth();
+
+        // Update cache with this result
+        $cachedData = $this->getCachedHealth() ?? [];
+        $cachedData['tmdb'] = $tmdbHealth;
+        $this->cacheHealth($cachedData);
+
+        return Response::create(
+            StatusCode::createOk(),
+            Json::encode(['tmdb' => $tmdbHealth]),
             [Header::createContentTypeJson()],
         );
     }
@@ -110,6 +152,7 @@ class HealthCheckController
             // Determine status based on latency
             if ($latencyMs < self::DB_HEALTHY_THRESHOLD_MS) {
                 return [
+                    'enabled' => true,
                     'status' => 'healthy',
                     'message' => 'Query OK',
                     'latency_ms' => $latencyMs,
@@ -117,6 +160,7 @@ class HealthCheckController
                 ];
             } else {
                 return [
+                    'enabled' => true,
                     'status' => 'degraded',
                     'message' => 'Query OK (slow)',
                     'latency_ms' => $latencyMs,
@@ -132,12 +176,22 @@ class HealthCheckController
             ]);
 
             return [
+                'enabled' => true,
                 'status' => 'down',
                 'message' => 'Database unreachable',
                 'latency_ms' => $latencyMs,
                 'checked_at' => date('Y-m-d H:i:s'),
             ];
         }
+    }
+
+    /**
+     * Check if TMDB is enabled (API key configured)
+     */
+    private function isTmdbEnabled() : bool
+    {
+        $apiKey = $this->serverSettings->getTmdbApiKey();
+        return $apiKey !== null && $apiKey !== '';
     }
 
     /**
@@ -150,6 +204,7 @@ class HealthCheckController
         // Check if API key is configured
         if ($apiKey === null || $apiKey === '') {
             return [
+                'enabled' => false,
                 'status' => 'down',
                 'message' => 'TMDB key not configured',
                 'latency_ms' => 0,
@@ -169,6 +224,7 @@ class HealthCheckController
 
             if ($statusCode === 200) {
                 return [
+                    'enabled' => true,
                     'status' => 'healthy',
                     'message' => 'TMDB reachable',
                     'latency_ms' => $latencyMs,
@@ -178,6 +234,7 @@ class HealthCheckController
 
             if ($statusCode === 401 || $statusCode === 403) {
                 return [
+                    'enabled' => true,
                     'status' => 'down',
                     'message' => 'TMDB auth failed',
                     'latency_ms' => $latencyMs,
@@ -187,6 +244,7 @@ class HealthCheckController
 
             if ($statusCode === 429) {
                 return [
+                    'enabled' => true,
                     'status' => 'degraded',
                     'message' => 'TMDB rate limited',
                     'latency_ms' => $latencyMs,
@@ -196,6 +254,7 @@ class HealthCheckController
 
             // 5xx or other errors
             return [
+                'enabled' => true,
                 'status' => 'degraded',
                 'message' => 'TMDB error',
                 'latency_ms' => $latencyMs,
@@ -213,6 +272,7 @@ class HealthCheckController
             // Check if it's a timeout
             if (str_contains($e->getMessage(), 'timeout') || str_contains($e->getMessage(), 'timed out')) {
                 return [
+                    'enabled' => true,
                     'status' => 'down',
                     'message' => 'TMDB timeout',
                     'latency_ms' => $latencyMs,
@@ -221,6 +281,7 @@ class HealthCheckController
             }
 
             return [
+                'enabled' => true,
                 'status' => 'down',
                 'message' => 'TMDB unreachable',
                 'latency_ms' => $latencyMs,
@@ -291,9 +352,10 @@ class HealthCheckController
     /**
      * Create unknown status response
      */
-    private function createUnknownStatus(string $service) : array
+    private function createUnknownStatus(string $service, bool $enabled) : array
     {
         return [
+            'enabled' => $enabled,
             'status' => 'unknown',
             'message' => 'Not checked yet',
             'latency_ms' => 0,

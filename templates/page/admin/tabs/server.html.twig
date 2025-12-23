@@ -26,12 +26,15 @@
                     </div>
 
                     <div class="mb-3">
-                        <button type="button" class="btn btn-primary" onclick="saveApiSettings()">
+                        <button type="button" class="btn btn-primary" id="saveApiSettingsBtn" onclick="saveApiSettings()">
                             <i class="bi bi-save me-1"></i>Save API Settings
                         </button>
                         <button type="button" class="btn btn-outline-secondary" onclick="testTmdbConnection()">
                             <i class="bi bi-lightning me-1"></i>Test TMDB Connection
                         </button>
+                        <div id="saveHelperText" class="form-text mt-2" style="display: none;">
+                            <i class="bi bi-info-circle"></i> <span id="saveHelperMessage"></span>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -164,45 +167,108 @@
                 <small class="text-muted" id="health-last-run">Last check: <span id="health-last-run-time">Never</span></small>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th style="width: 200px;">Service</th>
-                                <th style="width: 120px;">Status</th>
-                                <th>Message</th>
-                                <th style="width: 100px;">Latency</th>
-                                <th style="width: 180px;">Last Checked</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr id="health-db-row">
-                                <td><i class="bi bi-database me-2"></i>Database</td>
-                                <td><span id="health-db-status" class="badge bg-secondary">Unknown</span></td>
-                                <td id="health-db-message">Not checked yet</td>
-                                <td id="health-db-latency">-</td>
-                                <td id="health-db-checked">-</td>
-                            </tr>
-                            <tr id="health-tmdb-row">
-                                <td><i class="bi bi-cloud me-2"></i>TMDB API</td>
-                                <td><span id="health-tmdb-status" class="badge bg-secondary">Unknown</span></td>
-                                <td id="health-tmdb-message">Not checked yet</td>
-                                <td id="health-tmdb-latency">-</td>
-                                <td id="health-tmdb-checked">-</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="row g-3">
+                    <!-- Database Box -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 health-box" id="health-box-database">
+                            <div class="card-body text-center d-flex flex-column">
+                                <h6 class="card-title mb-3">Database</h6>
+                                <div class="health-icon mb-3">
+                                    <i class="bi bi-database text-secondary" style="font-size: 3rem;" id="health-icon-database"></i>
+                                </div>
+                                <span class="badge bg-secondary mb-2" id="health-badge-database">Unknown</span>
+                                <p class="small text-muted mb-2" id="health-message-database">Not checked yet</p>
+                                <p class="small text-muted mb-3" id="health-meta-database">
+                                    <span id="health-latency-database">-</span> • <span id="health-checked-database">-</span>
+                                </p>
+                                <div class="mt-auto">
+                                    <button class="btn btn-sm btn-outline-primary" id="health-retest-database" onclick="retestDatabase()">
+                                        <i class="bi bi-arrow-clockwise"></i> Retest
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TMDB Box -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 health-box" id="health-box-tmdb">
+                            <div class="card-body text-center d-flex flex-column">
+                                <h6 class="card-title mb-3">TMDB API</h6>
+                                <div class="health-icon mb-3">
+                                    <i class="bi bi-cloud text-secondary" style="font-size: 3rem;" id="health-icon-tmdb"></i>
+                                </div>
+                                <span class="badge bg-secondary mb-2" id="health-badge-tmdb">Unknown</span>
+                                <p class="small text-muted mb-2" id="health-message-tmdb">Not checked yet</p>
+                                <p class="small text-muted mb-3" id="health-meta-tmdb">
+                                    <span id="health-latency-tmdb">-</span> • <span id="health-checked-tmdb">-</span>
+                                </p>
+                                <div class="mt-auto">
+                                    <button class="btn btn-sm btn-outline-primary me-1" id="health-retest-tmdb" onclick="retestTmdb()">
+                                        <i class="bi bi-arrow-clockwise"></i> Retest
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('tmdb')">
+                                        <i class="bi bi-gear"></i> Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integration 1 Box (Placeholder) -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 health-box health-box-disabled" id="health-box-integration1">
+                            <div class="card-body text-center d-flex flex-column">
+                                <h6 class="card-title mb-3 text-muted">Integration 1</h6>
+                                <div class="health-icon mb-3">
+                                    <i class="bi bi-puzzle text-muted" style="font-size: 3rem;" id="health-icon-integration1"></i>
+                                </div>
+                                <span class="badge bg-secondary mb-2" id="health-badge-integration1">Disabled</span>
+                                <p class="small text-muted mb-2" id="health-message-integration1">Not enabled</p>
+                                <p class="small text-muted mb-3" id="health-meta-integration1">
+                                    <span id="health-latency-integration1">-</span> • <span id="health-checked-integration1">-</span>
+                                </p>
+                                <div class="mt-auto">
+                                    <button class="btn btn-sm btn-outline-secondary me-1" id="health-retest-integration1" disabled>
+                                        <i class="bi bi-arrow-clockwise"></i> Retest
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('integration1')">
+                                        <i class="bi bi-gear"></i> Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integration 2 Box (Placeholder) -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 health-box health-box-disabled" id="health-box-integration2">
+                            <div class="card-body text-center d-flex flex-column">
+                                <h6 class="card-title mb-3 text-muted">Integration 2</h6>
+                                <div class="health-icon mb-3">
+                                    <i class="bi bi-puzzle text-muted" style="font-size: 3rem;" id="health-icon-integration2"></i>
+                                </div>
+                                <span class="badge bg-secondary mb-2" id="health-badge-integration2">Disabled</span>
+                                <p class="small text-muted mb-2" id="health-message-integration2">Not enabled</p>
+                                <p class="small text-muted mb-3" id="health-meta-integration2">
+                                    <span id="health-latency-integration2">-</span> • <span id="health-checked-integration2">-</span>
+                                </p>
+                                <div class="mt-auto">
+                                    <button class="btn btn-sm btn-outline-secondary me-1" id="health-retest-integration2" disabled>
+                                        <i class="bi bi-arrow-clockwise"></i> Retest
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('integration2')">
+                                        <i class="bi bi-gear"></i> Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-3">
                     <button class="btn btn-primary btn-sm" id="runHealthCheckBtn" onclick="runHealthCheck()">
-                        <i class="bi bi-arrow-clockwise me-1"></i>Run Health Check
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="runDatabaseCheck()">
-                        <i class="bi bi-database me-1"></i>Check Database
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="runTmdbCheck()">
-                        <i class="bi bi-cloud me-1"></i>Check TMDB API
+                        <i class="bi bi-arrow-clockwise me-1"></i>Check All Systems
                     </button>
                 </div>
 
@@ -212,10 +278,79 @@
     </div>
 </div>
 
+<style>
+    /* TMDB Status Badge Styling */
+    #tmdbKeyStatus .badge {
+        font-size: 0.875rem;
+        padding: 0.35em 0.65em;
+    }
+
+    #tmdbKeyStatus .gap-2 > * {
+        margin-right: 0.5rem;
+    }
+
+    #tmdbKeyStatus .gap-2 > *:last-child {
+        margin-right: 0;
+    }
+
+    /* Health Box Styling */
+    .health-box {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .health-box:hover:not(.health-box-disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .health-box-disabled {
+        opacity: 0.6;
+    }
+
+    .health-box-disabled .card-body {
+        background-color: var(--bs-secondary-bg);
+    }
+
+    .health-icon {
+        line-height: 1;
+    }
+
+    .health-icon i {
+        transition: color 0.3s ease;
+    }
+
+    /* Dark mode adjustments */
+    [data-bs-theme="dark"] .health-box-disabled {
+        opacity: 0.5;
+    }
+
+    [data-bs-theme="dark"] .health-box {
+        border-color: var(--bs-border-color);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 991.98px) {
+        .health-box .btn-sm {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+    }
+</style>
+
 <script>
     // Load TMDB status on page load
     document.addEventListener('DOMContentLoaded', async () => {
         await loadTmdbStatus();
+
+        // Track input changes for dirty state
+        const tmdbInput = document.getElementById('tmdbApiKey');
+        if (tmdbInput) {
+            tmdbInput.addEventListener('input', () => {
+                tmdbDirty = true;
+                updateSaveButtonState();
+            });
+        }
     });
 
     async function loadTmdbStatus() {
@@ -238,21 +373,66 @@
         }
     }
 
+    // Track TMDB configuration state
+    let tmdbConfigured = false;
+    let tmdbDirty = false;
+
     function updateTmdbStatus(configured, updatedAt) {
         const statusEl = document.getElementById('tmdbKeyStatus');
+        tmdbConfigured = configured;
+        tmdbDirty = false; // Reset dirty state when status is updated
 
         if (configured) {
             const timestamp = updatedAt ? new Date(updatedAt.replace(' ', 'T')).toLocaleString() : 'Unknown';
             statusEl.innerHTML = `
-                <i class="bi bi-check-circle text-success"></i> Key is configured
-                • Last updated: ${timestamp}
-                • <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Get API key</a>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle-fill me-1"></i>Key Configured
+                    </span>
+                    <span class="text-muted small">Last updated: ${timestamp}</span>
+                    <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener" class="small">Get API key</a>
+                </div>
             `;
         } else {
             statusEl.innerHTML = `
-                <i class="bi bi-x-circle text-muted"></i> Key not configured
-                • <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Get API key</a>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge bg-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Not Configured
+                    </span>
+                    <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener" class="small">Get API key</a>
+                </div>
             `;
+        }
+
+        updateSaveButtonState();
+    }
+
+    function updateSaveButtonState() {
+        const saveBtn = document.getElementById('saveApiSettingsBtn');
+        const helperText = document.getElementById('saveHelperText');
+        const helperMessage = document.getElementById('saveHelperMessage');
+
+        if (!saveBtn) return;
+
+        if (tmdbConfigured && !tmdbDirty) {
+            // Configured and no changes
+            saveBtn.className = 'btn btn-success';
+            saveBtn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Saved';
+            saveBtn.disabled = true;
+            helperText.style.display = 'block';
+            helperMessage.textContent = 'No changes to save. Enter a new API key to update.';
+        } else if (tmdbDirty) {
+            // User has made changes
+            saveBtn.className = 'btn btn-primary';
+            saveBtn.innerHTML = '<i class="bi bi-save me-1"></i>Save API Settings';
+            saveBtn.disabled = false;
+            helperText.style.display = 'none';
+        } else {
+            // Not configured
+            saveBtn.className = 'btn btn-primary';
+            saveBtn.innerHTML = '<i class="bi bi-save me-1"></i>Save API Settings';
+            saveBtn.disabled = false;
+            helperText.style.display = 'none';
         }
     }
 
@@ -310,6 +490,10 @@
             document.getElementById('tmdbApiKey').value = '';
             document.getElementById('tmdbApiKey').type = 'password';
             updateTmdbStatus(true, data.updated_at);
+
+            // Reset dirty state and update button
+            tmdbDirty = false;
+            updateSaveButtonState();
         } catch (error) {
             showToast('Error saving API key: ' + error.message, 'danger');
         }
@@ -498,52 +682,169 @@
         }
     }
 
-    async function runDatabaseCheck() {
-        // For now, just run the full health check
-        // Can be extended to run individual checks if endpoints are added
-        await runHealthCheck();
+    async function retestDatabase() {
+        const button = document.getElementById('health-retest-database');
+        const originalHtml = button?.innerHTML;
+
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        }
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/health/db', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    csrf: getCsrfToken(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.database) {
+                updateServiceStatus('database', data.database);
+                updateLastRunTime();
+                showToast('Database check completed', 'success');
+            }
+        } catch (error) {
+            showToast('Error checking database: ' + error.message, 'danger');
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            }
+        }
     }
 
-    async function runTmdbCheck() {
-        // For now, just run the full health check
-        // Can be extended to run individual checks if endpoints are added
-        await runHealthCheck();
+    async function retestTmdb() {
+        const button = document.getElementById('health-retest-tmdb');
+        const originalHtml = button?.innerHTML;
+
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        }
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/health/tmdb', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    csrf: getCsrfToken(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.tmdb) {
+                updateServiceStatus('tmdb', data.tmdb);
+                updateLastRunTime();
+                showToast('TMDB check completed', 'success');
+            }
+        } catch (error) {
+            showToast('Error checking TMDB: ' + error.message, 'danger');
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            }
+        }
+    }
+
+    function navigateToSettings(module) {
+        switch (module) {
+            case 'database':
+                // Scroll to application settings (placeholder)
+                showToast('Database settings section coming soon', 'info');
+                break;
+            case 'tmdb':
+                // Scroll to TMDB API settings section
+                const tmdbSection = document.querySelector('.card-header:has(.bi-key)');
+                if (tmdbSection) {
+                    tmdbSection.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                break;
+            case 'integration1':
+            case 'integration2':
+                showToast('Integration settings coming soon', 'info');
+                break;
+        }
     }
 
     function updateHealthDisplay(data) {
-        // Update Database status
+        // Update all modules
         if (data.database) {
-            updateServiceStatus('db', data.database);
+            updateServiceStatus('database', data.database);
         }
-
-        // Update TMDB status
         if (data.tmdb) {
             updateServiceStatus('tmdb', data.tmdb);
+        }
+        if (data.integration1) {
+            updateServiceStatus('integration1', data.integration1);
+        }
+        if (data.integration2) {
+            updateServiceStatus('integration2', data.integration2);
         }
     }
 
     function updateServiceStatus(service, status) {
-        const statusBadge = document.getElementById(`health-${service}-status`);
-        const messageEl = document.getElementById(`health-${service}-message`);
-        const latencyEl = document.getElementById(`health-${service}-latency`);
-        const checkedEl = document.getElementById(`health-${service}-checked`);
+        const box = document.getElementById(`health-box-${service}`);
+        const icon = document.getElementById(`health-icon-${service}`);
+        const badge = document.getElementById(`health-badge-${service}`);
+        const messageEl = document.getElementById(`health-message-${service}`);
+        const latencyEl = document.getElementById(`health-latency-${service}`);
+        const checkedEl = document.getElementById(`health-checked-${service}`);
+        const retestBtn = document.getElementById(`health-retest-${service}`);
 
-        // Update status badge with color
-        statusBadge.textContent = status.status.charAt(0).toUpperCase() + status.status.slice(1);
-        statusBadge.className = 'badge';
+        // Handle disabled state
+        if (status.enabled === false) {
+            box?.classList.add('health-box-disabled');
+            icon?.classList.remove('text-success', 'text-warning', 'text-danger', 'text-secondary');
+            icon?.classList.add('text-muted');
+            badge.textContent = 'Disabled';
+            badge.className = 'badge bg-secondary mb-2';
+            messageEl.textContent = 'Not enabled';
+            latencyEl.textContent = '-';
+            checkedEl.textContent = '-';
+            if (retestBtn) {
+                retestBtn.disabled = true;
+            }
+            return;
+        }
 
+        // Remove disabled state if enabled
+        box?.classList.remove('health-box-disabled');
+        if (retestBtn) {
+            retestBtn.disabled = false;
+        }
+
+        // Update icon color based on status
+        icon?.classList.remove('text-success', 'text-warning', 'text-danger', 'text-secondary', 'text-muted');
         switch (status.status) {
             case 'healthy':
-                statusBadge.classList.add('bg-success');
+                icon?.classList.add('text-success');
+                badge.className = 'badge bg-success mb-2';
+                badge.textContent = 'Healthy';
                 break;
             case 'degraded':
-                statusBadge.classList.add('bg-warning');
+                icon?.classList.add('text-warning');
+                badge.className = 'badge bg-warning mb-2';
+                badge.textContent = 'Degraded';
                 break;
             case 'down':
-                statusBadge.classList.add('bg-danger');
+                icon?.classList.add('text-danger');
+                badge.className = 'badge bg-danger mb-2';
+                badge.textContent = 'Down';
                 break;
             default:
-                statusBadge.classList.add('bg-secondary');
+                icon?.classList.add('text-secondary');
+                badge.className = 'badge bg-secondary mb-2';
+                badge.textContent = 'Unknown';
         }
 
         // Update message
@@ -558,7 +859,7 @@
 
         // Update checked timestamp
         if (status.checked_at) {
-            const timestamp = new Date(status.checked_at.replace(' ', 'T')).toLocaleString();
+            const timestamp = new Date(status.checked_at.replace(' ', 'T')).toLocaleTimeString();
             checkedEl.textContent = timestamp;
         } else {
             checkedEl.textContent = '-';
