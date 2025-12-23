@@ -29,6 +29,9 @@ tmp/*
 # Local development data (not committed)
 /docker/mysql-data
 
+# MCP configuration (project-local)
+.mcp.json
+
 # Database dumps and backups
 *.sql
 *.dump
