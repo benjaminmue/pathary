@@ -41,6 +41,15 @@
     {% include 'partials/footer.twig' %}
     {% endif %}
 
+    <!-- Global Health Status Notification -->
+    <div id="health-alert" class="position-fixed top-0 end-0 m-3" style="z-index: 9999; display: none; min-width: 300px;">
+        <div class="alert alert-danger alert-dismissible fade show shadow" role="alert">
+            <h6 class="alert-heading mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>System Health Alert</h6>
+            <div id="health-alert-message" class="small"></div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
     <!-- Bootstrap JS (Local) -->
     <script src="{{ applicationUrl }}/js/bootstrap.bundle.min.js"></script>
 
@@ -49,6 +58,85 @@
 
     <!-- Theme Toggle JS -->
     <script src="{{ applicationUrl }}/assets/js/theme.js"></script>
+
+    <!-- Background Health Check (Admin Only) -->
+    {% if currentUser is defined and currentUser is not null and currentUser.isAdmin() %}
+    <script>
+        (function() {
+            const HEALTH_CHECK_INTERVAL = 60000; // 60 seconds
+            let lastCheck = 0;
+
+            async function checkSystemHealth() {
+                const now = Date.now();
+
+                // Rate limit: only check once per minute
+                if (now - lastCheck < HEALTH_CHECK_INTERVAL) {
+                    return;
+                }
+
+                lastCheck = now;
+
+                try {
+                    const response = await fetch('{{ applicationUrl }}/admin/health');
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const data = await response.json();
+
+                    // Check if database is down (critical)
+                    const isDatabaseDown = data.database && data.database.status === 'down';
+                    const isTmdbDown = data.tmdb && data.tmdb.status === 'down';
+                    const isDatabaseDegraded = data.database && data.database.status === 'degraded';
+
+                    // Show alert if database is down or degraded
+                    if (isDatabaseDown || isDatabaseDegraded) {
+                        showHealthAlert(data.database, 'Database');
+                    } else if (isTmdbDown) {
+                        // TMDB down is less critical, only show if database is OK
+                        showHealthAlert(data.tmdb, 'TMDB API');
+                    } else {
+                        // All systems healthy - hide alert
+                        hideHealthAlert();
+                    }
+                } catch (error) {
+                    console.error('Background health check failed:', error);
+                }
+            }
+
+            function showHealthAlert(service, serviceName) {
+                const alertDiv = document.getElementById('health-alert');
+                const messageDiv = document.getElementById('health-alert-message');
+
+                if (!alertDiv || !messageDiv) {
+                    return;
+                }
+
+                let message = `<strong>${serviceName}:</strong> ${service.message}`;
+                if (service.checked_at) {
+                    const time = new Date(service.checked_at.replace(' ', 'T')).toLocaleTimeString();
+                    message += `<br><small class="text-muted">Last checked: ${time}</small>`;
+                }
+
+                messageDiv.innerHTML = message;
+                alertDiv.style.display = 'block';
+            }
+
+            function hideHealthAlert() {
+                const alertDiv = document.getElementById('health-alert');
+                if (alertDiv) {
+                    alertDiv.style.display = 'none';
+                }
+            }
+
+            // Run initial check after 5 seconds (let page load first)
+            setTimeout(checkSystemHealth, 5000);
+
+            // Run periodic checks every minute
+            setInterval(checkSystemHealth, HEALTH_CHECK_INTERVAL);
+        })();
+    </script>
+    {% endif %}
 
     {% block scripts %}{% endblock %}
 </body>

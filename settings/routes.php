@@ -49,6 +49,10 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/admin/server', [Web\AdminController::class, 'renderServerTab'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/admin/integrations', [Web\AdminController::class, 'renderIntegrationsTab'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
 
+    # Admin Health Checks
+    $routes->add('GET', '/admin/health', [Web\HealthCheckController::class, 'getHealth'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/admin/health/run', [Web\HealthCheckController::class, 'runHealthCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+
     ###########
     # Profile #
     ###########

@@ -159,60 +159,54 @@
     <!-- System Health Card -->
     <div class="col-md-12 mb-4">
         <div class="card admin-card">
-            <div class="card-header">
-                <i class="bi bi-activity me-2"></i>System Health
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-activity me-2"></i>System Health</span>
+                <small class="text-muted" id="health-last-run">Last check: <span id="health-last-run-time">Never</span></small>
             </div>
             <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <div class="card bg-body-secondary h-100">
-                            <div class="card-body text-center">
-                                <div class="h1 text-success"><i class="bi bi-database"></i></div>
-                                <div class="small text-muted">Database</div>
-                                <div class="fw-bold text-success">Connected</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card bg-body-secondary h-100">
-                            <div class="card-body text-center">
-                                <div class="h1 text-success"><i class="bi bi-cloud"></i></div>
-                                <div class="small text-muted">TMDB API</div>
-                                <div class="fw-bold text-muted">Unknown</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card bg-body-secondary h-100">
-                            <div class="card-body text-center">
-                                <div class="h1 text-muted"><i class="bi bi-envelope"></i></div>
-                                <div class="small text-muted">Email</div>
-                                <div class="fw-bold text-muted">Not Configured</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card bg-body-secondary h-100">
-                            <div class="card-body text-center">
-                                <div class="h1 text-muted"><i class="bi bi-clock-history"></i></div>
-                                <div class="small text-muted">Job Queue</div>
-                                <div class="fw-bold text-muted">0 pending</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 200px;">Service</th>
+                                <th style="width: 120px;">Status</th>
+                                <th>Message</th>
+                                <th style="width: 100px;">Latency</th>
+                                <th style="width: 180px;">Last Checked</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="health-db-row">
+                                <td><i class="bi bi-database me-2"></i>Database</td>
+                                <td><span id="health-db-status" class="badge bg-secondary">Unknown</span></td>
+                                <td id="health-db-message">Not checked yet</td>
+                                <td id="health-db-latency">-</td>
+                                <td id="health-db-checked">-</td>
+                            </tr>
+                            <tr id="health-tmdb-row">
+                                <td><i class="bi bi-cloud me-2"></i>TMDB API</td>
+                                <td><span id="health-tmdb-status" class="badge bg-secondary">Unknown</span></td>
+                                <td id="health-tmdb-message">Not checked yet</td>
+                                <td id="health-tmdb-latency">-</td>
+                                <td id="health-tmdb-checked">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div class="mt-4">
-                    <button class="btn btn-outline-secondary btn-sm" onclick="refreshHealthStatus()">
-                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh Health Status
+                <div class="mt-3">
+                    <button class="btn btn-primary btn-sm" id="runHealthCheckBtn" onclick="runHealthCheck()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Run Health Check
                     </button>
-                    <a href="{{ applicationUrl }}/old/jobs" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-list-task me-1"></i>View Job Queue
-                    </a>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="runDatabaseCheck()">
+                        <i class="bi bi-database me-1"></i>Check Database
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="runTmdbCheck()">
+                        <i class="bi bi-cloud me-1"></i>Check TMDB API
+                    </button>
                 </div>
+
+                <div id="health-check-error" class="alert alert-warning mt-3" style="display: none;"></div>
             </div>
         </div>
     </div>
@@ -413,7 +407,161 @@
         );
     }
 
-    async function refreshHealthStatus() {
-        showToast('Health status refresh feature coming soon', 'info');
+    // Health Check Functions
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Try to load cached status first
+        const cachedData = await loadHealthStatus();
+
+        // If no cached data or cache is old, run a fresh check
+        if (!cachedData || cachedData.overall.status === 'unknown') {
+            await runHealthCheck(true); // Silent mode - no toast
+        }
+    });
+
+    async function loadHealthStatus() {
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/health');
+            if (!response.ok) {
+                throw new Error('Failed to load health status');
+            }
+
+            const data = await response.json();
+            updateHealthDisplay(data);
+            return data;
+        } catch (error) {
+            console.error('Error loading health status:', error);
+            return null;
+        }
+    }
+
+    async function runHealthCheck(silent = false) {
+        const button = document.getElementById('runHealthCheckBtn');
+        const originalHtml = button?.innerHTML;
+
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Checking...';
+        }
+
+        // Hide any previous error
+        const errorDiv = document.getElementById('health-check-error');
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/health/run', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    csrf: getCsrfToken(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                // Rate limit or other error
+                if (errorDiv) {
+                    errorDiv.textContent = data.error;
+                    errorDiv.style.display = 'block';
+                }
+            } else {
+                updateHealthDisplay(data);
+                updateLastRunTime();
+
+                if (!silent) {
+                    showToast('Health check completed', 'success');
+                }
+
+                // Store health status globally for notifications
+                window.healthStatus = data;
+            }
+        } catch (error) {
+            if (!silent) {
+                showToast('Error running health check: ' + error.message, 'danger');
+            }
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            }
+        }
+    }
+
+    function updateLastRunTime() {
+        const timeEl = document.getElementById('health-last-run-time');
+        if (timeEl) {
+            timeEl.textContent = new Date().toLocaleString();
+        }
+    }
+
+    async function runDatabaseCheck() {
+        // For now, just run the full health check
+        // Can be extended to run individual checks if endpoints are added
+        await runHealthCheck();
+    }
+
+    async function runTmdbCheck() {
+        // For now, just run the full health check
+        // Can be extended to run individual checks if endpoints are added
+        await runHealthCheck();
+    }
+
+    function updateHealthDisplay(data) {
+        // Update Database status
+        if (data.database) {
+            updateServiceStatus('db', data.database);
+        }
+
+        // Update TMDB status
+        if (data.tmdb) {
+            updateServiceStatus('tmdb', data.tmdb);
+        }
+    }
+
+    function updateServiceStatus(service, status) {
+        const statusBadge = document.getElementById(`health-${service}-status`);
+        const messageEl = document.getElementById(`health-${service}-message`);
+        const latencyEl = document.getElementById(`health-${service}-latency`);
+        const checkedEl = document.getElementById(`health-${service}-checked`);
+
+        // Update status badge with color
+        statusBadge.textContent = status.status.charAt(0).toUpperCase() + status.status.slice(1);
+        statusBadge.className = 'badge';
+
+        switch (status.status) {
+            case 'healthy':
+                statusBadge.classList.add('bg-success');
+                break;
+            case 'degraded':
+                statusBadge.classList.add('bg-warning');
+                break;
+            case 'down':
+                statusBadge.classList.add('bg-danger');
+                break;
+            default:
+                statusBadge.classList.add('bg-secondary');
+        }
+
+        // Update message
+        messageEl.textContent = status.message || 'No message';
+
+        // Update latency
+        if (status.latency_ms !== undefined && status.latency_ms > 0) {
+            latencyEl.textContent = status.latency_ms + 'ms';
+        } else {
+            latencyEl.textContent = '-';
+        }
+
+        // Update checked timestamp
+        if (status.checked_at) {
+            const timestamp = new Date(status.checked_at.replace(' ', 'T')).toLocaleString();
+            checkedEl.textContent = timestamp;
+        } else {
+            checkedEl.textContent = '-';
+        }
     }
 </script>
