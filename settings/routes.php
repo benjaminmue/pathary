@@ -307,5 +307,10 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
 
+    // Admin Settings API (admin-only)
+    $routes->add('GET', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'getTmdbStatus'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
+    $routes->add('POST', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'saveTmdbApiKey'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
+    $routes->add('POST', '/admin/settings/tmdb/test', [Api\AdminSettingsController::class, 'testTmdbConnection'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
+
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

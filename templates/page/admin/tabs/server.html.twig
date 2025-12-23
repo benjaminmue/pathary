@@ -14,16 +14,14 @@
                         </label>
                         <div class="input-group">
                             <input type="password" class="form-control font-monospace" id="tmdbApiKey"
-                                   value="••••••••••••••••"
-                                   placeholder="Enter TMDB API key">
+                                   placeholder="Enter TMDB API key (32 hexadecimal characters)">
                             <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('tmdbApiKey')">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </div>
-                        <div class="form-text">
-                            <i class="bi bi-check-circle text-success"></i> Key is configured
-                            • Last updated: Never
-                            • <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Get API key</a>
+                        <div class="form-text" id="tmdbKeyStatus">
+                            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                            Loading status...
                         </div>
                     </div>
 
@@ -221,6 +219,49 @@
 </div>
 
 <script>
+    // Load TMDB status on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadTmdbStatus();
+    });
+
+    async function loadTmdbStatus() {
+        try {
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to load TMDB status');
+            }
+
+            const data = await response.json();
+            updateTmdbStatus(data.configured, data.updated_at);
+        } catch (error) {
+            document.getElementById('tmdbKeyStatus').innerHTML =
+                '<i class="bi bi-exclamation-circle text-warning"></i> Failed to load status';
+        }
+    }
+
+    function updateTmdbStatus(configured, updatedAt) {
+        const statusEl = document.getElementById('tmdbKeyStatus');
+
+        if (configured) {
+            const timestamp = updatedAt ? new Date(updatedAt.replace(' ', 'T')).toLocaleString() : 'Unknown';
+            statusEl.innerHTML = `
+                <i class="bi bi-check-circle text-success"></i> Key is configured
+                • Last updated: ${timestamp}
+                • <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Get API key</a>
+            `;
+        } else {
+            statusEl.innerHTML = `
+                <i class="bi bi-x-circle text-muted"></i> Key not configured
+                • <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Get API key</a>
+            `;
+        }
+    }
+
     function toggleApiKeyVisibility(inputId) {
         const input = document.getElementById(inputId);
         const icon = event.target.closest('button').querySelector('i');
@@ -237,26 +278,75 @@
     }
 
     async function saveApiSettings() {
-        const tmdbApiKey = document.getElementById('tmdbApiKey').value;
+        const tmdbApiKey = document.getElementById('tmdbApiKey').value.trim();
 
-        if (tmdbApiKey === '••••••••••••••••') {
-            showToast('No changes to API key', 'info');
+        if (tmdbApiKey === '') {
+            showToast('Please enter a TMDB API key', 'warning');
+            return;
+        }
+
+        // Validate format (32 hexadecimal characters)
+        if (!/^[a-f0-9]{32}$/i.test(tmdbApiKey)) {
+            showToast('Invalid API key format. Expected 32 hexadecimal characters.', 'danger');
             return;
         }
 
         try {
-            // TODO: Implement API settings save endpoint
-            showToast('API settings save feature coming soon', 'info');
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                },
+                body: JSON.stringify({
+                    apiKey: tmdbApiKey,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                showToast(data.error || 'Failed to save API key', 'danger');
+                return;
+            }
+
+            showToast(data.message || 'API key saved successfully', 'success');
+
+            // Clear input and update status
+            document.getElementById('tmdbApiKey').value = '';
+            document.getElementById('tmdbApiKey').type = 'password';
+            updateTmdbStatus(true, data.updated_at);
         } catch (error) {
-            showToast('Error saving API settings: ' + error.message, 'danger');
+            showToast('Error saving API key: ' + error.message, 'danger');
         }
     }
 
     async function testTmdbConnection() {
+        const button = event.target.closest('button');
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Testing...';
+
         try {
-            showToast('TMDB connection test feature coming soon', 'info');
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb/test', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                },
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast(`Connection successful! (${data.latency_ms}ms)`, 'success');
+            } else {
+                showToast(data.message || 'Connection test failed', 'danger');
+            }
         } catch (error) {
-            showToast('Error testing TMDB connection: ' + error.message, 'danger');
+            showToast('Error testing connection: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
         }
     }
 

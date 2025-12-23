@@ -9,7 +9,7 @@ use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 
-class IsAuthenticated implements MiddlewareInterface
+class IsAdmin implements MiddlewareInterface
 {
     public function __construct(
         private readonly Authentication $authenticationService,
@@ -18,10 +18,12 @@ class IsAuthenticated implements MiddlewareInterface
 
     public function __invoke(Request $request) : ?Response
     {
-        if ($this->authenticationService->getUserIdByToken($request) === null) {
+        $currentUser = $this->authenticationService->getCurrentUser();
+
+        if ($currentUser === null || $currentUser->isAdmin() === false) {
             return Response::create(
                 StatusCode::createForbidden(),
-                Json::encode(['error' => 'Authentication required']),
+                Json::encode(['error' => 'Admin access required']),
                 [Header::createContentTypeJson()],
             );
         }

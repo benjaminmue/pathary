@@ -284,6 +284,43 @@ class ServerSettings
         $this->updateValue(self::TMDB_API_KEY, $tmdbApiKey);
     }
 
+    public function saveTmdbApiKeyWithMetadata(string $tmdbApiKey, ?int $userId = null) : void
+    {
+        // Save the key using existing method
+        $this->setTmdbApiKey($tmdbApiKey);
+
+        // Update metadata
+        $dbKey = $this->convertEnvironmentKeyToDatabaseKey(self::TMDB_API_KEY);
+        $now = date('Y-m-d H:i:s');
+
+        // Delete existing metadata
+        $this->dbConnection->prepare('DELETE FROM `server_setting_metadata` WHERE `key` = ?')
+            ->executeStatement([$dbKey]);
+
+        // Insert new metadata
+        $this->dbConnection->prepare(
+            'INSERT INTO `server_setting_metadata` (`key`, `updated_at`, `updated_by_user_id`) VALUES (?, ?, ?)'
+        )->executeStatement([$dbKey, $now, $userId]);
+    }
+
+    public function getTmdbApiKeyMetadata() : ?array
+    {
+        $dbKey = $this->convertEnvironmentKeyToDatabaseKey(self::TMDB_API_KEY);
+
+        $result = $this->dbConnection->fetchAssociative(
+            'SELECT updated_at, updated_by_user_id FROM `server_setting_metadata` WHERE `key` = ?',
+            [$dbKey]
+        );
+
+        return $result !== false ? $result : null;
+    }
+
+    public function isTmdbApiKeyConfigured() : bool
+    {
+        $key = $this->getTmdbApiKey();
+        return $key !== null && $key !== '';
+    }
+
     private function convertEnvironmentKeyToDatabaseKey(string $environmentKey) : string
     {
         return lcfirst(str_replace('_', '', ucwords(strtolower($environmentKey), '_')));
