@@ -13,8 +13,8 @@
   position: absolute;
   bottom: 100%; /* Sit on top of footer */
   right: 20px;
-  width: 72px;
-  height: 72px;
+  width: 90px;
+  height: 90px;
   padding: 0;
   border: none;
   background: transparent;
@@ -22,15 +22,20 @@
   z-index: 1000;
   transition: transform 0.15s ease;
   -webkit-tap-highlight-color: transparent;
+
+  /* SVG padding compensation: viewBox 0 0 2048 2048, visual bottom at ~1665
+     = ~383px empty space = 18.7% padding. Add 3px for ticket strip overhang. */
+  --svg-padding-offset: calc(18.7% + 3px);
+  transform: translateY(var(--svg-padding-offset));
 }
 
 #popcorn-bucket-btn:hover {
-  transform: scale(1.08);
+  transform: translateY(var(--svg-padding-offset)) scale(1.08);
 }
 
 #popcorn-bucket-btn:active,
 #popcorn-bucket-btn.popcorn-bucket-clicked {
-  transform: scale(0.92);
+  transform: translateY(var(--svg-padding-offset)) scale(0.92);
 }
 
 #popcorn-bucket-btn.popcorn-bucket-explosion {
@@ -38,16 +43,16 @@
 }
 
 @keyframes bucket-shake {
-  0%, 100% { transform: translateX(0) rotate(0); }
-  10% { transform: translateX(-5px) rotate(-5deg); }
-  20% { transform: translateX(5px) rotate(5deg); }
-  30% { transform: translateX(-5px) rotate(-3deg); }
-  40% { transform: translateX(5px) rotate(3deg); }
-  50% { transform: translateX(-3px) rotate(-2deg); }
-  60% { transform: translateX(3px) rotate(2deg); }
-  70% { transform: translateX(-2px) rotate(-1deg); }
-  80% { transform: translateX(2px) rotate(1deg); }
-  90% { transform: translateX(-1px) rotate(0); }
+  0%, 100% { transform: translateY(var(--svg-padding-offset)) translateX(0) rotate(0); }
+  10% { transform: translateY(var(--svg-padding-offset)) translateX(-5px) rotate(-5deg); }
+  20% { transform: translateY(var(--svg-padding-offset)) translateX(5px) rotate(5deg); }
+  30% { transform: translateY(var(--svg-padding-offset)) translateX(-5px) rotate(-3deg); }
+  40% { transform: translateY(var(--svg-padding-offset)) translateX(5px) rotate(3deg); }
+  50% { transform: translateY(var(--svg-padding-offset)) translateX(-3px) rotate(-2deg); }
+  60% { transform: translateY(var(--svg-padding-offset)) translateX(3px) rotate(2deg); }
+  70% { transform: translateY(var(--svg-padding-offset)) translateX(-2px) rotate(-1deg); }
+  80% { transform: translateY(var(--svg-padding-offset)) translateX(2px) rotate(1deg); }
+  90% { transform: translateY(var(--svg-padding-offset)) translateX(-1px) rotate(0); }
 }
 
 .popcorn-bucket-img {
@@ -63,19 +68,27 @@
 }
 
 /* Responsive sizing */
-@media (min-width: 768px) {
+@media (min-width: 1200px) {
   #popcorn-bucket-btn {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
+    right: 32px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  #popcorn-bucket-btn {
+    width: 105px;
+    height: 105px;
     right: 24px;
   }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 767px) {
   #popcorn-bucket-btn {
-    width: 56px;
-    height: 56px;
-    right: 12px;
+    width: 72px;
+    height: 72px;
+    right: 16px;
   }
 }
 

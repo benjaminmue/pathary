@@ -34,7 +34,8 @@
 
         // Sizing
         kernelSize: 12,
-        kernelSizeVariance: 4
+        kernelSizeVariance: 4,
+
     };
 
     // =========================================================================
@@ -132,7 +133,8 @@
     function spawnKernels(count, isExplosion) {
         const bucketRect = bucketButton.getBoundingClientRect();
         const spawnX = bucketRect.left + bucketRect.width / 2;
-        const spawnY = bucketRect.top + 10; // Near top of bucket
+        // Spawn from top quarter of bucket where the popcorn cloud is in the SVG
+        const spawnY = bucketRect.top + bucketRect.height * 0.25;
 
         for (let i = 0; i < count; i++) {
             // Enforce max kernel limit
@@ -201,6 +203,9 @@
                 kernelState.x += kernelState.vx;
                 kernelState.y += kernelState.vy;
 
+                // Check collision with bucket
+                checkBucketCollision(kernelState);
+
                 // Check landing on footer
                 const landingY = Math.min(footerTop - 10, viewportHeight - 20);
                 if (kernelState.y >= landingY && kernelState.vy > 0) {
@@ -227,6 +232,78 @@
         }
 
         requestAnimationFrame(step);
+    }
+
+    /**
+     * Checks if kernel collides with bucket and applies bounce physics
+     * Only checks when kernel is falling to avoid collision with spawn point
+     */
+    function checkBucketCollision(kernelState) {
+        if (!bucketButton) return;
+
+        // Only check collision when kernel is falling down (past its peak arc)
+        if (kernelState.vy < 0) return;
+
+        const bucketRect = bucketButton.getBoundingClientRect();
+        const kernelSize = CONFIG.kernelSize;
+
+        // SVG has transparent padding - adjust collision box to match visible bucket
+        // Top padding: ~20% (popcorn cloud starts at y=401/2048)
+        // Bottom padding: ~19% (bucket ends at y=1665/2048)
+        // Horizontal: bucket tapers, so inset sides slightly
+        const visibleRect = {
+            left: bucketRect.left + bucketRect.width * 0.15,   // 15% inset from sides
+            right: bucketRect.right - bucketRect.width * 0.15,
+            top: bucketRect.top + bucketRect.height * 0.20,    // 20% from top
+            bottom: bucketRect.bottom - bucketRect.height * 0.19  // 19% from bottom
+        };
+
+        // Check if kernel intersects with visible bucket area
+        const collision = (
+            kernelState.x + kernelSize > visibleRect.left &&
+            kernelState.x < visibleRect.right &&
+            kernelState.y + kernelSize > visibleRect.top &&
+            kernelState.y < visibleRect.bottom
+        );
+
+        if (collision) {
+            // Determine which side of the bucket was hit
+            const kernelCenterX = kernelState.x + kernelSize / 2;
+            const kernelCenterY = kernelState.y + kernelSize / 2;
+            const visibleCenterX = (visibleRect.left + visibleRect.right) / 2;
+            const visibleCenterY = (visibleRect.top + visibleRect.bottom) / 2;
+
+            const dx = kernelCenterX - visibleCenterX;
+            const dy = kernelCenterY - visibleCenterY;
+
+            // Determine primary collision axis
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Horizontal collision (left or right side)
+                kernelState.vx = -kernelState.vx * 0.6; // Bounce with damping
+                kernelState.vy *= 0.8; // Reduce vertical velocity slightly
+
+                // Add random horizontal velocity for variety
+                kernelState.vx += (Math.random() - 0.5) * 4;
+
+                // Push kernel out of collision
+                if (dx > 0) {
+                    kernelState.x = visibleRect.right;
+                } else {
+                    kernelState.x = visibleRect.left - kernelSize;
+                }
+            } else {
+                // Vertical collision (top or bottom)
+                kernelState.vy = -kernelState.vy * 0.5; // Bounce with damping
+                kernelState.vx += (Math.random() - 0.5) * 6; // Add random horizontal spread
+
+                // Push kernel out of collision
+                if (dy > 0) {
+                    kernelState.y = visibleRect.bottom;
+                } else {
+                    kernelState.y = visibleRect.top - kernelSize;
+                }
+            }
+        }
     }
 
     // =========================================================================

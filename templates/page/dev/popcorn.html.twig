@@ -11,119 +11,122 @@
 {% endblock %}
 
 {% block body %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <h1 class="h3 mb-0">Popcorn Easter Egg Test Page</h1>
-                </div>
-                <div class="card-body">
-                    <h2 class="h5">Instructions</h2>
-                    <ul>
-                        <li>Look for the <strong>popcorn bucket</strong> sitting on top of the footer (bottom-right)</li>
-                        <li><strong>Click it</strong> to spawn <strong>1-4 random</strong> popcorn kernels that arc up then fall</li>
-                        <li>Kernels land on the footer and stay for 10 seconds, then fade out</li>
-                        <li><strong>Click 30 times</strong> to trigger an explosion with 30 kernels!</li>
-                    </ul>
+{# Make this block a flex container so footer can stick to bottom #}
+<div class="d-flex flex-column h-100">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="h3 mb-0">Popcorn Easter Egg Test Page</h1>
+                    </div>
+                    <div class="card-body">
+                        <h2 class="h5">Instructions</h2>
+                        <ul>
+                            <li>Look for the <strong>popcorn bucket</strong> sitting on top of the footer (bottom-right)</li>
+                            <li><strong>Click it</strong> to spawn <strong>1-4 random</strong> popcorn kernels that arc up then fall</li>
+                            <li>Kernels land on the footer and stay for 10 seconds, then fade out</li>
+                            <li><strong>Click 30 times</strong> to trigger an explosion with 30 kernels!</li>
+                        </ul>
 
-                    <hr>
+                        <hr>
 
-                    <h2 class="h5">Testing Checklist</h2>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="check1">
-                        <label class="form-check-label" for="check1">
-                            Bucket sits on top of footer (bottom-right), no circle background
-                        </label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="check2">
-                        <label class="form-check-label" for="check2">
-                            Click spawns 1-4 random popcorn kernels
-                        </label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="check3">
-                        <label class="form-check-label" for="check3">
-                            Kernels arc upward then fall with gravity
-                        </label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="check4">
-                        <label class="form-check-label" for="check4">
-                            Kernels land on/above footer and stop
-                        </label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="check5">
-                        <label class="form-check-label" for="check5">
-                            Kernels fade out after ~10 seconds
-                        </label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="check6">
-                        <label class="form-check-label" for="check6">
-                            30+ clicks triggers explosion (bucket shakes, 30 kernels)
-                        </label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="check7">
-                        <label class="form-check-label" for="check7">
-                            Kernels look like popped corn (white micro-clouds, not emojis)
-                        </label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="check8">
-                        <label class="form-check-label" for="check8">
-                            Works in both light and dark mode
-                        </label>
-                    </div>
+                        <h2 class="h5">Testing Checklist</h2>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="check1">
+                            <label class="form-check-label" for="check1">
+                                Bucket sits on top of footer (bottom-right), no circle background
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="check2">
+                            <label class="form-check-label" for="check2">
+                                Click spawns 1-4 random popcorn kernels
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="check3">
+                            <label class="form-check-label" for="check3">
+                                Kernels arc upward then fall with gravity
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="check4">
+                            <label class="form-check-label" for="check4">
+                                Kernels land on/above footer and stop
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="check5">
+                            <label class="form-check-label" for="check5">
+                                Kernels fade out after ~10 seconds
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="check6">
+                            <label class="form-check-label" for="check6">
+                                30+ clicks triggers explosion (bucket shakes, 30 kernels)
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="check7">
+                            <label class="form-check-label" for="check7">
+                                Kernels look like popped corn (white micro-clouds, not emojis)
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="check8">
+                            <label class="form-check-label" for="check8">
+                                Works in both light and dark mode
+                            </label>
+                        </div>
 
-                    <hr>
+                        <hr>
 
-                    <h2 class="h5">Theme Toggle</h2>
-                    <p class="text-muted mb-3">Test that the easter egg works in both themes:</p>
-                    <button class="btn btn-outline-secondary" onclick="toggleTheme()">
-                        <i class="bi bi-circle-half"></i> Toggle Dark/Light Mode
-                    </button>
+                        <h2 class="h5">Theme Toggle</h2>
+                        <p class="text-muted mb-3">Test that the easter egg works in both themes:</p>
+                        <button class="btn btn-outline-secondary" onclick="toggleTheme()">
+                            <i class="bi bi-circle-half"></i> Toggle Dark/Light Mode
+                        </button>
 
-                    <hr>
+                        <hr>
 
-                    <h2 class="h5">Stats</h2>
-                    <p class="text-muted">Open browser console to see any errors.</p>
+                        <h2 class="h5">Stats</h2>
+                        <p class="text-muted">Open browser console to see any errors.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-function toggleTheme() {
-    const html = document.getElementById('html');
-    const currentTheme = html.getAttribute('data-bs-theme');
-    html.setAttribute('data-bs-theme', currentTheme === 'dark' ? 'light' : 'dark');
-}
-</script>
+    <script>
+    function toggleTheme() {
+        const html = document.getElementById('html');
+        const currentTheme = html.getAttribute('data-bs-theme');
+        html.setAttribute('data-bs-theme', currentTheme === 'dark' ? 'light' : 'dark');
+    }
+    </script>
 
-{# Custom footer with popcorn bucket for this dev page only #}
-<footer class="footer mt-auto py-3 bg-body-tertiary border-top footer-bucket-wrapper">
-    <button id="popcorn-bucket-btn" type="button" aria-label="Click for a popcorn surprise!">
-        <img src="{{ applicationUrl }}/images/pathary-logo.svg" alt="" class="popcorn-bucket-img">
-    </button>
-    <div class="container">
-        <div class="d-flex flex-wrap justify-content-center gap-3 small">
-            <a href="https://github.com/benjaminmue/pathary" target="_blank" rel="noopener noreferrer" class="text-body-secondary text-decoration-none">
-                <i class="bi bi-github me-1"></i>GitHub
-            </a>
-            <a href="https://github.com/benjaminmue/pathary/wiki" target="_blank" rel="noopener noreferrer" class="text-body-secondary text-decoration-none">
-                <i class="bi bi-book me-1"></i>Wiki
-            </a>
-            <a href="https://github.com/benjaminmue/pathary/issues/new" target="_blank" rel="noopener noreferrer" class="text-body-secondary text-decoration-none">
-                <i class="bi bi-bug me-1"></i>Report Issue
-            </a>
+    {# Custom footer with popcorn bucket for this dev page only #}
+    <footer class="footer mt-auto py-3 bg-body-tertiary border-top footer-bucket-wrapper">
+        <button id="popcorn-bucket-btn" type="button" aria-label="Click for a popcorn surprise!">
+            <img src="{{ applicationUrl }}/images/pathary-logo.svg" alt="" class="popcorn-bucket-img">
+        </button>
+        <div class="container">
+            <div class="d-flex flex-wrap justify-content-center gap-3 small">
+                <a href="https://github.com/benjaminmue/pathary" target="_blank" rel="noopener noreferrer" class="text-body-secondary text-decoration-none">
+                    <i class="bi bi-github me-1"></i>GitHub
+                </a>
+                <a href="https://github.com/benjaminmue/pathary/wiki" target="_blank" rel="noopener noreferrer" class="text-body-secondary text-decoration-none">
+                    <i class="bi bi-book me-1"></i>Wiki
+                </a>
+                <a href="https://github.com/benjaminmue/pathary/issues/new" target="_blank" rel="noopener noreferrer" class="text-body-secondary text-decoration-none">
+                    <i class="bi bi-bug me-1"></i>Report Issue
+                </a>
+            </div>
         </div>
-    </div>
-</footer>
+    </footer>
+</div>
 {% endblock %}
 
 {% block scripts %}
