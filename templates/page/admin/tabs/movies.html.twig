@@ -1,0 +1,257 @@
+<div class="card admin-card">
+    <div class="card-header">
+        <i class="bi bi-film me-2"></i>Movie Management
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            Manage movies in your Pathary instance. Delete movies, edit metadata, remove ratings, and sync with TMDB.
+        </p>
+
+        <!-- Movie Search Section -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-8">
+                <label for="movieSearch" class="form-label">Search Movies</label>
+                <input type="text"
+                       class="form-control"
+                       id="movieSearch"
+                       placeholder="Search by title, TMDB ID, or IMDB ID..."
+                       autocomplete="off">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button class="btn btn-primary w-100" onclick="searchMovies()">
+                    <i class="bi bi-search me-1"></i>Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div id="movieSearchResults" class="d-none">
+            <h6 class="border-bottom pb-2 mb-3">Search Results</h6>
+            <div id="movieResultsList" class="list-group mb-3"></div>
+        </div>
+
+        <!-- Selected Movie Details -->
+        <div id="movieDetails" class="d-none">
+            <h6 class="border-bottom pb-2 mb-3">Movie Details</h6>
+
+            <div class="row">
+                <div class="col-md-3 text-center mb-3">
+                    <img id="moviePoster" src="" alt="Movie Poster" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                </div>
+                <div class="col-md-9">
+                    <h4 id="movieTitle" class="mb-2"></h4>
+                    <p class="text-muted mb-3">
+                        <span id="movieYear"></span> •
+                        <span id="movieRuntime"></span> •
+                        TMDB ID: <span id="movieTmdbId"></span>
+                    </p>
+
+                    <div class="mb-3">
+                        <h6>Synopsis</h6>
+                        <p id="movieOverview" class="text-muted small"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6>Statistics</h6>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <div class="card bg-body-secondary">
+                                    <div class="card-body py-2 px-3">
+                                        <div class="small text-muted">Total Ratings</div>
+                                        <div class="h5 mb-0" id="movieRatingCount">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-body-secondary">
+                                    <div class="card-body py-2 px-3">
+                                        <div class="small text-muted">Watch Dates</div>
+                                        <div class="h5 mb-0" id="movieWatchCount">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-body-secondary">
+                                    <div class="card-body py-2 px-3">
+                                        <div class="small text-muted">Avg Rating</div>
+                                        <div class="h5 mb-0" id="movieAvgRating">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="btn-group mb-3" role="group">
+                        <button class="btn btn-outline-primary" onclick="syncMovieFromTMDB()">
+                            <i class="bi bi-arrow-clockwise me-1"></i>Sync from TMDB
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="viewMovieRatings()">
+                            <i class="bi bi-star me-1"></i>View All Ratings
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="confirmDeleteMovie()">
+                            <i class="bi bi-trash me-1"></i>Delete Movie
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ratings List -->
+            <div id="movieRatingsList" class="d-none mt-4">
+                <h6 class="border-bottom pb-2 mb-3">User Ratings</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Rating</th>
+                                <th>Watched Date</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ratingsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Operations Section -->
+        <div class="mt-5 pt-4 border-top">
+            <h6 class="mb-3"><i class="bi bi-tools me-2"></i>Bulk Operations</h6>
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">Cleanup Orphaned Posters</h6>
+                            <p class="card-text small text-muted">Remove poster images for deleted movies</p>
+                            <button class="btn btn-sm btn-outline-danger" onclick="cleanupOrphanedPosters()">
+                                <i class="bi bi-trash me-1"></i>Run Cleanup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">Refresh All TMDB Data</h6>
+                            <p class="card-text small text-muted">Queue job to update all movie metadata from TMDB</p>
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshAllTMDB()">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Queue Job
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentMovieId = null;
+
+    async function searchMovies() {
+        const query = document.getElementById('movieSearch').value.trim();
+        if (!query) {
+            showToast('Please enter a search term', 'warning');
+            return;
+        }
+
+        try {
+            // TODO: Implement movie search API endpoint
+            showToast('Movie search feature coming soon', 'info');
+        } catch (error) {
+            showToast('Error searching movies: ' + error.message, 'danger');
+        }
+    }
+
+    async function syncMovieFromTMDB() {
+        if (!currentMovieId) return;
+
+        showConfirmModal('Re-fetch this movie data from TMDB? This will update title, poster, runtime, and other metadata.', async () => {
+            try {
+                const response = await fetch(`{{ applicationUrl }}/old/movies/${currentMovieId}/refresh-tmdb`, {
+                    method: 'GET',
+                });
+
+                if (response.ok) {
+                    showToast('Movie data synced from TMDB successfully', 'success');
+                } else {
+                    showToast('Failed to sync movie data', 'danger');
+                }
+            } catch (error) {
+                showToast('Error syncing movie: ' + error.message, 'danger');
+            }
+        });
+    }
+
+    async function viewMovieRatings() {
+        if (!currentMovieId) return;
+
+        try {
+            // TODO: Implement ratings API endpoint
+            document.getElementById('movieRatingsList').classList.remove('d-none');
+            showToast('Ratings display feature coming soon', 'info');
+        } catch (error) {
+            showToast('Error loading ratings: ' + error.message, 'danger');
+        }
+    }
+
+    async function confirmDeleteMovie() {
+        if (!currentMovieId) return;
+
+        const movieTitle = document.getElementById('movieTitle').textContent;
+
+        showConfirmModal(
+            `Delete "${movieTitle}" and ALL associated ratings and watch dates? This action cannot be undone.`,
+            async () => {
+                try {
+                    // TODO: Implement movie deletion API endpoint
+                    showToast('Movie deletion feature coming soon', 'info');
+                } catch (error) {
+                    showToast('Error deleting movie: ' + error.message, 'danger');
+                }
+            }
+        );
+    }
+
+    async function deleteRating(movieId, userId) {
+        showConfirmModal(
+            'Delete this rating? This action cannot be undone.',
+            async () => {
+                try {
+                    // TODO: Implement rating deletion API endpoint
+                    showToast('Rating deletion feature coming soon', 'info');
+                } catch (error) {
+                    showToast('Error deleting rating: ' + error.message, 'danger');
+                }
+            }
+        );
+    }
+
+    async function cleanupOrphanedPosters() {
+        showConfirmModal(
+            'Scan and remove poster files for movies that no longer exist in the database?',
+            async () => {
+                try {
+                    showToast('Orphan cleanup feature coming soon', 'info');
+                } catch (error) {
+                    showToast('Error running cleanup: ' + error.message, 'danger');
+                }
+            }
+        );
+    }
+
+    async function refreshAllTMDB() {
+        showConfirmModal(
+            'Queue a background job to refresh all movie data from TMDB? This may take several minutes.',
+            async () => {
+                try {
+                    showToast('Bulk TMDB refresh feature coming soon', 'info');
+                } catch (error) {
+                    showToast('Error queuing job: ' + error.message, 'danger');
+                }
+            }
+        );
+    }
+</script>

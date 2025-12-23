@@ -40,6 +40,15 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     #######
     $routes->add('GET', '/dev/popcorn', [Web\DevController::class, 'renderPopcornTestPage']);
 
+    #########
+    # Admin #
+    #########
+    $routes->add('GET', '/admin', [Web\AdminController::class, 'index'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('GET', '/admin/movies', [Web\AdminController::class, 'renderMoviesTab'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('GET', '/admin/users', [Web\AdminController::class, 'renderUsersTab'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('GET', '/admin/server', [Web\AdminController::class, 'renderServerTab'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('GET', '/admin/integrations', [Web\AdminController::class, 'renderIntegrationsTab'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+
     ###########
     # Profile #
     ###########

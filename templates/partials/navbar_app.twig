@@ -28,6 +28,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ applicationUrl }}/profile">Profile</a>
                 </li>
+                {% if currentUserIsAdmin %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ applicationUrl }}/admin"><i class="bi bi-shield-lock me-1"></i>Admin</a>
+                </li>
+                {% endif %}
                 <li class="nav-item">
                     <button class="nav-link btn btn-link" onclick="logoutAndRedirect()" style="cursor: pointer;">Logout</button>
                 </li>

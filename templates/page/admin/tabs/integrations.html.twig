@@ -1,0 +1,263 @@
+<div class="card admin-card">
+    <div class="card-header">
+        <i class="bi bi-plug me-2"></i>Integrations
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            Connect Pathary with external services and platforms. Configure integrations for automated imports and syncing.
+        </p>
+
+        <div class="row g-4">
+            <!-- Plex Integration -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-warning bg-opacity-10 rounded p-3">
+                                    <i class="bi bi-play-circle h2 text-warning mb-0"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">Plex</h5>
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                        </div>
+                        <p class="card-text small text-muted">
+                            Automatically import watch history from your Plex Media Server via webhooks.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ applicationUrl }}/old/settings/integrations/plex" class="btn btn-sm btn-primary">
+                                <i class="bi bi-gear me-1"></i>Configure
+                            </a>
+                            <a href="https://github.com/benjaminmue/pathary/wiki/Integrations-Plex" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-book me-1"></i>Docs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jellyfin Integration -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-info bg-opacity-10 rounded p-3">
+                                    <i class="bi bi-collection-play h2 text-info mb-0"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">Jellyfin</h5>
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                        </div>
+                        <p class="card-text small text-muted">
+                            Sync watch history with Jellyfin server. Import and export watch data bidirectionally.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ applicationUrl }}/old/settings/integrations/jellyfin" class="btn btn-sm btn-primary">
+                                <i class="bi bi-gear me-1"></i>Configure
+                            </a>
+                            <a href="https://github.com/benjaminmue/pathary/wiki/Integrations-Jellyfin" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-book me-1"></i>Docs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trakt Integration -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-danger bg-opacity-10 rounded p-3">
+                                    <i class="bi bi-heart h2 text-danger mb-0"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">Trakt.tv</h5>
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                        </div>
+                        <p class="card-text small text-muted">
+                            Import watch history and ratings from Trakt.tv using your API credentials.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ applicationUrl }}/old/settings/integrations/trakt" class="btn btn-sm btn-primary">
+                                <i class="bi bi-gear me-1"></i>Configure
+                            </a>
+                            <a href="https://github.com/benjaminmue/pathary/wiki/Integrations-Trakt" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-book me-1"></i>Docs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Letterboxd Integration -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-secondary bg-opacity-10 rounded p-3">
+                                    <i class="bi bi-file-earmark-text h2 text-secondary mb-0"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">Letterboxd</h5>
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                        </div>
+                        <p class="card-text small text-muted">
+                            Import diary entries and ratings from Letterboxd CSV exports.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ applicationUrl }}/old/settings/integrations/letterboxd" class="btn btn-sm btn-primary">
+                                <i class="bi bi-gear me-1"></i>Configure
+                            </a>
+                            <a href="https://github.com/benjaminmue/pathary/wiki/Integrations-Letterboxd" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-book me-1"></i>Docs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mastodon Integration -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary bg-opacity-10 rounded p-3">
+                                    <i class="bi bi-mastodon h2 text-primary mb-0"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">Mastodon</h5>
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                        </div>
+                        <p class="card-text small text-muted">
+                            Automatically post your movie ratings to Mastodon with customizable privacy settings.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ applicationUrl }}/old/settings/integrations/mastodon" class="btn btn-sm btn-primary">
+                                <i class="bi bi-gear me-1"></i>Configure
+                            </a>
+                            <a href="https://github.com/benjaminmue/pathary/wiki/Integrations-Mastodon" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-book me-1"></i>Docs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kodi Integration -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success bg-opacity-10 rounded p-3">
+                                    <i class="bi bi-tv h2 text-success mb-0"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">Kodi</h5>
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                        </div>
+                        <p class="card-text small text-muted">
+                            Receive watch events from Kodi media center via webhook integration.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ applicationUrl }}/old/settings/integrations/kodi" class="btn btn-sm btn-primary">
+                                <i class="bi bi-gear me-1"></i>Configure
+                            </a>
+                            <a href="https://github.com/benjaminmue/pathary/wiki/Integrations-Kodi" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-book me-1"></i>Docs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Netflix Integration (Planned) -->
+            <div class="col-md-6">
+                <div class="card h-100 border-warning">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-warning bg-opacity-10 rounded p-3">
+                                    <i class="bi bi-film h2 text-warning mb-0"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">Netflix</h5>
+                                <span class="badge bg-warning">Limited</span>
+                            </div>
+                        </div>
+                        <p class="card-text small text-muted">
+                            Import watch history from Netflix CSV export. No real-time sync due to API limitations.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ applicationUrl }}/old/settings/integrations/netflix" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-gear me-1"></i>Configure
+                            </a>
+                            <a href="https://github.com/benjaminmue/pathary/wiki/Integrations-Netflix" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-book me-1"></i>Docs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radarr Integration -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-dark bg-opacity-10 rounded p-3">
+                                    <i class="bi bi-rss h2 text-dark mb-0"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">Radarr</h5>
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                        </div>
+                        <p class="card-text small text-muted">
+                            Generate RSS feed of your watchlist for Radarr to automatically download movies.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a href="{{ applicationUrl }}/old/settings/integrations/radarr" class="btn btn-sm btn-primary">
+                                <i class="bi bi-gear me-1"></i>Configure
+                            </a>
+                            <a href="https://github.com/benjaminmue/pathary/wiki/Integrations-Radarr" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-book me-1"></i>Docs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="alert alert-info mt-4" role="alert">
+            <h6 class="alert-heading"><i class="bi bi-lightbulb me-2"></i>Need Help?</h6>
+            <p class="mb-0 small">
+                Each integration has detailed setup instructions in the
+                <a href="https://github.com/benjaminmue/pathary/wiki" target="_blank" rel="noopener" class="alert-link">Pathary Wiki</a>.
+                For troubleshooting, check the
+                <a href="https://github.com/benjaminmue/pathary/issues" target="_blank" rel="noopener" class="alert-link">GitHub Issues</a>.
+            </p>
+        </div>
+    </div>
+</div>

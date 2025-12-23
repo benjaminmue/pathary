@@ -1,0 +1,329 @@
+<div class="row">
+    <!-- API Settings Card -->
+    <div class="col-md-12 mb-4">
+        <div class="card admin-card">
+            <div class="card-header">
+                <i class="bi bi-key me-2"></i>API Settings
+            </div>
+            <div class="card-body">
+                <form id="apiSettingsForm">
+                    <div class="mb-3">
+                        <label for="tmdbApiKey" class="form-label">
+                            TMDB API Key
+                            <i class="bi bi-info-circle text-muted" title="Required for movie metadata" data-bs-toggle="tooltip"></i>
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control font-monospace" id="tmdbApiKey"
+                                   value="••••••••••••••••"
+                                   placeholder="Enter TMDB API key">
+                            <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('tmdbApiKey')">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <i class="bi bi-check-circle text-success"></i> Key is configured
+                            • Last updated: Never
+                            • <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Get API key</a>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-primary" onclick="saveApiSettings()">
+                            <i class="bi bi-save me-1"></i>Save API Settings
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="testTmdbConnection()">
+                            <i class="bi bi-lightning me-1"></i>Test TMDB Connection
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Settings Card -->
+    <div class="col-md-12 mb-4">
+        <div class="card admin-card">
+            <div class="card-header">
+                <i class="bi bi-gear me-2"></i>Application Settings
+            </div>
+            <div class="card-body">
+                <form id="appSettingsForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="appName" class="form-label">Application Name</label>
+                            <input type="text" class="form-control" id="appName" value="Pathary">
+                            <div class="form-text">Displayed in navbar and page titles</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="appUrl" class="form-label">Application URL</label>
+                            <input type="url" class="form-control" id="appUrl" value="{{ applicationUrl }}" readonly>
+                            <div class="form-text">Configure via APPLICATION_URL environment variable</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="registrationEnabled">
+                            <label class="form-check-label" for="registrationEnabled">
+                                Enable user registration
+                            </label>
+                        </div>
+                        <div class="form-text">Allow new users to create accounts without admin approval</div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="saveAppSettings()">
+                        <i class="bi bi-save me-1"></i>Save App Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Settings Card -->
+    <div class="col-md-12 mb-4">
+        <div class="card admin-card">
+            <div class="card-header">
+                <i class="bi bi-envelope me-2"></i>Email Settings (SMTP)
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Configure SMTP settings for sending emails (password resets, notifications, etc.)
+                </p>
+
+                <form id="emailSettingsForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="smtpHost" class="form-label">SMTP Host</label>
+                            <input type="text" class="form-control" id="smtpHost" placeholder="smtp.gmail.com">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label for="smtpPort" class="form-label">Port</label>
+                            <input type="number" class="form-control" id="smtpPort" value="587">
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label for="smtpEncryption" class="form-label">Encryption</label>
+                            <select class="form-select" id="smtpEncryption">
+                                <option value="tls">TLS</option>
+                                <option value="ssl">SSL</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="smtpUsername" class="form-label">Username / Email</label>
+                            <input type="text" class="form-control" id="smtpUsername" placeholder="your-email@gmail.com">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="smtpPassword" class="form-label">Password / App Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="smtpPassword" placeholder="•••••••••••">
+                                <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('smtpPassword')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="smtpFromAddress" class="form-label">From Address</label>
+                        <input type="email" class="form-control" id="smtpFromAddress" placeholder="noreply@pathary.local">
+                        <div class="form-text">Email address shown as sender</div>
+                    </div>
+
+                    <div class="border-top pt-3 mt-3">
+                        <button type="button" class="btn btn-primary" onclick="saveEmailSettings()">
+                            <i class="bi bi-save me-1"></i>Save Email Settings
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="sendTestEmail()">
+                            <i class="bi bi-send me-1"></i>Send Test Email
+                        </button>
+                    </div>
+                </form>
+
+                <!-- OAuth SMTP Placeholder -->
+                <div class="alert alert-info mt-4" role="alert">
+                    <h6 class="alert-heading"><i class="bi bi-lightbulb me-2"></i>OAuth SMTP Authentication</h6>
+                    <p class="mb-0 small">
+                        OAuth-based SMTP authentication (Gmail, Outlook) is planned for a future release.
+                        For now, use app-specific passwords.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health Card -->
+    <div class="col-md-12 mb-4">
+        <div class="card admin-card">
+            <div class="card-header">
+                <i class="bi bi-activity me-2"></i>System Health
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="card bg-body-secondary h-100">
+                            <div class="card-body text-center">
+                                <div class="h1 text-success"><i class="bi bi-database"></i></div>
+                                <div class="small text-muted">Database</div>
+                                <div class="fw-bold text-success">Connected</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card bg-body-secondary h-100">
+                            <div class="card-body text-center">
+                                <div class="h1 text-success"><i class="bi bi-cloud"></i></div>
+                                <div class="small text-muted">TMDB API</div>
+                                <div class="fw-bold text-muted">Unknown</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card bg-body-secondary h-100">
+                            <div class="card-body text-center">
+                                <div class="h1 text-muted"><i class="bi bi-envelope"></i></div>
+                                <div class="small text-muted">Email</div>
+                                <div class="fw-bold text-muted">Not Configured</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card bg-body-secondary h-100">
+                            <div class="card-body text-center">
+                                <div class="h1 text-muted"><i class="bi bi-clock-history"></i></div>
+                                <div class="small text-muted">Job Queue</div>
+                                <div class="fw-bold text-muted">0 pending</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="refreshHealthStatus()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh Health Status
+                    </button>
+                    <a href="{{ applicationUrl }}/old/jobs" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-list-task me-1"></i>View Job Queue
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleApiKeyVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = event.target.closest('button').querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+
+    async function saveApiSettings() {
+        const tmdbApiKey = document.getElementById('tmdbApiKey').value;
+
+        if (tmdbApiKey === '••••••••••••••••') {
+            showToast('No changes to API key', 'info');
+            return;
+        }
+
+        try {
+            // TODO: Implement API settings save endpoint
+            showToast('API settings save feature coming soon', 'info');
+        } catch (error) {
+            showToast('Error saving API settings: ' + error.message, 'danger');
+        }
+    }
+
+    async function testTmdbConnection() {
+        try {
+            showToast('TMDB connection test feature coming soon', 'info');
+        } catch (error) {
+            showToast('Error testing TMDB connection: ' + error.message, 'danger');
+        }
+    }
+
+    async function saveAppSettings() {
+        const appName = document.getElementById('appName').value;
+        const registrationEnabled = document.getElementById('registrationEnabled').checked;
+
+        try {
+            // TODO: Implement app settings save endpoint
+            showToast('App settings save feature coming soon', 'info');
+        } catch (error) {
+            showToast('Error saving app settings: ' + error.message, 'danger');
+        }
+    }
+
+    async function saveEmailSettings() {
+        const settings = {
+            host: document.getElementById('smtpHost').value,
+            port: document.getElementById('smtpPort').value,
+            encryption: document.getElementById('smtpEncryption').value,
+            username: document.getElementById('smtpUsername').value,
+            password: document.getElementById('smtpPassword').value,
+            fromAddress: document.getElementById('smtpFromAddress').value,
+        };
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/old/settings/server/email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings),
+            });
+
+            if (!response.ok) throw new Error('Failed to save email settings');
+
+            showToast('Email settings saved successfully', 'success');
+        } catch (error) {
+            showToast('Error saving email settings: ' + error.message, 'danger');
+        }
+    }
+
+    async function sendTestEmail() {
+        const fromAddress = document.getElementById('smtpFromAddress').value;
+
+        if (!fromAddress) {
+            showToast('Please configure and save email settings first', 'warning');
+            return;
+        }
+
+        showConfirmModal(
+            `Send a test email to ${fromAddress}?`,
+            async () => {
+                try {
+                    const response = await fetch('{{ applicationUrl }}/old/settings/server/email-test', {
+                        method: 'POST',
+                    });
+
+                    if (!response.ok) throw new Error('Failed to send test email');
+
+                    showToast('Test email sent successfully', 'success');
+                } catch (error) {
+                    showToast('Error sending test email: ' + error.message, 'danger');
+                }
+            }
+        );
+    }
+
+    async function refreshHealthStatus() {
+        showToast('Health status refresh feature coming soon', 'info');
+    }
+</script>
