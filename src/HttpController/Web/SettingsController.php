@@ -462,6 +462,7 @@ class SettingsController
                 'smtpPortSetInEnv' => $this->serverSettings->isSmtpPortSetInEnvironment(),
                 'smtpFromAddress' => $this->serverSettings->getFromAddress(),
                 'smtpFromAddressSetInEnv' => $this->serverSettings->isSmtpFromAddressSetInEnvironment(),
+                'smtpFromDisplayName' => $this->serverSettings->getFromDisplayName(),
                 'smtpEncryption' => $this->serverSettings->getSmtpEncryption(),
                 'smtpEncryptionSetInEnv' => $this->serverSettings->isSmtpEncryptionSetInEnvironment(),
                 'smtpWithAuthentication' => $this->serverSettings->getSmtpWithAuthentication(),
@@ -586,6 +587,7 @@ class SettingsController
                 true, // OAuth always uses authentication
                 null,
                 null,
+                $this->serverSettings->getFromDisplayName(),
             );
         } else {
             // For password mode, use settings from request
@@ -597,6 +599,7 @@ class SettingsController
                 (bool)$requestData['smtpWithAuthentication'],
                 isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'],
                 isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'],
+                isset($requestData['smtpFromDisplayName']) === false ? null : $requestData['smtpFromDisplayName'],
             );
         }
 
@@ -943,6 +946,7 @@ class SettingsController
         $smtpHost = isset($requestData['smtpHost']) === false ? null : $requestData['smtpHost'];
         $smtpPort = isset($requestData['smtpPort']) === false ? null : $requestData['smtpPort'];
         $smtpFromAddress = isset($requestData['smtpFromAddress']) === false ? null : $requestData['smtpFromAddress'];
+        $smtpFromDisplayName = isset($requestData['smtpFromDisplayName']) === false ? null : $requestData['smtpFromDisplayName'];
         $smtpEncryption = isset($requestData['smtpEncryption']) === false ? null : $requestData['smtpEncryption'];
         $smtpWithAuthentication = isset($requestData['smtpWithAuthentication']) === false ? null : (bool)$requestData['smtpWithAuthentication'];
         $smtpUser = isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'];
@@ -956,6 +960,9 @@ class SettingsController
         }
         if ($smtpFromAddress !== null) {
             $this->serverSettings->setSmtpFromAddress($smtpFromAddress);
+        }
+        if ($smtpFromDisplayName !== null) {
+            $this->serverSettings->setSmtpFromDisplayName($smtpFromDisplayName);
         }
         if ($smtpEncryption !== null) {
             $this->serverSettings->setSmtpEncryption($smtpEncryption);

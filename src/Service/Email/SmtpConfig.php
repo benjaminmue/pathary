@@ -12,6 +12,7 @@ class SmtpConfig
         private readonly bool $withAuthentication,
         private readonly ?string $user,
         private readonly ?string $password,
+        private readonly ?string $fromDisplayName = null,
     ) {
     }
 
@@ -23,8 +24,9 @@ class SmtpConfig
         bool $withAuthentication,
         ?string $user,
         ?string $password,
+        ?string $fromDisplayName = null,
     ) : self {
-        return new self($host, $port, $fromAddress, $encryption, $withAuthentication, $user, $password);
+        return new self($host, $port, $fromAddress, $encryption, $withAuthentication, $user, $password, $fromDisplayName);
     }
 
     public function getEncryption() : ?string
@@ -35,6 +37,11 @@ class SmtpConfig
     public function getFromAddress() : string
     {
         return $this->fromAddress;
+    }
+
+    public function getFromDisplayName() : ?string
+    {
+        return $this->fromDisplayName;
     }
 
     public function getHost() : string

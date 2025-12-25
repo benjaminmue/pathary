@@ -2,6 +2,7 @@ const smtpHostInput = document.getElementById('smtpHostInput');
 const smtpPortInput = document.getElementById('smtpPortInput');
 const smtpEncryptionInput = document.getElementById('smtpEncryptionInput');
 const smtpFromAddressInput = document.getElementById('smtpFromAddressInput');
+const smtpFromDisplayNameInput = document.getElementById('smtpFromDisplayNameInput');
 const smtpWithAuthenticationInput = document.getElementById('smtpWithAuthenticationInput');
 const smtpUserInput = document.getElementById('smtpUserInput');
 const smtpPasswordInput = document.getElementById('smtpPasswordInput');
@@ -11,6 +12,7 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
         smtpHostInput.value,
         smtpPortInput.value,
         smtpFromAddressInput.value,
+        smtpFromDisplayNameInput.value,
         smtpEncryptionInput.value,
         smtpWithAuthenticationInput.checked,
         smtpUserInput.value,
@@ -34,7 +36,7 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
     }
 });
 
-function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
+function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpFromDisplayName, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
     return fetch(APPLICATION_URL + '/old/settings/server/email', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
@@ -42,6 +44,7 @@ function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWi
             'smtpHost': smtpHost,
             'smtpPort': smtpPort,
             'smtpFromAddress': smtpFromAddress,
+            'smtpFromDisplayName': smtpFromDisplayName,
             'smtpEncryption': smtpEncryption,
             'smtpWithAuthentication': smtpWithAuthentication,
             'smtpUser': smtpUser,
@@ -78,6 +81,7 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
         smtpHostInput.value,
         smtpPortInput.value,
         smtpFromAddressInput.value,
+        smtpFromDisplayNameInput.value,
         smtpEncryptionInput.value,
         smtpWithAuthenticationInput.value,
         smtpUserInput.value,
@@ -102,7 +106,7 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
     }
 });
 
-function testEmail(recipient, smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
+function testEmail(recipient, smtpHost, smtpPort, smtpFromAddress, smtpFromDisplayName, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
     return fetch(APPLICATION_URL + '/old/settings/server/email-test', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
@@ -112,6 +116,7 @@ function testEmail(recipient, smtpHost, smtpPort, smtpFromAddress, smtpEncryptio
             'smtpPort': smtpPort,
             'smtpEncryption': smtpEncryption,
             'smtpFromAddress': smtpFromAddress,
+            'smtpFromDisplayName': smtpFromDisplayName,
             'smtpWithAuthentication': smtpWithAuthentication,
             'smtpUser': smtpUser,
             'smtpPassword': smtpPassword

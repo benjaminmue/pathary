@@ -99,6 +99,7 @@ class AdminController
         $smtpPort = $this->serverSettings->getSmtpPort();
         $smtpEncryption = $this->serverSettings->getSmtpEncryption();
         $smtpFromAddress = $this->serverSettings->getFromAddress();
+        $smtpFromDisplayName = $this->serverSettings->getFromDisplayName();
         $smtpUsername = $this->serverSettings->getSmtpUser();
         $smtpPassword = $this->serverSettings->getSmtpPassword();
         $smtpWithAuth = $this->serverSettings->getSmtpWithAuthentication();
@@ -139,6 +140,7 @@ class AdminController
             'smtpPort' => $smtpPort,
             'smtpEncryption' => $smtpEncryption ?? '',
             'smtpFromAddress' => $smtpFromAddress,
+            'smtpFromDisplayName' => $smtpFromDisplayName,
             'smtpUsername' => $smtpUsername,
             'smtpPasswordConfigured' => !empty($smtpPassword),
             'smtpWithAuth' => $smtpWithAuth,

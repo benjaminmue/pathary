@@ -41,7 +41,14 @@ class EmailService
         $this->phpMailer->isSMTP();
         $this->phpMailer->Host = $smtpConfig->getHost();
         $this->phpMailer->Port = $smtpConfig->getPort();
-        $this->phpMailer->setFrom($smtpConfig->getFromAddress());
+
+        // Set From address with optional display name
+        $displayName = $smtpConfig->getFromDisplayName();
+        if ($displayName !== null && $displayName !== '') {
+            $this->phpMailer->setFrom($smtpConfig->getFromAddress(), $displayName);
+        } else {
+            $this->phpMailer->setFrom($smtpConfig->getFromAddress());
+        }
 
         // Map encryption value to PHPMailer constants
         $encryption = $smtpConfig->getEncryption();
@@ -141,7 +148,13 @@ class EmailService
             ? $customFromAddress
             : $oauthConfig->fromAddress;
 
-        $this->phpMailer->setFrom($fromAddress);
+        // Set From address with optional display name
+        $displayName = $this->serverSettings->getFromDisplayName();
+        if ($displayName !== null && $displayName !== '') {
+            $this->phpMailer->setFrom($fromAddress, $displayName);
+        } else {
+            $this->phpMailer->setFrom($fromAddress);
+        }
 
         // Set encryption based on provider
         $encryption = $oauthConfig->getSmtpEncryption();

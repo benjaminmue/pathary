@@ -79,6 +79,20 @@
                     >
                 </div>
 
+                <div class="mb-3">
+                    <label for="smtpFromDisplayNameInput" class="form-label">
+                        <b>From Display Name</b> <small class="text-muted">(optional)</small>
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           value="{{ smtpFromDisplayName }}"
+                           id="smtpFromDisplayNameInput"
+                           style="text-align: center;"
+                           placeholder="e.g., Email from Pathary"
+                    >
+                    <small class="form-text text-muted">If set, recipients will see "Display Name &lt;email@address&gt;" instead of just the email address.</small>
+                </div>
+
                 <div style="padding-bottom: 1rem;padding-top: 0.5rem">
                     <input class="form-check-input"
                            type="checkbox"

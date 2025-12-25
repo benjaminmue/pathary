@@ -38,6 +38,8 @@ class ServerSettings
 
     private const string SMTP_FROM_ADDRESS = 'SMTP_FROM_ADDRESS';
 
+    private const string SMTP_FROM_DISPLAY_NAME = 'SMTP_FROM_DISPLAY_NAME';
+
     private const string SMTP_ENCRYPTION = 'SMTP_ENCRYPTION';
 
     private const string SMTP_WITH_AUTH = 'SMTP_WITH_AUTH';
@@ -75,6 +77,11 @@ class ServerSettings
     public function getFromAddress() : ?string
     {
         return $this->getByKey(self::SMTP_FROM_ADDRESS);
+    }
+
+    public function getFromDisplayName() : ?string
+    {
+        return $this->getByKey(self::SMTP_FROM_DISPLAY_NAME);
     }
 
     public function getJellyfinAppName() : string
@@ -261,6 +268,13 @@ class ServerSettings
         $this->updateValue(self::SMTP_FROM_ADDRESS, $smtpFromAddress);
     }
 
+    public function setSmtpFromDisplayName(string $displayName) : void
+    {
+        // Sanitize to prevent header injection attacks
+        $sanitized = $this->sanitizeDisplayName($displayName);
+        $this->updateValue(self::SMTP_FROM_DISPLAY_NAME, $sanitized);
+    }
+
     public function setSmtpFromWithAuthentication(bool $smtpFromWithAuthentication) : void
     {
         $this->updateValue(self::SMTP_WITH_AUTH, $smtpFromWithAuthentication);
@@ -376,6 +390,26 @@ class ServerSettings
         }
 
         return true;
+    }
+
+    private function sanitizeDisplayName(string $name) : string
+    {
+        // Trim whitespace
+        $name = trim($name);
+
+        // Remove control characters (including CR, LF, TAB) to prevent header injection
+        $sanitized = preg_replace('/[\r\n\t\x00-\x1F\x7F]/', '', $name);
+        if ($sanitized === null) {
+            // preg_replace failed, return empty string
+            return '';
+        }
+
+        // Limit length to 100 characters
+        if (strlen($sanitized) > 100) {
+            $sanitized = substr($sanitized, 0, 100);
+        }
+
+        return $sanitized;
     }
 
     private function updateValue(string $environmentKey, mixed $value) : void

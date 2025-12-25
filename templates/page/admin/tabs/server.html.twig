@@ -209,6 +209,15 @@
                                 <div class="form-text">Email address shown as sender</div>
                             </div>
 
+                            <div class="mb-3">
+                                <label for="smtpFromDisplayName" class="form-label">
+                                    From Display Name <small class="text-muted">(optional)</small>
+                                </label>
+                                <input type="text" class="form-control" id="smtpFromDisplayName" placeholder="Email from Pathary"
+                                       value="{{ smtpFromDisplayName ?? '' }}">
+                                <div class="form-text">If set, recipients will see "Display Name &lt;email@address&gt;" instead of just the email address</div>
+                            </div>
+
                             <div class="border-top pt-3 mt-3">
                                 <button type="button" class="btn btn-primary" onclick="saveEmailSettings()">
                                     <i class="bi bi-save me-1"></i>Save SMTP Settings
@@ -465,6 +474,27 @@
                                         Optional: Send emails from a different address.
                                         <span class="text-warning">Requires "Send As" permission in Exchange Online</span>
                                         (see setup instructions above).
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="oauthFromDisplayName" class="form-label">
+                                        From Display Name <small class="text-muted">(optional)</small>
+                                        <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
+                                           title="Friendly name shown to recipients (e.g., 'Email from Pathary'). Works with both authentication mailbox and custom From addresses."></i>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="oauthFromDisplayName"
+                                               value="{{ smtpFromDisplayName ?? '' }}"
+                                               placeholder="Email from Pathary">
+                                        <button type="button" class="btn btn-outline-primary" onclick="saveOAuthFromDisplayName()">
+                                            <i class="bi bi-save me-1"></i>Save
+                                        </button>
+                                    </div>
+                                    <div class="form-text">
+                                        If set, recipients will see "Display Name &lt;email@address&gt;" instead of just the email address.
                                     </div>
                                 </div>
                             </div>
@@ -1039,6 +1069,7 @@
             smtpEncryption: document.getElementById('smtpEncryption').value,
             smtpUser: document.getElementById('smtpUsername').value,
             smtpFromAddress: document.getElementById('smtpFromAddress').value,
+            smtpFromDisplayName: document.getElementById('smtpFromDisplayName').value,
             smtpWithAuthentication: true, // Enable auth when credentials provided
         };
 
@@ -1748,6 +1779,49 @@
 
         } catch (error) {
             showToast('Error saving From address: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    /**
+     * Save OAuth Email From Display Name
+     */
+    async function saveOAuthFromDisplayName() {
+        const displayName = document.getElementById('oauthFromDisplayName').value.trim();
+
+        const button = event.target;
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+
+        try {
+            // Use the existing email settings endpoint
+            const response = await fetch('{{ applicationUrl }}/old/settings/server/email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    smtpHost: '{{ serverSettings.smtpHost ?? "smtp.office365.com" }}',
+                    smtpPort: {{ serverSettings.smtpPort ?? 587 }},
+                    smtpEncryption: '{{ serverSettings.smtpEncryption ?? "tls" }}',
+                    smtpUser: '',
+                    smtpFromAddress: '{{ serverSettings.fromAddress ?? "" }}',
+                    smtpFromDisplayName: displayName,
+                    smtpWithAuthentication: true,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save From display name');
+            }
+
+            showToast(displayName
+                ? `From display name set to "${displayName}"`
+                : 'From display name cleared', 'success');
+
+        } catch (error) {
+            showToast('Error saving From display name: ' + error.message, 'danger');
         } finally {
             button.disabled = false;
             button.innerHTML = originalHtml;
