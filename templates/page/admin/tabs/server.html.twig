@@ -81,113 +81,539 @@
         </div>
     </div>
 
-    <!-- Email Settings Card -->
+    <!-- Email Settings Card with Tabs -->
     <div class="col-md-12 mb-4">
         <div class="card admin-card">
             <div class="card-header">
-                <i class="bi bi-envelope me-2"></i>Email Settings (SMTP)
+                <i class="bi bi-envelope me-2"></i>Email Settings
             </div>
             <div class="card-body">
                 <p class="text-muted small">
-                    Configure SMTP settings for sending emails (password resets, notifications, etc.)
+                    Configure email sending via SMTP password or OAuth 2.0 authentication
                 </p>
 
-                <form id="emailSettingsForm">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="smtpHost" class="form-label">SMTP Host</label>
-                            <input type="text" class="form-control" id="smtpHost" placeholder="smtp.gmail.com"
-                                   value="{{ smtpHost ?? '' }}">
-                        </div>
+                <!-- Authentication Mode Tabs -->
+                <ul class="nav nav-tabs mb-4" id="emailAuthTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {{ emailAuthMode == 'smtp_password' or emailAuthMode is not defined ? 'active' : '' }}"
+                                id="smtp-password-tab" data-bs-toggle="tab" data-bs-target="#smtp-password-panel"
+                                type="button" role="tab">
+                            <i class="bi bi-key me-2"></i>SMTP Password
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {{ emailAuthMode == 'smtp_oauth' ? 'active' : '' }}"
+                                id="oauth-tab" data-bs-toggle="tab" data-bs-target="#oauth-panel"
+                                type="button" role="tab">
+                            <i class="bi bi-shield-lock me-2"></i>OAuth 2.0
+                            {% if oauthConfig and oauthConfig.connected %}
+                                <span class="badge bg-success ms-1">Connected</span>
+                            {% endif %}
+                        </button>
+                    </li>
+                </ul>
 
-                        <div class="col-md-3 mb-3">
-                            <label for="smtpPort" class="form-label">Port</label>
-                            <input type="number" class="form-control" id="smtpPort"
-                                   value="{{ smtpPort ?? 587 }}" placeholder="587">
-                        </div>
-
-                        <div class="col-md-3 mb-3">
-                            <label for="smtpEncryption" class="form-label">Encryption</label>
-                            <select class="form-select" id="smtpEncryption">
-                                <option value="tls" {{ smtpEncryption == 'tls' ? 'selected' : '' }}>TLS (STARTTLS)</option>
-                                <option value="ssl" {{ smtpEncryption == 'ssl' ? 'selected' : '' }}>SSL</option>
-                                <option value="" {{ smtpEncryption == '' ? 'selected' : '' }}>None</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="smtpUsername" class="form-label">Username / Email</label>
-                            <input type="text" class="form-control" id="smtpUsername" placeholder="your-email@gmail.com"
-                                   value="{{ smtpUsername ?? '' }}">
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label for="smtpPassword" class="form-label">
-                                Password / App Password
-                                {% if smtpPasswordConfigured %}
-                                    <span class="badge bg-success ms-2">
-                                        <i class="bi bi-check-circle-fill"></i> Configured
-                                    </span>
-                                {% endif %}
-                            </label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" id="smtpPassword"
-                                       placeholder="{% if smtpPasswordConfigured %}Saved (leave blank to keep current){% else %}Enter password{% endif %}">
-                                <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('smtpPassword')">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                            <div class="form-text">
-                                {% if smtpPasswordConfigured %}
-                                    Password is saved. Leave blank to keep current password.
+                <!-- Current Mode Indicator -->
+                <div class="alert {{ emailAuthMode == 'smtp_oauth' ? 'alert-success' : 'alert-warning' }} mb-3" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi {{ emailAuthMode == 'smtp_oauth' ? 'bi-shield-lock-fill' : 'bi-key-fill' }} fs-4 me-3"></i>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <strong>Current Authentication Mode:</strong>
+                                {{ emailAuthMode == 'smtp_oauth' ? 'OAuth 2.0 (Modern Auth)' : 'SMTP Password (Legacy)' }}
+                            </h6>
+                            <small>
+                                {% if emailAuthMode == 'smtp_oauth' %}
+                                    ✓ Using secure OAuth authentication with {{ oauthConfig ? oauthConfig.fromAddress : 'not configured' }}
                                 {% else %}
-                                    Enter your SMTP password or app-specific password
+                                    Using password-based authentication (less secure)
                                 {% endif %}
-                            </div>
+                            </small>
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="smtpFromAddress" class="form-label">From Address</label>
-                        <input type="email" class="form-control" id="smtpFromAddress" placeholder="noreply@pathary.local"
-                               value="{{ smtpFromAddress ?? '' }}">
-                        <div class="form-text">Email address shown as sender</div>
-                    </div>
-
-                    <div class="border-top pt-3 mt-3">
-                        <button type="button" class="btn btn-primary" onclick="saveEmailSettings()">
-                            <i class="bi bi-save me-1"></i>Save Email Settings
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="sendTestEmail()">
-                            <i class="bi bi-send me-1"></i>Send Test Email
-                        </button>
-                        <button type="button" class="btn btn-outline-info" onclick="runSMTPDiagnostics()">
-                            <i class="bi bi-tools me-1"></i>Run Diagnostics
-                        </button>
-                    </div>
-                </form>
-
-                <!-- SMTP Diagnostics Results -->
-                <div id="smtpDiagnosticsResults" class="mt-4" style="display: none;">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-tools me-2"></i>SMTP Diagnostics</h5>
-                        </div>
-                        <div class="card-body" id="diagnosticsContent">
-                            <!-- Results will be populated here -->
-                        </div>
+                        {% if emailAuthMode == 'smtp_oauth' and not oauthConfig %}
+                            <span class="badge bg-danger">Not Configured</span>
+                        {% elseif emailAuthMode == 'smtp_oauth' and oauthConfig and not oauthConfig.connected %}
+                            <span class="badge bg-warning">Not Connected</span>
+                        {% elseif emailAuthMode == 'smtp_oauth' and oauthConfig and oauthConfig.connected %}
+                            <span class="badge bg-success">Connected</span>
+                        {% endif %}
                     </div>
                 </div>
 
-                <!-- OAuth SMTP Placeholder -->
-                <div class="alert alert-info mt-4" role="alert">
-                    <h6 class="alert-heading"><i class="bi bi-lightbulb me-2"></i>OAuth SMTP Authentication</h6>
-                    <p class="mb-0 small">
-                        OAuth-based SMTP authentication (Gmail, Outlook) is planned for a future release.
-                        For now, use app-specific passwords.
-                    </p>
+                <div class="tab-content" id="emailAuthTabContent">
+                    <!-- SMTP Password Tab -->
+                    <div class="tab-pane fade {{ emailAuthMode == 'smtp_password' or emailAuthMode is not defined ? 'show active' : '' }}"
+                         id="smtp-password-panel" role="tabpanel">
+
+                        <form id="emailSettingsForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="smtpHost" class="form-label">SMTP Host</label>
+                                    <input type="text" class="form-control" id="smtpHost" placeholder="smtp.gmail.com"
+                                           value="{{ smtpHost ?? '' }}">
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="smtpPort" class="form-label">Port</label>
+                                    <input type="number" class="form-control" id="smtpPort"
+                                           value="{{ smtpPort ?? 587 }}" placeholder="587">
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="smtpEncryption" class="form-label">Encryption</label>
+                                    <select class="form-select" id="smtpEncryption">
+                                        <option value="tls" {{ smtpEncryption == 'tls' ? 'selected' : '' }}>TLS (STARTTLS)</option>
+                                        <option value="ssl" {{ smtpEncryption == 'ssl' ? 'selected' : '' }}>SSL</option>
+                                        <option value="" {{ smtpEncryption == '' ? 'selected' : '' }}>None</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="smtpUsername" class="form-label">Username / Email</label>
+                                    <input type="text" class="form-control" id="smtpUsername" placeholder="your-email@gmail.com"
+                                           value="{{ smtpUsername ?? '' }}">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="smtpPassword" class="form-label">
+                                        Password / App Password
+                                        {% if smtpPasswordConfigured %}
+                                            <span class="badge bg-success ms-2">
+                                                <i class="bi bi-check-circle-fill"></i> Configured
+                                            </span>
+                                        {% endif %}
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="smtpPassword"
+                                               placeholder="{% if smtpPasswordConfigured %}Saved (leave blank to keep current){% else %}Enter password{% endif %}">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('smtpPassword')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">
+                                        {% if smtpPasswordConfigured %}
+                                            Password is saved. Leave blank to keep current password.
+                                        {% else %}
+                                            Enter your SMTP password or app-specific password
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="smtpFromAddress" class="form-label">From Address</label>
+                                <input type="email" class="form-control" id="smtpFromAddress" placeholder="noreply@pathary.local"
+                                       value="{{ smtpFromAddress ?? '' }}">
+                                <div class="form-text">Email address shown as sender</div>
+                            </div>
+
+                            <div class="border-top pt-3 mt-3">
+                                <button type="button" class="btn btn-primary" onclick="saveEmailSettings()">
+                                    <i class="bi bi-save me-1"></i>Save SMTP Settings
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="sendTestEmail()">
+                                    <i class="bi bi-send me-1"></i>Send Test Email
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="runSMTPDiagnostics()">
+                                    <i class="bi bi-tools me-1"></i>Run Diagnostics
+                                </button>
+                                {% if emailAuthMode == 'smtp_oauth' %}
+                                    <button type="button" class="btn btn-outline-warning" onclick="switchToPasswordMode()">
+                                        <i class="bi bi-arrow-left-circle me-1"></i>Switch to Password Mode
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </form>
+
+                        <!-- SMTP Diagnostics Results -->
+                        <div id="smtpDiagnosticsResults" class="mt-4" style="display: none;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>SMTP Diagnostics</h5>
+                                </div>
+                                <div class="card-body" id="diagnosticsContent">
+                                    <!-- Results will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OAuth 2.0 Tab -->
+                    <div class="tab-pane fade {{ emailAuthMode == 'smtp_oauth' ? 'show active' : '' }}"
+                         id="oauth-panel" role="tabpanel">
+
+                        {% if not encryptionKeyConfigured %}
+                            <div class="alert alert-warning" role="alert">
+                                <h6 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Encryption Key Required</h6>
+                                <p class="mb-2">OAuth requires an encryption key to securely store credentials.</p>
+                                <button type="button" class="btn btn-sm btn-warning" onclick="generateEncryptionKey()">
+                                    <i class="bi bi-key me-1"></i>Generate Encryption Key
+                                </button>
+                                <p class="small text-muted mt-2 mb-0">
+                                    For production, set <code>ENCRYPTION_KEY</code> environment variable instead.
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Gmail Setup Instructions Alert -->
+                        <div class="alert alert-info mb-3" role="alert" id="gmailInstructions" style="display: none;">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-info-circle-fill fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="alert-heading mb-2">Gmail OAuth Setup</h6>
+                                    <p class="small mb-2">
+                                        <strong>Quick setup guide:</strong> Follow the steps below or see the
+                                        <a href="https://github.com/benjaminmue/pathary/wiki/OAuth-Email-Setup#gmail-oauth-setup" target="_blank" class="alert-link">
+                                            <i class="bi bi-book me-1"></i>complete Gmail OAuth setup guide
+                                        </a>
+                                        for detailed instructions, troubleshooting, and API permission requirements.
+                                    </p>
+                                    <button class="btn btn-sm btn-outline-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#gmailInstructionsCollapse">
+                                        <i class="bi bi-chevron-down me-1"></i>Show Quick Setup Steps
+                                    </button>
+
+                                    <div class="collapse" id="gmailInstructionsCollapse">
+                                        <div class="mt-2">
+                                            <h6 class="text-primary">1. Create Google Cloud Project</h6>
+                                            <ol class="small mb-3">
+                                                <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                                                <li>Create a new project or select existing one</li>
+                                                <li>Name: "Pathary Email OAuth"</li>
+                                            </ol>
+
+                                            <h6 class="text-primary">2. Enable Gmail API</h6>
+                                            <ol class="small mb-3">
+                                                <li>In your project, go to <strong>APIs & Services → Library</strong></li>
+                                                <li>Search for "Gmail API"</li>
+                                                <li>Click on it and click <strong>Enable</strong></li>
+                                            </ol>
+
+                                            <h6 class="text-primary">3. Configure OAuth Consent Screen</h6>
+                                            <ol class="small mb-3">
+                                                <li>Go to <strong>APIs & Services → OAuth consent screen</strong></li>
+                                                <li>User Type: Select "Internal" (for Google Workspace) or "External"</li>
+                                                <li>Fill in Application name: "Pathary"</li>
+                                                <li>Add your email as support email</li>
+                                                <li>Click <strong>Save and Continue</strong></li>
+                                            </ol>
+
+                                            <h6 class="text-primary">4. Create OAuth Client ID</h6>
+                                            <ol class="small mb-3">
+                                                <li>Go to <strong>APIs & Services → Credentials</strong></li>
+                                                <li>Click <strong>Create Credentials → OAuth client ID</strong></li>
+                                                <li>Application type: "Web application"</li>
+                                                <li>Name: "Pathary Email OAuth"</li>
+                                                <li>Authorized redirect URIs: Add the redirect URI shown below</li>
+                                                <li>Click <strong>Create</strong></li>
+                                                <li><strong>Copy the Client ID and Client Secret</strong></li>
+                                            </ol>
+
+                                            <h6 class="text-primary">5. Get Required Values</h6>
+                                            <ul class="small mb-3">
+                                                <li><strong>Client ID</strong>: From step 4</li>
+                                                <li><strong>Client Secret</strong>: From step 4</li>
+                                                <li><strong>Tenant ID</strong>: Not required for Gmail (leave empty)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Azure Setup Instructions Alert -->
+                        <div class="alert alert-info mb-3" role="alert" id="azureInstructions">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-info-circle-fill fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="alert-heading mb-2">Azure App Registration Setup</h6>
+                                    <p class="small mb-2">
+                                        <strong>Quick setup guide:</strong> Follow the steps below or see the
+                                        <a href="https://github.com/benjaminmue/pathary/wiki/OAuth-Email-Setup#microsoft-365-oauth-setup" target="_blank" class="alert-link">
+                                            <i class="bi bi-book me-1"></i>complete Microsoft 365 OAuth setup guide
+                                        </a>
+                                        for detailed instructions, required API permissions, SMTP AUTH configuration, and troubleshooting.
+                                    </p>
+                                    <button class="btn btn-sm btn-outline-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#azureInstructionsCollapse">
+                                        <i class="bi bi-chevron-down me-1"></i>Show Quick Setup Steps
+                                    </button>
+
+                                    <div class="collapse" id="azureInstructionsCollapse">
+                                        <div class="mt-2">
+                                            <h6 class="text-primary">1. Create App Registration</h6>
+                                            <ol class="small mb-3">
+                                                <li>Go to <a href="https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank">Azure Portal → App registrations</a></li>
+                                                <li>Click <strong>New registration</strong></li>
+                                                <li>Name: "Pathary Email OAuth"</li>
+                                                <li>Supported account types: "Accounts in this organizational directory only"</li>
+                                                <li>Redirect URI: Select "Web" and enter the URI shown below</li>
+                                                <li>Click <strong>Register</strong></li>
+                                            </ol>
+
+                                            <h6 class="text-primary">2. Configure API Permissions</h6>
+                                            <ol class="small mb-3">
+                                                <li>In your app, go to <strong>API permissions</strong></li>
+                                                <li>Click <strong>Add a permission</strong></li>
+                                                <li>Select <strong>Microsoft Graph</strong></li>
+                                                <li>Select <strong>Delegated permissions</strong></li>
+                                                <li>Search for and check these permissions:
+                                                    <ul>
+                                                        <li><code>SMTP.Send</code> - Send emails from mailboxes using SMTP AUTH</li>
+                                                        <li><code>User.Read</code> - Sign in and read user profile</li>
+                                                        <li><code>offline_access</code> - Maintain access to data</li>
+                                                    </ul>
+                                                </li>
+                                                <li>Click <strong>Add permissions</strong></li>
+                                                <li>Click <strong>Grant admin consent for [Your Organization]</strong> (requires admin)</li>
+                                                <li>Verify all three permissions show "✓ Granted" status</li>
+                                            </ol>
+
+                                            <h6 class="text-primary">3. Create Client Secret</h6>
+                                            <ol class="small mb-3">
+                                                <li>Go to <strong>Certificates & secrets</strong></li>
+                                                <li>Click <strong>New client secret</strong></li>
+                                                <li>Description: "Pathary OAuth Secret"</li>
+                                                <li>Expires: Choose duration (3-24 months)</li>
+                                                <li>Click <strong>Add</strong></li>
+                                                <li><strong>Copy the secret value immediately</strong> (shown only once)</li>
+                                            </ol>
+
+                                            <h6 class="text-primary">4. Get Required Values</h6>
+                                            <ul class="small mb-3">
+                                                <li><strong>Client ID</strong>: App's Overview page → Application (client) ID</li>
+                                                <li><strong>Tenant ID</strong>: App's Overview page → Directory (tenant) ID</li>
+                                                <li><strong>Client Secret</strong>: Value you copied in step 3</li>
+                                            </ul>
+
+                                            <h6 class="text-primary">5. Enable SMTP AUTH (Important!)</h6>
+                                            <p class="small mb-2">SMTP AUTH must be enabled for your mailbox:</p>
+                                            <div class="bg-dark text-light p-2 rounded mb-2" style="font-family: monospace; font-size: 0.85em;">
+                                                <div class="text-success"># Connect to Exchange Online PowerShell</div>
+                                                <div>Install-Module ExchangeOnlineManagement</div>
+                                                <div>Connect-ExchangeOnline</div>
+                                                <div class="mt-2 text-success"># Enable SMTP AUTH for your mailbox</div>
+                                                <div>Set-CASMailbox -Identity pathary@domain.local -SmtpClientAuthenticationDisabled $false</div>
+                                            </div>
+
+                                            <h6 class="text-primary">6. Send As Permission (Optional)</h6>
+                                            <p class="small mb-2">If sending from a different address than the authenticated mailbox:</p>
+                                            <div class="bg-dark text-light p-2 rounded" style="font-family: monospace; font-size: 0.85em;">
+                                                <div class="text-success"># Create the "From" mailbox if it doesn't exist</div>
+                                                <div>New-Mailbox -Shared -Name "No Reply" -PrimarySmtpAddress "noreply@domain.local"</div>
+                                                <div class="mt-2 text-success"># Grant Send As permission</div>
+                                                <div>Add-RecipientPermission -Identity "noreply@domain.local" -Trustee "pathary@domain.local" -AccessRights SendAs</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="oauthSettingsForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="oauthProvider" class="form-label">
+                                        Email Provider
+                                        <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
+                                           title="Select your email service provider. Click 'Show Setup Instructions' above for Azure configuration."></i>
+                                    </label>
+                                    <select class="form-select" id="oauthProvider" onchange="toggleTenantIdField(); toggleOAuthInstructions();">
+                                        <option value="gmail" {{ oauthConfig and oauthConfig.provider == 'gmail' ? 'selected' : '' }}>
+                                            Gmail
+                                        </option>
+                                        <option value="microsoft" {{ oauthConfig and oauthConfig.provider == 'microsoft' ? 'selected' : '' }}>
+                                            Microsoft 365 / Outlook
+                                        </option>
+                                    </select>
+                                    <div class="form-text">Select your email service provider</div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="oauthFromAddress" class="form-label">
+                                        Authentication Mailbox
+                                        <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
+                                           title="The actual mailbox used for OAuth authentication (e.g., pathary@domain.local). Must be a real mailbox with SMTP AUTH enabled."></i>
+                                    </label>
+                                    <input type="email" class="form-control" id="oauthFromAddress"
+                                           value="{{ oauthConfig ? oauthConfig.fromAddress : '' }}"
+                                           placeholder="pathary@domain.local">
+                                    <div class="form-text">Mailbox to authenticate with (must have SMTP AUTH enabled)</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="oauthEmailFromAddress" class="form-label">
+                                        Email From Address (Optional)
+                                        <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
+                                           title="The 'From' address shown in emails (e.g., noreply@pathary.tv). Leave blank to use authentication mailbox. Requires 'Send As' permission if different."></i>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="email" class="form-control" id="oauthEmailFromAddress"
+                                               value="{{ serverSettings.fromAddress ?? '' }}"
+                                               placeholder="noreply@pathary.tv (optional - leave blank to use authentication mailbox)">
+                                        <button type="button" class="btn btn-outline-primary" onclick="saveOAuthFromAddress()">
+                                            <i class="bi bi-save me-1"></i>Save
+                                        </button>
+                                    </div>
+                                    <div class="form-text">
+                                        Optional: Send emails from a different address.
+                                        <span class="text-warning">Requires "Send As" permission in Exchange Online</span>
+                                        (see setup instructions above).
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="oauthClientId" class="form-label">Client ID</label>
+                                    <input type="text" class="form-control font-monospace" id="oauthClientId"
+                                           value="{{ oauthConfig ? oauthConfig.clientId : '' }}"
+                                           placeholder="Enter client ID from provider">
+                                    <div class="form-text">Public OAuth client identifier</div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="oauthClientSecret" class="form-label">
+                                        Client Secret
+                                        {% if oauthConfig %}
+                                            <span class="badge bg-success ms-2">
+                                                <i class="bi bi-check-circle-fill"></i> Configured
+                                            </span>
+                                        {% endif %}
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control font-monospace" id="oauthClientSecret"
+                                               placeholder="{% if oauthConfig %}Saved (leave blank to keep current){% else %}Enter client secret{% endif %}">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('oauthClientSecret')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">OAuth client secret (stored encrypted)</div>
+                                </div>
+                            </div>
+
+                            <div class="row" id="tenantIdRow" style="display: {{ oauthConfig and oauthConfig.provider == 'microsoft' ? 'flex' : 'none' }};">
+                                <div class="col-md-6 mb-3">
+                                    <label for="oauthTenantId" class="form-label">Tenant ID (Microsoft Only)</label>
+                                    <input type="text" class="form-control font-monospace" id="oauthTenantId"
+                                           value="{{ oauthConfig ? oauthConfig.tenantId : '' }}"
+                                           placeholder="common or your-tenant-guid">
+                                    <div class="form-text">Azure AD tenant ID (use "common" for multi-tenant)</div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="oauthSecretExpiry" class="form-label">Client Secret Expires In</label>
+                                    <select class="form-select" id="oauthSecretExpiry">
+                                        {% set savedMonths = oauthConfig and oauthConfig.daysUntilSecretExpiry ? (oauthConfig.daysUntilSecretExpiry / 30)|round(0, 'floor') : 12 %}
+                                        {% if savedMonths > 18 %}{% set savedMonths = 24 %}
+                                        {% elseif savedMonths > 9 %}{% set savedMonths = 12 %}
+                                        {% elseif savedMonths > 4 %}{% set savedMonths = 6 %}
+                                        {% else %}{% set savedMonths = 3 %}{% endif %}
+                                        <option value="3" {{ savedMonths == 3 ? 'selected' : '' }}>3 months</option>
+                                        <option value="6" {{ savedMonths == 6 ? 'selected' : '' }}>6 months</option>
+                                        <option value="12" {{ savedMonths == 12 ? 'selected' : '' }}>12 months</option>
+                                        <option value="24" {{ savedMonths == 24 ? 'selected' : '' }}>24 months</option>
+                                    </select>
+                                    <div class="form-text">Track when secret needs renewal</div>
+                                </div>
+                            </div>
+
+                            <!-- Connection Status -->
+                            {% if oauthConfig %}
+                                <div class="alert alert-{{ oauthConfig.tokenStatusVariant }} mb-3" role="alert">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <strong>Status:</strong> {{ oauthConfig.tokenStatusLabel }}
+                                            {% if oauthConfig.tokenStatusMessage %}
+                                                <br><small>{{ oauthConfig.tokenStatusMessage }}</small>
+                                            {% endif %}
+                                            {% if oauthConfig.connectedAt %}
+                                                <br><small class="text-muted">Connected: {{ oauthConfig.connectedAt }}</small>
+                                            {% endif %}
+                                            {% if oauthConfig.clientSecretExpiring %}
+                                                <br><small class="text-warning">
+                                                    <i class="bi bi-exclamation-triangle"></i> Client secret expires in {{ oauthConfig.daysUntilSecretExpiry }} days
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-{{ oauthConfig.tokenStatusVariant }} fs-6">
+                                                {{ oauthConfig.providerDisplayName }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Redirect URI Display -->
+                            <div class="mb-3">
+                                <label class="form-label">OAuth Redirect URI</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control font-monospace" id="oauthRedirectUri"
+                                           value="{{ applicationUrl }}/admin/server/email/oauth/callback" readonly>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('oauthRedirectUri')">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Configure this URL in your OAuth provider settings</div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="border-top pt-3 mt-3">
+                                <button type="button" class="btn btn-primary" onclick="saveOAuthConfig()" {{ not encryptionKeyConfigured ? 'disabled' : '' }}>
+                                    <i class="bi bi-save me-1"></i>Save OAuth Config
+                                </button>
+
+                                {% if oauthConfig %}
+                                    {% if oauthConfig.connected %}
+                                        <button type="button" class="btn btn-success" onclick="switchToOAuthMode()">
+                                            <i class="bi bi-check-circle me-1"></i>Use OAuth Mode
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="sendTestEmail()">
+                                            <i class="bi bi-send me-1"></i>Send Test Email
+                                        </button>
+                                        <button type="button" class="btn btn-outline-warning" onclick="disconnectOAuth()">
+                                            <i class="bi bi-x-circle me-1"></i>Disconnect
+                                        </button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-success" onclick="authorizeOAuth()">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i>Connect
+                                        </button>
+                                    {% endif %}
+
+                                    <button type="button" class="btn btn-outline-danger" onclick="deleteOAuthConfig()">
+                                        <i class="bi bi-trash me-1"></i>Delete Config
+                                    </button>
+                                {% else %}
+                                    <button type="button" class="btn btn-success" onclick="authorizeOAuth()" disabled>
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>Connect (Save config first)
+                                    </button>
+                                {% endif %}
+                            </div>
+
+                            <!-- Helper Text -->
+                            <div class="alert alert-info mt-3" role="alert">
+                                <h6 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Setup Instructions</h6>
+                                <ol class="small mb-0">
+                                    <li>Create OAuth app in <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> or <a href="https://portal.azure.com/" target="_blank">Azure Portal</a></li>
+                                    <li>Copy the redirect URI above and add it to your OAuth app settings</li>
+                                    <li>Copy Client ID and Client Secret from your OAuth app</li>
+                                    <li>Paste credentials here and click "Save OAuth Config"</li>
+                                    <li>Click "Connect" to authorize Pathary to send emails</li>
+                                    <li>After successful connection, click "Use OAuth Mode" to switch</li>
+                                </ol>
+                                <p class="small text-muted mb-0 mt-2">
+                                    See <a href="https://github.com/benjaminmue/pathary/wiki" target="_blank">GitHub Wiki</a> for detailed setup guides.
+                                </p>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1150,4 +1576,446 @@
             checkedEl.textContent = '-';
         }
     }
+
+    // ===========================
+    // OAuth Email Functions
+    // ===========================
+
+    /**
+     * Toggle visibility of Tenant ID field based on provider selection
+     */
+    function toggleTenantIdField() {
+        const provider = document.getElementById('oauthProvider').value;
+        const tenantIdRow = document.getElementById('tenantIdRow');
+
+        if (provider === 'microsoft') {
+            tenantIdRow.style.display = 'flex';
+        } else {
+            tenantIdRow.style.display = 'none';
+        }
+    }
+
+    /**
+     * Copy redirect URI to clipboard
+     */
+    async function copyToClipboard(elementId) {
+        const input = document.getElementById(elementId);
+        const text = input.value;
+
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast('Redirect URI copied to clipboard', 'success');
+        } catch (error) {
+            // Fallback for older browsers
+            input.select();
+            document.execCommand('copy');
+            showToast('Redirect URI copied to clipboard', 'success');
+        }
+    }
+
+    /**
+     * Save OAuth configuration (client ID, secret, etc.)
+     */
+    async function saveOAuthConfig() {
+        const provider = document.getElementById('oauthProvider').value;
+        const clientId = document.getElementById('oauthClientId').value.trim();
+        const clientSecret = document.getElementById('oauthClientSecret').value.trim();
+        const fromAddress = document.getElementById('oauthFromAddress').value.trim();
+        const tenantId = document.getElementById('oauthTenantId').value.trim();
+        const secretExpiresInMonths = parseInt(document.getElementById('oauthSecretExpiry').value);
+
+        // Validation
+        if (!clientId) {
+            showToast('Client ID is required', 'warning');
+            return;
+        }
+
+        if (!fromAddress) {
+            showToast('From Address is required', 'warning');
+            return;
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(fromAddress)) {
+            showToast('Invalid email address format', 'danger');
+            return;
+        }
+
+        // Client secret required only if not already configured
+        const isUpdate = {{ oauthConfig ? 'true' : 'false' }};
+        if (!isUpdate && !clientSecret) {
+            showToast('Client Secret is required for initial configuration', 'warning');
+            return;
+        }
+
+        // Microsoft requires tenant ID
+        if (provider === 'microsoft' && !tenantId) {
+            showToast('Tenant ID is required for Microsoft 365', 'warning');
+            return;
+        }
+
+        const button = event.target;
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+
+        try {
+            const payload = {
+                csrf: getCsrfToken(),
+                provider: provider,
+                clientId: clientId,
+                fromAddress: fromAddress,
+                tenantId: provider === 'microsoft' ? tenantId : null,
+                secretExpiresInMonths: secretExpiresInMonths
+            };
+
+            // Only include secret if user entered one
+            if (clientSecret) {
+                payload.clientSecret = clientSecret;
+            }
+
+            const response = await fetch('{{ applicationUrl }}/admin/server/email/oauth/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to save OAuth configuration');
+            }
+
+            showToast('OAuth configuration saved successfully', 'success');
+
+            // Clear client secret field
+            document.getElementById('oauthClientSecret').value = '';
+
+            // Reload page to show updated status
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            showToast('Error saving OAuth configuration: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    /**
+     * Save OAuth Email From Address (optional custom From address)
+     */
+    async function saveOAuthFromAddress() {
+        const fromAddress = document.getElementById('oauthEmailFromAddress').value.trim();
+
+        // Allow empty value (will use auth mailbox)
+        if (fromAddress && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fromAddress)) {
+            showToast('Invalid email address format', 'danger');
+            return;
+        }
+
+        const button = event.target;
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+
+        try {
+            // Use the existing email settings endpoint
+            const response = await fetch('{{ applicationUrl }}/old/settings/server/email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    smtpHost: '{{ serverSettings.smtpHost ?? "smtp.office365.com" }}',
+                    smtpPort: {{ serverSettings.smtpPort ?? 587 }},
+                    smtpEncryption: '{{ serverSettings.smtpEncryption ?? "tls" }}',
+                    smtpUser: '',
+                    smtpFromAddress: fromAddress,
+                    smtpWithAuthentication: true,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save From address');
+            }
+
+            showToast(fromAddress
+                ? `From address set to ${fromAddress}`
+                : 'From address cleared (will use authentication mailbox)', 'success');
+
+        } catch (error) {
+            showToast('Error saving From address: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    /**
+     * Start OAuth authorization flow (redirect to provider)
+     */
+    function authorizeOAuth() {
+        // Redirect to authorization endpoint
+        // The backend will redirect to the OAuth provider's consent page
+        window.location.href = '{{ applicationUrl }}/admin/server/email/oauth/authorize';
+    }
+
+    /**
+     * Disconnect OAuth (clear tokens but keep configuration)
+     */
+    async function disconnectOAuth() {
+        if (!confirm('Disconnect OAuth? This will remove the authorization but keep your configuration.')) {
+            return;
+        }
+
+        const button = event.target;
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Disconnecting...';
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/server/email/oauth/disconnect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    csrf: getCsrfToken(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to disconnect OAuth');
+            }
+
+            showToast('OAuth disconnected successfully', 'success');
+
+            // Reload page to show updated status
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            showToast('Error disconnecting OAuth: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    /**
+     * Delete OAuth configuration completely
+     */
+    async function deleteOAuthConfig() {
+        if (!confirm('Delete OAuth configuration? This will remove all settings and tokens. This action cannot be undone.')) {
+            return;
+        }
+
+        const button = event.target;
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Deleting...';
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/server/email/oauth/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    csrf: getCsrfToken(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to delete OAuth configuration');
+            }
+
+            showToast('OAuth configuration deleted', 'success');
+
+            // Reload page to show cleared form
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            showToast('Error deleting OAuth configuration: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    /**
+     * Generate encryption key (for development)
+     */
+    async function generateEncryptionKey() {
+        if (!confirm('Generate a new encryption key? This should only be used in development. In production, use the ENCRYPTION_KEY environment variable.')) {
+            return;
+        }
+
+        const button = event.target;
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Generating...';
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/server/email/oauth/generate-key', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    csrf: getCsrfToken(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to generate encryption key');
+            }
+
+            showToast('Encryption key generated and saved', 'success');
+
+            // Reload page to hide warning and enable Save button
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            showToast('Error generating encryption key: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    /**
+     * Switch email authentication mode to OAuth
+     */
+    async function switchToOAuthMode() {
+        if (!confirm('Switch to OAuth email authentication? Emails will be sent using OAuth instead of password authentication.')) {
+            return;
+        }
+
+        const button = event.target;
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Switching...';
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/server/email/auth-mode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    csrf: getCsrfToken(),
+                    mode: 'smtp_oauth',
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to switch to OAuth mode');
+            }
+
+            showToast('Switched to OAuth authentication mode', 'success');
+
+            // Reload page to show active tab
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            showToast('Error switching to OAuth mode: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    /**
+     * Switch email authentication mode to password
+     */
+    async function switchToPasswordMode() {
+        if (!confirm('Switch to password-based email authentication? Emails will be sent using SMTP username/password instead of OAuth.')) {
+            return;
+        }
+
+        const button = event.target;
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Switching...';
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/server/email/auth-mode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    csrf: getCsrfToken(),
+                    mode: 'smtp_password',
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to switch to password mode');
+            }
+
+            showToast('Switched to password authentication mode', 'success');
+
+            // Reload page to show active tab
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            showToast('Error switching to password mode: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    /**
+     * Toggle OAuth setup instructions based on selected provider
+     */
+    function toggleOAuthInstructions() {
+        const provider = document.getElementById('oauthProvider').value;
+        const gmailInstructions = document.getElementById('gmailInstructions');
+        const azureInstructions = document.getElementById('azureInstructions');
+
+        if (provider === 'gmail') {
+            gmailInstructions.style.display = 'block';
+            azureInstructions.style.display = 'none';
+        } else {
+            gmailInstructions.style.display = 'none';
+            azureInstructions.style.display = 'block';
+        }
+    }
+
+    // Handle OAuth callback success/error messages
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.has('oauth_success')) {
+            showToast('OAuth authorization successful! You can now use OAuth mode.', 'success');
+            // Clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        if (urlParams.has('oauth_error')) {
+            const error = urlParams.get('oauth_error');
+            showToast('OAuth authorization failed: ' + error, 'danger');
+            // Clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // Initialize OAuth instructions visibility based on current provider
+        toggleOAuthInstructions();
+    });
 </script>

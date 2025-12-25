@@ -2,6 +2,9 @@
 
 namespace Movary\Service\Email;
 
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use Movary\Service\ServerSettings;
+use PHPMailer\PHPMailer\OAuth;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
@@ -9,12 +12,23 @@ class EmailService
 {
     public function __construct(
         private PHPMailer $phpMailer,
+        private ServerSettings $serverSettings,
+        private OAuthConfigService $oauthConfigService,
+        private OAuthTokenService $oauthTokenService,
     ) {
     }
 
     public function sendEmail(string $targetEmailAddress, string $subject, string $htmlMessage, SmtpConfig $smtpConfig) : void
     {
+        // Clear PHPMailer state from any previous sends (important for singleton)
+        $this->phpMailer->clearAllRecipients();
+        $this->phpMailer->clearReplyTos();
+        $this->phpMailer->clearAttachments();
+        $this->phpMailer->clearCustomHeaders();
+
+        // Disable debug output (OAuth is working correctly)
         $this->phpMailer->SMTPDebug = SMTP::DEBUG_OFF;
+        $this->phpMailer->Debugoutput = 'error_log';
 
         if ($smtpConfig->getHost() === '') {
             throw new CannotSendEmailException('SMTP host must be set.');
@@ -40,9 +54,18 @@ class EmailService
             $this->phpMailer->SMTPSecure = false;
         }
 
-        $this->phpMailer->SMTPAuth = $smtpConfig->isWithAuthentication();
-        $this->phpMailer->Username = (string)$smtpConfig->getUser();
-        $this->phpMailer->Password = (string)$smtpConfig->getPassword();
+        // Check email auth mode and configure authentication
+        $emailAuthMode = $this->serverSettings->getEmailAuthMode();
+
+        if ($emailAuthMode === 'smtp_oauth') {
+            // OAuth 2.0 authentication
+            $this->configureOAuthAuthentication();
+        } else {
+            // Traditional password authentication
+            $this->phpMailer->SMTPAuth = $smtpConfig->isWithAuthentication();
+            $this->phpMailer->Username = (string)$smtpConfig->getUser();
+            $this->phpMailer->Password = (string)$smtpConfig->getPassword();
+        }
 
         $this->phpMailer->addAddress($targetEmailAddress);
         $this->phpMailer->Subject = $subject;
@@ -83,5 +106,113 @@ class EmailService
 
             throw new CannotSendEmailException($errorInfo);
         }
+    }
+
+    /**
+     * Configure PHPMailer for OAuth 2.0 authentication
+     *
+     * @throws CannotSendEmailException If OAuth configuration is invalid or token refresh fails
+     */
+    private function configureOAuthAuthentication() : void
+    {
+        // Load OAuth configuration
+        $oauthConfig = $this->oauthConfigService->getConfig();
+        if ($oauthConfig === null) {
+            throw new CannotSendEmailException(
+                'OAuth email authentication is enabled but not configured. ' .
+                'Please configure OAuth in Admin → Server Management → Email Settings.'
+            );
+        }
+
+        if (!$oauthConfig->isConnected()) {
+            throw new CannotSendEmailException(
+                'OAuth email authentication is not connected. ' .
+                'Please authorize your email account in Admin → Server Management → Email Settings.'
+            );
+        }
+
+        // Override SMTP settings with OAuth provider defaults
+        $this->phpMailer->Host = $oauthConfig->getSmtpHost();
+        $this->phpMailer->Port = $oauthConfig->getSmtpPort();
+
+        // Use custom From address if set in server settings, otherwise use OAuth auth mailbox
+        $customFromAddress = $this->serverSettings->getFromAddress();
+        $fromAddress = (!empty($customFromAddress) && trim($customFromAddress) !== '')
+            ? $customFromAddress
+            : $oauthConfig->fromAddress;
+
+        $this->phpMailer->setFrom($fromAddress);
+
+        // Set encryption based on provider
+        $encryption = $oauthConfig->getSmtpEncryption();
+        if ($encryption === 'tls') {
+            $this->phpMailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        } elseif ($encryption === 'ssl') {
+            $this->phpMailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        }
+
+        // Get fresh access token
+        try {
+            $redirectUri = $this->oauthTokenService->buildRedirectUri();
+            $accessToken = $this->oauthTokenService->getAccessToken($redirectUri);
+        } catch (\RuntimeException $e) {
+            throw new CannotSendEmailException(
+                'Failed to refresh OAuth access token: ' . $e->getMessage() . '. ' .
+                'Please reconnect your email account in Admin → Server Management → Email Settings.',
+                0,
+                $e
+            );
+        }
+
+        // Configure PHPMailer for XOAUTH2
+        $this->phpMailer->AuthType = 'XOAUTH2';
+        $this->phpMailer->SMTPAuth = true;
+
+        // Create OAuth provider for PHPMailer
+        $oauthProvider = new OAuth([
+            'provider' => $this->createPhpMailerOAuthProvider($oauthConfig, $redirectUri),
+            'userName' => $oauthConfig->fromAddress,
+            'clientSecret' => $this->oauthConfigService->getDecryptedClientSecret(),
+            'clientId' => $oauthConfig->clientId,
+            'refreshToken' => $this->oauthConfigService->getDecryptedRefreshToken(),
+        ]);
+
+        $this->phpMailer->setOAuth($oauthProvider);
+    }
+
+    /**
+     * Create OAuth provider for PHPMailer based on configuration
+     *
+     * @param OAuthConfig $config OAuth configuration
+     * @param string $redirectUri OAuth callback URL
+     * @return \League\OAuth2\Client\Provider\AbstractProvider
+     */
+    private function createPhpMailerOAuthProvider(OAuthConfig $config, string $redirectUri) : \League\OAuth2\Client\Provider\AbstractProvider
+    {
+        $clientSecret = $this->oauthConfigService->getDecryptedClientSecret();
+
+        if ($config->isGmail()) {
+            return new \League\OAuth2\Client\Provider\Google([
+                'clientId' => $config->clientId,
+                'clientSecret' => $clientSecret,
+                'redirectUri' => $redirectUri,
+            ]);
+        }
+
+        if ($config->isMicrosoft()) {
+            return new \TheNetworg\OAuth2\Client\Provider\Azure([
+                'clientId' => $config->clientId,
+                'clientSecret' => $clientSecret,
+                'redirectUri' => $redirectUri,
+                'tenant' => $config->tenantId ?? 'common',
+                // Use v2.0 endpoint for modern OAuth
+                'defaultEndPointVersion' => \TheNetworg\OAuth2\Client\Provider\Azure::ENDPOINT_VERSION_2_0,
+                // Force tokens to be requested for Exchange Online resource
+                'urlAPI' => 'https://outlook.office365.com/',
+                'resource' => 'https://outlook.office365.com/',
+            ]);
+        }
+
+        throw new CannotSendEmailException("Unsupported OAuth provider: {$config->provider}");
     }
 }

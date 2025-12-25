@@ -42,6 +42,8 @@ class ServerSettings
 
     private const string SMTP_WITH_AUTH = 'SMTP_WITH_AUTH';
 
+    private const string EMAIL_AUTH_MODE = 'EMAIL_AUTH_MODE';
+
     private const string TMDB_API_KEY = 'TMDB_API_KEY';
 
     public function __construct(
@@ -128,6 +130,11 @@ class ServerSettings
     public function getSmtpWithAuthentication() : ?bool
     {
         return (bool)$this->getByKey(self::SMTP_WITH_AUTH);
+    }
+
+    public function getEmailAuthMode() : string
+    {
+        return $this->getByKey(self::EMAIL_AUTH_MODE) ?? 'smtp_password';
     }
 
     public function getTmdbApiKey() : ?string
@@ -277,6 +284,15 @@ class ServerSettings
     public function setSmtpUser(string $smtpUser) : void
     {
         $this->updateValue(self::SMTP_USER, $smtpUser);
+    }
+
+    public function setEmailAuthMode(string $emailAuthMode) : void
+    {
+        if (!in_array($emailAuthMode, ['smtp_password', 'smtp_oauth'], true)) {
+            throw new \InvalidArgumentException("Invalid email auth mode: {$emailAuthMode}. Must be 'smtp_password' or 'smtp_oauth'.");
+        }
+
+        $this->updateValue(self::EMAIL_AUTH_MODE, $emailAuthMode);
     }
 
     public function setTmdbApiKey(string $tmdbApiKey) : void

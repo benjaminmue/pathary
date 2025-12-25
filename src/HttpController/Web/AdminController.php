@@ -4,6 +4,8 @@ namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Service\CsrfTokenService;
+use Movary\Service\Email\OAuthConfigService;
+use Movary\Service\EncryptionService;
 use Movary\Service\ServerSettings;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -53,6 +55,8 @@ class AdminController
         private readonly Authentication $authenticationService,
         private readonly CsrfTokenService $csrfTokenService,
         private readonly ServerSettings $serverSettings,
+        private readonly OAuthConfigService $oauthConfigService,
+        private readonly EncryptionService $encryptionService,
     ) {
     }
 
@@ -99,6 +103,36 @@ class AdminController
         $smtpPassword = $this->serverSettings->getSmtpPassword();
         $smtpWithAuth = $this->serverSettings->getSmtpWithAuthentication();
 
+        // Load OAuth configuration
+        $emailAuthMode = $this->serverSettings->getEmailAuthMode();
+        $oauthConfig = $this->oauthConfigService->getConfig();
+        $encryptionKeyConfigured = $this->encryptionService->isEncryptionKeyConfigured();
+        $encryptionKeySource = $this->encryptionService->getEncryptionKeySource();
+
+        // Prepare OAuth status info for UI
+        $oauthData = null;
+        if ($oauthConfig !== null) {
+            $statusInfo = $oauthConfig->getTokenStatusInfo();
+            $oauthData = [
+                'configured' => true,
+                'connected' => $oauthConfig->isConnected(),
+                'provider' => $oauthConfig->provider,
+                'providerDisplayName' => $oauthConfig->getProviderDisplayName(),
+                'clientId' => $oauthConfig->clientId,
+                'fromAddress' => $oauthConfig->fromAddress,
+                'tenantId' => $oauthConfig->tenantId,
+                'tokenStatus' => $statusInfo['status'],
+                'tokenStatusLabel' => $statusInfo['label'],
+                'tokenStatusVariant' => $statusInfo['variant'],
+                'tokenStatusMessage' => $statusInfo['message'],
+                'connectedAt' => $oauthConfig->connectedAt,
+                'lastTokenRefreshAt' => $oauthConfig->lastTokenRefreshAt,
+                'clientSecretExpiring' => $this->oauthConfigService->isClientSecretExpiringSoon(),
+                'clientSecretExpiresAt' => $oauthConfig->clientSecretExpiresAt,
+                'daysUntilSecretExpiry' => $oauthConfig->getDaysUntilSecretExpiry(),
+            ];
+        }
+
         return $this->renderTab('server', [
             'csrf' => $this->csrfTokenService->generateToken(),
             'smtpHost' => $smtpHost,
@@ -108,6 +142,10 @@ class AdminController
             'smtpUsername' => $smtpUsername,
             'smtpPasswordConfigured' => !empty($smtpPassword),
             'smtpWithAuth' => $smtpWithAuth,
+            'emailAuthMode' => $emailAuthMode,
+            'oauthConfig' => $oauthData,
+            'encryptionKeyConfigured' => $encryptionKeyConfigured,
+            'encryptionKeySource' => $encryptionKeySource,
         ]);
     }
 

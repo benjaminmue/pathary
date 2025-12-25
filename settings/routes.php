@@ -162,6 +162,43 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class
     ]);
+
+    ################
+    # OAuth Email  #
+    ################
+    $routes->add('POST', '/admin/server/email/oauth/save', [Web\OAuthEmailController::class, 'saveConfig'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('GET', '/admin/server/email/oauth/authorize', [Web\OAuthEmailController::class, 'authorize'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('GET', '/admin/server/email/oauth/callback', [Web\OAuthEmailController::class, 'callback'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/admin/server/email/oauth/disconnect', [Web\OAuthEmailController::class, 'disconnect'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/admin/server/email/oauth/delete', [Web\OAuthEmailController::class, 'deleteConfig'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/admin/server/email/oauth/generate-key', [Web\OAuthEmailController::class, 'generateEncryptionKey'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('GET', '/admin/server/email/oauth/status', [Web\OAuthEmailController::class, 'getStatus'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/admin/server/email/auth-mode', [Web\OAuthEmailController::class, 'updateAuthMode'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+
     $routes->add('POST', '/old/settings/account', [Web\SettingsController::class, 'updateGeneral'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('POST', '/old/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('POST', '/old/settings/account/security/create-totp-uri', [

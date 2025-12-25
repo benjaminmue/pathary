@@ -573,20 +573,37 @@ class SettingsController
             return Response::createBadRequest('Recipient email address is too long (max 255 characters)');
         }
 
-        $smtpConfig = SmtpConfig::create(
-            (string)$requestData['smtpHost'],
-            (int)$requestData['smtpPort'],
-            (string)$requestData['smtpFromAddress'],
-            (string)$requestData['smtpEncryption'],
-            (bool)$requestData['smtpWithAuthentication'],
-            isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'],
-            isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'],
-        );
+        // Check email auth mode to determine how to send the email
+        $emailAuthMode = $this->serverSettings->getEmailAuthMode();
+
+        if ($emailAuthMode === 'smtp_oauth') {
+            // For OAuth mode, load settings from database
+            $smtpConfig = SmtpConfig::create(
+                $this->serverSettings->getSmtpHost() ?? '',
+                $this->serverSettings->getSmtpPort() ?? 587,
+                $this->serverSettings->getFromAddress() ?? '',
+                $this->serverSettings->getSmtpEncryption() ?? 'tls',
+                true, // OAuth always uses authentication
+                null,
+                null,
+            );
+        } else {
+            // For password mode, use settings from request
+            $smtpConfig = SmtpConfig::create(
+                (string)$requestData['smtpHost'],
+                (int)$requestData['smtpPort'],
+                (string)$requestData['smtpFromAddress'],
+                (string)$requestData['smtpEncryption'],
+                (bool)$requestData['smtpWithAuthentication'],
+                isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'],
+                isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'],
+            );
+        }
 
         try {
             $this->emailService->sendEmail(
                 $recipient,
-                'Movary: Test Email',
+                'Pathary: Test Email',
                 'This is a test email sent to check the currently set email settings. It seems to work!',
                 $smtpConfig,
             );
