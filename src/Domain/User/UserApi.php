@@ -227,6 +227,11 @@ class UserApi
         return $this->repository->findUserByName($name);
     }
 
+    public function findUserByEmail(string $email) : ?UserEntity
+    {
+        return $this->repository->findUserByEmail($email);
+    }
+
     public function findUserIdByApiToken(string $apiToken) : ?int
     {
         return $this->repository->findUserIdByApiToken($apiToken);

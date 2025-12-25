@@ -165,4 +165,35 @@
             </div>
         </div>
     </div>
+
+    <!-- 2FA Recommendation Modal -->
+    {% if passwordSetSuccess %}
+    <div class="modal fade" id="twoFactorRecommendationModal" tabindex="-1" aria-labelledby="twoFactorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="twoFactorModalLabel">
+                        <i class="bi bi-shield-lock me-2"></i>Secure Your Account
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Your password has been created successfully!</p>
+                    <p class="mb-3">We strongly recommend enabling <strong>Two-Factor Authentication (2FA)</strong> to add an extra layer of security to your account.</p>
+                    <div class="alert alert-info mb-0">
+                        <strong>What is 2FA?</strong>
+                        <p class="mb-2 mt-2">Two-Factor Authentication requires a verification code from your phone in addition to your password when you log in.</p>
+                        <p class="mb-0">You can enable 2FA in <strong>Profile → Security</strong> after you log in.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Maybe Later</button>
+                    <button type="button" class="btn btn-primary" onclick="acknowledgeAndDismiss()">
+                        <i class="bi bi-check-circle me-1"></i>Got It
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

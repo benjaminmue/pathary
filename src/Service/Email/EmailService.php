@@ -3,10 +3,12 @@
 namespace Movary\Service\Email;
 
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\ServerSettings;
 use PHPMailer\PHPMailer\OAuth;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
+use Twig\Environment;
 
 class EmailService
 {
@@ -15,6 +17,8 @@ class EmailService
         private ServerSettings $serverSettings,
         private OAuthConfigService $oauthConfigService,
         private OAuthTokenService $oauthTokenService,
+        private Environment $twig,
+        private ApplicationUrlService $applicationUrlService,
     ) {
     }
 
@@ -76,7 +80,11 @@ class EmailService
 
         $this->phpMailer->addAddress($targetEmailAddress);
         $this->phpMailer->Subject = $subject;
+
+        // Configure for HTML email
+        $this->phpMailer->isHTML(true);
         $this->phpMailer->Body = $htmlMessage;
+        $this->phpMailer->CharSet = 'UTF-8';
 
         if ($this->phpMailer->send() === false || $this->phpMailer->isError() === true) {
             // Provide more detailed error information
@@ -227,5 +235,55 @@ class EmailService
         }
 
         throw new CannotSendEmailException("Unsupported OAuth provider: {$config->provider}");
+    }
+
+    /**
+     * Send welcome email to a newly created user
+     *
+     * @param string $recipientEmail Email address of the recipient
+     * @param string $recipientName Display name of the recipient
+     * @param string|null $invitationToken Optional invitation token for password setup
+     * @throws CannotSendEmailException
+     */
+    public function sendWelcomeEmail(string $recipientEmail, string $recipientName, ?string $invitationToken = null) : void
+    {
+        // Get application settings
+        $applicationName = $this->serverSettings->getApplicationName() ?? 'Pathary';
+        $applicationUrl = (string)$this->applicationUrlService->createApplicationUrl();
+
+        // Build logo URL (prefer PNG for email compatibility)
+        $logoUrl = $applicationUrl . '/images/pathary-logo-192x192.png';
+
+        // Build password setup URL if invitation token provided
+        $passwordSetupUrl = null;
+        if ($invitationToken !== null) {
+            $passwordSetupUrl = $applicationUrl . '/setup-password?token=' . urlencode($invitationToken);
+        }
+
+        // Render email template
+        $htmlMessage = $this->twig->render('email/welcome.html.twig', [
+            'recipient_name' => $recipientName,
+            'application_name' => $applicationName,
+            'application_url' => $applicationUrl,
+            'logo_url' => $logoUrl,
+            'password_setup_url' => $passwordSetupUrl,
+            'has_invitation' => $invitationToken !== null,
+        ]);
+
+        // Build SMTP config from current settings
+        $smtpConfig = SmtpConfig::create(
+            $this->serverSettings->getSmtpHost() ?? '',
+            $this->serverSettings->getSmtpPort() ?? 587,
+            $this->serverSettings->getFromAddress() ?? '',
+            $this->serverSettings->getSmtpEncryption() ?? 'tls',
+            $this->serverSettings->getSmtpWithAuthentication() ?? true,
+            $this->serverSettings->getSmtpUser(),
+            $this->serverSettings->getSmtpPassword(),
+            $this->serverSettings->getFromDisplayName(),
+        );
+
+        // Send email
+        $subject = "Welcome to {$applicationName}";
+        $this->sendEmail($recipientEmail, $subject, $htmlMessage, $smtpConfig);
     }
 }

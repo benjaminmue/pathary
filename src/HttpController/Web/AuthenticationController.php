@@ -20,13 +20,17 @@ class AuthenticationController
     public function renderLoginPage(Request $request) : Response
     {
         $failedLogin = $this->sessionWrapper->has('failedLogin');
+        $passwordSetSuccess = $this->sessionWrapper->has('passwordSetSuccess');
         $redirect = $request->getGetParameters()['redirect'] ?? false;
+
         $this->sessionWrapper->unset('failedLogin');
+        $this->sessionWrapper->unset('passwordSetSuccess');
 
         $renderedTemplate = $this->twig->render(
             'page/login.html.twig',
             [
                 'failedLogin' => $failedLogin,
+                'passwordSetSuccess' => $passwordSetSuccess,
                 'redirect' => $redirect
             ],
         );

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Welcome to {{ application_name }}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #1a1a1a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+    <!-- Background with subtle popcorn pattern -->
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #1a1a1a; background-image: radial-gradient(circle at 10% 20%, rgba(251, 188, 9, 0.03) 0%, transparent 50%), radial-gradient(circle at 90% 80%, rgba(224, 168, 0, 0.03) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.01) 0%, transparent 40%);">
+        <tr>
+            <td style="padding: 40px 20px;">
+                <!-- Main container -->
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width: 600px; margin: 0 auto; background-color: #2d2d2d; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);">
+                    <tr>
+                        <td style="padding: 40px 40px 30px 40px; text-align: center;">
+                            <!-- Logo -->
+                            <img src="{{ logo_url }}" alt="{{ application_name }}" width="120" height="120" style="display: block; margin: 0 auto 30px auto; border-radius: 12px;">
+
+                            <!-- Greeting -->
+                            <h1 style="margin: 0 0 20px 0; color: #ffffff; font-size: 28px; font-weight: 600; line-height: 1.3;">
+                                Hi {{ recipient_name }},
+                            </h1>
+
+                            <!-- Invitation message -->
+                            <p style="margin: 0 0 30px 0; color: #b8b8b8; font-size: 16px; line-height: 1.6;">
+                                You have been invited to join <strong style="color: #ffffff;">{{ application_name }}</strong>.
+                            </p>
+
+                            {% if has_invitation %}
+                                <p style="margin: 0 0 30px 0; color: #b8b8b8; font-size: 16px; line-height: 1.6;">
+                                    Your account has been created. To get started, click the button below to create your password.
+                                </p>
+
+                                <!-- Create Password button (primary) -->
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 0 auto 20px auto;">
+                                    <tr>
+                                        <td style="background: linear-gradient(135deg, #FBBC09 0%, #e0a800 100%); border-radius: 8px; padding: 2px;">
+                                            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                                <tr>
+                                                    <td style="background-color: #FBBC09; border-radius: 6px;">
+                                                        <a href="{{ password_setup_url }}" target="_blank" style="display: inline-block; padding: 16px 40px; color: #1a1a2e; text-decoration: none; font-size: 18px; font-weight: 600; letter-spacing: 0.5px;">
+                                                            Create Password
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Secondary button - Open Site -->
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 0 auto 40px auto;">
+                                    <tr>
+                                        <td style="border: 2px solid #FBBC09; border-radius: 8px;">
+                                            <a href="{{ application_url }}" target="_blank" style="display: inline-block; padding: 14px 38px; color: #FBBC09; text-decoration: none; font-size: 16px; font-weight: 600;">
+                                                Open {{ application_name }}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p style="margin: 0 0 30px 0; color: #808080; font-size: 13px; line-height: 1.5;">
+                                    This invitation link expires in 3 days for security reasons.
+                                </p>
+                            {% else %}
+                                <p style="margin: 0 0 30px 0; color: #b8b8b8; font-size: 16px; line-height: 1.6;">
+                                    Your account has been created. To get started, open the site and log in.
+                                </p>
+
+                                <!-- Primary button -->
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 0 auto 40px auto;">
+                                    <tr>
+                                        <td style="background: linear-gradient(135deg, #FBBC09 0%, #e0a800 100%); border-radius: 8px; padding: 2px;">
+                                            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                                <tr>
+                                                    <td style="background-color: #FBBC09; border-radius: 6px;">
+                                                        <a href="{{ application_url }}" target="_blank" style="display: inline-block; padding: 16px 40px; color: #1a1a2e; text-decoration: none; font-size: 18px; font-weight: 600; letter-spacing: 0.5px;">
+                                                            Open {{ application_name }}
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            {% endif %}
+
+                            <!-- Divider -->
+                            <div style="height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(251, 188, 9, 0.3) 50%, transparent 100%); margin: 0 0 30px 0;"></div>
+
+                            <!-- Feature summary -->
+                            <h2 style="margin: 0 0 20px 0; color: #ffffff; font-size: 22px; font-weight: 600;">
+                                What you can do:
+                            </h2>
+
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 0 30px 0;">
+                                <tr>
+                                    <td style="padding: 12px 0; text-align: left;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td width="40" style="vertical-align: top; padding-right: 12px; font-size: 24px;">🎬</td>
+                                                <td style="color: #b8b8b8; font-size: 15px; line-height: 1.6;">
+                                                    <strong style="color: #ffffff;">Add movies</strong> from The Movie Database (TMDB)
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; text-align: left;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td width="40" style="vertical-align: top; padding-right: 12px; font-size: 24px;">🍿</td>
+                                                <td style="color: #b8b8b8; font-size: 15px; line-height: 1.6;">
+                                                    <strong style="color: #ffffff;">Rate movies</strong> with the popcorn scale (1-7)
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; text-align: left;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td width="40" style="vertical-align: top; padding-right: 12px; font-size: 24px;">💬</td>
+                                                <td style="color: #b8b8b8; font-size: 15px; line-height: 1.6;">
+                                                    <strong style="color: #ffffff;">Leave comments</strong> and share your thoughts
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; text-align: left;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td width="40" style="vertical-align: top; padding-right: 12px; font-size: 24px;">👥</td>
+                                                <td style="color: #b8b8b8; font-size: 15px; line-height: 1.6;">
+                                                    <strong style="color: #ffffff;">See group ratings</strong> and discover what others think
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; text-align: left;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td width="40" style="vertical-align: top; padding-right: 12px; font-size: 24px;">📍</td>
+                                                <td style="color: #b8b8b8; font-size: 15px; line-height: 1.6;">
+                                                    <strong style="color: #ffffff;">Track where</strong> you watched (Cinema, Home, or Other)
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; text-align: left;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td width="40" style="vertical-align: top; padding-right: 12px; font-size: 24px;">📅</td>
+                                                <td style="color: #b8b8b8; font-size: 15px; line-height: 1.6;">
+                                                    <strong style="color: #ffffff;">Track when</strong> you watched with specific dates
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Divider -->
+                            <div style="height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(251, 188, 9, 0.3) 50%, transparent 100%); margin: 0 0 30px 0;"></div>
+
+                            <!-- Footer note -->
+                            <p style="margin: 0 0 10px 0; color: #808080; font-size: 13px; line-height: 1.5;">
+                                If you did not expect this invitation, you can safely ignore this email.
+                            </p>
+
+                            <p style="margin: 0; color: #808080; font-size: 13px; line-height: 1.5;">
+                                <a href="{{ application_url }}" target="_blank" style="color: #FBBC09; text-decoration: none;">{{ application_url }}</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

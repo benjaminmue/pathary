@@ -179,3 +179,23 @@ function formatRecoveryCodeInput(event) {
         input.setSelectionRange(newPosition, newPosition);
     }
 }
+
+// Show 2FA recommendation modal after password setup
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('twoFactorRecommendationModal');
+    if (modal) {
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+    }
+});
+
+// Acknowledge and dismiss 2FA recommendation
+function acknowledgeAndDismiss() {
+    const modal = document.getElementById('twoFactorRecommendationModal');
+    if (modal) {
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        if (bootstrapModal) {
+            bootstrapModal.hide();
+        }
+    }
+}
