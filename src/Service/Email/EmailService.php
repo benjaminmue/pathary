@@ -34,12 +34,22 @@ class EmailService
         $this->phpMailer->SMTPDebug = SMTP::DEBUG_OFF;
         $this->phpMailer->Debugoutput = 'error_log';
 
+        // Check email auth mode for better error messages
+        $emailAuthMode = $this->serverSettings->getEmailAuthMode();
+        $isOAuthMode = ($emailAuthMode === 'smtp_oauth');
+
         if ($smtpConfig->getHost() === '') {
-            throw new CannotSendEmailException('SMTP host must be set.');
+            $errorMessage = $isOAuthMode
+                ? 'SMTP host must be configured (required even when using OAuth authentication). Go to Admin → Server Management → Email Settings to configure.'
+                : 'SMTP host must be set.';
+            throw new CannotSendEmailException($errorMessage);
         }
 
         if ($smtpConfig->getPort() === 0) {
-            throw new CannotSendEmailException('SMTP port must be set.');
+            $errorMessage = $isOAuthMode
+                ? 'SMTP port must be configured (required even when using OAuth authentication). Go to Admin → Server Management → Email Settings to configure.'
+                : 'SMTP port must be set.';
+            throw new CannotSendEmailException($errorMessage);
         }
 
         $this->phpMailer->isSMTP();
@@ -65,9 +75,7 @@ class EmailService
             $this->phpMailer->SMTPSecure = false;
         }
 
-        // Check email auth mode and configure authentication
-        $emailAuthMode = $this->serverSettings->getEmailAuthMode();
-
+        // Configure authentication based on email auth mode
         if ($emailAuthMode === 'smtp_oauth') {
             // OAuth 2.0 authentication
             $this->configureOAuthAuthentication();

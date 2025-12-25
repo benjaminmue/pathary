@@ -23,6 +23,7 @@ services:
       DATABASE_MYSQL_NAME: "${MYSQL_DATABASE:-movary}"
       DATABASE_MYSQL_USER: "${MYSQL_USER:-movary}"
       DATABASE_MYSQL_PASSWORD: "${MYSQL_PASSWORD:-movary}"
+      DATABASE_DISABLE_AUTO_MIGRATION: "${DATABASE_DISABLE_AUTO_MIGRATION:-false}"
     networks:
       - pathary-network
     depends_on:

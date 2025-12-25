@@ -455,6 +455,55 @@
                                 </div>
                             </div>
 
+                            <!-- SMTP Server Settings (Required for OAuth) -->
+                            <div class="alert alert-info mb-4" role="alert">
+                                <h6 class="alert-heading">
+                                    <i class="bi bi-info-circle-fill me-2"></i>SMTP Server Settings Required
+                                </h6>
+                                <p class="mb-2 small">
+                                    Even with OAuth authentication, SMTP server settings are required. OAuth replaces your <strong>password</strong> with a secure <strong>access token</strong>,
+                                    but the application still needs to know <strong>which mail server to connect to</strong>.
+                                </p>
+                                <p class="mb-0 small">
+                                    The server, port, and encryption below will be auto-filled based on your provider selection.
+                                </p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="oauthSmtpHost" class="form-label">
+                                        SMTP Server <span class="text-danger">*</span>
+                                        <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
+                                           title="The SMTP server address for your email provider"></i>
+                                    </label>
+                                    <input type="text" class="form-control font-monospace" id="oauthSmtpHost"
+                                           value="{{ smtpHost ?? (oauthConfig and oauthConfig.provider == 'gmail' ? 'smtp.gmail.com' : 'smtp.office365.com') }}"
+                                           readonly>
+                                    <div class="form-text">Auto-filled based on provider</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="oauthSmtpPort" class="form-label">
+                                        Port <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="oauthSmtpPort"
+                                           value="{{ smtpPort ?? 587 }}"
+                                           readonly>
+                                    <div class="form-text">Default: 587 (TLS)</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="oauthSmtpEncryption" class="form-label">
+                                        Encryption <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="oauthSmtpEncryption" disabled>
+                                        <option value="tls" {{ smtpEncryption == 'tls' or not smtpEncryption ? 'selected' : '' }}>TLS (STARTTLS)</option>
+                                        <option value="ssl" {{ smtpEncryption == 'ssl' ? 'selected' : '' }}>SSL</option>
+                                    </select>
+                                    <div class="form-text">Default: TLS</div>
+                                </div>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label for="oauthEmailFromAddress" class="form-label">
@@ -1614,15 +1663,23 @@
 
     /**
      * Toggle visibility of Tenant ID field based on provider selection
+     * Also auto-populate SMTP settings
      */
     function toggleTenantIdField() {
         const provider = document.getElementById('oauthProvider').value;
         const tenantIdRow = document.getElementById('tenantIdRow');
+        const smtpHostInput = document.getElementById('oauthSmtpHost');
 
         if (provider === 'microsoft') {
             tenantIdRow.style.display = 'flex';
+            if (smtpHostInput) {
+                smtpHostInput.value = 'smtp.office365.com';
+            }
         } else {
             tenantIdRow.style.display = 'none';
+            if (smtpHostInput) {
+                smtpHostInput.value = 'smtp.gmail.com';
+            }
         }
     }
 
@@ -1692,6 +1749,7 @@
         button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
 
         try {
+            // First, save OAuth configuration
             const payload = {
                 csrf: getCsrfToken(),
                 provider: provider,
@@ -1720,7 +1778,28 @@
                 throw new Error(data.error || 'Failed to save OAuth configuration');
             }
 
-            showToast('OAuth configuration saved successfully', 'success');
+            // Also save SMTP server settings (required for OAuth)
+            const smtpHost = document.getElementById('oauthSmtpHost').value;
+            const smtpPort = parseInt(document.getElementById('oauthSmtpPort').value);
+            const smtpEncryption = document.getElementById('oauthSmtpEncryption').value;
+
+            const smtpResponse = await fetch('{{ applicationUrl }}/old/settings/server/email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    smtpHost: smtpHost,
+                    smtpPort: smtpPort,
+                    smtpEncryption: smtpEncryption,
+                    smtpFromAddress: fromAddress,
+                    smtpWithAuthentication: true,
+                }),
+            });
+
+            if (!smtpResponse.ok) {
+                console.warn('Failed to save SMTP settings, but OAuth config was saved');
+            }
+
+            showToast('OAuth configuration and SMTP settings saved successfully', 'success');
 
             // Clear client secret field
             document.getElementById('oauthClientSecret').value = '';
