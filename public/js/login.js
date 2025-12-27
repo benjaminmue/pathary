@@ -199,3 +199,36 @@ function acknowledgeAndDismiss() {
         }
     }
 }
+
+// Validate email input in real-time
+function validateEmailInput(event) {
+    const input = event.target;
+    const value = input.value;
+
+    // Check for header injection characters (CR/LF) - security check
+    if (value.includes('\r') || value.includes('\n')) {
+        input.setCustomValidity('Email address cannot contain line breaks');
+        input.classList.add('is-invalid');
+        input.classList.remove('is-valid');
+        return;
+    }
+
+    // Basic email format validation
+    const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
+    if (value === '') {
+        // Empty field - reset validation state
+        input.setCustomValidity('');
+        input.classList.remove('is-invalid', 'is-valid');
+    } else if (emailRegex.test(value)) {
+        // Valid email
+        input.setCustomValidity('');
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+    } else {
+        // Invalid email
+        input.setCustomValidity('Please enter a valid email address');
+        input.classList.add('is-invalid');
+        input.classList.remove('is-valid');
+    }
+}

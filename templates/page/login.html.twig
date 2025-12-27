@@ -40,9 +40,15 @@
                            id="email"
                            placeholder="name@example.com"
                            onkeydown="submitCredentialsOnEnter(event)"
+                           oninput="validateEmailInput(event)"
                            autocomplete="email"
+                           pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+                           title="Please enter a valid email address"
                            required>
                     <label for="email">Email address</label>
+                    <div class="invalid-feedback" id="emailError">
+                        Please enter a valid email address.
+                    </div>
                 </div>
 
                 <div class="form-floating">

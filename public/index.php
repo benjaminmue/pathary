@@ -5,6 +5,7 @@
 use Movary\HttpController\Web\ErrorController;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 use Psr\Log\LoggerInterface;
 
 $container = require(__DIR__ . '/../bootstrap.php');
@@ -69,6 +70,9 @@ try {
 
     if (str_starts_with($uri, '/api') === false) {
         $response = $container->get(ErrorController::class)->renderInternalServerError();
+    } else {
+        // For API endpoints, return generic JSON error without exposing details
+        $response = Response::create(StatusCode::createInternalServerError());
     }
 }
 
