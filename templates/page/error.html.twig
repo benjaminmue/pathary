@@ -1,0 +1,159 @@
+{% extends 'layouts/error_base.twig' %}
+
+{% block title %}
+    {% if statusCode == 404 %}
+        Page Not Found
+    {% elseif statusCode == 401 %}
+        Login Required
+    {% elseif statusCode == 403 %}
+        Access Denied
+    {% elseif statusCode == 500 %}
+        Server Error
+    {% else %}
+        Error {{ statusCode }}
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="error-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center">
+                    {# Subtle logo watermark #}
+                    <img src="{{ applicationUrl }}/images/pathary-logo.svg" alt="" class="error-logo">
+
+                    {# Error code #}
+                    <div class="error-code">{{ statusCode }}</div>
+
+                    {# Dynamic title based on status code #}
+                    <h1 class="error-title">
+                        {% if statusCode == 404 %}
+                            Page Not Found
+                        {% elseif statusCode == 401 %}
+                            Login Required
+                        {% elseif statusCode == 403 %}
+                            Access Denied
+                        {% elseif statusCode == 500 %}
+                            Something Went Wrong
+                        {% else %}
+                            Request Error
+                        {% endif %}
+                    </h1>
+
+                    {# Dynamic message based on status code #}
+                    <p class="error-message">
+                        {% if statusCode == 404 %}
+                            The page you're looking for doesn't exist or has been moved.
+                        {% elseif statusCode == 401 %}
+                            You need to be logged in to access this page. Please sign in to continue.
+                        {% elseif statusCode == 403 %}
+                            You don't have permission to access this resource. This page may require administrator privileges.
+                        {% elseif statusCode == 500 %}
+                            We're experiencing technical difficulties. Our team has been notified and is working to fix the issue.
+                        {% else %}
+                            An unexpected error occurred while processing your request.
+                        {% endif %}
+                    </p>
+
+                    {# Dynamic actions based on status code #}
+                    <div class="error-actions">
+                        {% if statusCode == 404 %}
+                            {% if referer and referer != currentUrl %}
+                                <a href="{{ referer }}" class="btn btn-error-secondary">
+                                    <i class="bi bi-arrow-left"></i>Go Back
+                                </a>
+                            {% endif %}
+                            {% if isAuthenticated %}
+                                <a href="{{ applicationUrl }}/search" class="btn btn-error-primary">
+                                    <i class="bi bi-search"></i>Search Movies
+                                </a>
+                            {% else %}
+                                <a href="{{ applicationUrl }}/" class="btn btn-error-primary">
+                                    <i class="bi bi-house"></i>Go Home
+                                </a>
+                            {% endif %}
+
+                        {% elseif statusCode == 401 %}
+                            <a href="{{ applicationUrl }}/login{% if currentUrl %}?redirect={{ currentUrl|url_encode }}{% endif %}" class="btn btn-error-primary">
+                                <i class="bi bi-box-arrow-in-right"></i>Go to Login
+                            </a>
+
+                        {% elseif statusCode == 403 %}
+                            {% if isAuthenticated %}
+                                <a href="{{ applicationUrl }}/profile" class="btn btn-error-primary">
+                                    <i class="bi bi-person"></i>Go to Profile
+                                </a>
+                            {% else %}
+                                <a href="{{ applicationUrl }}/" class="btn btn-error-primary">
+                                    <i class="bi bi-house"></i>Go Home
+                                </a>
+                            {% endif %}
+
+                        {% elseif statusCode == 500 %}
+                            {% if referer and referer != currentUrl %}
+                                <a href="{{ referer }}" class="btn btn-error-secondary">
+                                    <i class="bi bi-arrow-clockwise"></i>Try Again
+                                </a>
+                            {% endif %}
+                            <a href="{{ applicationUrl }}/" class="btn btn-error-primary">
+                                <i class="bi bi-house"></i>Go Home
+                            </a>
+
+                        {% else %}
+                            <a href="{{ applicationUrl }}/" class="btn btn-error-primary">
+                                <i class="bi bi-house"></i>Go Home
+                            </a>
+                        {% endif %}
+
+                        {# Always show report issue link #}
+                        {% set issueTitle = "Error " ~ statusCode ~ " encountered" %}
+                        {% set issueBody %}
+**Error Details:**
+- **Error Code:** {{ statusCode }}
+- **Page:** `{{ currentUrl }}`
+{% if referer and referer != currentUrl %}
+- **Previous Page:** `{{ referer }}`
+{% endif %}
+- **Timestamp:** {{ "now"|date("Y-m-d H:i:s") }}
+
+**What I was trying to do:**
+<!-- Please describe what you were trying to do when this error occurred -->
+
+**Expected behavior:**
+<!-- What did you expect to happen? -->
+
+**Additional context:**
+<!-- Add any other context about the problem here -->
+                        {% endset %}
+                        <a href="https://github.com/benjaminmue/pathary/issues/new?title={{ issueTitle|url_encode }}&body={{ issueBody|url_encode }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-bug"></i>Report Issue
+                        </a>
+                    </div>
+
+                    {# Error metadata #}
+                    <div class="error-meta">
+                        <span class="error-meta-item">
+                            <strong>Error Code:</strong> {{ statusCode }}
+                        </span>
+                        {% if currentUrl %}
+                        <span class="error-meta-item">
+                            <strong>Path:</strong> {{ currentUrl }}
+                        </span>
+                        {% endif %}
+                        <span class="error-meta-item">
+                            <strong>Time:</strong> <span id="error-timestamp"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Display current timestamp
+        document.getElementById('error-timestamp').textContent = new Date().toLocaleTimeString();
+    </script>
+{% endblock %}

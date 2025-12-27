@@ -62,14 +62,24 @@ try {
             throw new LogicException('Unhandled dispatcher status :' . $routeInfo[0]);
     }
 
-    if ($response->getStatusCode()->getCode() === 404 && str_starts_with($uri, '/api') === false) {
-        $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
+    // Handle different error responses for web routes (not API)
+    if (str_starts_with($uri, '/api') === false) {
+        $statusCode = $response->getStatusCode()->getCode();
+
+        if ($statusCode === 404) {
+            $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
+        } elseif ($statusCode === 401) {
+            $response = $container->get(ErrorController::class)->renderUnauthorized($httpRequest);
+        } elseif ($statusCode === 403 && $response->getBody() === null) {
+            // Only render 403 page if there's no redirect (empty body)
+            $response = $container->get(ErrorController::class)->renderForbidden($httpRequest);
+        }
     }
 } catch (Throwable $t) {
     $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
 
     if (str_starts_with($uri, '/api') === false) {
-        $response = $container->get(ErrorController::class)->renderInternalServerError();
+        $response = $container->get(ErrorController::class)->renderInternalServerError($httpRequest);
     } else {
         // For API endpoints, return generic JSON error without exposing details
         $response = Response::create(StatusCode::createInternalServerError());
