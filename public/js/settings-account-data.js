@@ -69,17 +69,35 @@ document.getElementById('deleteAccountButton').addEventListener('click', async (
 function deleteUserAccount() {
     return fetch(APPLICATION_URL + '/old/settings/account/delete-account', {
         method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     })
 }
 
 function deleteUserHistory() {
     return fetch(APPLICATION_URL + '/old/settings/account/delete-history', {
         method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     })
 }
 
 function deleteUserRatings() {
     return fetch(APPLICATION_URL + '/old/settings/account/delete-ratings', {
         method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     })
 }

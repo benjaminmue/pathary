@@ -75,6 +75,7 @@
                     Please fill out all fields
                 </div>
             {% endif %}
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <button class="w-100 btn btn-lg btn-primary" type="submit">Create</button>
         </form>
     </main>

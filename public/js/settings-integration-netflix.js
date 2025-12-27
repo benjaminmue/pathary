@@ -15,7 +15,10 @@ async function importNetflixHistory() {
         }
     }
 
-    const importDataAsJson = JSON.stringify(importData);
+    const importDataWithCsrf = JSON.stringify({
+        importData: importData,
+        _csrf_token: getCsrfToken()
+    });
 
     createPageNavigation(1, 1, true);
     disable(document.getElementById('importNetflixButton'));
@@ -26,7 +29,7 @@ async function importNetflixHistory() {
         headers: {
             'Content-type': 'application/json'
         },
-        body: importDataAsJson
+        body: importDataWithCsrf
     }).then(response => {
         if (!response.ok) {
             console.log(response)
@@ -47,6 +50,7 @@ async function uploadNetflixHistory() {
     let requestFormData = new FormData();
     requestFormData.append('netflixActivityCsv', document.getElementById('netflixCsvInput').files[0]);
     requestFormData.append('netflixActivityCsvDateFormat', document.getElementById('netflixCsvDateFormatInput').value);
+    requestFormData.append('_csrf_token', getCsrfToken());
 
     document.getElementById('netflixTableBody').getElementsByTagName('tr')[0].remove();
     setDefaultTable()

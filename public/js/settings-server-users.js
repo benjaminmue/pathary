@@ -139,6 +139,7 @@ document.getElementById('createUserButton').addEventListener('click', async () =
             'password': document.getElementById('userModalPasswordInput').value,
             'email': document.getElementById('userModalEmailInput').value,
             'isAdmin': document.getElementById('userModalIsAdminInput').checked,
+            '_csrf_token': getCsrfToken(),
         })
     })
 
@@ -177,6 +178,7 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
             'email': document.getElementById('userModalEmailInput').value,
             'isAdmin': document.getElementById('userModalIsAdminInput').checked,
             'password': password,
+            '_csrf_token': getCsrfToken(),
         })
     })
 
@@ -198,7 +200,13 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
     }
 
     const response = await fetch(APPLICATION_URL + '/old/settings/users/' + document.getElementById('userModalIdInput').value, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     });
 
     if (response.status !== 200) {

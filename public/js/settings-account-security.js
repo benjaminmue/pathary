@@ -66,6 +66,7 @@ function updatePassword(currentPassword, newPassword) {
         body: JSON.stringify({
             'currentPassword': currentPassword,
             'newPassword': newPassword,
+            '_csrf_token': getCsrfToken(),
         })
     })
 }
@@ -75,7 +76,10 @@ async function showAddTwoFactorAuthenticationModal() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     }).catch(function(error) { 
         console.error(error);
         addAlert('twoFactorAuthenticationAlertDiv', 'Something has gone wrong. Check the logs in Movary or the browser console and try again', 'danger');
@@ -117,7 +121,8 @@ async function enableTOTP() {
         },
         body: JSON.stringify({
             'input': input,
-            'uri': document.getElementById('qrcode').title
+            'uri': document.getElementById('qrcode').title,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(function(response) {
         if(response.ok) {
@@ -134,7 +139,13 @@ async function enableTOTP() {
 
 async function disableTOTP() {
     await fetch(APPLICATION_URL + '/old/settings/account/security/disable-totp', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     }).then(function(response) {
         if(response.ok) {
             window.location.reload();

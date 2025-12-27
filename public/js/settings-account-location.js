@@ -142,7 +142,8 @@ document.getElementById('createLocationButton').addEventListener('click', async 
         },
         body: JSON.stringify({
             'name': categoryName,
-            'isCinema': isCinema
+            'isCinema': isCinema,
+            '_csrf_token': getCsrfToken(),
         })
     })
 
@@ -190,7 +191,13 @@ document.getElementById('deleteLocationButton').addEventListener('click', async 
     }
 
     const response = await fetch(APPLICATION_URL + '/old/settings/locations/' + document.getElementById('locationModalIdInput').value, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     });
 
     if (response.status !== 200) {
@@ -222,7 +229,8 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
         },
         body: JSON.stringify({
             'name': locationName,
-            'isCinema': isCinema
+            'isCinema': isCinema,
+            '_csrf_token': getCsrfToken(),
         })
     })
 
@@ -287,6 +295,7 @@ async function sendRequestToggleLocationsFeature(isLocationsEnabled) {
         },
         body: JSON.stringify({
             'locationsEnabled': isLocationsEnabled,
+            '_csrf_token': getCsrfToken(),
         })
     })
 

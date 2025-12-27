@@ -60,6 +60,8 @@
                         {% endif %}
                     </div>
 
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
                     <button class="btn btn-outline-primary" type="button" {% if coreAccountChangesDisabled == true %}disabled{% endif %} onclick="verifyTraktCredentials()"
                             id="verifyButton">
                         Verify

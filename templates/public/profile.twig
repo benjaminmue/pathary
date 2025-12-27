@@ -385,6 +385,8 @@
                         <p class="form-hint">Used for account recovery and notifications.</p>
                     </div>
 
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
                     <div class="form-actions">
                         <button type="submit" class="btn btn-save">
                             <i class="bi bi-check-lg"></i> Save Changes

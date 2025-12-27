@@ -85,7 +85,8 @@ async function updateDashboardRows() {
         body: JSON.stringify({
             'orderRows': orderRows,
             'visibleRows': visibleRows,
-            'extendedRows': extendedRows
+            'extendedRows': extendedRows,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(response => {
         if (!response.ok) {
@@ -108,6 +109,9 @@ async function resetDashboardRows() {
         headers: {
             'Content-Type': 'application/json'
         },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     }).then(response => {
         if (!response.ok) {
             console.error(response);

@@ -34,7 +34,15 @@ function deleteJellyfinWebhook() {
 }
 
 async function regenerateJellyfinWebhookRequest() {
-    const response = await fetch(APPLICATION_URL + '/old/settings/jellyfin/webhook', {'method': 'put'})
+    const response = await fetch(APPLICATION_URL + '/old/settings/jellyfin/webhook', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
+    })
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -45,7 +53,15 @@ async function regenerateJellyfinWebhookRequest() {
 }
 
 async function deleteJellyfinWebhookRequest() {
-    const response = await fetch(APPLICATION_URL + '/old/settings/jellyfin/webhook', {'method': 'delete'})
+    const response = await fetch(APPLICATION_URL + '/old/settings/jellyfin/webhook', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
+    })
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -76,6 +92,7 @@ async function updateScrobbleOptions() {
         },
         body: JSON.stringify({
             'scrobbleWatches': document.getElementById('scrobbleWatchesCheckbox').checked,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(response => {
         if (!response.ok) {
@@ -103,7 +120,8 @@ async function saveJellyfinServerUrl() {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            'JellyfinServerUrl': jellyfinServerUrl
+            'JellyfinServerUrl': jellyfinServerUrl,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(response => {
         document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
@@ -140,7 +158,8 @@ async function verifyJellyfinServerUrl() {
             },
             signal: AbortSignal.timeout(4000),
             body: JSON.stringify({
-                'jellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value
+                'jellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value,
+                '_csrf_token': getCsrfToken(),
             })
         }
     ).catch(function (error) {
@@ -193,6 +212,7 @@ async function authenticateJellyfinAccount() {
             body: JSON.stringify({
                 'username': document.getElementById('jellyfinAuthenticationModalUsernameInput').value,
                 'password': document.getElementById('jellyfinAuthenticationModalPasswordInput').value,
+                '_csrf_token': getCsrfToken(),
             })
         }
     ).catch(function (error) {
@@ -223,7 +243,10 @@ async function removeJellyfinAuthentication() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     }).then(response => {
         if (!response.ok) {
             addAlert('alertJellyfinImportDiv', 'The authentication could not be removed', 'danger');
@@ -249,6 +272,7 @@ async function updateSyncOptions() {
         },
         body: JSON.stringify({
             'syncWatches': document.getElementById('automaticWatchStateSyncCheckbox').checked,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(response => {
         if (!response.ok) {
@@ -267,7 +291,15 @@ async function updateSyncOptions() {
 async function exportJellyfin() {
     const response = await fetch(
         APPLICATION_URL + '/old/jobs/schedule/jellyfin-export-history',
-        {'method': 'POST'}
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                '_csrf_token': getCsrfToken(),
+            })
+        }
     ).catch(function (error) {
         addAlert('alertJellyfinExportHistoryDiv', 'History export could not be scheduled', 'danger')
 
@@ -297,7 +329,15 @@ async function exportJellyfin() {
 async function importJellyfin() {
     const response = await fetch(
         APPLICATION_URL + '/old/jobs/schedule/jellyfin-import-history',
-        {'method': 'POST'}
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                '_csrf_token': getCsrfToken(),
+            })
+        }
     ).catch(function (error) {
         addAlert('alertJellyfinImportHistoryDiv', 'History import could not be scheduled', 'danger')
 

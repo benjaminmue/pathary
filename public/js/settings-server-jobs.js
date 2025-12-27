@@ -36,6 +36,12 @@ async function removeAllJobs() {
         const response = await fetch(
             APPLICATION_URL + '/job-queue/purge-all', {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    '_csrf_token': getCsrfToken(),
+                }),
                 signal: AbortSignal.timeout(10000)
             }
         );
@@ -68,6 +74,12 @@ async function removeProcessedJobs() {
         const response = await fetch(
             APPLICATION_URL + '/job-queue/purge-processed', {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    '_csrf_token': getCsrfToken(),
+                }),
                 signal: AbortSignal.timeout(10000)
             }
         );

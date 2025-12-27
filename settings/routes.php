@@ -52,10 +52,10 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     # Admin Health Checks
     $routes->add('GET', '/admin/health', [Web\HealthCheckController::class, 'getHealth'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/admin/health/run', [Web\HealthCheckController::class, 'runHealthCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/admin/health/db', [Web\HealthCheckController::class, 'runDatabaseCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/admin/health/tmdb', [Web\HealthCheckController::class, 'runTmdbCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/admin/health/oauth', [Web\HealthCheckController::class, 'runOAuthCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/admin/health/run', [Web\HealthCheckController::class, 'runHealthCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/admin/health/db', [Web\HealthCheckController::class, 'runDatabaseCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/admin/health/tmdb', [Web\HealthCheckController::class, 'runTmdbCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/admin/health/oauth', [Web\HealthCheckController::class, 'runOAuthCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
 
     ###########
     # Profile #
@@ -221,76 +221,77 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ]);
     $routes->add('POST', '/api/admin/oauth/acknowledge-banner', [Api\OAuthMonitoringController::class, 'acknowledgeBanner'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class,
     ]);
 
-    $routes->add('POST', '/old/settings/account', [Web\SettingsController::class, 'updateGeneral'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/account', [Web\SettingsController::class, 'updateGeneral'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/old/settings/account/security/create-totp-uri', [
         Web\TwoFactorAuthenticationController::class,
         'createTotpUri'
-    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/account/security/disable-totp', [Web\TwoFactorAuthenticationController::class, 'disableTotp'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/account/security/enable-totp', [Web\TwoFactorAuthenticationController::class, 'enableTotp'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/account/security/disable-totp', [Web\TwoFactorAuthenticationController::class, 'disableTotp'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/account/security/enable-totp', [Web\TwoFactorAuthenticationController::class, 'enableTotp'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/account/export/csv/{exportType:.+}', [Web\ExportController::class, 'getCsvExport'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/account/import/csv/{exportType:.+}', [Web\ImportController::class, 'handleCsvImport'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('DELETE', '/old/settings/account/delete-ratings', [Web\SettingsController::class, 'deleteRatings'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('DELETE', '/old/settings/account/delete-history', [Web\SettingsController::class, 'deleteHistory'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('DELETE', '/old/settings/account/delete-account', [Web\SettingsController::class, 'deleteAccount'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/account/update-dashboard-rows', [Web\SettingsController::class, 'updateDashboardRows'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/account/reset-dashboard-rows', [Web\SettingsController::class, 'resetDashboardRows'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/account/import/csv/{exportType:.+}', [Web\ImportController::class, 'handleCsvImport'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('DELETE', '/old/settings/account/delete-ratings', [Web\SettingsController::class, 'deleteRatings'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('DELETE', '/old/settings/account/delete-history', [Web\SettingsController::class, 'deleteHistory'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('DELETE', '/old/settings/account/delete-account', [Web\SettingsController::class, 'deleteAccount'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/account/update-dashboard-rows', [Web\SettingsController::class, 'updateDashboardRows'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/account/reset-dashboard-rows', [Web\SettingsController::class, 'resetDashboardRows'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/integrations/trakt', [Web\SettingsController::class, 'renderTraktPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/trakt', [Web\SettingsController::class, 'updateTrakt'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/trakt/verify-credentials', [Web\SettingsController::class, 'traktVerifyCredentials'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/trakt', [Web\SettingsController::class, 'updateTrakt'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/trakt/verify-credentials', [Web\SettingsController::class, 'traktVerifyCredentials'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/integrations/letterboxd', [Web\SettingsController::class, 'renderLetterboxdPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/old/settings/letterboxd-export', [Web\SettingsController::class, 'generateLetterboxdExportData'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/old/settings/integrations/plex', [Web\SettingsController::class, 'renderPlexPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/old/settings/plex/logout', [Web\PlexController::class, 'removePlexAccessTokens'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/plex/server-url-save', [Web\PlexController::class, 'savePlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/plex/server-url-verify', [Web\PlexController::class, 'verifyPlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/plex/server-url-save', [Web\PlexController::class, 'savePlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/plex/server-url-verify', [Web\PlexController::class, 'verifyPlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/plex/authentication-url', [Web\PlexController::class, 'generatePlexAuthenticationUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/old/settings/plex/callback', [Web\PlexController::class, 'processPlexCallback'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/plex', [Web\SettingsController::class, 'updatePlex'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('PUT', '/old/settings/plex/webhook', [Web\PlexController::class, 'regeneratePlexWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('DELETE', '/old/settings/plex/webhook', [Web\PlexController::class, 'deletePlexWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/plex', [Web\SettingsController::class, 'updatePlex'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('PUT', '/old/settings/plex/webhook', [Web\PlexController::class, 'regeneratePlexWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('DELETE', '/old/settings/plex/webhook', [Web\PlexController::class, 'deletePlexWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/integrations/jellyfin', [Web\SettingsController::class, 'renderJellyfinPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/jellyfin', [Web\SettingsController::class, 'updateJellyfin'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/jellyfin/sync', [Web\JellyfinController::class, 'saveJellyfinSyncOptions'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/jellyfin/authenticate', [Web\JellyfinController::class, 'authenticateJellyfinAccount'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/jellyfin/remove-authentication', [Web\JellyfinController::class, 'removeJellyfinAuthentication'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/jellyfin/server-url-save', [Web\JellyfinController::class, 'saveJellyfinServerUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/jellyfin/server-url-verify', [Web\JellyfinController::class, 'verifyJellyfinServerUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/jellyfin', [Web\SettingsController::class, 'updateJellyfin'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/jellyfin/sync', [Web\JellyfinController::class, 'saveJellyfinSyncOptions'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/jellyfin/authenticate', [Web\JellyfinController::class, 'authenticateJellyfinAccount'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/jellyfin/remove-authentication', [Web\JellyfinController::class, 'removeJellyfinAuthentication'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/jellyfin/server-url-save', [Web\JellyfinController::class, 'saveJellyfinServerUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/jellyfin/server-url-verify', [Web\JellyfinController::class, 'verifyJellyfinServerUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/jellyfin/webhook', [Web\JellyfinController::class, 'getJellyfinWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('PUT', '/old/settings/jellyfin/webhook', [Web\JellyfinController::class, 'regenerateJellyfinWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('DELETE', '/old/settings/jellyfin/webhook', [Web\JellyfinController::class, 'deleteJellyfinWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('PUT', '/old/settings/jellyfin/webhook', [Web\JellyfinController::class, 'regenerateJellyfinWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('DELETE', '/old/settings/jellyfin/webhook', [Web\JellyfinController::class, 'deleteJellyfinWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/integrations/emby', [Web\SettingsController::class, 'renderEmbyPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/emby', [Web\SettingsController::class, 'updateEmby'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('PUT', '/old/settings/emby/webhook', [Web\EmbyController::class, 'regenerateEmbyWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('DELETE', '/old/settings/emby/webhook', [Web\EmbyController::class, 'deleteEmbyWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/emby', [Web\SettingsController::class, 'updateEmby'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('PUT', '/old/settings/emby/webhook', [Web\EmbyController::class, 'regenerateEmbyWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('DELETE', '/old/settings/emby/webhook', [Web\EmbyController::class, 'deleteEmbyWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/integrations/kodi', [Web\SettingsController::class, 'renderKodiPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/kodi', [Web\SettingsController::class, 'updateKodi'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('PUT', '/old/settings/kodi/webhook', [Web\KodiController::class, 'regenerateKodiWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('DELETE', '/old/settings/kodi/webhook', [Web\KodiController::class, 'deleteKodiWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/kodi', [Web\SettingsController::class, 'updateKodi'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('PUT', '/old/settings/kodi/webhook', [Web\KodiController::class, 'regenerateKodiWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('DELETE', '/old/settings/kodi/webhook', [Web\KodiController::class, 'deleteKodiWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/app', [Web\SettingsController::class, 'renderAppPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/old/settings/integrations/netflix', [Web\SettingsController::class, 'renderNetflixPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/netflix', [Web\NetflixController::class, 'matchNetflixActivityCsvWithTmdbMovies'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/netflix/import', [Web\NetflixController::class, 'importNetflixData'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/netflix', [Web\NetflixController::class, 'matchNetflixActivityCsvWithTmdbMovies'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/netflix/import', [Web\NetflixController::class, 'importNetflixData'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/integrations/mastodon', [Web\SettingsController::class, 'renderMastodonPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/integrations/mastodon', [Web\SettingsController::class, 'updateMastodon'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/integrations/mastodon', [Web\SettingsController::class, 'updateMastodon'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/users', [Web\UserController::class, 'fetchUsers'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/users', [Web\UserController::class, 'createUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('PUT', '/old/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('DELETE', '/old/settings/users/{userId:\d+}', [Web\UserController::class, 'deleteUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/users', [Web\UserController::class, 'createUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('PUT', '/old/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('DELETE', '/old/settings/users/{userId:\d+}', [Web\UserController::class, 'deleteUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/locations', [Web\LocationController::class, 'fetchLocations'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/locations', [Web\LocationController::class, 'createLocation'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('PUT', '/old/settings/locations/{locationId:\d+}', [Web\LocationController::class, 'updateLocation'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('DELETE', '/old/settings/locations/{locationId:\d+}', [Web\LocationController::class, 'deleteLocation'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/locations', [Web\LocationController::class, 'createLocation'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('PUT', '/old/settings/locations/{locationId:\d+}', [Web\LocationController::class, 'updateLocation'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('DELETE', '/old/settings/locations/{locationId:\d+}', [Web\LocationController::class, 'deleteLocation'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/locations/toggle-feature', [Web\LocationController::class, 'fetchToggleFeature'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/locations/toggle-feature', [Web\LocationController::class, 'updateToggleFeature'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/locations/toggle-feature', [Web\LocationController::class, 'updateToggleFeature'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
 
     $routes->add('GET', '/old/settings/integrations/radarr', [Web\SettingsController::class, 'renderRadarrPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('PUT', '/old/settings/radarr/feed', [RadarrController::class, 'regenerateRadarrFeedUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('DELETE', '/old/settings/radarr/feed', [RadarrController::class, 'deleteRadarrFeedUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('PUT', '/old/settings/radarr/feed', [RadarrController::class, 'regenerateRadarrFeedUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('DELETE', '/old/settings/radarr/feed', [RadarrController::class, 'deleteRadarrFeedUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
 
 
     ##########
@@ -327,17 +328,17 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('DELETE', '/old/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [
         Web\HistoryController::class,
         'deleteHistoryEntry'
-    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/old/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [
         Web\HistoryController::class,
         'createHistoryEntry'
-    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/old/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating', [
         Web\Movie\MovieRatingController::class,
         'updateRating'
-    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/log-movie', [Web\HistoryController::class, 'logMovie'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/log-movie', [Web\HistoryController::class, 'logMovie'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/fetchMovieRatingByTmdbdId', [Web\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes, true);

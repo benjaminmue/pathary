@@ -70,6 +70,12 @@ async function traktImportRatings() {
 function importTraktRatings() {
     return fetch(APPLICATION_URL + '/old/jobs/schedule/trakt-ratings-sync', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     })
 }
 
@@ -98,5 +104,11 @@ async function traktImportHistory() {
 function importTraktHistory() {
     return fetch(APPLICATION_URL + '/old/jobs/schedule/trakt-history-sync', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     })
 }

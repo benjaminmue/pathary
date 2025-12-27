@@ -58,7 +58,8 @@ function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchl
             'country': country,
             'displayCharacterNames': displayCharacterNames,
             'displayTmdbRatings': displayTmdbRatings,
-            'displayImdbRatings': displayImdbRatings
+            'displayImdbRatings': displayImdbRatings,
+            '_csrf_token': getCsrfToken(),
         })
     })
 }

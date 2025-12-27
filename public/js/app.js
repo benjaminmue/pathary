@@ -1,3 +1,12 @@
+/**
+ * Get CSRF token from meta tag
+ * @returns {string} CSRF token
+ */
+function getCsrfToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+}
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
         navigator.serviceWorker
@@ -331,6 +340,7 @@ function addToWatchlist(context) {
         }, body: JSON.stringify({
             'tmdbId': tmdbId,
             'postToMastodon': postToMastodon,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(function (response) {
         if (response.status === 200) {
@@ -372,6 +382,7 @@ function logMovie(context) {
             'personalRating': rating,
             'locationId': locationId,
             'postToMastodon': postToMastodon,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(function (response) {
         if (response.status === 200) {
@@ -556,6 +567,12 @@ function removeAlert(parentDivId) {
 async function logout() {
     await fetch(APPLICATION_URL + '/api/authentication/token', {
         method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
     });
 
     window.location.href = APPLICATION_URL + '/'

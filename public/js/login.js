@@ -104,6 +104,9 @@ function loginRequest() {
         }
     }
 
+    // Add CSRF token
+    requestBody['_csrf_token'] = getCsrfToken();
+
     return fetch(APPLICATION_URL + '/api/authentication/token', {
         method: 'POST',
         headers: {

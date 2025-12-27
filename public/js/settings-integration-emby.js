@@ -31,7 +31,15 @@ function deleteEmbyWebhook() {
 }
 
 async function regenerateEmbyWebhookRequest() {
-    const response = await fetch(APPLICATION_URL + '/old/settings/emby/webhook', {'method': 'put'})
+    const response = await fetch(APPLICATION_URL + '/old/settings/emby/webhook', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
+    })
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -42,7 +50,15 @@ async function regenerateEmbyWebhookRequest() {
 }
 
 async function deleteEmbyWebhookRequest() {
-    const response = await fetch(APPLICATION_URL + '/old/settings/emby/webhook', {'method': 'delete'})
+    const response = await fetch(APPLICATION_URL + '/old/settings/emby/webhook', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            '_csrf_token': getCsrfToken(),
+        })
+    })
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -73,6 +89,7 @@ async function updateScrobbleOptions() {
         },
         body: JSON.stringify({
             'scrobbleWatches': document.getElementById('scrobbleWatchesCheckbox').checked,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(response => {
         if (!response.ok) {

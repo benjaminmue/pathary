@@ -308,7 +308,7 @@ function initializePasswordValidation() {
             const response = await fetch(APPLICATION_URL + '/profile/security/password', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({currentPassword: currentPass, newPassword: newPass})
+                body: JSON.stringify({currentPassword: currentPass, newPassword: newPass, _csrf_token: getCsrfToken()})
             });
 
             const data = await response.json();
@@ -335,7 +335,9 @@ function initializePasswordValidation() {
 async function enable2FA() {
     try {
         const response = await fetch(APPLICATION_URL + '/profile/security/totp/enable', {
-            method: 'POST'
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({_csrf_token: getCsrfToken()})
         });
 
         const data = await response.json();
@@ -417,7 +419,7 @@ async function verify2FACode() {
         const response = await fetch(APPLICATION_URL + '/profile/security/totp/verify', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({code})
+            body: JSON.stringify({code, _csrf_token: getCsrfToken()})
         });
 
         const data = await response.json();
@@ -1000,7 +1002,7 @@ async function submitDisable2FA() {
         const response = await fetch(APPLICATION_URL + '/profile/security/totp/disable', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({password})
+            body: JSON.stringify({password, _csrf_token: getCsrfToken()})
         });
 
         const data = await response.json();
@@ -1030,7 +1032,9 @@ async function regenerateRecoveryCodes() {
 
     try {
         const response = await fetch(APPLICATION_URL + '/profile/security/recovery-codes/regenerate', {
-            method: 'POST'
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({_csrf_token: getCsrfToken()})
         });
 
         const data = await response.json();
@@ -1054,7 +1058,9 @@ async function revokeTrustedDevice(deviceId) {
 
     try {
         const response = await fetch(APPLICATION_URL + `/profile/security/trusted-devices/${deviceId}/revoke`, {
-            method: 'POST'
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({_csrf_token: getCsrfToken()})
         });
 
         const data = await response.json();
@@ -1078,7 +1084,9 @@ async function revokeAllTrustedDevices() {
 
     try {
         const response = await fetch(APPLICATION_URL + '/profile/security/trusted-devices/revoke-all', {
-            method: 'POST'
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({_csrf_token: getCsrfToken()})
         });
 
         const data = await response.json();

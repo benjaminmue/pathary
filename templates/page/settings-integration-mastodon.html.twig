@@ -126,6 +126,8 @@
                     {% endif %}
                 </div>
 
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
                 <button class="btn btn-outline-primary mb-3" type="button" onclick="testCredentials()" id="verifyButton">
                     Test
                 </button>

@@ -76,7 +76,8 @@ async function updateScrobbleOptions() {
         },
         body: JSON.stringify({
             'scrobbleWatches': document.getElementById('scrobbleWatchesCheckbox').checked,
-            'scrobbleRatings': document.getElementById('scrobbleRatingsCheckbox').checked
+            'scrobbleRatings': document.getElementById('scrobbleRatingsCheckbox').checked,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(response => {
         if (!response.ok) {
@@ -155,6 +156,7 @@ async function savePlexServerUrl() {
         },
         body: JSON.stringify({
             'plexServerUrl': document.getElementById('plexServerUrlInput').value,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(async function (response) {
         return {'status': response.status, 'message': await response.text()};
@@ -192,6 +194,7 @@ async function verifyPlexServerUrl() {
         },
         body: JSON.stringify({
             'plexServerUrl': document.getElementById('plexServerUrlInput').value,
+            '_csrf_token': getCsrfToken(),
         })
     }).then(async function (response) {
         document.getElementById('alertPlexServerUrlLoadingSpinner').classList.add('d-none')
@@ -227,7 +230,15 @@ document.getElementById('plexServerUrlInput').addEventListener('input', function
 async function importPlexWatchlist() {
     const response = await fetch(
         APPLICATION_URL + '/old/jobs/schedule/plex-watchlist-sync',
-        {'method': 'POST'}
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                '_csrf_token': getCsrfToken(),
+            })
+        }
     ).catch(function (error) {
         addAlert('alertPlexWatchlistImportDiv', 'Watchlist import could not be scheduled', 'danger')
 

@@ -48,7 +48,8 @@ function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpFromDisplayName, s
             'smtpEncryption': smtpEncryption,
             'smtpWithAuthentication': smtpWithAuthentication,
             'smtpUser': smtpUser,
-            'smtpPassword': smtpPassword
+            'smtpPassword': smtpPassword,
+            '_csrf_token': getCsrfToken(),
         })
     });
 }
@@ -119,7 +120,8 @@ function testEmail(recipient, smtpHost, smtpPort, smtpFromAddress, smtpFromDispl
             'smtpFromDisplayName': smtpFromDisplayName,
             'smtpWithAuthentication': smtpWithAuthentication,
             'smtpUser': smtpUser,
-            'smtpPassword': smtpPassword
+            'smtpPassword': smtpPassword,
+            '_csrf_token': getCsrfToken(),
         })
     });
 }

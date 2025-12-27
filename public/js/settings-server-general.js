@@ -73,6 +73,7 @@ function updateGeneral(tmdbApiKey, applicationUrl, applicationName, applicationT
             'applicationUrl': applicationUrl,
             'applicationName': applicationName,
             'applicationTimezone': applicationTimezone,
+            '_csrf_token': getCsrfToken(),
         })
     });
 }

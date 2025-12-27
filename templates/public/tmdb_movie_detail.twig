@@ -260,6 +260,7 @@
             {% else %}
                 <div class="action-buttons">
                     <form action="{{ applicationUrl }}/tmdb/movie/{{ tmdbId }}/add" method="post">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-add-library">
                             <i class="bi bi-plus-circle"></i>
                             Add to library
