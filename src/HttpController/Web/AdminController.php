@@ -2,11 +2,13 @@
 
 namespace Movary\HttpController\Web;
 
+use Movary\Domain\User\Repository\SecurityAuditRepository;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Service\CsrfTokenService;
 use Movary\Service\Email\OAuthConfigService;
 use Movary\Service\EncryptionService;
 use Movary\Service\ServerSettings;
+use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -48,6 +50,14 @@ class AdminController
             'template' => 'page/admin/tabs/integrations.html.twig',
             'enabled' => true,
         ],
+        'events' => [
+            'id' => 'events',
+            'label' => 'Events',
+            'icon' => 'bi bi-activity',
+            'route' => '/admin/events',
+            'template' => 'page/admin/tabs/events.html.twig',
+            'enabled' => true,
+        ],
     ];
 
     public function __construct(
@@ -57,6 +67,7 @@ class AdminController
         private readonly ServerSettings $serverSettings,
         private readonly OAuthConfigService $oauthConfigService,
         private readonly EncryptionService $encryptionService,
+        private readonly SecurityAuditRepository $securityAuditRepository,
     ) {
     }
 
@@ -158,6 +169,20 @@ class AdminController
     {
         return $this->renderTab('integrations', [
             'csrf' => $this->csrfTokenService->generateToken(),
+        ]);
+    }
+
+    /**
+     * Render Events tab
+     */
+    public function renderEventsTab(Request $request) : Response
+    {
+        // Fetch distinct event types for filter dropdown
+        $eventTypes = $this->securityAuditRepository->findDistinctEventTypes();
+
+        return $this->renderTab('events', [
+            'csrf' => $this->csrfTokenService->generateToken(),
+            'eventTypes' => $eventTypes,
         ]);
     }
 

@@ -48,6 +48,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/admin/users', [Web\AdminController::class, 'renderUsersTab'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/admin/server', [Web\AdminController::class, 'renderServerTab'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/admin/integrations', [Web\AdminController::class, 'renderIntegrationsTab'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('GET', '/admin/events', [Web\AdminController::class, 'renderEventsTab'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
 
     # Admin Health Checks
     $routes->add('GET', '/admin/health', [Web\HealthCheckController::class, 'getHealth'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
@@ -360,6 +361,10 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'getTmdbStatus'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
     $routes->add('POST', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'saveTmdbApiKey'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
     $routes->add('POST', '/admin/settings/tmdb/test', [Api\AdminSettingsController::class, 'testTmdbConnection'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
+
+    // Admin Events API (admin-only)
+    $routes->add('GET', '/admin/events', [Api\AdminEventsController::class, 'getEvents'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
+    $routes->add('GET', '/admin/events/{id:\d+}', [Api\AdminEventsController::class, 'getEventById'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

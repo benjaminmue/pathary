@@ -1,0 +1,390 @@
+<div class="card admin-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-activity me-2"></i>Security Events Log</span>
+        <span class="badge bg-secondary" id="totalEventsCount">Loading...</span>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            Monitor and investigate security events, login attempts, and system activity.
+        </p>
+
+        <!-- Filters -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <form id="eventsFilterForm" class="row g-3">
+                    <!-- Event Type Filter -->
+                    <div class="col-md-3">
+                        <label for="eventTypeFilter" class="form-label">Event Type</label>
+                        <select class="form-select" id="eventTypeFilter">
+                            <option value="">All Events</option>
+                            {% for eventType in eventTypes %}
+                                <option value="{{ eventType }}">{{ eventType }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Search Query -->
+                    <div class="col-md-3">
+                        <label for="searchQuery" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="searchQuery" placeholder="IP, user agent, metadata...">
+                    </div>
+
+                    <!-- Date From -->
+                    <div class="col-md-2">
+                        <label for="dateFrom" class="form-label">From Date</label>
+                        <input type="date" class="form-control" id="dateFrom">
+                    </div>
+
+                    <!-- Date To -->
+                    <div class="col-md-2">
+                        <label for="dateTo" class="form-label">To Date</label>
+                        <input type="date" class="form-control" id="dateTo">
+                    </div>
+
+                    <!-- Filter Actions -->
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="btn-group w-100">
+                            <button type="button" class="btn btn-primary" onclick="applyFilters()">
+                                <i class="bi bi-funnel"></i> Apply
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="resetFilters()">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Events Table -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Event Type</th>
+                        <th>User</th>
+                        <th>IP Address</th>
+                        <th>Timestamp</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="eventsTableBody">
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            Loading events...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-muted" id="paginationInfo">
+                Showing 0-0 of 0 events
+            </div>
+            <nav aria-label="Events pagination">
+                <ul class="pagination mb-0" id="paginationControls">
+                    <!-- Pagination buttons will be inserted here -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Event Details Modal -->
+<div class="modal fade" id="eventDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-info-circle me-2"></i>Event Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="eventDetailsContent">
+                    <div class="text-center text-muted">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        Loading event details...
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let eventDetailsModalInstance;
+    const EVENTS_PER_PAGE = 50;
+    let currentPage = 1;
+    let totalEvents = 0;
+    let currentFilters = {};
+
+    // Load events on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        eventDetailsModalInstance = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+        loadEvents();
+    });
+
+    async function loadEvents(page = 1) {
+        currentPage = page;
+        const offset = (page - 1) * EVENTS_PER_PAGE;
+
+        try {
+            const params = new URLSearchParams({
+                limit: EVENTS_PER_PAGE,
+                offset: offset,
+                ...currentFilters
+            });
+
+            // Note: This endpoint will be created in the next step
+            const response = await fetch(`{{ applicationUrl }}/api/admin/events?${params}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to load events');
+
+            const data = await response.json();
+            totalEvents = data.total;
+            renderEventsTable(data.events);
+            renderPagination();
+            updateTotalCount();
+        } catch (error) {
+            document.getElementById('eventsTableBody').innerHTML = `
+                <tr><td colspan="6" class="text-center text-danger">Error loading events: ${error.message}</td></tr>
+            `;
+            console.error('Error loading events:', error);
+        }
+    }
+
+    function renderEventsTable(events) {
+        const tbody = document.getElementById('eventsTableBody');
+
+        if (events.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No events found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = events.map(event => {
+            const userName = event.user_name ? escapeHtml(event.user_name) : '<span class="text-muted">N/A</span>';
+            const ipAddress = event.ip_address ? escapeHtml(event.ip_address) : '<span class="text-muted">N/A</span>';
+
+            return `
+                <tr>
+                    <td>${event.id}</td>
+                    <td>
+                        <span class="badge bg-${getEventTypeBadgeColor(event.event_type)}">
+                            ${getEventTypeIcon(event.event_type)} ${escapeHtml(event.event_type)}
+                        </span>
+                    </td>
+                    <td>${userName}</td>
+                    <td><code class="small">${ipAddress}</code></td>
+                    <td><small class="text-muted">${escapeHtml(event.created_at)}</small></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="showEventDetails(${event.id})" title="View Details">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function getEventTypeBadgeColor(eventType) {
+        if (eventType.includes('login_success')) return 'success';
+        if (eventType.includes('login_failed')) return 'danger';
+        if (eventType.includes('password_changed')) return 'warning';
+        if (eventType.includes('totp_enabled')) return 'info';
+        if (eventType.includes('totp_disabled')) return 'warning';
+        if (eventType.includes('logout')) return 'secondary';
+        return 'primary';
+    }
+
+    function getEventTypeIcon(eventType) {
+        if (eventType.includes('login_success')) return '<i class="bi bi-box-arrow-in-right"></i>';
+        if (eventType.includes('login_failed')) return '<i class="bi bi-exclamation-triangle"></i>';
+        if (eventType.includes('password_changed')) return '<i class="bi bi-key"></i>';
+        if (eventType.includes('totp_enabled')) return '<i class="bi bi-shield-plus"></i>';
+        if (eventType.includes('totp_disabled')) return '<i class="bi bi-shield-x"></i>';
+        if (eventType.includes('logout')) return '<i class="bi bi-box-arrow-right"></i>';
+        return '<i class="bi bi-info-circle"></i>';
+    }
+
+    function renderPagination() {
+        const totalPages = Math.ceil(totalEvents / EVENTS_PER_PAGE);
+        const paginationControls = document.getElementById('paginationControls');
+
+        if (totalPages <= 1) {
+            paginationControls.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+
+        // Previous button
+        html += `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadEvents(${currentPage - 1}); return false;">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+        `;
+
+        // Page numbers (show max 5 pages)
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, startPage + 4);
+
+        if (startPage > 1) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">1</a></li>`;
+            if (startPage > 2) {
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadEvents(${i}); return false;">${i}</a>
+                </li>
+            `;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${totalPages}); return false;">${totalPages}</a></li>`;
+        }
+
+        // Next button
+        html += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadEvents(${currentPage + 1}); return false;">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        `;
+
+        paginationControls.innerHTML = html;
+
+        // Update pagination info
+        const start = (currentPage - 1) * EVENTS_PER_PAGE + 1;
+        const end = Math.min(currentPage * EVENTS_PER_PAGE, totalEvents);
+        document.getElementById('paginationInfo').textContent = `Showing ${start}-${end} of ${totalEvents} events`;
+    }
+
+    function updateTotalCount() {
+        document.getElementById('totalEventsCount').textContent = `${totalEvents} total events`;
+    }
+
+    function applyFilters() {
+        const eventType = document.getElementById('eventTypeFilter').value;
+        const searchQuery = document.getElementById('searchQuery').value.trim();
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+
+        currentFilters = {};
+        if (eventType) currentFilters.eventType = eventType;
+        if (searchQuery) currentFilters.searchQuery = searchQuery;
+        if (dateFrom) currentFilters.dateFrom = dateFrom;
+        if (dateTo) currentFilters.dateTo = dateTo;
+
+        loadEvents(1); // Reset to page 1 when filters change
+    }
+
+    function resetFilters() {
+        document.getElementById('eventsFilterForm').reset();
+        currentFilters = {};
+        loadEvents(1);
+    }
+
+    async function showEventDetails(eventId) {
+        eventDetailsModalInstance.show();
+
+        const content = document.getElementById('eventDetailsContent');
+        content.innerHTML = `
+            <div class="text-center text-muted">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                Loading event details...
+            </div>
+        `;
+
+        try {
+            // Note: This endpoint will be created in the next step
+            const response = await fetch(`{{ applicationUrl }}/api/admin/events/${eventId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to load event details');
+
+            const event = await response.json();
+            renderEventDetails(event);
+        } catch (error) {
+            content.innerHTML = `<div class="alert alert-danger">Error loading event details: ${error.message}</div>`;
+            console.error('Error loading event details:', error);
+        }
+    }
+
+    function renderEventDetails(event) {
+        const content = document.getElementById('eventDetailsContent');
+
+        const userName = event.user_name ? escapeHtml(event.user_name) : '<span class="text-muted">N/A</span>';
+        const ipAddress = event.ip_address ? escapeHtml(event.ip_address) : '<span class="text-muted">N/A</span>';
+        const userAgent = event.user_agent ? escapeHtml(event.user_agent) : '<span class="text-muted">N/A</span>';
+        const metadata = event.metadata ? escapeHtml(event.metadata) : '<span class="text-muted">N/A</span>';
+
+        content.innerHTML = `
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Event ID</label>
+                    <p>${event.id}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Event Type</label>
+                    <p>
+                        <span class="badge bg-${getEventTypeBadgeColor(event.event_type)}">
+                            ${getEventTypeIcon(event.event_type)} ${escapeHtml(event.event_type)}
+                        </span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">User</label>
+                    <p>${userName} ${event.user_id ? `<small class="text-muted">(ID: ${event.user_id})</small>` : ''}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Timestamp</label>
+                    <p>${escapeHtml(event.created_at)}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">IP Address</label>
+                    <p><code>${ipAddress}</code></p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">User Agent</label>
+                    <p class="small">${userAgent}</p>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">Metadata</label>
+                    <p class="small"><code>${metadata}</code></p>
+                </div>
+            </div>
+        `;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+</script>
