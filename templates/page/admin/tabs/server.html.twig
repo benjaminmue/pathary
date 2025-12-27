@@ -784,6 +784,31 @@
                         </div>
                     </div>
 
+                    <!-- OAuth Email Box -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 health-box" id="health-box-oauth">
+                            <div class="card-body text-center d-flex flex-column">
+                                <h6 class="card-title mb-3">Email OAuth</h6>
+                                <div class="health-icon mb-3">
+                                    <i class="bi bi-envelope text-secondary" style="font-size: 3rem;" id="health-icon-oauth"></i>
+                                </div>
+                                <span class="badge bg-secondary mb-2" id="health-badge-oauth">Unknown</span>
+                                <p class="small text-muted mb-2" id="health-message-oauth">Not checked yet</p>
+                                <p class="small text-muted mb-3" id="health-meta-oauth">
+                                    <span id="health-latency-oauth">-</span> • <span id="health-checked-oauth">-</span>
+                                </p>
+                                <div class="mt-auto">
+                                    <button class="btn btn-sm btn-outline-primary me-1" id="health-retest-oauth" onclick="retestOauth()">
+                                        <i class="bi bi-arrow-clockwise"></i> Retest
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('oauth')">
+                                        <i class="bi bi-gear"></i> Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Integration 1 Box (Placeholder) -->
                     <div class="col-md-6 col-lg-3">
                         <div class="card h-100 health-box health-box-disabled" id="health-box-integration1">
@@ -1547,6 +1572,43 @@
         }
     }
 
+    async function retestOauth() {
+        const button = document.getElementById('health-retest-oauth');
+        const originalHtml = button?.innerHTML;
+
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        }
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/health/oauth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    csrf: getCsrfToken(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.oauth) {
+                updateServiceStatus('oauth', data.oauth);
+                updateLastRunTime();
+                showToast('OAuth check completed', 'success');
+            }
+        } catch (error) {
+            showToast('Error checking OAuth: ' + error.message, 'danger');
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            }
+        }
+    }
+
     function navigateToSettings(module) {
         switch (module) {
             case 'database':
@@ -1558,6 +1620,19 @@
                 const tmdbSection = document.querySelector('.card-header:has(.bi-key)');
                 if (tmdbSection) {
                     tmdbSection.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                break;
+            case 'oauth':
+                // Scroll to OAuth email settings section
+                const oauthSection = document.querySelector('#email-oauth-settings');
+                if (oauthSection) {
+                    oauthSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    // Fallback: scroll to email settings card
+                    const emailCard = document.querySelector('.card-header:has(.bi-envelope)');
+                    if (emailCard) {
+                        emailCard.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 }
                 break;
             case 'integration1':
@@ -1574,6 +1649,9 @@
         }
         if (data.tmdb) {
             updateServiceStatus('tmdb', data.tmdb);
+        }
+        if (data.oauth) {
+            updateServiceStatus('oauth', data.oauth);
         }
         if (data.integration1) {
             updateServiceStatus('integration1', data.integration1);

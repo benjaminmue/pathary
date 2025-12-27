@@ -55,6 +55,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/admin/health/run', [Web\HealthCheckController::class, 'runHealthCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('POST', '/admin/health/db', [Web\HealthCheckController::class, 'runDatabaseCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('POST', '/admin/health/tmdb', [Web\HealthCheckController::class, 'runTmdbCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/admin/health/oauth', [Web\HealthCheckController::class, 'runOAuthCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
 
     ###########
     # Profile #
@@ -198,6 +199,16 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAdmin::class
     ]);
     $routes->add('POST', '/admin/server/email/auth-mode', [Web\OAuthEmailController::class, 'updateAuthMode'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+
+    // OAuth Monitoring API Routes
+    $routes->add('GET', '/api/admin/oauth/monitoring-status', [Api\OAuthMonitoringController::class, 'getMonitoringStatus'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/api/admin/oauth/acknowledge-banner', [Api\OAuthMonitoringController::class, 'acknowledgeBanner'], [
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class
     ]);

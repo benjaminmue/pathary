@@ -30,6 +30,17 @@ class SecurityAuditService
     public const EVENT_USER_WELCOME_EMAIL_SENT = 'user_welcome_email_sent';
     public const EVENT_USER_WELCOME_EMAIL_FAILED = 'user_welcome_email_failed';
 
+    // OAuth Monitoring Event types
+    public const EVENT_OAUTH_TOKEN_WARN_45 = 'oauth_token_warn_45';
+    public const EVENT_OAUTH_TOKEN_WARN_30 = 'oauth_token_warn_30';
+    public const EVENT_OAUTH_TOKEN_WARN_15 = 'oauth_token_warn_15';
+    public const EVENT_OAUTH_TOKEN_WARN_DAILY = 'oauth_token_warn_daily';
+    public const EVENT_OAUTH_TOKEN_EXPIRED = 'oauth_token_expired';
+    public const EVENT_OAUTH_TOKEN_REFRESH_FAILED = 'oauth_token_refresh_failed';
+    public const EVENT_OAUTH_TOKEN_REFRESH_RECOVERED = 'oauth_token_refresh_recovered';
+    public const EVENT_OAUTH_BANNER_ACKNOWLEDGED = 'oauth_banner_acknowledged';
+    public const EVENT_OAUTH_BANNER_SHOWN = 'oauth_banner_shown';
+
     public function __construct(
         private readonly SecurityAuditRepository $securityAuditRepository,
     ) {
@@ -104,6 +115,15 @@ class SecurityAuditService
             self::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN => 'Password Changed by Admin',
             self::EVENT_USER_WELCOME_EMAIL_SENT => 'Welcome Email Sent',
             self::EVENT_USER_WELCOME_EMAIL_FAILED => 'Welcome Email Failed',
+            self::EVENT_OAUTH_TOKEN_WARN_45 => 'OAuth Token Warning (45 Days)',
+            self::EVENT_OAUTH_TOKEN_WARN_30 => 'OAuth Token Warning (30 Days)',
+            self::EVENT_OAUTH_TOKEN_WARN_15 => 'OAuth Token Warning (15 Days)',
+            self::EVENT_OAUTH_TOKEN_WARN_DAILY => 'OAuth Token Warning (Daily Alert)',
+            self::EVENT_OAUTH_TOKEN_EXPIRED => 'OAuth Token Expired',
+            self::EVENT_OAUTH_TOKEN_REFRESH_FAILED => 'OAuth Token Refresh Failed',
+            self::EVENT_OAUTH_TOKEN_REFRESH_RECOVERED => 'OAuth Token Refresh Recovered',
+            self::EVENT_OAUTH_BANNER_ACKNOWLEDGED => 'OAuth Banner Acknowledged',
+            self::EVENT_OAUTH_BANNER_SHOWN => 'OAuth Banner Shown',
             default => $eventType,
         };
     }

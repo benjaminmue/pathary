@@ -1,0 +1,189 @@
+{# OAuth Monitoring Alert Banner - Shows for admins when OAuth needs attention #}
+{% if currentUser is defined and currentUser is not null and currentUser.isAdmin() %}
+<!-- OAuth Monitoring Banner Modal -->
+<div class="modal fade" id="oauthAlertModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="oauthAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="oauthAlertModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span id="oauthAlertTitle">Email OAuth Connection Needs Attention</span>
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div id="oauthAlertContent">
+                    <div class="alert alert-warning mb-3" role="alert">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-info-circle-fill me-2 mt-1"></i>
+                            <div>
+                                <strong id="oauthAlertProvider"></strong>
+                                <div id="oauthAlertMessage" class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6>What you need to do:</h6>
+                        <ol class="mb-0">
+                            <li>Open <strong>Email Settings</strong> in the admin panel</li>
+                            <li>Navigate to the <strong>OAuth</strong> tab</li>
+                            <li>Review the connection status</li>
+                            <li>Click <strong>"Reconnect"</strong> if needed to re-authorize</li>
+                        </ol>
+                    </div>
+
+                    <div class="small text-muted">
+                        <i class="bi bi-clock me-1"></i>
+                        This alert will reappear in 3 hours if not resolved.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="acknowledgeOAuthBanner()">
+                    <i class="bi bi-check-circle me-1"></i> Acknowledge (Remind in 3 hours)
+                </button>
+                <a href="{{ applicationUrl }}/admin/server/email" class="btn btn-primary">
+                    <i class="bi bi-gear me-1"></i> Open Email Settings
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// OAuth Banner Management
+(function() {
+    let oauthBannerModal = null;
+    let currentAlertLevel = null;
+
+    // Initialize modal on DOM ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalEl = document.getElementById('oauthAlertModal');
+        if (modalEl) {
+            oauthBannerModal = new bootstrap.Modal(modalEl);
+            checkOAuthStatus();
+        }
+    });
+
+    // Check OAuth status and show banner if needed
+    async function checkOAuthStatus() {
+        try {
+            const response = await fetch('{{ applicationUrl }}/api/admin/oauth/monitoring-status');
+            if (!response.ok) {
+                return; // Fail silently
+            }
+
+            const data = await response.json();
+
+            if (data.should_show_banner) {
+                currentAlertLevel = data.alert_level;
+                showOAuthBanner(data);
+            }
+        } catch (error) {
+            console.error('Failed to check OAuth monitoring status:', error);
+        }
+    }
+
+    function showOAuthBanner(data) {
+        // Update modal content
+        const titleEl = document.getElementById('oauthAlertTitle');
+        const providerEl = document.getElementById('oauthAlertProvider');
+        const messageEl = document.getElementById('oauthAlertMessage');
+        const modalHeader = document.querySelector('#oauthAlertModal .modal-header');
+
+        if (titleEl) titleEl.textContent = 'Email OAuth Connection Needs Attention';
+        if (providerEl) providerEl.textContent = data.provider_display_name + ' OAuth Connection';
+        if (messageEl) messageEl.textContent = data.message;
+
+        // Update header color based on severity
+        if (modalHeader) {
+            modalHeader.className = 'modal-header text-white ' + getBannerClass(data.alert_level);
+        }
+
+        // Show the modal
+        if (oauthBannerModal) {
+            oauthBannerModal.show();
+        }
+    }
+
+    function getBannerClass(alertLevel) {
+        switch (alertLevel) {
+            case 'expired':
+            case 'critical':
+                return 'bg-danger';
+            case 'warn':
+                return 'bg-warning';
+            default:
+                return 'bg-info';
+        }
+    }
+
+    // Acknowledge banner (exposed globally)
+    window.acknowledgeOAuthBanner = async function() {
+        if (!currentAlertLevel) {
+            return;
+        }
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/api/admin/oauth/acknowledge-banner', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    alert_level: currentAlertLevel
+                })
+            });
+
+            if (response.ok) {
+                // Close the modal
+                if (oauthBannerModal) {
+                    oauthBannerModal.hide();
+                }
+
+                // Show confirmation toast
+                showToast('Banner acknowledged. You will be reminded in 3 hours if the issue persists.');
+            } else {
+                showToast('Failed to acknowledge banner. Please try again.', 'danger');
+            }
+        } catch (error) {
+            console.error('Failed to acknowledge banner:', error);
+            showToast('Failed to acknowledge banner. Please try again.', 'danger');
+        }
+    };
+
+    function showToast(message, variant = 'success') {
+        // Create toast element
+        const toastHtml = `
+            <div class="toast align-items-center text-bg-${variant} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+
+        // Create container if it doesn't exist
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+        }
+
+        // Add toast and show it
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        const toastEl = container.lastElementChild;
+        const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 3000 });
+        toast.show();
+
+        // Remove toast element after hidden
+        toastEl.addEventListener('hidden.bs.toast', function() {
+            toastEl.remove();
+        });
+    }
+})();
+</script>
+{% endif %}

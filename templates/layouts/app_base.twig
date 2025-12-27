@@ -31,6 +31,9 @@
 <body class="d-flex flex-column min-vh-100">
     {% include 'partials/navbar_app.twig' %}
 
+    {# OAuth Monitoring Banner (Admin Only) #}
+    {% include 'partials/oauth_monitor_banner.twig' %}
+
     <main class="flex-grow-1 pb-4">
         {% block body %}{% endblock %}
     </main>

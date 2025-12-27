@@ -289,6 +289,76 @@ class OAuthConfigService
     }
 
     /**
+     * Update monitoring fields after token refresh attempt
+     *
+     * @param bool $success Whether refresh was successful
+     * @param string|null $errorCode Error code if failed (sanitized)
+     * @param string|null $errorMessage Error message if failed (sanitized, short)
+     * @param bool $reauthRequired Whether re-authorization is needed
+     */
+    public function updateMonitoring(
+        bool $success,
+        ?string $errorCode = null,
+        ?string $errorMessage = null,
+        bool $reauthRequired = false
+    ) : void {
+        if ($success) {
+            $this->dbConnection->prepare(
+                <<<SQL
+                UPDATE `oauth_email_config`
+                SET
+                    `last_token_refresh_at` = CURRENT_TIMESTAMP,
+                    `token_status` = 'active',
+                    `token_error` = NULL,
+                    `last_error_code` = NULL,
+                    `reauth_required` = 0,
+                    `updated_at` = CURRENT_TIMESTAMP
+                SQL
+            )->executeStatement();
+        } else {
+            // Sanitize error code and message
+            $sanitizedCode = $errorCode !== null ? substr($errorCode, 0, 100) : null;
+            $sanitizedMessage = $errorMessage !== null ? substr($errorMessage, 0, 255) : null;
+
+            $this->dbConnection->prepare(
+                <<<SQL
+                UPDATE `oauth_email_config`
+                SET
+                    `last_failure_at` = CURRENT_TIMESTAMP,
+                    `last_error_code` = ?,
+                    `token_error` = ?,
+                    `token_status` = IF(? = 1, 'expired', 'error'),
+                    `reauth_required` = ?,
+                    `updated_at` = CURRENT_TIMESTAMP
+                SQL
+            )->executeStatement([
+                $sanitizedCode,
+                $sanitizedMessage,
+                $reauthRequired ? 1 : 0,
+                $reauthRequired ? 1 : 0,
+            ]);
+        }
+    }
+
+    /**
+     * Update alert level and next notification time
+     *
+     * @param string $alertLevel Alert level: ok, warn, critical, expired
+     * @param string|null $nextNotificationAt Next notification datetime
+     */
+    public function updateAlertLevel(string $alertLevel, ?string $nextNotificationAt = null) : void
+    {
+        $validLevels = ['ok', 'warn', 'critical', 'expired'];
+        if (!in_array($alertLevel, $validLevels, true)) {
+            throw new RuntimeException("Invalid alert level: {$alertLevel}");
+        }
+
+        $this->dbConnection->prepare(
+            'UPDATE `oauth_email_config` SET `alert_level` = ?, `next_notification_at` = ?, `updated_at` = CURRENT_TIMESTAMP'
+        )->executeStatement([$alertLevel, $nextNotificationAt]);
+    }
+
+    /**
      * Hydrate database row into OAuthConfig value object
      *
      * @param array<string, mixed> $row Database row
@@ -312,6 +382,11 @@ class OAuthConfigService
             clientSecretExpiresAt: $row['client_secret_expires_at'] !== null ? (string)$row['client_secret_expires_at'] : null,
             connectedAt: $row['connected_at'] !== null ? (string)$row['connected_at'] : null,
             lastTokenRefreshAt: $row['last_token_refresh_at'] !== null ? (string)$row['last_token_refresh_at'] : null,
+            lastFailureAt: $row['last_failure_at'] !== null ? (string)$row['last_failure_at'] : null,
+            lastErrorCode: $row['last_error_code'] !== null ? (string)$row['last_error_code'] : null,
+            reauthRequired: (bool)($row['reauth_required'] ?? false),
+            alertLevel: (string)($row['alert_level'] ?? 'ok'),
+            nextNotificationAt: $row['next_notification_at'] !== null ? (string)$row['next_notification_at'] : null,
             createdAt: (string)$row['created_at'],
             updatedAt: (string)$row['updated_at'],
         );

@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Doctrine\DBAL\Connection;
+use Movary\Service\Email\OAuthConfigService;
 use Movary\Service\ServerSettings;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
@@ -27,6 +28,7 @@ class HealthCheckController
         private readonly ClientInterface $httpClient,
         private readonly SessionWrapper $sessionWrapper,
         private readonly LoggerInterface $logger,
+        private readonly OAuthConfigService $oauthConfigService,
     ) {
     }
 
@@ -42,6 +44,7 @@ class HealthCheckController
             $cachedData = [
                 'database' => $this->createUnknownStatus('Database', true),
                 'tmdb' => $this->createUnknownStatus('TMDB API', $this->isTmdbEnabled()),
+                'oauth' => $this->createUnknownStatus('Email OAuth', $this->isOAuthEnabled()),
                 'integration1' => $this->createUnknownStatus('Integration 1', false),
                 'integration2' => $this->createUnknownStatus('Integration 2', false),
                 'overall' => ['status' => 'unknown'],
@@ -76,13 +79,15 @@ class HealthCheckController
         // Run health checks
         $dbHealth = $this->checkDatabaseHealth();
         $tmdbHealth = $this->checkTmdbHealth();
+        $oauthHealth = $this->checkOAuthHealth();
 
         // Determine overall status
-        $overallStatus = $this->determineOverallStatus($dbHealth['status'], $tmdbHealth['status']);
+        $overallStatus = $this->determineOverallStatus($dbHealth['status'], $tmdbHealth['status'], $oauthHealth['status']);
 
         $results = [
             'database' => $dbHealth,
             'tmdb' => $tmdbHealth,
+            'oauth' => $oauthHealth,
             'integration1' => $this->createUnknownStatus('Integration 1', false),
             'integration2' => $this->createUnknownStatus('Integration 2', false),
             'overall' => ['status' => $overallStatus],
@@ -133,6 +138,25 @@ class HealthCheckController
         return Response::create(
             StatusCode::createOk(),
             Json::encode(['tmdb' => $tmdbHealth]),
+            [Header::createContentTypeJson()],
+        );
+    }
+
+    /**
+     * POST /admin/health/oauth - Run OAuth health check only
+     */
+    public function runOAuthCheck(Request $request) : Response
+    {
+        $oauthHealth = $this->checkOAuthHealth();
+
+        // Update cache with this result
+        $cachedData = $this->getCachedHealth() ?? [];
+        $cachedData['oauth'] = $oauthHealth;
+        $this->cacheHealth($cachedData);
+
+        return Response::create(
+            StatusCode::createOk(),
+            Json::encode(['oauth' => $oauthHealth]),
             [Header::createContentTypeJson()],
         );
     }
@@ -192,6 +216,19 @@ class HealthCheckController
     {
         $apiKey = $this->serverSettings->getTmdbApiKey();
         return $apiKey !== null && $apiKey !== '';
+    }
+
+    /**
+     * Check if OAuth is enabled (configured and connected)
+     */
+    private function isOAuthEnabled() : bool
+    {
+        try {
+            $config = $this->oauthConfigService->getConfig();
+            return $config !== null;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -291,27 +328,114 @@ class HealthCheckController
     }
 
     /**
+     * Check OAuth email connectivity and token health
+     */
+    private function checkOAuthHealth() : array
+    {
+        try {
+            $config = $this->oauthConfigService->getConfig();
+
+            // Not configured
+            if ($config === null) {
+                return [
+                    'enabled' => false,
+                    'status' => 'down',
+                    'message' => 'OAuth not configured',
+                    'latency_ms' => 0,
+                    'checked_at' => date('Y-m-d H:i:s'),
+                ];
+            }
+
+            // Check alert level to determine health
+            $alertLevel = $config->alertLevel;
+            $lastRefresh = $config->lastTokenRefreshAt;
+            $lastFailure = $config->lastFailureAt;
+
+            // Map alert level to health status
+            switch ($alertLevel) {
+                case 'ok':
+                    return [
+                        'enabled' => true,
+                        'status' => 'healthy',
+                        'message' => 'OAuth connected',
+                        'latency_ms' => 0,
+                        'checked_at' => date('Y-m-d H:i:s'),
+                        'last_refresh' => $lastRefresh,
+                    ];
+
+                case 'warn':
+                    return [
+                        'enabled' => true,
+                        'status' => 'degraded',
+                        'message' => 'OAuth token refresh needed',
+                        'latency_ms' => 0,
+                        'checked_at' => date('Y-m-d H:i:s'),
+                        'last_refresh' => $lastRefresh,
+                    ];
+
+                case 'critical':
+                case 'expired':
+                    return [
+                        'enabled' => true,
+                        'status' => 'down',
+                        'message' => $alertLevel === 'expired' ? 'OAuth token expired' : 'OAuth token failing',
+                        'latency_ms' => 0,
+                        'checked_at' => date('Y-m-d H:i:s'),
+                        'last_refresh' => $lastRefresh,
+                        'last_failure' => $lastFailure,
+                    ];
+
+                default:
+                    return [
+                        'enabled' => true,
+                        'status' => 'unknown',
+                        'message' => 'OAuth status unknown',
+                        'latency_ms' => 0,
+                        'checked_at' => date('Y-m-d H:i:s'),
+                    ];
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('OAuth health check failed', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'enabled' => false,
+                'status' => 'down',
+                'message' => 'OAuth check failed',
+                'latency_ms' => 0,
+                'checked_at' => date('Y-m-d H:i:s'),
+            ];
+        }
+    }
+
+    /**
      * Determine overall system status from individual checks
      */
-    private function determineOverallStatus(string $dbStatus, string $tmdbStatus) : string
+    private function determineOverallStatus(string $dbStatus, string $tmdbStatus, string $oauthStatus = 'unknown') : string
     {
-        // If either critical service is down, overall is down
+        // If database is down, overall is down (critical)
         if ($dbStatus === 'down') {
             return 'down';
         }
 
         // If any service is degraded, overall is degraded
-        if ($dbStatus === 'degraded' || $tmdbStatus === 'degraded') {
+        if ($dbStatus === 'degraded' || $tmdbStatus === 'degraded' || $oauthStatus === 'degraded') {
             return 'degraded';
         }
 
-        // If TMDB is down but DB is healthy, overall is degraded (not critical)
-        if ($tmdbStatus === 'down') {
+        // If TMDB or OAuth is down but DB is healthy, overall is degraded (not critical)
+        if ($tmdbStatus === 'down' || $oauthStatus === 'down') {
             return 'degraded';
         }
 
-        // Both healthy
-        if ($dbStatus === 'healthy' && $tmdbStatus === 'healthy') {
+        // All healthy
+        if ($dbStatus === 'healthy' && $tmdbStatus === 'healthy' && $oauthStatus === 'healthy') {
+            return 'healthy';
+        }
+
+        // Database healthy but other services unknown
+        if ($dbStatus === 'healthy') {
             return 'healthy';
         }
 

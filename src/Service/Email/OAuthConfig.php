@@ -28,6 +28,11 @@ class OAuthConfig
         public readonly ?string $clientSecretExpiresAt,
         public readonly ?string $connectedAt,
         public readonly ?string $lastTokenRefreshAt,
+        public readonly ?string $lastFailureAt,
+        public readonly ?string $lastErrorCode,
+        public readonly bool $reauthRequired,
+        public readonly string $alertLevel,
+        public readonly ?string $nextNotificationAt,
         public readonly string $createdAt,
         public readonly string $updatedAt,
     ) {
@@ -190,5 +195,86 @@ class OAuthConfig
                 'message' => null,
             ],
         };
+    }
+
+    /**
+     * Get alert level information with variant and label
+     *
+     * @return array{level: string, label: string, variant: string, severity: int}
+     */
+    public function getAlertLevelInfo() : array
+    {
+        return match ($this->alertLevel) {
+            'ok' => [
+                'level' => 'ok',
+                'label' => 'Healthy',
+                'variant' => 'success',
+                'severity' => 0,
+            ],
+            'warn' => [
+                'level' => 'warn',
+                'label' => 'Warning',
+                'variant' => 'warning',
+                'severity' => 1,
+            ],
+            'critical' => [
+                'level' => 'critical',
+                'label' => 'Critical',
+                'variant' => 'danger',
+                'severity' => 2,
+            ],
+            'expired' => [
+                'level' => 'expired',
+                'label' => 'Expired',
+                'variant' => 'danger',
+                'severity' => 3,
+            ],
+            default => [
+                'level' => 'unknown',
+                'label' => 'Unknown',
+                'variant' => 'secondary',
+                'severity' => -1,
+            ],
+        };
+    }
+
+    /**
+     * Check if alert level requires admin attention
+     */
+    public function requiresAttention() : bool
+    {
+        return in_array($this->alertLevel, ['warn', 'critical', 'expired'], true);
+    }
+
+    /**
+     * Get days since last successful refresh
+     */
+    public function getDaysSinceLastRefresh() : ?int
+    {
+        if ($this->lastTokenRefreshAt === null) {
+            return null;
+        }
+
+        $lastRefresh = strtotime($this->lastTokenRefreshAt);
+        $now = time();
+        $diff = $now - $lastRefresh;
+
+        return (int)floor($diff / 86400);
+    }
+
+    /**
+     * Get days since last failure
+     */
+    public function getDaysSinceLastFailure() : ?int
+    {
+        if ($this->lastFailureAt === null) {
+            return null;
+        }
+
+        $lastFailure = strtotime($this->lastFailureAt);
+        $now = time();
+        $diff = $now - $lastFailure;
+
+        return (int)floor($diff / 86400);
     }
 }

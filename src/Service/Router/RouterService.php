@@ -14,6 +14,7 @@ class RouterService
             $middleware = $route->getMiddleware();
             if ($isWebRoute === true) {
                 $middleware[] = Web\Middleware\StartSession::class;
+                $middleware[] = Web\Middleware\OAuthLazyMonitoring::class;
             }
 
             $routeCollector->addRoute(
