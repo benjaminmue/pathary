@@ -30,11 +30,7 @@ class UserController
 
     public function createUser(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false
-            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createForbidden();
-        }
-
+        // Authorization enforced by middleware: UserIsAuthenticated + UserIsAdmin
         $requestUserData = Json::decode($request->getBody());
         $sendWelcomeEmail = $requestUserData['sendWelcomeEmail'] ?? false;
 
