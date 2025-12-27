@@ -10,11 +10,13 @@ use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserInvitationService;
 use Movary\Domain\User\UserApi;
+use Movary\Service\CsrfTokenService;
 use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 use Psr\Log\LoggerInterface;
 
 class UserController
@@ -24,6 +26,7 @@ class UserController
         private readonly UserApi $userApi,
         private readonly EmailService $emailService,
         private readonly UserInvitationService $invitationService,
+        private readonly CsrfTokenService $csrfTokenService,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -32,6 +35,15 @@ class UserController
     {
         // Authorization enforced by middleware: UserIsAuthenticated + UserIsAdmin
         $requestUserData = Json::decode($request->getBody());
+
+        // Validate CSRF token
+        if (!$this->csrfTokenService->validateToken($requestUserData['csrf'] ?? '')) {
+            return Response::create(
+                StatusCode::createBadRequest(),
+                Json::encode(['error' => 'Invalid CSRF token']),
+            );
+        }
+
         $sendWelcomeEmail = $requestUserData['sendWelcomeEmail'] ?? false;
 
         // Determine password: use provided password or generate placeholder for invitation
@@ -110,6 +122,16 @@ class UserController
             return Response::createForbidden();
         }
 
+        $requestUserData = Json::decode($request->getBody());
+
+        // Validate CSRF token
+        if (!$this->csrfTokenService->validateToken($requestUserData['csrf'] ?? '')) {
+            return Response::create(
+                StatusCode::createBadRequest(),
+                Json::encode(['error' => 'Invalid CSRF token']),
+            );
+        }
+
         $this->userApi->deleteUser($userId);
 
         return Response::createOk();
@@ -135,6 +157,14 @@ class UserController
         }
 
         $requestUserData = Json::decode($request->getBody());
+
+        // Validate CSRF token
+        if (!$this->csrfTokenService->validateToken($requestUserData['csrf'] ?? '')) {
+            return Response::create(
+                StatusCode::createBadRequest(),
+                Json::encode(['error' => 'Invalid CSRF token']),
+            );
+        }
 
         try {
             $this->userApi->updateName($userId, $requestUserData['name']);

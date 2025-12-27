@@ -147,6 +147,7 @@
 
 <script>
     let createUserModalInstance, editUserModalInstance;
+    const CSRF_TOKEN = '{{ csrf }}';
 
     // Load users on page load
     document.addEventListener('DOMContentLoaded', () => {
@@ -275,7 +276,7 @@
             const response = await fetch('{{ applicationUrl }}/old/settings/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password, isAdmin, sendWelcomeEmail }),
+                body: JSON.stringify({ name, email, password, isAdmin, sendWelcomeEmail, csrf: CSRF_TOKEN }),
             });
 
             if (!response.ok) {
@@ -311,7 +312,7 @@
         const password = document.getElementById('editUserPassword').value;
         const isAdmin = document.getElementById('editUserIsAdmin').checked;
 
-        const data = { name, email, isAdmin };
+        const data = { name, email, isAdmin, csrf: CSRF_TOKEN };
         if (password) {
             if (password.length < 10) {
                 showToast('Password must be at least 10 characters', 'warning');
@@ -352,6 +353,8 @@
                 try {
                     const response = await fetch(`{{ applicationUrl }}/old/settings/users/${userId}`, {
                         method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ csrf: CSRF_TOKEN }),
                     });
 
                     if (!response.ok) {
