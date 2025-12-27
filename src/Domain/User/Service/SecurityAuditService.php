@@ -41,6 +41,16 @@ class SecurityAuditService
     public const EVENT_OAUTH_BANNER_ACKNOWLEDGED = 'oauth_banner_acknowledged';
     public const EVENT_OAUTH_BANNER_SHOWN = 'oauth_banner_shown';
 
+    // OAuth Configuration Event types
+    public const EVENT_OAUTH_CONFIG_CREATED = 'oauth_config_created';
+    public const EVENT_OAUTH_CONFIG_UPDATED = 'oauth_config_updated';
+    public const EVENT_OAUTH_CONFIG_DELETED = 'oauth_config_deleted';
+    public const EVENT_OAUTH_CONNECTED = 'oauth_connected';
+    public const EVENT_OAUTH_DISCONNECTED = 'oauth_disconnected';
+    public const EVENT_OAUTH_AUTH_MODE_CHANGED = 'oauth_auth_mode_changed';
+    public const EVENT_OAUTH_ENCRYPTION_KEY_GENERATED = 'oauth_encryption_key_generated';
+    public const EVENT_OAUTH_CALLBACK_FAILED = 'oauth_callback_failed';
+
     public function __construct(
         private readonly SecurityAuditRepository $securityAuditRepository,
     ) {
@@ -124,6 +134,14 @@ class SecurityAuditService
             self::EVENT_OAUTH_TOKEN_REFRESH_RECOVERED => 'OAuth Token Refresh Recovered',
             self::EVENT_OAUTH_BANNER_ACKNOWLEDGED => 'OAuth Banner Acknowledged',
             self::EVENT_OAUTH_BANNER_SHOWN => 'OAuth Banner Shown',
+            self::EVENT_OAUTH_CONFIG_CREATED => 'OAuth Config Created',
+            self::EVENT_OAUTH_CONFIG_UPDATED => 'OAuth Config Updated',
+            self::EVENT_OAUTH_CONFIG_DELETED => 'OAuth Config Deleted',
+            self::EVENT_OAUTH_CONNECTED => 'OAuth Connected',
+            self::EVENT_OAUTH_DISCONNECTED => 'OAuth Disconnected',
+            self::EVENT_OAUTH_AUTH_MODE_CHANGED => 'Email Auth Mode Changed',
+            self::EVENT_OAUTH_ENCRYPTION_KEY_GENERATED => 'OAuth Encryption Key Generated',
+            self::EVENT_OAUTH_CALLBACK_FAILED => 'OAuth Callback Failed',
             default => $eventType,
         };
     }

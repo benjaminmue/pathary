@@ -2,6 +2,8 @@
 
 namespace Movary\HttpController\Web;
 
+use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\SecurityAuditService;
 use Movary\Service\CsrfTokenService;
 use Movary\Service\Email\OAuthConfigService;
 use Movary\Service\Email\OAuthTokenService;
@@ -31,6 +33,8 @@ class OAuthEmailController
         private readonly ServerSettings $serverSettings,
         private readonly CsrfTokenService $csrfTokenService,
         private readonly EmailService $emailService,
+        private readonly Authentication $authenticationService,
+        private readonly SecurityAuditService $securityAuditService,
     ) {
     }
 
@@ -98,6 +102,10 @@ class OAuthEmailController
         }
 
         try {
+            // Check if config already exists (to determine create vs update)
+            $existingConfig = $this->oauthConfigService->getConfig();
+            $isUpdate = $existingConfig !== null;
+
             // Save configuration (encrypts client secret automatically)
             $this->oauthConfigService->saveConfig(
                 $provider,
@@ -106,6 +114,22 @@ class OAuthEmailController
                 $fromAddress,
                 $tenantId,
                 $secretExpiresInMonths,
+            );
+
+            // Log audit event
+            $userId = $this->authenticationService->getCurrentUserId();
+            $this->securityAuditService->log(
+                $userId,
+                $isUpdate ? SecurityAuditService::EVENT_OAUTH_CONFIG_UPDATED : SecurityAuditService::EVENT_OAUTH_CONFIG_CREATED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'provider' => $provider,
+                    'client_id' => $clientId,
+                    'from_address' => $fromAddress,
+                    'tenant_id' => $tenantId,
+                    'has_secret_expiry' => $secretExpiresInMonths !== null,
+                ]
             );
 
             return Response::create(
@@ -174,6 +198,20 @@ class OAuthEmailController
         // Check for authorization errors
         if ($error !== null) {
             $errorDescription = $request->getGetParameters()['error_description'] ?? 'Unknown error';
+
+            // Log failed callback attempt
+            $userId = $this->authenticationService->getCurrentUserId();
+            $this->securityAuditService->log(
+                $userId,
+                SecurityAuditService::EVENT_OAUTH_CALLBACK_FAILED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'error' => $error,
+                    'error_description' => $errorDescription,
+                ]
+            );
+
             return Response::create(
                 StatusCode::createBadRequest(),
                 'OAuth authorization failed: ' . $error . ' - ' . $errorDescription,
@@ -194,10 +232,40 @@ class OAuthEmailController
             // Handle callback and save tokens
             $this->oauthTokenService->handleCallback($code, $state, $redirectUri);
 
+            // Get config to log connection details
+            $config = $this->oauthConfigService->getConfig();
+
+            // Log successful OAuth connection
+            $userId = $this->authenticationService->getCurrentUserId();
+            $this->securityAuditService->log(
+                $userId,
+                SecurityAuditService::EVENT_OAUTH_CONNECTED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'provider' => $config?->provider,
+                    'from_address' => $config?->fromAddress,
+                    'granted_scopes' => $config?->scopes,
+                ]
+            );
+
             // Redirect to admin panel with success message
             return Response::createSeeOther('/admin/server?oauth_success=1');
 
         } catch (RuntimeException $e) {
+            // Log failed callback attempt
+            $userId = $this->authenticationService->getCurrentUserId();
+            $this->securityAuditService->log(
+                $userId,
+                SecurityAuditService::EVENT_OAUTH_CALLBACK_FAILED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'error' => 'exception',
+                    'error_description' => $e->getMessage(),
+                ]
+            );
+
             return Response::create(
                 StatusCode::createBadRequest(),
                 'Failed to complete OAuth authorization: ' . $e->getMessage(),
@@ -224,7 +292,23 @@ class OAuthEmailController
         }
 
         try {
+            // Get config before disconnecting (to log provider details)
+            $config = $this->oauthConfigService->getConfig();
+
             $this->oauthConfigService->disconnect();
+
+            // Log disconnect event
+            $userId = $this->authenticationService->getCurrentUserId();
+            $this->securityAuditService->log(
+                $userId,
+                SecurityAuditService::EVENT_OAUTH_DISCONNECTED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'provider' => $config?->provider,
+                    'from_address' => $config?->fromAddress,
+                ]
+            );
 
             return Response::create(
                 StatusCode::createOk(),
@@ -263,7 +347,24 @@ class OAuthEmailController
         }
 
         try {
+            // Get config before deleting (to log provider details)
+            $config = $this->oauthConfigService->getConfig();
+
             $this->oauthConfigService->deleteConfig();
+
+            // Log delete event
+            $userId = $this->authenticationService->getCurrentUserId();
+            $this->securityAuditService->log(
+                $userId,
+                SecurityAuditService::EVENT_OAUTH_CONFIG_DELETED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'provider' => $config?->provider,
+                    'client_id' => $config?->clientId,
+                    'from_address' => $config?->fromAddress,
+                ]
+            );
 
             return Response::create(
                 StatusCode::createOk(),
@@ -315,6 +416,19 @@ class OAuthEmailController
             }
 
             $keyBase64 = $this->encryptionService->generateAndStoreKey();
+
+            // Log key generation event (NOT the key value itself)
+            $userId = $this->authenticationService->getCurrentUserId();
+            $this->securityAuditService->log(
+                $userId,
+                SecurityAuditService::EVENT_OAUTH_ENCRYPTION_KEY_GENERATED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'key_source' => 'database',
+                    'key_length' => strlen($keyBase64),
+                ]
+            );
 
             return Response::create(
                 StatusCode::createOk(),
@@ -421,7 +535,23 @@ class OAuthEmailController
         }
 
         try {
+            // Get old mode before changing
+            $oldMode = $this->serverSettings->getEmailAuthMode();
+
             $this->serverSettings->setEmailAuthMode($mode);
+
+            // Log auth mode change event
+            $userId = $this->authenticationService->getCurrentUserId();
+            $this->securityAuditService->log(
+                $userId,
+                SecurityAuditService::EVENT_OAUTH_AUTH_MODE_CHANGED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'old_mode' => $oldMode,
+                    'new_mode' => $mode,
+                ]
+            );
 
             return Response::create(
                 StatusCode::createOk(),
