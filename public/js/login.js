@@ -144,8 +144,8 @@ function formatRecoveryCodeInput(event) {
     // Get raw input value
     let value = input.value;
 
-    // Remove all non-alphanumeric characters
-    let cleaned = value.replace(/[^A-Za-z0-9]/g, '');
+    // Remove all characters except valid recovery code chars (excludes 0, O, 1, I for clarity)
+    let cleaned = value.replace(/[^A-HJ-NP-Za-hj-np-z2-9]/g, '');
 
     // Convert to uppercase
     cleaned = cleaned.toUpperCase();

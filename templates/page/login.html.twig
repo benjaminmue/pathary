@@ -113,6 +113,7 @@
                            pattern="[0-9]*"
                            id="totpCode"
                            onkeydown="submitCredentialsOnEnter(event)"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                            required>
 
                     <!-- Trust This Device Checkbox -->
