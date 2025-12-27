@@ -320,7 +320,10 @@ class Factory
         // slugify filter for "nice looking" URLs
         //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
         $twig->addFilter(new TwigFilter('slugify', [$container->get(SlugifyService::class), 'slugify']));
-        
+
+        // CSRF token function for form protection
+        $twig->addFunction(new TwigFunction('csrf_token', [$container->get(CsrfTokenService::class), 'generateToken']));
+
         return $twig;
     }
 

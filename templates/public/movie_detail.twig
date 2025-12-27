@@ -547,6 +547,8 @@
                     <textarea id="comment" name="comment" placeholder="Share your thoughts about this movie...">{{ userRating.comment ?? '' }}</textarea>
                 </div>
 
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
                 <div class="rating-form-actions">
                     <button type="submit" class="btn btn-submit-rating">
                         {{ userRating ? 'Update Rating' : 'Submit Rating' }}
