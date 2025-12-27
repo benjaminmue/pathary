@@ -59,7 +59,9 @@ class EmailService
         // Set From address with optional display name
         $displayName = $smtpConfig->getFromDisplayName();
         if ($displayName !== null && $displayName !== '') {
-            $this->phpMailer->setFrom($smtpConfig->getFromAddress(), $displayName);
+            // Defensive sanitization: remove CR/LF characters to prevent header injection
+            $sanitizedDisplayName = str_replace(["\r", "\n"], '', $displayName);
+            $this->phpMailer->setFrom($smtpConfig->getFromAddress(), $sanitizedDisplayName);
         } else {
             $this->phpMailer->setFrom($smtpConfig->getFromAddress());
         }
@@ -167,7 +169,9 @@ class EmailService
         // Set From address with optional display name
         $displayName = $this->serverSettings->getFromDisplayName();
         if ($displayName !== null && $displayName !== '') {
-            $this->phpMailer->setFrom($fromAddress, $displayName);
+            // Defensive sanitization: remove CR/LF characters to prevent header injection
+            $sanitizedDisplayName = str_replace(["\r", "\n"], '', $displayName);
+            $this->phpMailer->setFrom($fromAddress, $sanitizedDisplayName);
         } else {
             $this->phpMailer->setFrom($fromAddress);
         }

@@ -3,6 +3,7 @@
 namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\Exception\EmailNotUnique;
+use Movary\Domain\User\Exception\InvalidEmail;
 use Movary\Domain\User\Exception\PasswordPolicyViolation;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
@@ -26,6 +27,26 @@ class Validator
 
         if ($user->getId() !== $expectUserId) {
             throw new EmailNotUnique();
+        }
+    }
+
+    /**
+     * Validates email address for security:
+     * - Prevents email header injection by checking for CR/LF characters
+     * - Validates email format using PHP's built-in filter
+     *
+     * @throws InvalidEmail
+     */
+    public function ensureEmailIsValid(string $email) : void
+    {
+        // Check for header injection characters (CR/LF)
+        if (strpbrk($email, "\r\n") !== false) {
+            throw InvalidEmail::create();
+        }
+
+        // Validate email format
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            throw InvalidEmail::create();
         }
     }
 

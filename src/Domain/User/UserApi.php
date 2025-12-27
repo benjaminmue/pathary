@@ -21,6 +21,7 @@ class UserApi
 
     public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : void
     {
+        $this->userValidator->ensureEmailIsValid($email);
         $this->userValidator->ensureEmailIsUnique($email);
         $this->userValidator->ensurePasswordIsValid($password);
         $this->userValidator->ensureNameFormatIsValid($name);
@@ -372,6 +373,7 @@ class UserApi
 
     public function updateEmail(int $userId, string $email) : void
     {
+        $this->userValidator->ensureEmailIsValid($email);
         $this->userValidator->ensureEmailIsUnique($email, $userId);
 
         $this->repository->updateEmail($userId, $email);
