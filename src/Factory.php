@@ -26,6 +26,7 @@ use Movary\HttpController\Web\LandingPageController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ApplicationUrlService;
+use Movary\Service\CsrfTokenService;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
@@ -48,6 +49,7 @@ use Psr\Log\LogLevel;
 use RuntimeException;
 use Twig;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 class Factory
 {
@@ -82,6 +84,13 @@ class Factory
         return new Config(
             $container->get(File::class),
             array_merge($fpmEnvironment, $systemEnvironment),
+        );
+    }
+
+    public static function createCsrfTokenService(ContainerInterface $container) : Service\CsrfTokenService
+    {
+        return new Service\CsrfTokenService(
+            $container->get(SessionWrapper::class),
         );
     }
 
