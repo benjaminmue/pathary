@@ -8,6 +8,7 @@ use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\SecurityAuditService;
 use Movary\Domain\User\Service\UserInvitationService;
 use Movary\Domain\User\UserApi;
 use Movary\Service\CsrfTokenService;
@@ -27,6 +28,7 @@ class UserController
         private readonly EmailService $emailService,
         private readonly UserInvitationService $invitationService,
         private readonly CsrfTokenService $csrfTokenService,
+        private readonly SecurityAuditService $securityAuditService,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -78,20 +80,36 @@ class UserController
             return Response::createBadRequest('Name is not in a valid format.');
         }
 
+        // Get the newly created user for audit logging
+        $newUser = $this->userApi->findUserByEmail($requestUserData['email']);
+        if ($newUser === null) {
+            $this->logger->error('Failed to find newly created user for audit logging', [
+                'email' => $requestUserData['email'],
+            ]);
+            return Response::createOk('User created but audit log failed');
+        }
+
+        // Log user creation event
+        $currentUser = $this->authenticationService->getCurrentUser();
+        $this->securityAuditService->log(
+            $currentUser->getId(),
+            SecurityAuditService::EVENT_USER_CREATED,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            [
+                'target_user_id' => $newUser->getId(),
+                'target_email' => $requestUserData['email'],
+                'target_name' => $requestUserData['name'],
+                'is_admin' => $requestUserData['isAdmin'] ?? false,
+                'welcome_email_requested' => $sendWelcomeEmail,
+            ]
+        );
+
         // Send welcome email with invitation token if requested
         if ($sendWelcomeEmail) {
             try {
-                // Get the newly created user ID
-                $user = $this->userApi->findUserByEmail($requestUserData['email']);
-                if ($user === null) {
-                    $this->logger->error('Failed to find newly created user by email', [
-                        'email' => $requestUserData['email'],
-                    ]);
-                    return Response::createOk('User created but welcome email could not be sent: User not found');
-                }
-
                 // Generate invitation token (3 days expiration)
-                $invitationToken = $this->invitationService->createInvitation($user->getId());
+                $invitationToken = $this->invitationService->createInvitation($newUser->getId());
 
                 // Send welcome email with token
                 $this->emailService->sendWelcomeEmail(
@@ -99,12 +117,38 @@ class UserController
                     $requestUserData['name'],
                     $invitationToken,
                 );
+
+                // Log successful welcome email
+                $this->securityAuditService->log(
+                    $currentUser->getId(),
+                    SecurityAuditService::EVENT_USER_WELCOME_EMAIL_SENT,
+                    $_SERVER['REMOTE_ADDR'] ?? null,
+                    $_SERVER['HTTP_USER_AGENT'] ?? null,
+                    [
+                        'target_user_id' => $newUser->getId(),
+                        'target_email' => $requestUserData['email'],
+                    ]
+                );
             } catch (CannotSendEmailException $e) {
                 // Log the error but don't fail user creation
                 $this->logger->warning('Failed to send welcome email to new user', [
                     'email' => $requestUserData['email'],
                     'error' => $e->getMessage(),
                 ]);
+
+                // Log failed welcome email event
+                $this->securityAuditService->log(
+                    $currentUser->getId(),
+                    SecurityAuditService::EVENT_USER_WELCOME_EMAIL_FAILED,
+                    $_SERVER['REMOTE_ADDR'] ?? null,
+                    $_SERVER['HTTP_USER_AGENT'] ?? null,
+                    [
+                        'target_user_id' => $newUser->getId(),
+                        'target_email' => $requestUserData['email'],
+                        'error' => $e->getMessage(),
+                    ]
+                );
+
                 // Return success but indicate email wasn't sent
                 return Response::createOk('User created but welcome email could not be sent: ' . $e->getMessage());
             }
@@ -131,6 +175,28 @@ class UserController
                 Json::encode(['error' => 'Invalid CSRF token']),
             );
         }
+
+        // Get user info before deletion for audit logging
+        $targetUser = $this->userApi->fetchUser($userId);
+        if ($targetUser === null) {
+            return Response::createNotFound();
+        }
+
+        $targetEmail = $this->userApi->findUserEmail($userId);
+
+        // Log user deletion event before deleting
+        $this->securityAuditService->log(
+            $currentUser->getId(),
+            SecurityAuditService::EVENT_USER_DELETED,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            [
+                'target_user_id' => $userId,
+                'target_email' => $targetEmail,
+                'target_name' => $targetUser->getName(),
+                'was_admin' => $targetUser->isAdmin(),
+            ]
+        );
 
         $this->userApi->deleteUser($userId);
 
@@ -166,13 +232,41 @@ class UserController
             );
         }
 
-        try {
-            $this->userApi->updateName($userId, $requestUserData['name']);
-            $this->userApi->updateEmail($userId, $requestUserData['email']);
-            $this->userApi->updateIsAdmin($userId, $requestUserData['isAdmin']);
+        // Get user before update to track changes
+        $targetUser = $this->userApi->fetchUser($userId);
+        if ($targetUser === null) {
+            return Response::createNotFound();
+        }
 
+        $changedFields = [];
+        $passwordChanged = false;
+        $adminStatusChanged = false;
+        $previousAdminStatus = $targetUser->isAdmin();
+
+        try {
+            // Track name changes
+            if ($requestUserData['name'] !== $targetUser->getName()) {
+                $this->userApi->updateName($userId, $requestUserData['name']);
+                $changedFields[] = 'name';
+            }
+
+            // Track email changes
+            if ($requestUserData['email'] !== $targetUser->getEmail()) {
+                $this->userApi->updateEmail($userId, $requestUserData['email']);
+                $changedFields[] = 'email';
+            }
+
+            // Track admin status changes
+            if ($requestUserData['isAdmin'] !== $targetUser->isAdmin()) {
+                $this->userApi->updateIsAdmin($userId, $requestUserData['isAdmin']);
+                $changedFields[] = 'is_admin';
+                $adminStatusChanged = true;
+            }
+
+            // Track password changes
             if ($requestUserData['password'] !== null) {
                 $this->userApi->updatePassword($userId, $requestUserData['password']);
+                $passwordChanged = true;
             }
         } catch (EmailNotUnique) {
             return Response::createBadRequest('Email already in use.');
@@ -184,6 +278,44 @@ class UserController
             return Response::createBadRequest($e->getMessage());
         } catch (UsernameInvalidFormat) {
             return Response::createBadRequest('Name is not in a valid format.');
+        }
+
+        // Log user update event if any changes were made
+        if (count($changedFields) > 0 || $passwordChanged) {
+            $metadata = [
+                'target_user_id' => $userId,
+                'target_email' => $requestUserData['email'],
+                'changed_fields' => $changedFields,
+            ];
+
+            if ($adminStatusChanged) {
+                $metadata['admin_status_change'] = [
+                    'from' => $previousAdminStatus,
+                    'to' => $requestUserData['isAdmin'],
+                ];
+            }
+
+            $this->securityAuditService->log(
+                $currentUser->getId(),
+                SecurityAuditService::EVENT_USER_UPDATED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                $metadata
+            );
+
+            // Log separate event for password change by admin (if not self-update)
+            if ($passwordChanged && $currentUser->getId() !== $userId) {
+                $this->securityAuditService->log(
+                    $currentUser->getId(),
+                    SecurityAuditService::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN,
+                    $_SERVER['REMOTE_ADDR'] ?? null,
+                    $_SERVER['HTTP_USER_AGENT'] ?? null,
+                    [
+                        'target_user_id' => $userId,
+                        'target_email' => $requestUserData['email'],
+                    ]
+                );
+            }
         }
 
         return Response::createOk();

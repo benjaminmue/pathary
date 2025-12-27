@@ -22,6 +22,14 @@ class SecurityAuditService
     public const EVENT_LOGIN_FAILED_RECOVERY_CODE = 'login_failed_recovery_code';
     public const EVENT_LOGOUT = 'logout';
 
+    // User Management Event types
+    public const EVENT_USER_CREATED = 'user_created';
+    public const EVENT_USER_UPDATED = 'user_updated';
+    public const EVENT_USER_DELETED = 'user_deleted';
+    public const EVENT_USER_PASSWORD_CHANGED_BY_ADMIN = 'user_password_changed_by_admin';
+    public const EVENT_USER_WELCOME_EMAIL_SENT = 'user_welcome_email_sent';
+    public const EVENT_USER_WELCOME_EMAIL_FAILED = 'user_welcome_email_failed';
+
     public function __construct(
         private readonly SecurityAuditRepository $securityAuditRepository,
     ) {
@@ -90,6 +98,12 @@ class SecurityAuditService
             self::EVENT_LOGIN_FAILED_TOTP => 'Login Failed (2FA)',
             self::EVENT_LOGIN_FAILED_RECOVERY_CODE => 'Login Failed (Recovery Code)',
             self::EVENT_LOGOUT => 'Logout',
+            self::EVENT_USER_CREATED => 'User Created',
+            self::EVENT_USER_UPDATED => 'User Updated',
+            self::EVENT_USER_DELETED => 'User Deleted',
+            self::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN => 'Password Changed by Admin',
+            self::EVENT_USER_WELCOME_EMAIL_SENT => 'Welcome Email Sent',
+            self::EVENT_USER_WELCOME_EMAIL_FAILED => 'Welcome Email Failed',
             default => $eventType,
         };
     }

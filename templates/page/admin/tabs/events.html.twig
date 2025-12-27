@@ -204,16 +204,27 @@
         if (eventType.includes('totp_enabled')) return 'info';
         if (eventType.includes('totp_disabled')) return 'warning';
         if (eventType.includes('logout')) return 'secondary';
+        if (eventType.includes('user_created')) return 'success';
+        if (eventType.includes('user_updated')) return 'info';
+        if (eventType.includes('user_deleted')) return 'danger';
+        if (eventType.includes('user_welcome_email_sent')) return 'success';
+        if (eventType.includes('user_welcome_email_failed')) return 'danger';
         return 'primary';
     }
 
     function getEventTypeIcon(eventType) {
         if (eventType.includes('login_success')) return '<i class="bi bi-box-arrow-in-right"></i>';
         if (eventType.includes('login_failed')) return '<i class="bi bi-exclamation-triangle"></i>';
+        if (eventType.includes('password_changed_by_admin')) return '<i class="bi bi-key-fill"></i>';
         if (eventType.includes('password_changed')) return '<i class="bi bi-key"></i>';
         if (eventType.includes('totp_enabled')) return '<i class="bi bi-shield-plus"></i>';
         if (eventType.includes('totp_disabled')) return '<i class="bi bi-shield-x"></i>';
         if (eventType.includes('logout')) return '<i class="bi bi-box-arrow-right"></i>';
+        if (eventType.includes('user_created')) return '<i class="bi bi-person-plus"></i>';
+        if (eventType.includes('user_updated')) return '<i class="bi bi-pencil"></i>';
+        if (eventType.includes('user_deleted')) return '<i class="bi bi-person-x"></i>';
+        if (eventType.includes('user_welcome_email_sent')) return '<i class="bi bi-envelope-check"></i>';
+        if (eventType.includes('user_welcome_email_failed')) return '<i class="bi bi-envelope-x"></i>';
         return '<i class="bi bi-info-circle"></i>';
     }
 

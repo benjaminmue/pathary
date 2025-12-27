@@ -44,7 +44,25 @@ class ProfileSecurityController
 
         $recoveryCodesCount = $this->recoveryCodeService->getRemainingCodeCount($userId);
         $trustedDevices = $this->trustedDeviceService->getTrustedDevices($userId);
-        $securityEvents = $this->securityAuditService->getRecentEvents($userId, 20);
+
+        // Get recent events but exclude user management events (those are admin actions, not user actions)
+        $allEvents = $this->securityAuditService->getRecentEvents($userId, 50);
+        $userManagementEvents = [
+            SecurityAuditService::EVENT_USER_CREATED,
+            SecurityAuditService::EVENT_USER_UPDATED,
+            SecurityAuditService::EVENT_USER_DELETED,
+            SecurityAuditService::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN,
+            SecurityAuditService::EVENT_USER_WELCOME_EMAIL_SENT,
+            SecurityAuditService::EVENT_USER_WELCOME_EMAIL_FAILED,
+        ];
+
+        // Filter out user management events - users should only see their own actions, not admin actions on their account
+        $securityEvents = array_filter($allEvents, function($event) use ($userManagementEvents) {
+            return !in_array($event['event_type'], $userManagementEvents, true);
+        });
+
+        // Take only first 20 after filtering
+        $securityEvents = array_slice($securityEvents, 0, 20);
 
         return Response::create(
             StatusCode::createOk(),
@@ -358,7 +376,26 @@ class ProfileSecurityController
         $userId = $this->authenticationService->getCurrentUserId();
         $limit = (int)($request->getGetParameters()['limit'] ?? 20);
 
-        $events = $this->securityAuditService->getRecentEvents($userId, $limit);
+        // Get events but fetch more to account for filtering
+        $allEvents = $this->securityAuditService->getRecentEvents($userId, $limit * 3);
+
+        // Exclude user management events (admin actions on the user's account)
+        $userManagementEvents = [
+            SecurityAuditService::EVENT_USER_CREATED,
+            SecurityAuditService::EVENT_USER_UPDATED,
+            SecurityAuditService::EVENT_USER_DELETED,
+            SecurityAuditService::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN,
+            SecurityAuditService::EVENT_USER_WELCOME_EMAIL_SENT,
+            SecurityAuditService::EVENT_USER_WELCOME_EMAIL_FAILED,
+        ];
+
+        // Filter out user management events
+        $filteredEvents = array_filter($allEvents, function($event) use ($userManagementEvents) {
+            return !in_array($event['event_type'], $userManagementEvents, true);
+        });
+
+        // Take only requested number after filtering
+        $events = array_slice($filteredEvents, 0, $limit);
 
         // Format events for display
         $formattedEvents = array_map(function ($event) {
