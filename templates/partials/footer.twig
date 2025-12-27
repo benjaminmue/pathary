@@ -1,24 +1,22 @@
 <style>
-    footer.footer a,
-    footer.footer a:link,
-    footer.footer a:visited {
-        color: #6c757d !important;
+    /* Light mode: force dark footer to match navbar */
+    [data-bs-theme="light"] footer.footer {
+        background-color: var(--pathe-dark) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
-    footer.footer a:hover,
-    footer.footer a:active {
-        color: #495057 !important;
-    }
-    [data-bs-theme="dark"] footer.footer a,
-    [data-bs-theme="dark"] footer.footer a:link,
-    [data-bs-theme="dark"] footer.footer a:visited {
+
+    [data-bs-theme="light"] footer.footer a,
+    [data-bs-theme="light"] footer.footer a:link,
+    [data-bs-theme="light"] footer.footer a:visited {
         color: #adb5bd !important;
     }
-    [data-bs-theme="dark"] footer.footer a:hover,
-    [data-bs-theme="dark"] footer.footer a:active {
+
+    [data-bs-theme="light"] footer.footer a:hover,
+    [data-bs-theme="light"] footer.footer a:active {
         color: #dee2e6 !important;
     }
 </style>
-<footer class="footer mt-auto py-3 bg-body-tertiary border-top">
+<footer class="footer mt-auto py-3 bg-body-tertiary">
     <div class="container">
         <div class="d-flex flex-wrap justify-content-center gap-3 small">
             <a href="https://github.com/benjaminmue/pathary" target="_blank" rel="noopener noreferrer" class="text-decoration-none">

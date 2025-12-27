@@ -1,4 +1,10 @@
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--pathe-dark);">
+<style>
+    /* Light mode: force dark navbar */
+    [data-bs-theme="light"] .navbar {
+        background-color: var(--pathe-dark) !important;
+    }
+</style>
+<nav class="navbar navbar-expand-lg navbar-dark bg-body-tertiary">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center gap-2" href="{{ applicationUrl }}/">
             <img src="{{ applicationUrl }}/images/pathary-logo.svg" alt="" height="32" class="navbar-logo">
