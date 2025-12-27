@@ -78,6 +78,43 @@ function initializeSecurityListeners() {
     if (revokeAllBtn) {
         revokeAllBtn.addEventListener('click', revokeAllTrustedDevices);
     }
+
+    // Security Activity Show More/Less
+    const showMoreBtn = document.getElementById('showMoreSecurityBtn');
+    if (showMoreBtn) {
+        showMoreBtn.addEventListener('click', toggleSecurityActivity);
+    }
+}
+
+// Toggle Security Activity collapse/expand
+function toggleSecurityActivity() {
+    const container = document.getElementById('securityActivityContainer');
+    const btn = document.getElementById('showMoreSecurityBtn');
+    const btnText = document.getElementById('showMoreBtnText');
+
+    if (!container || !btn || !btnText) return;
+
+    const isCollapsed = container.classList.contains('collapsed');
+
+    if (isCollapsed) {
+        // Expand
+        container.classList.remove('collapsed');
+        container.classList.add('expanded');
+        btnText.textContent = 'Show less';
+        btn.setAttribute('aria-expanded', 'true');
+    } else {
+        // Collapse
+        container.classList.remove('expanded');
+        container.classList.add('collapsed');
+        btnText.textContent = 'Show more';
+        btn.setAttribute('aria-expanded', 'false');
+
+        // Smooth scroll to top of security activity section
+        const securitySection = container.closest('.security-section');
+        if (securitySection) {
+            securitySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
 }
 
 // Change Password
