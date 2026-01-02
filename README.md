@@ -14,7 +14,7 @@
 > This repository is in **heavy development** and will be updated frequently. Expect breaking changes, new features, and ongoing improvements. Always back up your data before updating.
 
 > [!NOTE]
-> This project was built with the assistance of **Claude Code**, **OpenAI functionality**, manual research, and community contributions. We leverage AI tools to accelerate development while maintaining code quality and security standards.
+> This project was built with the assistance of **Claude Code**, **OpenAI functionality**, manual research, and community contributions from the original Repository (movary). I leverage AI tools to accelerate development while maintaining code quality and security standards.
 
 ## What is Pathary?
 
