@@ -147,14 +147,24 @@
 
 <script>
     let createUserModalInstance, editUserModalInstance;
-    const CSRF_TOKEN = '{{ csrf }}';
+    let CSRF_TOKEN;
 
     // Load users on page load
-    document.addEventListener('DOMContentLoaded', () => {
+    // Check if DOM is already loaded (in case DOMContentLoaded already fired)
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initUserManagement);
+    } else {
+        // DOM already loaded, run immediately
+        initUserManagement();
+    }
+
+    function initUserManagement() {
+        // Get CSRF token (getCsrfToken is defined in base template scripts block)
+        CSRF_TOKEN = getCsrfToken();
         loadUsers();
         createUserModalInstance = new bootstrap.Modal(document.getElementById('createUserModal'));
         editUserModalInstance = new bootstrap.Modal(document.getElementById('editUserModal'));
-    });
+    }
 
     async function loadUsers() {
         try {

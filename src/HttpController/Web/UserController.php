@@ -36,15 +36,8 @@ class UserController
     public function createUser(Request $request) : Response
     {
         // Authorization enforced by middleware: UserIsAuthenticated + UserIsAdmin
+        // CSRF validation enforced by middleware: CsrfProtection
         $requestUserData = Json::decode($request->getBody());
-
-        // Validate CSRF token
-        if (!$this->csrfTokenService->validateToken($requestUserData['csrf'] ?? '')) {
-            return Response::create(
-                StatusCode::createBadRequest(),
-                Json::encode(['error' => 'Invalid CSRF token']),
-            );
-        }
 
         $sendWelcomeEmail = $requestUserData['sendWelcomeEmail'] ?? false;
 
@@ -111,11 +104,12 @@ class UserController
                 // Generate invitation token (3 days expiration)
                 $invitationToken = $this->invitationService->createInvitation($newUser->getId());
 
-                // Send welcome email with token
+                // Send welcome email with token (pass sender user ID for rate limiting)
                 $this->emailService->sendWelcomeEmail(
                     $requestUserData['email'],
                     $requestUserData['name'],
                     $invitationToken,
+                    $currentUser->getId()
                 );
 
                 // Log successful welcome email
@@ -128,6 +122,12 @@ class UserController
                         'target_user_id' => $newUser->getId(),
                         'target_email' => $requestUserData['email'],
                     ]
+                );
+            } catch (\Movary\Service\Email\Exception\EmailRateLimitExceededException $e) {
+                // Rate limit exceeded - return specific error
+                return Response::createJson(
+                    Json::encode(['error' => $e->getMessage()]),
+                    StatusCode::createTooManyRequests()
                 );
             } catch (CannotSendEmailException $e) {
                 // Log the error but don't fail user creation
@@ -159,21 +159,12 @@ class UserController
 
     public function deleteUser(Request $request) : Response
     {
+        // CSRF validation enforced by middleware: CsrfProtection
         $userId = (int)$request->getRouteParameters()['userId'];
         $currentUser = $this->authenticationService->getCurrentUser();
 
         if ($currentUser->getId() !== $userId && $currentUser->isAdmin() === false) {
             return Response::createForbidden();
-        }
-
-        $requestUserData = Json::decode($request->getBody());
-
-        // Validate CSRF token
-        if (!$this->csrfTokenService->validateToken($requestUserData['csrf'] ?? '')) {
-            return Response::create(
-                StatusCode::createBadRequest(),
-                Json::encode(['error' => 'Invalid CSRF token']),
-            );
         }
 
         // Get user info before deletion for audit logging
@@ -206,7 +197,7 @@ class UserController
     public function fetchUsers() : Response
     {
         if ($this->authenticationService->isUserAuthenticatedWithCookie() === false
-            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            || $this->authenticationService->getCurrentUser()->isAdmin() === false) {
             return Response::createForbidden();
         }
 
@@ -215,6 +206,7 @@ class UserController
 
     public function updateUser(Request $request) : Response
     {
+        // CSRF validation enforced by middleware: CsrfProtection
         $userId = (int)$request->getRouteParameters()['userId'];
         $currentUser = $this->authenticationService->getCurrentUser();
 
@@ -223,14 +215,6 @@ class UserController
         }
 
         $requestUserData = Json::decode($request->getBody());
-
-        // Validate CSRF token
-        if (!$this->csrfTokenService->validateToken($requestUserData['csrf'] ?? '')) {
-            return Response::create(
-                StatusCode::createBadRequest(),
-                Json::encode(['error' => 'Invalid CSRF token']),
-            );
-        }
 
         // Get user before update to track changes
         $targetUser = $this->userApi->fetchUser($userId);

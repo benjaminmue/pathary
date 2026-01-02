@@ -19,6 +19,7 @@ class EmailService
         private OAuthTokenService $oauthTokenService,
         private Environment $twig,
         private ApplicationUrlService $applicationUrlService,
+        private EmailRateLimiterService $emailRateLimiter,
     ) {
     }
 
@@ -257,45 +258,57 @@ class EmailService
      * @param string|null $invitationToken Optional invitation token for password setup
      * @throws CannotSendEmailException
      */
-    public function sendWelcomeEmail(string $recipientEmail, string $recipientName, ?string $invitationToken = null) : void
+    public function sendWelcomeEmail(string $recipientEmail, string $recipientName, ?string $invitationToken = null, ?int $senderUserId = null) : void
     {
-        // Get application settings
-        $applicationName = $this->serverSettings->getApplicationName() ?? 'Pathary';
-        $applicationUrl = (string)$this->applicationUrlService->createApplicationUrl();
+        // Check rate limits before attempting to send
+        $this->emailRateLimiter->checkRateLimit($recipientEmail, $senderUserId);
 
-        // Build logo URL (prefer PNG for email compatibility)
-        $logoUrl = $applicationUrl . '/images/pathary-logo-192x192.png';
+        try {
+            // Get application settings
+            $applicationName = $this->serverSettings->getApplicationName() ?? 'Pathary';
+            $applicationUrl = (string)$this->applicationUrlService->createApplicationUrl();
 
-        // Build password setup URL if invitation token provided
-        $passwordSetupUrl = null;
-        if ($invitationToken !== null) {
-            $passwordSetupUrl = $applicationUrl . '/setup-password?token=' . urlencode($invitationToken);
+            // Build logo URL (prefer PNG for email compatibility)
+            $logoUrl = $applicationUrl . '/images/pathary-logo-192x192.png';
+
+            // Build password setup URL if invitation token provided
+            $passwordSetupUrl = null;
+            if ($invitationToken !== null) {
+                $passwordSetupUrl = $applicationUrl . '/setup-password?token=' . urlencode($invitationToken);
+            }
+
+            // Render email template
+            $htmlMessage = $this->twig->render('email/welcome.html.twig', [
+                'recipient_name' => $recipientName,
+                'application_name' => $applicationName,
+                'application_url' => $applicationUrl,
+                'logo_url' => $logoUrl,
+                'password_setup_url' => $passwordSetupUrl,
+                'has_invitation' => $invitationToken !== null,
+            ]);
+
+            // Build SMTP config from current settings
+            $smtpConfig = SmtpConfig::create(
+                $this->serverSettings->getSmtpHost() ?? '',
+                $this->serverSettings->getSmtpPort() ?? 587,
+                $this->serverSettings->getFromAddress() ?? '',
+                $this->serverSettings->getSmtpEncryption() ?? 'tls',
+                $this->serverSettings->getSmtpWithAuthentication() ?? true,
+                $this->serverSettings->getSmtpUser(),
+                $this->serverSettings->getSmtpPassword(),
+                $this->serverSettings->getFromDisplayName(),
+            );
+
+            // Send email
+            $subject = "Welcome to {$applicationName}";
+            $this->sendEmail($recipientEmail, $subject, $htmlMessage, $smtpConfig);
+
+            // Log successful email send
+            $this->emailRateLimiter->logEmailSend($recipientEmail, 'welcome', $senderUserId, true);
+        } catch (CannotSendEmailException $e) {
+            // Log failed email send
+            $this->emailRateLimiter->logEmailSend($recipientEmail, 'welcome', $senderUserId, false, $e->getMessage());
+            throw $e;
         }
-
-        // Render email template
-        $htmlMessage = $this->twig->render('email/welcome.html.twig', [
-            'recipient_name' => $recipientName,
-            'application_name' => $applicationName,
-            'application_url' => $applicationUrl,
-            'logo_url' => $logoUrl,
-            'password_setup_url' => $passwordSetupUrl,
-            'has_invitation' => $invitationToken !== null,
-        ]);
-
-        // Build SMTP config from current settings
-        $smtpConfig = SmtpConfig::create(
-            $this->serverSettings->getSmtpHost() ?? '',
-            $this->serverSettings->getSmtpPort() ?? 587,
-            $this->serverSettings->getFromAddress() ?? '',
-            $this->serverSettings->getSmtpEncryption() ?? 'tls',
-            $this->serverSettings->getSmtpWithAuthentication() ?? true,
-            $this->serverSettings->getSmtpUser(),
-            $this->serverSettings->getSmtpPassword(),
-            $this->serverSettings->getFromDisplayName(),
-        );
-
-        // Send email
-        $subject = "Welcome to {$applicationName}";
-        $this->sendEmail($recipientEmail, $subject, $htmlMessage, $smtpConfig);
     }
 }
