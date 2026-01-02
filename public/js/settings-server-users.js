@@ -129,7 +129,7 @@ document.getElementById('createUserButton').addEventListener('click', async () =
         return;
     }
 
-    const response = await fetch(APPLICATION_URL + '/old/settings/users', {
+    const response = await fetch(APPLICATION_URL + '/api/admin/users', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -168,7 +168,7 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
         password = null
     }
 
-    const response = await fetch(APPLICATION_URL + '/old/settings/users/' + document.getElementById('userModalIdInput').value, {
+    const response = await fetch(APPLICATION_URL + '/api/admin/users/' + document.getElementById('userModalIdInput').value, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -199,7 +199,7 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
         return
     }
 
-    const response = await fetch(APPLICATION_URL + '/old/settings/users/' + document.getElementById('userModalIdInput').value, {
+    const response = await fetch(APPLICATION_URL + '/api/admin/users/' + document.getElementById('userModalIdInput').value, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
@@ -232,7 +232,7 @@ async function reloadTable() {
     table.getElementsByTagName('tbody')[0].innerHTML = ''
     document.getElementById('userTableLoadingSpinner').classList.remove('d-none')
 
-    const response = await fetch(APPLICATION_URL + '/old/settings/users');
+    const response = await fetch(APPLICATION_URL + '/api/admin/users');
 
     if (response.status !== 200) {
         setUserManagementAlert('Could not load users', 'danger')

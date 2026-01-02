@@ -1211,6 +1211,7 @@
             smtpFromAddress: document.getElementById('smtpFromAddress').value,
             smtpFromDisplayName: document.getElementById('smtpFromDisplayName').value,
             smtpWithAuthentication: true, // Enable auth when credentials provided
+            _csrf_token: getCsrfToken(),
         };
 
         // Only include password if user entered a new one
@@ -1219,8 +1220,8 @@
         }
 
         try {
-            const response = await fetch('{{ applicationUrl }}/old/settings/server/email', {
-                method: 'POST',
+            const response = await fetch('{{ applicationUrl }}/api/admin/server/email', {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings),
             });
@@ -1320,6 +1321,7 @@
             smtpUser: document.getElementById('smtpUsername').value,
             smtpPassword: document.getElementById('smtpPassword').value,
             recipient: recipient,
+            _csrf_token: getCsrfToken(),
         };
 
         // Show loading state
@@ -1328,7 +1330,7 @@
         errorDiv.style.display = 'none';
 
         try {
-            const response = await fetch('{{ applicationUrl }}/old/settings/server/email-test', {
+            const response = await fetch('{{ applicationUrl }}/api/admin/server/email/test', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings),
@@ -1362,6 +1364,7 @@
             smtpHost: document.getElementById('smtpHost').value,
             smtpPort: parseInt(document.getElementById('smtpPort').value),
             smtpEncryption: document.getElementById('smtpEncryption').value,
+            _csrf_token: getCsrfToken(),
         };
 
         const resultsDiv = document.getElementById('smtpDiagnosticsResults');
@@ -1379,7 +1382,7 @@
         `;
 
         try {
-            const response = await fetch('{{ applicationUrl }}/old/settings/server/email-diagnose', {
+            const response = await fetch('{{ applicationUrl }}/api/admin/server/email/diagnose', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings),
@@ -1927,8 +1930,8 @@
             const smtpPort = parseInt(document.getElementById('oauthSmtpPort').value);
             const smtpEncryption = document.getElementById('oauthSmtpEncryption').value;
 
-            const smtpResponse = await fetch('{{ applicationUrl }}/old/settings/server/email', {
-                method: 'POST',
+            const smtpResponse = await fetch('{{ applicationUrl }}/api/admin/server/email', {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     smtpHost: smtpHost,
@@ -1936,6 +1939,7 @@
                     smtpEncryption: smtpEncryption,
                     smtpFromAddress: fromAddress,
                     smtpWithAuthentication: true,
+                    _csrf_token: getCsrfToken(),
                 }),
             });
 
@@ -1979,8 +1983,8 @@
 
         try {
             // Use the existing email settings endpoint
-            const response = await fetch('{{ applicationUrl }}/old/settings/server/email', {
-                method: 'POST',
+            const response = await fetch('{{ applicationUrl }}/api/admin/server/email', {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     smtpHost: '{{ serverSettings.smtpHost ?? "smtp.office365.com" }}',
@@ -1989,6 +1993,7 @@
                     smtpUser: '',
                     smtpFromAddress: fromAddress,
                     smtpWithAuthentication: true,
+                    _csrf_token: getCsrfToken(),
                 }),
             });
 
@@ -2021,8 +2026,8 @@
 
         try {
             // Use the existing email settings endpoint
-            const response = await fetch('{{ applicationUrl }}/old/settings/server/email', {
-                method: 'POST',
+            const response = await fetch('{{ applicationUrl }}/api/admin/server/email', {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     smtpHost: '{{ serverSettings.smtpHost ?? "smtp.office365.com" }}',
@@ -2032,6 +2037,7 @@
                     smtpFromAddress: '{{ serverSettings.fromAddress ?? "" }}',
                     smtpFromDisplayName: displayName,
                     smtpWithAuthentication: true,
+                    _csrf_token: getCsrfToken(),
                 }),
             });
 

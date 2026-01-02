@@ -21,7 +21,7 @@ class RateLimited implements MiddlewareInterface
     private const int DEFAULT_PASSWORD_CHANGE_WINDOW = 300; // 5 minutes
 
     private const int DEFAULT_USER_CREATE_MAX = 10;
-    private const int DEFAULT_USER_CREATE_WINDOW = 3600; // 1 hour
+    private const int DEFAULT_USER_CREATE_WINDOW = 60; // 1 minute
 
     private const int DEFAULT_OAUTH_CALLBACK_MAX = 10;
     private const int DEFAULT_OAUTH_CALLBACK_WINDOW = 600; // 10 minutes

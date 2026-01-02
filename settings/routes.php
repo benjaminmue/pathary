@@ -35,6 +35,16 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ##############
     $routes->add('GET', '/movies', [Web\AllMoviesController::class, 'index'], [Web\Middleware\UserIsAuthenticated::class]);
 
+    #############
+    # Watchlist #
+    #############
+    $routes->add('GET', '/watchlist', [Web\WatchlistController::class, 'renderWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
+
+    ##########
+    # Person #
+    ##########
+    $routes->add('GET', '/person/{id:\d+}[-{nameSlugSuffix:[^/]*}]', [Web\PersonController::class, 'renderPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\PersonSlugRedirector::class]);
+
     #######
     # Dev #
     #######
@@ -153,25 +163,6 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class
     ]);
-    $routes->add('GET', '/old/settings/server/email', [Web\SettingsController::class, 'renderServerEmailPage'], [
-        Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
-    ]);
-    $routes->add('POST', '/old/settings/server/email', [Web\SettingsController::class, 'updateServerEmail'], [
-        Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class,
-        Web\Middleware\CsrfProtection::class,
-    ]);
-    $routes->add('POST', '/old/settings/server/email-test', [Web\SettingsController::class, 'sendTestEmail'], [
-        Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class,
-        Web\Middleware\CsrfProtection::class,
-    ]);
-    $routes->add('POST', '/old/settings/server/email-diagnose', [Web\SettingsController::class, 'diagnoseSMTP'], [
-        Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class,
-        Web\Middleware\CsrfProtection::class,
-    ]);
 
     ################
     # OAuth Email  #
@@ -223,6 +214,50 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,
         Web\Middleware\CsrfProtection::class,
+    ]);
+
+    // Modern User Management API Routes
+    $routes->add('GET', '/api/admin/users', [Web\UserController::class, 'fetchUsers'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/api/admin/users', [Web\UserController::class, 'createUser'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class,
+        Web\Middleware\RateLimited::class
+    ]);
+    $routes->add('PUT', '/api/admin/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class
+    ]);
+    $routes->add('DELETE', '/api/admin/users/{userId:\d+}', [Web\UserController::class, 'deleteUser'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class
+    ]);
+
+    // Modern Server Email API Routes
+    $routes->add('GET', '/api/admin/server/email', [Web\SettingsController::class, 'renderServerEmailPage'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('PUT', '/api/admin/server/email', [Web\SettingsController::class, 'updateServerEmail'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class
+    ]);
+    $routes->add('POST', '/api/admin/server/email/test', [Web\SettingsController::class, 'sendTestEmail'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class,
+        Web\Middleware\RateLimited::class
+    ]);
+    $routes->add('POST', '/api/admin/server/email/diagnose', [Web\SettingsController::class, 'diagnoseSMTP'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class
     ]);
 
     $routes->add('POST', '/old/settings/account', [Web\SettingsController::class, 'updateGeneral'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
@@ -278,10 +313,6 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/old/settings/netflix/import', [Web\NetflixController::class, 'importNetflixData'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/integrations/mastodon', [Web\SettingsController::class, 'renderMastodonPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('POST', '/old/settings/integrations/mastodon', [Web\SettingsController::class, 'updateMastodon'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
-    $routes->add('GET', '/old/settings/users', [Web\UserController::class, 'fetchUsers'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/users', [Web\UserController::class, 'createUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimited::class]);
-    $routes->add('PUT', '/old/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
-    $routes->add('DELETE', '/old/settings/users/{userId:\d+}', [Web\UserController::class, 'deleteUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/locations', [Web\LocationController::class, 'fetchLocations'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('POST', '/old/settings/locations', [Web\LocationController::class, 'createLocation'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('PUT', '/old/settings/locations/{locationId:\d+}', [Web\LocationController::class, 'updateLocation'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
@@ -309,37 +340,6 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/old/persons/{id:[0-9]+}/refresh-tmdb', [Web\PersonController::class, 'refreshTmdbData'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/old/persons/{id:[0-9]+}/hide-in-top-lists', [Web\PersonController::class, 'hideInTopLists'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/old/persons/{id:[0-9]+}/show-in-top-lists', [Web\PersonController::class, 'showInTopLists'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-
-    ##############
-    # User media #
-    ##############
-    $routes->add('GET', '/old/users/{username:[a-zA-Z0-9]+}/dashboard', [Web\DashboardController::class, 'redirectToDashboard'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/users/{username:[a-zA-Z0-9]+}', [Web\DashboardController::class, 'render'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/users/{username:[a-zA-Z0-9]+}/history', [Web\HistoryController::class, 'renderHistory'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/users/{username:[a-zA-Z0-9]+}/watchlist', [Web\WatchlistController::class, 'renderWatchlist'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/users/{username:[a-zA-Z0-9]+}/movies', [Web\MoviesController::class, 'renderPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/users/{username:[a-zA-Z0-9]+}/actors', [Web\ActorsController::class, 'renderPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/users/{username:[a-zA-Z0-9]+}/directors', [Web\DirectorsController::class, 'renderPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    // the following routes (/movies/ and /persons/) can have any non-slash characters following the URL after a -
-    //   e.g., http://movary.test/users/alifeee/movies/14-freakier-friday which is identical to
-    //         http://movary.test/users/alifeee/movies/14
-    $routes->add('GET', '/old/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}[-{nameSlugSuffix:[^/]*}]', [Web\Movie\MovieController::class, 'renderPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\MovieSlugRedirector::class]);
-    $routes->add('GET', '/old/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}[-{nameSlugSuffix:[^/]*}]', [Web\PersonController::class, 'renderPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\PersonSlugRedirector::class]);
-    $routes->add('DELETE', '/old/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [
-        Web\HistoryController::class,
-        'deleteHistoryEntry'
-    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
-    $routes->add('POST', '/old/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [
-        Web\HistoryController::class,
-        'createHistoryEntry'
-    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
-    $routes->add('POST', '/old/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating', [
-        Web\Movie\MovieRatingController::class,
-        'updateRating'
-    ], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
-    $routes->add('POST', '/old/log-movie', [Web\HistoryController::class, 'logMovie'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
-    $routes->add('POST', '/old/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
-    $routes->add('GET', '/old/fetchMovieRatingByTmdbdId', [Web\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes, true);
 }

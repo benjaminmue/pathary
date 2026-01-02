@@ -158,7 +158,7 @@
 
     async function loadUsers() {
         try {
-            const response = await fetch('{{ applicationUrl }}/old/settings/users', {
+            const response = await fetch('{{ applicationUrl }}/api/admin/users', {
                 method: 'GET',
             });
 
@@ -273,10 +273,10 @@
         button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Creating...';
 
         try {
-            const response = await fetch('{{ applicationUrl }}/old/settings/users', {
+            const response = await fetch('{{ applicationUrl }}/api/admin/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password, isAdmin, sendWelcomeEmail, csrf: CSRF_TOKEN }),
+                body: JSON.stringify({ name, email, password, isAdmin, sendWelcomeEmail, _csrf_token: CSRF_TOKEN }),
             });
 
             if (!response.ok) {
@@ -312,7 +312,7 @@
         const password = document.getElementById('editUserPassword').value;
         const isAdmin = document.getElementById('editUserIsAdmin').checked;
 
-        const data = { name, email, isAdmin, csrf: CSRF_TOKEN };
+        const data = { name, email, isAdmin, _csrf_token: CSRF_TOKEN };
         if (password) {
             if (password.length < 10) {
                 showToast('Password must be at least 10 characters', 'warning');
@@ -322,7 +322,7 @@
         }
 
         try {
-            const response = await fetch(`{{ applicationUrl }}/old/settings/users/${userId}`, {
+            const response = await fetch(`{{ applicationUrl }}/api/admin/users/${userId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
@@ -351,10 +351,10 @@
             `Delete user "${userName}"? All their ratings and watch history will also be deleted. This action cannot be undone.`,
             async () => {
                 try {
-                    const response = await fetch(`{{ applicationUrl }}/old/settings/users/${userId}`, {
+                    const response = await fetch(`{{ applicationUrl }}/api/admin/users/${userId}`, {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ csrf: CSRF_TOKEN }),
+                        body: JSON.stringify({ _csrf_token: CSRF_TOKEN }),
                     });
 
                     if (!response.ok) {
