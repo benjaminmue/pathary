@@ -21,6 +21,7 @@ class SecurityAuditService
     public const EVENT_LOGIN_FAILED_TOTP = 'login_failed_totp';
     public const EVENT_LOGIN_FAILED_RECOVERY_CODE = 'login_failed_recovery_code';
     public const EVENT_LOGOUT = 'logout';
+    public const EVENT_RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded';
 
     // User Management Event types
     public const EVENT_USER_CREATED = 'user_created';

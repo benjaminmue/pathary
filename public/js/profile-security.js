@@ -15,7 +15,11 @@ async function loadSecurityTab() {
 
     try {
         console.log('Fetching from:', APPLICATION_URL + '/profile/security');
-        const response = await fetch(APPLICATION_URL + '/profile/security');
+        const response = await fetch(APPLICATION_URL + '/profile/security', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
         console.log('Response status:', response.status);
 
         if (!response.ok) {

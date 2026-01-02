@@ -68,7 +68,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     # Profile Security  #
     #####################
     $routes->add('GET', '/profile/security', [Web\ProfileSecurityController::class, 'show'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/profile/security/password', [Web\ProfileSecurityController::class, 'changePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/profile/security/password', [Web\ProfileSecurityController::class, 'changePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimited::class]);
     $routes->add('POST', '/profile/security/totp/enable', [Web\ProfileSecurityController::class, 'enableTotp'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/profile/security/totp/verify', [Web\ProfileSecurityController::class, 'verifyAndSaveTotp'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/profile/security/totp/disable', [Web\ProfileSecurityController::class, 'disableTotp'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
@@ -97,7 +97,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\ServerHasRegistrationEnabled::class
     ]);
     $routes->add('GET', '/setup-password', [Web\SetPasswordController::class, 'renderPage'], [Web\Middleware\UserIsUnauthenticated::class]);
-    $routes->add('POST', '/setup-password', [Web\SetPasswordController::class, 'setPassword'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/setup-password', [Web\SetPasswordController::class, 'setPassword'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimited::class]);
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
     // placeholder image generator
     $routes->add('GET', '/images/placeholder/{imageNameBase64Encoded:.+}', [Web\PlaceholderImageController::class, 'renderPlaceholderImage']);
@@ -226,7 +226,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ]);
 
     $routes->add('POST', '/old/settings/account', [Web\SettingsController::class, 'updateGeneral'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
-    $routes->add('POST', '/old/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimited::class]);
     $routes->add('POST', '/old/settings/account/security/create-totp-uri', [
         Web\TwoFactorAuthenticationController::class,
         'createTotpUri'
@@ -279,7 +279,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/old/settings/integrations/mastodon', [Web\SettingsController::class, 'renderMastodonPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('POST', '/old/settings/integrations/mastodon', [Web\SettingsController::class, 'updateMastodon'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/users', [Web\UserController::class, 'fetchUsers'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/settings/users', [Web\UserController::class, 'createUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/settings/users', [Web\UserController::class, 'createUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimited::class]);
     $routes->add('PUT', '/old/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('DELETE', '/old/settings/users/{userId:\d+}', [Web\UserController::class, 'deleteUser'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/locations', [Web\LocationController::class, 'fetchLocations'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);

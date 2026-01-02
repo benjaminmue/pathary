@@ -11,6 +11,7 @@ use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\Service\TwoFactorAuthenticationFactory;
 use Movary\Domain\User\Service\Validator;
 use Movary\Domain\User\UserApi;
+use Movary\Domain\User\UserEntity;
 use Movary\Util\Json;
 use Movary\Util\TrustedDeviceCookie;
 use Movary\ValueObject\Http\Request;
@@ -39,42 +40,33 @@ class ProfileSecurityController
         $userId = $this->authenticationService->getCurrentUserId();
         $user = $this->userApi->fetchUser($userId);
 
-        $totpUri = $this->twoFactorAuthenticationApi->findTotpUri($userId);
-        $totpEnabled = $totpUri !== null;
+        // Check if this is an AJAX request (for tab content loading)
+        $isAjax = $this->isAjaxRequest();
 
-        $recoveryCodesCount = $this->recoveryCodeService->getRemainingCodeCount($userId);
-        $trustedDevices = $this->trustedDeviceService->getTrustedDevices($userId);
+        // If NOT an AJAX request, return full page with pre-loaded Security tab content
+        if (!$isAjax) {
+            $email = $this->userApi->findUserEmail($userId);
+            $profileImage = $this->userApi->findProfileImage($userId);
 
-        // Get recent events but exclude user management events (those are admin actions, not user actions)
-        $allEvents = $this->securityAuditService->getRecentEvents($userId, 50);
-        $userManagementEvents = [
-            SecurityAuditService::EVENT_USER_CREATED,
-            SecurityAuditService::EVENT_USER_UPDATED,
-            SecurityAuditService::EVENT_USER_DELETED,
-            SecurityAuditService::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN,
-            SecurityAuditService::EVENT_USER_WELCOME_EMAIL_SENT,
-            SecurityAuditService::EVENT_USER_WELCOME_EMAIL_FAILED,
-        ];
+            $securityTabContent = $this->renderSecurityTabContent($userId, $user, $request);
 
-        // Filter out user management events - users should only see their own actions, not admin actions on their account
-        $securityEvents = array_filter($allEvents, function($event) use ($userManagementEvents) {
-            return !in_array($event['event_type'], $userManagementEvents, true);
-        });
+            return Response::create(
+                StatusCode::createOk(),
+                $this->twig->render('public/profile.twig', [
+                    'userName' => $user->getName(),
+                    'userEmail' => $email,
+                    'profileImage' => $profileImage,
+                    'securityTabContent' => $securityTabContent,
+                    'success' => $request->getGetParameters()['success'] ?? null,
+                    'error' => $request->getGetParameters()['error'] ?? null,
+                ]),
+            );
+        }
 
-        // Take only first 20 after filtering
-        $securityEvents = array_slice($securityEvents, 0, 20);
-
+        // AJAX request - return partial content for tab
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('public/profile-security.twig', [
-                'userName' => $user->getName(),
-                'totpEnabled' => $totpEnabled,
-                'recoveryCodesCount' => $recoveryCodesCount,
-                'trustedDevices' => $trustedDevices,
-                'securityEvents' => $securityEvents,
-                'success' => $request->getGetParameters()['success'] ?? null,
-                'error' => $request->getGetParameters()['error'] ?? null,
-            ]),
+            $this->renderSecurityTabContent($userId, $user, $request),
         );
     }
 
@@ -411,5 +403,73 @@ class ProfileSecurityController
         }, $events);
 
         return Response::createJson(Json::encode(['events' => $formattedEvents]));
+    }
+
+    private function isAjaxRequest() : bool
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+            && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
+
+    private function renderSecurityTabContent(int $userId, UserEntity $user, Request $request) : string
+    {
+        $totpUri = $this->twoFactorAuthenticationApi->findTotpUri($userId);
+        $totpEnabled = $totpUri !== null;
+        $recoveryCodesCount = $this->recoveryCodeService->getRemainingCodeCount($userId);
+        $trustedDevices = $this->trustedDeviceService->getTrustedDevices($userId);
+        $securityEvents = $this->getFilteredSecurityEvents($userId);
+
+        return $this->twig->render('public/profile-security.twig', [
+            'userName' => $user->getName(),
+            'totpEnabled' => $totpEnabled,
+            'recoveryCodesCount' => $recoveryCodesCount,
+            'trustedDevices' => $trustedDevices,
+            'securityEvents' => $securityEvents,
+            'success' => $request->getGetParameters()['success'] ?? null,
+            'error' => $request->getGetParameters()['error'] ?? null,
+        ]);
+    }
+
+    private function getFilteredSecurityEvents(int $userId) : array
+    {
+        $allEvents = $this->securityAuditService->getRecentEvents($userId, 50);
+
+        // Exclude events that should only be visible to admins
+        $adminOnlyEvents = [
+            // User management events - admin actions on user accounts
+            SecurityAuditService::EVENT_USER_CREATED,
+            SecurityAuditService::EVENT_USER_UPDATED,
+            SecurityAuditService::EVENT_USER_DELETED,
+            SecurityAuditService::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN,
+            SecurityAuditService::EVENT_USER_WELCOME_EMAIL_SENT,
+            SecurityAuditService::EVENT_USER_WELCOME_EMAIL_FAILED,
+            // Rate limiting events - security monitoring for admins
+            SecurityAuditService::EVENT_RATE_LIMIT_EXCEEDED,
+            // OAuth configuration events - server configuration for admins
+            SecurityAuditService::EVENT_OAUTH_CONFIG_CREATED,
+            SecurityAuditService::EVENT_OAUTH_CONFIG_UPDATED,
+            SecurityAuditService::EVENT_OAUTH_CONFIG_DELETED,
+            SecurityAuditService::EVENT_OAUTH_CONNECTED,
+            SecurityAuditService::EVENT_OAUTH_DISCONNECTED,
+            SecurityAuditService::EVENT_OAUTH_AUTH_MODE_CHANGED,
+            SecurityAuditService::EVENT_OAUTH_ENCRYPTION_KEY_GENERATED,
+            SecurityAuditService::EVENT_OAUTH_CALLBACK_FAILED,
+            SecurityAuditService::EVENT_OAUTH_TOKEN_WARN_45,
+            SecurityAuditService::EVENT_OAUTH_TOKEN_WARN_30,
+            SecurityAuditService::EVENT_OAUTH_TOKEN_WARN_15,
+            SecurityAuditService::EVENT_OAUTH_TOKEN_WARN_DAILY,
+            SecurityAuditService::EVENT_OAUTH_TOKEN_EXPIRED,
+            SecurityAuditService::EVENT_OAUTH_TOKEN_REFRESH_FAILED,
+            SecurityAuditService::EVENT_OAUTH_TOKEN_REFRESH_RECOVERED,
+            SecurityAuditService::EVENT_OAUTH_BANNER_ACKNOWLEDGED,
+            SecurityAuditService::EVENT_OAUTH_BANNER_SHOWN,
+        ];
+
+        $filteredEvents = array_filter($allEvents, function($event) use ($adminOnlyEvents) {
+            return !in_array($event['event_type'], $adminOnlyEvents, true);
+        });
+
+        // Take only first 20 after filtering
+        return array_slice($filteredEvents, 0, 20);
     }
 }

@@ -45,6 +45,11 @@ class Header
         return new self('X-Content-Type-Options', 'nosniff');
     }
 
+    public static function createRetryAfter(int $seconds) : self
+    {
+        return new self('Retry-After', (string)$seconds);
+    }
+
     public function __toString() : string
     {
         return $this->name . ': ' . $this->value;

@@ -93,6 +93,15 @@ class Response
         return new self(StatusCode::createUnauthorized(), $message, $headers);
     }
 
+    public static function createTooManyRequests(string $message, int $retryAfter) : self
+    {
+        return new self(
+            StatusCode::createTooManyRequests(),
+            $message,
+            [Header::createRetryAfter($retryAfter)]
+        );
+    }
+
     public static function createUnsupportedMediaType() : self
     {
         return new self(StatusCode::createUnsupportedMediaType());

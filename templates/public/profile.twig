@@ -407,7 +407,11 @@
         <!-- Security Tab -->
         <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
             <div id="securityTabContent">
-                <p class="text-center"><i class="bi bi-hourglass-split"></i> Loading security settings...</p>
+                {% if securityTabContent is defined %}
+                    {{ securityTabContent|raw }}
+                {% else %}
+                    <p class="text-center"><i class="bi bi-hourglass-split"></i> Loading security settings...</p>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -484,9 +488,10 @@ console.log('jQuery available:', typeof $ !== 'undefined');
 <script src="{{ applicationUrl }}/js/qrcode.min.js"></script>
 <script src="{{ applicationUrl }}/js/profile-security.js"></script>
 <script>
-// Initialize security tab loader
+// Initialize security tab loader and URL handling
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded fired');
+    const profileTab = document.getElementById('profile-tab');
     const securityTab = document.getElementById('security-tab');
     console.log('Security tab element:', securityTab);
 
@@ -500,11 +505,50 @@ document.addEventListener('DOMContentLoaded', function() {
         // Listen for the Bootstrap tab shown event
         securityTab.addEventListener('shown.bs.tab', function(e) {
             console.log('shown.bs.tab event fired');
+            // Update URL when Security tab is clicked
+            history.pushState({tab: 'security'}, '', '{{ applicationUrl }}/profile/security');
+
             const content = document.getElementById('securityTabContent');
             if (content && content.innerHTML.includes('Loading security settings')) {
                 loadSecurityTab();
             }
         });
+    }
+
+    if (profileTab) {
+        // Update URL when Profile tab is clicked
+        profileTab.addEventListener('shown.bs.tab', function(e) {
+            history.pushState({tab: 'profile'}, '', '{{ applicationUrl }}/profile');
+        });
+    }
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.tab) {
+            const tabEl = document.getElementById(event.state.tab + '-tab');
+            if (tabEl && typeof bootstrap !== 'undefined') {
+                const tab = new bootstrap.Tab(tabEl);
+                tab.show();
+            }
+        }
+    });
+
+    // Check URL on page load and activate correct tab
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/security')) {
+        const securityTabInstance = new bootstrap.Tab(securityTab);
+        securityTabInstance.show();
+        history.replaceState({tab: 'security'}, '', '{{ applicationUrl }}/profile/security');
+
+        // If content is pre-rendered (not "Loading..."), initialize listeners immediately
+        const content = document.getElementById('securityTabContent');
+        if (content && !content.innerHTML.includes('Loading security settings')) {
+            if (typeof initializeSecurityListeners === 'function') {
+                initializeSecurityListeners();
+            }
+        }
+    } else {
+        history.replaceState({tab: 'profile'}, '', '{{ applicationUrl }}/profile');
     }
 });
 </script>

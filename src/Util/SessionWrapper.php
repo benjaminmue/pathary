@@ -37,16 +37,19 @@ class SessionWrapper
 
     public function find(string $key) : mixed
     {
+        $this->start();
         return $_SESSION[$key] ?? null;
     }
 
     public function has(string $key) : bool
     {
+        $this->start();
         return isset($_SESSION[$key]) === true;
     }
 
     public function set(string $key, mixed $value) : void
     {
+        $this->start();
         $_SESSION[$key] = $value;
     }
 
