@@ -414,6 +414,12 @@
 
 {% block scripts %}
 <script>
+// CSRF token helper function
+function getCsrfToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+}
+
 // Profile image preview
 document.getElementById('profileImageInput').addEventListener('change', function(e) {
     const file = e.target.files[0];

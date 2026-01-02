@@ -326,11 +326,16 @@ function initializePasswordValidation() {
                 bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
                 showAlert('Password changed successfully.', 'success');
                 loadSecurityTab();
-            } else {
+            } else if (data.error) {
+                // Show specific error message from server
                 alertDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            } else {
+                // Fallback for unexpected response format
+                alertDiv.innerHTML = '<div class="alert alert-danger">Failed to change password. Please try again.</div>';
             }
         } catch (error) {
-            alertDiv.innerHTML = '<div class="alert alert-danger">Failed to change password.</div>';
+            console.error('Password change error:', error);
+            alertDiv.innerHTML = '<div class="alert alert-danger">Failed to change password. Please try again.</div>';
         }
     });
 }
