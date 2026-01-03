@@ -50,6 +50,22 @@ This roadmap outlines planned features, implementation ideas, and strategic dire
   - Visually appealing design with charts/graphs
 - [ ] Enable and migrate integrations from `/old/` routes to new routes (Plex, Jellyfin, Trakt, etc.)
   - Create individual Wiki page for each integration
+- [ ] **Weekly Admin Statistics Email**:
+  - Automated weekly email digest sent to all admins
+  - Server statistics: movies added, new users, comments, ratings distribution
+  - Growth trends and activity metrics
+  - **Primary benefit**: Keeps OAuth refresh token active (prevents 90-day Microsoft 365 inactivity expiration)
+  - **Secondary benefit**: Admins stay informed of platform health without logging in
+  - Configurable send day/time in admin settings
+  - Option to enable/disable per-admin
+- [ ] **Monthly User Statistics Email**:
+  - Automated monthly personalized digest sent to all users (with email addresses)
+  - **Personal statistics**: Movies watched this month/total, ratings given, average rating, watch streak
+  - **Platform updates**: Recently added movies (past 30 days), trending movies, top-rated new additions
+  - **Engagement**: Recommendations based on user's rating history
+  - **OAuth benefit**: Additional monthly email activity to keep refresh token active
+  - User preference: opt-in/opt-out in profile settings
+  - Admin control: enable/disable feature globally, configure send day of month
 
 ### Long-term (Future Releases)
 

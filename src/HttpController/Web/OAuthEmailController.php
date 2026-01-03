@@ -48,7 +48,7 @@ class OAuthEmailController
         $requestData = Json::decode($request->getBody());
 
         // Validate CSRF token
-        if (!$this->csrfTokenService->validateToken($requestData['csrf'] ?? '')) {
+        if (!$this->csrfTokenService->validateToken($requestData['_csrf_token'] ?? '')) {
             return Response::create(
                 StatusCode::createBadRequest(),
                 Json::encode(['error' => 'Invalid CSRF token']),
@@ -287,7 +287,7 @@ class OAuthEmailController
         $requestData = Json::decode($request->getBody());
 
         // Validate CSRF token
-        if (!$this->csrfTokenService->validateToken($requestData['csrf'] ?? '')) {
+        if (!$this->csrfTokenService->validateToken($requestData['_csrf_token'] ?? '')) {
             return Response::create(
                 StatusCode::createBadRequest(),
                 Json::encode(['error' => 'Invalid CSRF token']),
@@ -342,7 +342,7 @@ class OAuthEmailController
         $requestData = Json::decode($request->getBody());
 
         // Validate CSRF token
-        if (!$this->csrfTokenService->validateToken($requestData['csrf'] ?? '')) {
+        if (!$this->csrfTokenService->validateToken($requestData['_csrf_token'] ?? '')) {
             return Response::create(
                 StatusCode::createBadRequest(),
                 Json::encode(['error' => 'Invalid CSRF token']),
@@ -398,7 +398,7 @@ class OAuthEmailController
         $requestData = Json::decode($request->getBody());
 
         // Validate CSRF token
-        if (!$this->csrfTokenService->validateToken($requestData['csrf'] ?? '')) {
+        if (!$this->csrfTokenService->validateToken($requestData['_csrf_token'] ?? '')) {
             return Response::create(
                 StatusCode::createBadRequest(),
                 Json::encode(['error' => 'Invalid CSRF token']),
@@ -520,7 +520,7 @@ class OAuthEmailController
         $requestData = Json::decode($request->getBody());
 
         // Validate CSRF token
-        if (!$this->csrfTokenService->validateToken($requestData['csrf'] ?? '')) {
+        if (!$this->csrfTokenService->validateToken($requestData['_csrf_token'] ?? '')) {
             return Response::create(
                 StatusCode::createBadRequest(),
                 Json::encode(['error' => 'Invalid CSRF token']),

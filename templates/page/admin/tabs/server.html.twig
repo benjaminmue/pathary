@@ -1525,7 +1525,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    csrf: getCsrfToken(),
+                    _csrf_token: getCsrfToken(),
                 }),
             });
 
@@ -1583,7 +1583,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    csrf: getCsrfToken(),
+                    _csrf_token: getCsrfToken(),
                 }),
             });
 
@@ -1620,7 +1620,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    csrf: getCsrfToken(),
+                    _csrf_token: getCsrfToken(),
                 }),
             });
 
@@ -1657,7 +1657,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    csrf: getCsrfToken(),
+                    _csrf_token: getCsrfToken(),
                 }),
             });
 
@@ -1898,7 +1898,7 @@
         try {
             // First, save OAuth configuration
             const payload = {
-                csrf: getCsrfToken(),
+                _csrf_token: getCsrfToken(),
                 provider: provider,
                 clientId: clientId,
                 fromAddress: fromAddress,
@@ -2086,7 +2086,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    csrf: getCsrfToken(),
+                    _csrf_token: getCsrfToken(),
                 }),
             });
 
@@ -2130,7 +2130,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    csrf: getCsrfToken(),
+                    _csrf_token: getCsrfToken(),
                 }),
             });
 
@@ -2174,7 +2174,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    csrf: getCsrfToken(),
+                    _csrf_token: getCsrfToken(),
                 }),
             });
 
@@ -2218,7 +2218,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    csrf: getCsrfToken(),
+                    _csrf_token: getCsrfToken(),
                     mode: 'smtp_oauth',
                 }),
             });
@@ -2261,7 +2261,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    csrf: getCsrfToken(),
+                    _csrf_token: getCsrfToken(),
                     mode: 'smtp_password',
                 }),
             });

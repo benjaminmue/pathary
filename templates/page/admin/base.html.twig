@@ -141,7 +141,8 @@
 
         // CSRF token helper
         function getCsrfToken() {
-            return '{{ csrf }}';
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            return csrfMeta ? csrfMeta.getAttribute('content') : '';
         }
 
         // Success/error toast notifications

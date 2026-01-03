@@ -40,6 +40,7 @@ class UserController
         $requestUserData = Json::decode($request->getBody());
 
         $sendWelcomeEmail = $requestUserData['sendWelcomeEmail'] ?? false;
+        $currentUser = $this->authenticationService->getCurrentUser();
 
         // Determine password: use provided password or generate placeholder for invitation
         if ($sendWelcomeEmail && empty($requestUserData['password'])) {
@@ -54,7 +55,9 @@ class UserController
             }
         }
 
+        // Validation exceptions are thrown before any database changes
         try {
+            // Validate user data (throws exceptions if invalid)
             $this->userApi->createUser(
                 $requestUserData['email'],
                 $password,
@@ -73,32 +76,21 @@ class UserController
             return Response::createBadRequest('Name is not in a valid format.');
         }
 
-        // Get the newly created user for audit logging
+        // Get the newly created user
         $newUser = $this->userApi->findUserByEmail($requestUserData['email']);
         if ($newUser === null) {
-            $this->logger->error('Failed to find newly created user for audit logging', [
+            $this->logger->error('Failed to find newly created user', [
                 'email' => $requestUserData['email'],
             ]);
-            return Response::createOk('User created but audit log failed');
+            return Response::create(
+                StatusCode::createInternalServerError(),
+                'User creation failed: unable to retrieve created user.'
+            );
         }
 
-        // Log user creation event
-        $currentUser = $this->authenticationService->getCurrentUser();
-        $this->securityAuditService->log(
-            $currentUser->getId(),
-            SecurityAuditService::EVENT_USER_CREATED,
-            $_SERVER['REMOTE_ADDR'] ?? null,
-            $_SERVER['HTTP_USER_AGENT'] ?? null,
-            [
-                'target_user_id' => $newUser->getId(),
-                'target_email' => $requestUserData['email'],
-                'target_name' => $requestUserData['name'],
-                'is_admin' => $requestUserData['isAdmin'] ?? false,
-                'welcome_email_requested' => $sendWelcomeEmail,
-            ]
-        );
-
         // Send welcome email with invitation token if requested
+        // This must succeed when welcome email is requested, otherwise user cannot log in
+        $invitationToken = null;
         if ($sendWelcomeEmail) {
             try {
                 // Generate invitation token (3 days expiration)
@@ -111,47 +103,77 @@ class UserController
                     $invitationToken,
                     $currentUser->getId()
                 );
-
-                // Log successful welcome email
-                $this->securityAuditService->log(
-                    $currentUser->getId(),
-                    SecurityAuditService::EVENT_USER_WELCOME_EMAIL_SENT,
-                    $_SERVER['REMOTE_ADDR'] ?? null,
-                    $_SERVER['HTTP_USER_AGENT'] ?? null,
-                    [
-                        'target_user_id' => $newUser->getId(),
-                        'target_email' => $requestUserData['email'],
-                    ]
-                );
             } catch (\Movary\Service\Email\Exception\EmailRateLimitExceededException $e) {
-                // Rate limit exceeded - return specific error
+                // Rate limit exceeded - delete the created user and return error
+                $this->userApi->deleteUser($newUser->getId());
+
+                $this->logger->warning('User creation failed: email rate limit exceeded', [
+                    'email' => $requestUserData['email'],
+                    'admin_user_id' => $currentUser->getId(),
+                ]);
+
                 return Response::createJson(
                     Json::encode(['error' => $e->getMessage()]),
                     StatusCode::createTooManyRequests()
                 );
             } catch (CannotSendEmailException $e) {
-                // Log the error but don't fail user creation
-                $this->logger->warning('Failed to send welcome email to new user', [
+                // Email send failed - delete the created user and return error
+                // This prevents leaving the user in an inaccessible state
+                $this->userApi->deleteUser($newUser->getId());
+
+                $this->logger->error('User creation failed: could not send welcome email', [
                     'email' => $requestUserData['email'],
+                    'admin_user_id' => $currentUser->getId(),
                     'error' => $e->getMessage(),
                 ]);
 
-                // Log failed welcome email event
+                // Log failed user creation attempt
                 $this->securityAuditService->log(
                     $currentUser->getId(),
                     SecurityAuditService::EVENT_USER_WELCOME_EMAIL_FAILED,
                     $_SERVER['REMOTE_ADDR'] ?? null,
                     $_SERVER['HTTP_USER_AGENT'] ?? null,
                     [
-                        'target_user_id' => $newUser->getId(),
                         'target_email' => $requestUserData['email'],
                         'error' => $e->getMessage(),
+                        'rollback' => true,
                     ]
                 );
 
-                // Return success but indicate email wasn't sent
-                return Response::createOk('User created but welcome email could not be sent: ' . $e->getMessage());
+                return Response::create(
+                    StatusCode::createInternalServerError(),
+                    'User creation failed: could not send welcome email. Please check email configuration and try again.'
+                );
             }
+        }
+
+        // Log successful user creation
+        $this->securityAuditService->log(
+            $currentUser->getId(),
+            SecurityAuditService::EVENT_USER_CREATED,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            [
+                'target_user_id' => $newUser->getId(),
+                'target_email' => $requestUserData['email'],
+                'target_name' => $requestUserData['name'],
+                'is_admin' => $requestUserData['isAdmin'] ?? false,
+                'welcome_email_sent' => $sendWelcomeEmail,
+            ]
+        );
+
+        // Log successful welcome email if sent
+        if ($sendWelcomeEmail) {
+            $this->securityAuditService->log(
+                $currentUser->getId(),
+                SecurityAuditService::EVENT_USER_WELCOME_EMAIL_SENT,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'target_user_id' => $newUser->getId(),
+                    'target_email' => $requestUserData['email'],
+                ]
+            );
         }
 
         return Response::createOk();

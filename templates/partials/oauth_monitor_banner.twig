@@ -124,6 +124,10 @@
             return;
         }
 
+        // Get CSRF token from meta tag
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
         try {
             const response = await fetch('{{ applicationUrl }}/api/admin/oauth/acknowledge-banner', {
                 method: 'POST',
@@ -131,7 +135,8 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    alert_level: currentAlertLevel
+                    alert_level: currentAlertLevel,
+                    _csrf_token: csrfToken
                 })
             });
 
