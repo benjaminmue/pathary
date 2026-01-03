@@ -21,7 +21,7 @@ This roadmap outlines planned features, implementation ideas, and strategic dire
 - [ ] Center profile and security pages (`/profile`, `/profile/security`)
 - [ ] Document popcorn rating system in Wiki
 
-### Medium-term (Next Quarter)
+### Medium-term
 
 *Features that need design/planning before implementation*
 
@@ -67,7 +67,7 @@ This roadmap outlines planned features, implementation ideas, and strategic dire
   - User preference: opt-in/opt-out in profile settings
   - Admin control: enable/disable feature globally, configure send day of month
 
-### Long-term (Future Releases)
+### Long-term
 
 *Strategic direction and major features*
 
