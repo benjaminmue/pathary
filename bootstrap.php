@@ -40,4 +40,60 @@ $timezone = $container->get(\Movary\ValueObject\Config::class)->getAsString('TIM
 /** @psalm-suppress ArgumentTypeCoercion */
 date_default_timezone_set($timezone);
 
+// Validate APPLICATION_URL configuration if set
+$applicationUrl = getenv('APPLICATION_URL');
+if ($applicationUrl !== false && $applicationUrl !== '') {
+    validateApplicationUrl($applicationUrl);
+}
+
 return $container;
+
+/**
+ * Validate APPLICATION_URL configuration to prevent misconfiguration
+ *
+ * @throws RuntimeException If APPLICATION_URL is invalid
+ */
+function validateApplicationUrl(string $url): void
+{
+    // Must start with http:// or https://
+    if (!preg_match('/^https?:\/\//i', $url)) {
+        throw new RuntimeException(
+            'APPLICATION_URL must start with http:// or https://. ' .
+            'Current value: ' . $url
+        );
+    }
+
+    // Must not end with slash
+    if (str_ends_with($url, '/')) {
+        throw new RuntimeException(
+            'APPLICATION_URL must not end with a slash. ' .
+            'Current value: ' . $url
+        );
+    }
+
+    // Must be valid URL
+    if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+        throw new RuntimeException(
+            'APPLICATION_URL is not a valid URL. ' .
+            'Current value: ' . $url
+        );
+    }
+
+    // Must not contain path segments (strict check for clean base URLs)
+    $parsed = parse_url($url);
+    if (!empty($parsed['path']) && $parsed['path'] !== '/') {
+        throw new RuntimeException(
+            'APPLICATION_URL should be domain only, without path segments. ' .
+            'Current value: ' . $url . ' ' .
+            'Example: http://localhost or https://pathary.example.com'
+        );
+    }
+
+    // Must not contain query string or fragment
+    if (!empty($parsed['query']) || !empty($parsed['fragment'])) {
+        throw new RuntimeException(
+            'APPLICATION_URL must not contain query parameters or fragments. ' .
+            'Current value: ' . $url
+        );
+    }
+}
