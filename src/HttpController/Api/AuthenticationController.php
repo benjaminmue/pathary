@@ -78,11 +78,11 @@ class AuthenticationController
                 ]),
                 [Header::createContentTypeJson()],
             );
-        } catch (InvalidCredentials) {
+        } catch (InvalidCredentials $e) {
             return Response::createUnauthorized(
                 Json::encode([
                     'error' => 'InvalidCredentials',
-                    'message' => 'Invalid credentials'
+                    'message' => $e->getMessage()
                 ]),
                 [Header::createContentTypeJson()],
             );

@@ -6,6 +6,7 @@ class EmailNotFound extends InvalidCredentials
 {
     public static function create() : self
     {
-        return new self('No user found with matching email address.');
+        // Use parent's generic message to prevent user enumeration
+        return new self('Unknown email/password. Please try again.');
     }
 }

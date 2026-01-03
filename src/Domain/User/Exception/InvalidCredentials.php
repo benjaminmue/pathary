@@ -6,4 +6,8 @@ use RuntimeException;
 
 class InvalidCredentials extends RuntimeException
 {
+    public static function create() : self
+    {
+        return new self('Unknown email/password. Please try again.');
+    }
 }

@@ -23,17 +23,21 @@ class UserInvitationService
         // Generate cryptographically secure random token
         $token = bin2hex(random_bytes(self::TOKEN_LENGTH / 2));
 
+        // Hash token for secure storage (defense against database compromise)
+        $tokenHash = hash('sha256', $token);
+
         // Calculate expiration (3 days from now)
         $expiresAt = DateTime::create()->modify('+' . self::EXPIRATION_HOURS . ' hours');
 
-        // Store in database
+        // Store HASHED token in database (not plaintext)
         $this->dbConnection->insert('user_invitation', [
             'user_id' => $userId,
-            'token' => $token,
+            'token_hash' => $tokenHash,
             'expires_at' => (string)$expiresAt,
             'created_at' => (string)DateTime::create(),
         ]);
 
+        // Return plaintext token (only time it's available)
         return $token;
     }
 
@@ -44,9 +48,12 @@ class UserInvitationService
      */
     public function validateToken(string $token) : ?int
     {
+        // Hash the token to compare with stored hash
+        $tokenHash = hash('sha256', $token);
+
         $invitation = $this->dbConnection->fetchAssociative(
-            'SELECT user_id, expires_at, used_at FROM user_invitation WHERE token = ?',
-            [$token]
+            'SELECT user_id, expires_at, used_at FROM user_invitation WHERE token_hash = ?',
+            [$tokenHash]
         );
 
         if ($invitation === false) {
@@ -73,10 +80,13 @@ class UserInvitationService
      */
     public function markTokenAsUsed(string $token) : void
     {
+        // Hash the token to find the record
+        $tokenHash = hash('sha256', $token);
+
         $this->dbConnection->update(
             'user_invitation',
             ['used_at' => (string)DateTime::create()],
-            ['token' => $token]
+            ['token_hash' => $tokenHash]
         );
     }
 

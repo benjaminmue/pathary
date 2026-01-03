@@ -6,6 +6,7 @@ class InvalidPassword extends InvalidCredentials
 {
     public static function create() : self
     {
-        return new self('Password wrong.');
+        // Use parent's generic message to prevent user enumeration
+        return new self('Unknown email/password. Please try again.');
     }
 }

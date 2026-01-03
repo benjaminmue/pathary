@@ -40,21 +40,15 @@ $timezone = $container->get(\Movary\ValueObject\Config::class)->getAsString('TIM
 /** @psalm-suppress ArgumentTypeCoercion */
 date_default_timezone_set($timezone);
 
-// Validate APPLICATION_URL configuration if set
-$applicationUrl = getenv('APPLICATION_URL');
-if ($applicationUrl !== false && $applicationUrl !== '') {
-    validateApplicationUrl($applicationUrl);
-}
-
-return $container;
-
-/**
- * Validate APPLICATION_URL configuration to prevent misconfiguration
- *
- * @throws RuntimeException If APPLICATION_URL is invalid
- */
-function validateApplicationUrl(string $url): void
-{
+// Define validation function if not already defined
+if (!function_exists('validateApplicationUrl')) {
+    /**
+     * Validate APPLICATION_URL configuration to prevent misconfiguration
+     *
+     * @throws RuntimeException If APPLICATION_URL is invalid
+     */
+    function validateApplicationUrl(string $url): void
+    {
     // Must start with http:// or https://
     if (!preg_match('/^https?:\/\//i', $url)) {
         throw new RuntimeException(
@@ -96,4 +90,13 @@ function validateApplicationUrl(string $url): void
             'Current value: ' . $url
         );
     }
+    }
 }
+
+// Validate APPLICATION_URL configuration if set
+$applicationUrl = getenv('APPLICATION_URL');
+if ($applicationUrl !== false && $applicationUrl !== '') {
+    validateApplicationUrl($applicationUrl);
+}
+
+return $container;

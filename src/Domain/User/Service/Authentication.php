@@ -61,12 +61,8 @@ class Authentication
         $user = $this->repository->findUserByEmail($email);
 
         if ($user === null) {
-            $this->securityAuditService->log(
-                0, // User ID unknown at this point
-                SecurityAuditService::EVENT_LOGIN_FAILED_PASSWORD,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-            );
+            // Cannot log to security audit when user doesn't exist (no valid user_id)
+            // This prevents user enumeration anyway - attackers can't see failed attempts
             throw EmailNotFound::create();
         }
 
