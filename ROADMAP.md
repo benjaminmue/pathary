@@ -18,22 +18,49 @@ This roadmap outlines planned features, implementation ideas, and strategic dire
 
 *Implementation ideas ready to start*
 
-- [ ] Example: Document popcorn rating system in Wiki
-- [ ] Example: Add email system health monitoring to dashboard
+- [ ] Center profile and security pages (`/profile`, `/profile/security`)
+- [ ] Document popcorn rating system in Wiki
 
 ### Medium-term (Next Quarter)
 
 *Features that need design/planning before implementation*
 
-- [ ] Example: Enhanced movie discovery features
-- [ ] Example: Social sharing capabilities
+- [ ] **Movie Poster Lightbox**: Click movie poster to show full-size overlay with close button (X) and click-outside-to-close
+- [ ] **Enhanced Admin Movies Page** (`/admin/movies`):
+  - Refresh movie posters
+  - Edit movie metadata
+  - Delete user comments on movies
+  - Delete movies
+  - Additional movie management features (to be determined)
+- [ ] **User Comment Management** (`/admin/users`):
+  - View all user comments with delete options
+  - Toggle select/deselect all comments
+  - Block/unblock users
+  - Display user statistics (comment count, movie count)
+  - Fix user creation date display
+  - Add accordion view for user comments with inline delete
+- [ ] **Enhanced Homepage Statistics**:
+  - Recently Added (single row only)
+  - Most Liked movies (new row)
+  - Public statistics for all visitors:
+    - Total movies count
+    - Total comments count
+    - Rating distribution (1-7 with bar chart)
+    - Most popular watch locations (Cinema/Home/Other)
+  - Visually appealing design with charts/graphs
+- [ ] Enable and migrate integrations from `/old/` routes to new routes (Plex, Jellyfin, Trakt, etc.)
+  - Create individual Wiki page for each integration
 
 ### Long-term (Future Releases)
 
 *Strategic direction and major features*
 
-- [ ] Example: Mobile app companion
-- [ ] Example: Advanced statistics and analytics
+- [ ] **GitHub Release Checker** (`/admin/releases`):
+  - Auto-check for updates from GitHub repository
+  - Show available stable releases, beta releases, and pre-releases
+  - Update notification system
+- [ ] Mobile app companion
+- [ ] Advanced statistics and analytics dashboard
 
 ---
 
@@ -51,9 +78,14 @@ This roadmap outlines planned features, implementation ideas, and strategic dire
 
 *Documentation that needs to be created or updated*
 
-- [ ] Example: "For Nerds" technical deep-dive Wiki page
-- [ ] Example: OAuth email setup guide
-- [ ] Example: Self-hosting best practices
+- [ ] Integration setup guides (Wiki pages for each):
+  - Plex integration
+  - Jellyfin integration
+  - Trakt integration
+  - Other media platform integrations
+- [ ] Popcorn rating system explanation
+- [ ] "For Nerds" technical deep-dive Wiki page
+- [ ] Self-hosting best practices
 
 ---
 
@@ -71,9 +103,12 @@ This roadmap outlines planned features, implementation ideas, and strategic dire
 
 *Rough ideas that need validation or prototyping*
 
-- Add your implementation ideas here
-- Use this section for brainstorming
-- Reference these when planning sprints
+- User watchlist/wish list feature
+- Movie recommendation engine based on user ratings
+- Social features (follow users, share lists)
+- Export user data (CSV, JSON)
+- Public user profiles (optional)
+- Movie collections/playlists
 
 ---
 
