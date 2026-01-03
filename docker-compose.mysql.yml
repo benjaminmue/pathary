@@ -2,10 +2,13 @@ services:
   mysql:
     image: mysql:8.0
     environment:
+      # ⚠️ WARNING: Change these default credentials in production!
+      # These defaults are for local development only and pose a security risk.
+      # Set environment variables or use .env file: DATABASE_MYSQL_ROOT_PASSWORD, DATABASE_MYSQL_PASSWORD
       MYSQL_ROOT_PASSWORD: ${DATABASE_MYSQL_ROOT_PASSWORD:-root}
-      MYSQL_USER: ${DATABASE_MYSQL_USER:-movary}
-      MYSQL_PASSWORD: ${DATABASE_MYSQL_PASSWORD:-movary}
-      MYSQL_DATABASE: ${DATABASE_MYSQL_NAME:-movary}
+      MYSQL_USER: ${DATABASE_MYSQL_USER:-pathary}
+      MYSQL_PASSWORD: ${DATABASE_MYSQL_PASSWORD:-pathary}
+      MYSQL_DATABASE: ${DATABASE_MYSQL_NAME:-pathary}
       MYSQL_PORT: ${DATABASE_MYSQL_PORT:-3306}
     volumes:
       - mysql-data:/var/lib/mysql
@@ -16,9 +19,10 @@ services:
     environment:
       DATABASE_MODE: "${DATABASE_MODE:-mysql}"
       DATABASE_MYSQL_HOST: "${DATABASE_MYSQL_HOST:-mysql}"
-      DATABASE_MYSQL_NAME: "${DATABASE_MYSQL_NAME:-movary}"
-      DATABASE_MYSQL_USER: "${DATABASE_MYSQL_USER:-movary}"
-      DATABASE_MYSQL_PASSWORD: "${DATABASE_MYSQL_PASSWORD:-movary}"
+      DATABASE_MYSQL_NAME: "${DATABASE_MYSQL_NAME:-pathary}"
+      DATABASE_MYSQL_USER: "${DATABASE_MYSQL_USER:-pathary}"
+      # ⚠️ WARNING: Change default database password in production!
+      DATABASE_MYSQL_PASSWORD: "${DATABASE_MYSQL_PASSWORD:-pathary}"
       DATABASE_MYSQL_PORT: "${DATABASE_MYSQL_PORT:-3306}"
 
 volumes:

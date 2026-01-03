@@ -20,9 +20,11 @@ services:
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "pathary-mysql"
       DATABASE_MYSQL_PORT: "3306"
-      DATABASE_MYSQL_NAME: "${MYSQL_DATABASE:-movary}"
-      DATABASE_MYSQL_USER: "${MYSQL_USER:-movary}"
-      DATABASE_MYSQL_PASSWORD: "${MYSQL_PASSWORD:-movary}"
+      DATABASE_MYSQL_NAME: "${MYSQL_DATABASE:-pathary}"
+      DATABASE_MYSQL_USER: "${MYSQL_USER:-pathary}"
+      # ⚠️ WARNING: Change default database password in production!
+      # Set MYSQL_PASSWORD environment variable or use .env file
+      DATABASE_MYSQL_PASSWORD: "${MYSQL_PASSWORD:-pathary}"
       DATABASE_DISABLE_AUTO_MIGRATION: "${DATABASE_DISABLE_AUTO_MIGRATION:-false}"
     networks:
       - pathary-network
@@ -34,10 +36,13 @@ services:
     container_name: pathary-mysql
     image: mysql:8.0
     environment:
+      # ⚠️ WARNING: Change these default credentials in production!
+      # These defaults are for local development only and pose a security risk.
+      # Set environment variables or use .env file: MYSQL_ROOT_PASSWORD, MYSQL_PASSWORD
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-root}"
-      MYSQL_DATABASE: "${MYSQL_DATABASE:-movary}"
-      MYSQL_USER: "${MYSQL_USER:-movary}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD:-movary}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE:-pathary}"
+      MYSQL_USER: "${MYSQL_USER:-pathary}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD:-pathary}"
     volumes:
       - mysql-data:/var/lib/mysql
     ports:
