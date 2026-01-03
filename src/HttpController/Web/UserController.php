@@ -65,15 +65,32 @@ class UserController
                 $requestUserData['isAdmin'] ?? false,
             );
         } catch (EmailNotUnique) {
-            return Response::createBadRequest('Email already in use.');
+            // Log specific error for debugging, but return generic message to prevent user enumeration
+            $this->logger->info('User creation failed: email already exists', [
+                'attempted_email' => $requestUserData['email'],
+                'admin_id' => $currentUser->getId(),
+            ]);
+            return Response::createBadRequest('User creation failed. Please check your input and try again.');
         } catch (UsernameNotUnique) {
-            return Response::createBadRequest('Name already in use.');
+            // Log specific error for debugging, but return generic message to prevent user enumeration
+            $this->logger->info('User creation failed: username already exists', [
+                'attempted_username' => $requestUserData['name'],
+                'admin_id' => $currentUser->getId(),
+            ]);
+            return Response::createBadRequest('User creation failed. Please check your input and try again.');
+        } catch (UsernameInvalidFormat) {
+            // Log specific error for debugging, but return generic message to prevent user enumeration
+            $this->logger->info('User creation failed: invalid username format', [
+                'attempted_username' => $requestUserData['name'],
+                'admin_id' => $currentUser->getId(),
+            ]);
+            return Response::createBadRequest('User creation failed. Please check your input and try again.');
         } catch (PasswordTooShort) {
+            // Password policy errors don't reveal user existence, can be specific
             return Response::createBadRequest('Password too short.');
         } catch (PasswordPolicyViolation $e) {
+            // Password policy errors don't reveal user existence, can be specific
             return Response::createBadRequest($e->getMessage());
-        } catch (UsernameInvalidFormat) {
-            return Response::createBadRequest('Name is not in a valid format.');
         }
 
         // Get the newly created user
@@ -275,15 +292,35 @@ class UserController
                 $passwordChanged = true;
             }
         } catch (EmailNotUnique) {
-            return Response::createBadRequest('Email already in use.');
+            // Log specific error for debugging, but return generic message to prevent user enumeration
+            $this->logger->info('User update failed: email already exists', [
+                'attempted_email' => $requestUserData['email'],
+                'user_id' => $userId,
+                'updated_by' => $currentUser->getId(),
+            ]);
+            return Response::createBadRequest('User update failed. Please check your input and try again.');
         } catch (UsernameNotUnique) {
-            return Response::createBadRequest('Name already in use.');
+            // Log specific error for debugging, but return generic message to prevent user enumeration
+            $this->logger->info('User update failed: username already exists', [
+                'attempted_username' => $requestUserData['name'],
+                'user_id' => $userId,
+                'updated_by' => $currentUser->getId(),
+            ]);
+            return Response::createBadRequest('User update failed. Please check your input and try again.');
+        } catch (UsernameInvalidFormat) {
+            // Log specific error for debugging, but return generic message to prevent user enumeration
+            $this->logger->info('User update failed: invalid username format', [
+                'attempted_username' => $requestUserData['name'],
+                'user_id' => $userId,
+                'updated_by' => $currentUser->getId(),
+            ]);
+            return Response::createBadRequest('User update failed. Please check your input and try again.');
         } catch (PasswordTooShort) {
+            // Password policy errors don't reveal user existence, can be specific
             return Response::createBadRequest('Password too short.');
         } catch (PasswordPolicyViolation $e) {
+            // Password policy errors don't reveal user existence, can be specific
             return Response::createBadRequest($e->getMessage());
-        } catch (UsernameInvalidFormat) {
-            return Response::createBadRequest('Name is not in a valid format.');
         }
 
         // Log user update event if any changes were made
