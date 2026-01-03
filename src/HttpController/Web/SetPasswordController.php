@@ -7,6 +7,7 @@ use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\UserInvitationService;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ApplicationUrlService;
+use Movary\Service\PasswordSetupRateLimiterService;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
@@ -24,6 +25,7 @@ class SetPasswordController
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
         private readonly ApplicationUrlService $applicationUrlService,
+        private readonly PasswordSetupRateLimiterService $passwordSetupRateLimiter,
     ) {
     }
 
@@ -60,12 +62,14 @@ class SetPasswordController
         $errorPasswordPolicyViolation = $this->sessionWrapper->find('errorPasswordPolicyViolation');
         $errorPasswordNotEqual = $this->sessionWrapper->find('errorPasswordNotEqual');
         $missingFormData = $this->sessionWrapper->find('missingFormData');
+        $rateLimitExceeded = $this->sessionWrapper->find('rateLimitExceeded');
 
         $this->sessionWrapper->unset(
             'errorPasswordTooShort',
             'errorPasswordPolicyViolation',
             'errorPasswordNotEqual',
             'missingFormData',
+            'rateLimitExceeded',
         );
 
         return Response::create(
@@ -77,6 +81,7 @@ class SetPasswordController
                 'errorPasswordPolicyViolation' => $errorPasswordPolicyViolation,
                 'errorPasswordNotEqual' => $errorPasswordNotEqual,
                 'missingFormData' => $missingFormData,
+                'rateLimitExceeded' => $rateLimitExceeded,
             ]),
         );
     }
@@ -93,8 +98,20 @@ class SetPasswordController
             return $this->redirectToSetupPage($token);
         }
 
+        // Check rate limit BEFORE validating password
+        // This prevents attackers from learning about password policy through timing attacks
+        try {
+            $this->passwordSetupRateLimiter->checkRateLimit($token);
+        } catch (\RuntimeException $e) {
+            // Rate limit exceeded
+            $this->sessionWrapper->set('rateLimitExceeded', true);
+            return $this->redirectToSetupPage($token);
+        }
+
         if ($password !== $repeatPassword) {
             $this->sessionWrapper->set('errorPasswordNotEqual', true);
+            // Log failed attempt
+            $this->passwordSetupRateLimiter->logAttempt($token, false, $_SERVER['REMOTE_ADDR'] ?? null);
             return $this->redirectToSetupPage($token);
         }
 
@@ -117,6 +134,9 @@ class SetPasswordController
             // Mark invitation token as used
             $this->invitationService->markTokenAsUsed($token);
 
+            // Log successful password setup
+            $this->passwordSetupRateLimiter->logAttempt($token, true, $_SERVER['REMOTE_ADDR'] ?? null);
+
             // Set success flag for 2FA recommendation modal
             $this->sessionWrapper->set('passwordSetSuccess', true);
 
@@ -130,9 +150,13 @@ class SetPasswordController
             );
         } catch (PasswordTooShort) {
             $this->sessionWrapper->set('errorPasswordTooShort', true);
+            // Log failed attempt
+            $this->passwordSetupRateLimiter->logAttempt($token, false, $_SERVER['REMOTE_ADDR'] ?? null);
             return $this->redirectToSetupPage($token);
         } catch (PasswordPolicyViolation $e) {
             $this->sessionWrapper->set('errorPasswordPolicyViolation', $e->getMessage());
+            // Log failed attempt
+            $this->passwordSetupRateLimiter->logAttempt($token, false, $_SERVER['REMOTE_ADDR'] ?? null);
             return $this->redirectToSetupPage($token);
         }
     }
