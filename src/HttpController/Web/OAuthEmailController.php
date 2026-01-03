@@ -197,7 +197,11 @@ class OAuthEmailController
 
         // Check for authorization errors
         if ($error !== null) {
-            $errorDescription = $request->getGetParameters()['error_description'] ?? 'Unknown error';
+            $errorDescription = htmlspecialchars(
+                $request->getGetParameters()['error_description'] ?? 'Unknown error',
+                ENT_QUOTES,
+                'UTF-8'
+            );
 
             // Log failed callback attempt
             $userId = $this->authenticationService->getCurrentUserId();

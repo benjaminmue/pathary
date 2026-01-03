@@ -7,6 +7,7 @@ use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\UserInvitationService;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ApplicationUrlService;
+use Movary\Service\CsrfTokenService;
 use Movary\Service\PasswordSetupRateLimiterService;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
@@ -26,6 +27,7 @@ class SetPasswordController
         private readonly SessionWrapper $sessionWrapper,
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly PasswordSetupRateLimiterService $passwordSetupRateLimiter,
+        private readonly CsrfTokenService $csrfTokenService,
     ) {
     }
 
@@ -92,6 +94,16 @@ class SetPasswordController
         $token = $postParameters['token'] ?? null;
         $password = $postParameters['password'] ?? null;
         $repeatPassword = $postParameters['repeatPassword'] ?? null;
+
+        // Validate CSRF token first
+        if ($this->csrfTokenService->validateToken($postParameters['_csrf_token'] ?? null) === false) {
+            return Response::create(
+                StatusCode::createForbidden(),
+                $this->twig->render('page/error.html.twig', [
+                    'errorMessage' => 'Invalid security token. Please try again.',
+                ]),
+            );
+        }
 
         if ($token === null || $password === null || $repeatPassword === null) {
             $this->sessionWrapper->set('missingFormData', true);
