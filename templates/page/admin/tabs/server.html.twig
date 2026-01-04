@@ -799,11 +799,11 @@
                         </div>
                     </div>
 
-                    <!-- OAuth Email Box -->
+                    <!-- Email Box (OAuth or SMTP) -->
                     <div class="col-md-6 col-lg-3">
                         <div class="card h-100 health-box" id="health-box-oauth">
                             <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3">Email OAuth</h6>
+                                <h6 class="card-title mb-3" id="health-title-oauth">Email System</h6>
                                 <div class="health-icon mb-3">
                                     <i class="bi bi-envelope text-secondary" style="font-size: 3rem;" id="health-icon-oauth"></i>
                                 </div>
@@ -816,7 +816,7 @@
                                     <button class="btn btn-sm btn-outline-primary me-1" id="health-retest-oauth" onclick="retestOauth()">
                                         <i class="bi bi-arrow-clockwise"></i> Retest
                                     </button>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('oauth')">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('email')">
                                         <i class="bi bi-gear"></i> Settings
                                     </button>
                                 </div>
@@ -1691,16 +1691,20 @@
                     tmdbSection.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
                 break;
+            case 'email':
             case 'oauth':
-                // Scroll to OAuth email settings section
-                const oauthSection = document.querySelector('#email-oauth-settings');
-                if (oauthSection) {
-                    oauthSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } else {
-                    // Fallback: scroll to email settings card
-                    const emailCard = document.querySelector('.card-header:has(.bi-envelope)');
-                    if (emailCard) {
-                        emailCard.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Scroll to email settings section and expand accordion
+                const emailCard = document.querySelector('.card-header:has(.bi-envelope)');
+                if (emailCard) {
+                    // Scroll to email settings card
+                    emailCard.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                    // Expand the accordion if collapsed
+                    const collapseButton = emailCard.querySelector('[data-bs-toggle="collapse"]');
+                    const targetCollapse = emailCard.nextElementSibling;
+
+                    if (collapseButton && targetCollapse && !targetCollapse.classList.contains('show')) {
+                        collapseButton.click();
                     }
                 }
                 break;
@@ -1738,6 +1742,18 @@
         const latencyEl = document.getElementById(`health-latency-${service}`);
         const checkedEl = document.getElementById(`health-checked-${service}`);
         const retestBtn = document.getElementById(`health-retest-${service}`);
+        const titleEl = document.getElementById(`health-title-${service}`);
+
+        // Update box title if provider_name is available (for email box)
+        if (titleEl && status.provider_name) {
+            titleEl.textContent = status.provider_name;
+            // Update title color based on enabled state
+            if (status.enabled === false) {
+                titleEl.classList.add('text-muted');
+            } else {
+                titleEl.classList.remove('text-muted');
+            }
+        }
 
         // Handle disabled state
         if (status.enabled === false) {

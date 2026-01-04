@@ -328,9 +328,38 @@ class HealthCheckController
     }
 
     /**
-     * Check OAuth email connectivity and token health
+     * Check email system health (OAuth or SMTP based on configuration)
      */
     private function checkOAuthHealth() : array
+    {
+        // Detect email authentication mode
+        $emailAuthMode = $this->serverSettings->getEmailAuthMode();
+
+        // Handle NULL or empty string as "not configured"
+        if ($emailAuthMode === null || $emailAuthMode === '') {
+            return [
+                'enabled' => false,
+                'status' => 'down',
+                'message' => 'Email not configured',
+                'provider' => 'none',
+                'provider_name' => 'Email System',
+                'latency_ms' => 0,
+                'checked_at' => date('Y-m-d H:i:s'),
+            ];
+        }
+
+        if ($emailAuthMode === 'smtp_oauth') {
+            return $this->checkOAuthEmailHealth();
+        }
+
+        // SMTP password mode
+        return $this->checkSmtpPasswordHealth();
+    }
+
+    /**
+     * Check OAuth email connectivity and token health
+     */
+    private function checkOAuthEmailHealth() : array
     {
         try {
             $config = $this->oauthConfigService->getConfig();
@@ -341,9 +370,19 @@ class HealthCheckController
                     'enabled' => false,
                     'status' => 'down',
                     'message' => 'OAuth not configured',
+                    'provider' => 'none',
+                    'provider_name' => 'Email System',
                     'latency_ms' => 0,
                     'checked_at' => date('Y-m-d H:i:s'),
                 ];
+            }
+
+            // Determine provider name
+            $providerName = 'Email - OAuth';
+            if ($config->isGmail()) {
+                $providerName = 'Email - Gmail';
+            } elseif ($config->isMicrosoft()) {
+                $providerName = 'Email - Microsoft 365';
             }
 
             // Check alert level to determine health
@@ -358,6 +397,8 @@ class HealthCheckController
                         'enabled' => true,
                         'status' => 'healthy',
                         'message' => 'OAuth connected',
+                        'provider' => $config->provider,
+                        'provider_name' => $providerName,
                         'latency_ms' => 0,
                         'checked_at' => date('Y-m-d H:i:s'),
                         'last_refresh' => $lastRefresh,
@@ -368,6 +409,8 @@ class HealthCheckController
                         'enabled' => true,
                         'status' => 'degraded',
                         'message' => 'OAuth token refresh needed',
+                        'provider' => $config->provider,
+                        'provider_name' => $providerName,
                         'latency_ms' => 0,
                         'checked_at' => date('Y-m-d H:i:s'),
                         'last_refresh' => $lastRefresh,
@@ -379,6 +422,8 @@ class HealthCheckController
                         'enabled' => true,
                         'status' => 'down',
                         'message' => $alertLevel === 'expired' ? 'OAuth token expired' : 'OAuth token failing',
+                        'provider' => $config->provider,
+                        'provider_name' => $providerName,
                         'latency_ms' => 0,
                         'checked_at' => date('Y-m-d H:i:s'),
                         'last_refresh' => $lastRefresh,
@@ -390,6 +435,8 @@ class HealthCheckController
                         'enabled' => true,
                         'status' => 'unknown',
                         'message' => 'OAuth status unknown',
+                        'provider' => $config->provider,
+                        'provider_name' => $providerName,
                         'latency_ms' => 0,
                         'checked_at' => date('Y-m-d H:i:s'),
                     ];
@@ -403,10 +450,66 @@ class HealthCheckController
                 'enabled' => false,
                 'status' => 'down',
                 'message' => 'OAuth check failed',
+                'provider' => 'none',
+                'provider_name' => 'Email System',
                 'latency_ms' => 0,
                 'checked_at' => date('Y-m-d H:i:s'),
             ];
         }
+    }
+
+    /**
+     * Check SMTP password email health
+     */
+    private function checkSmtpPasswordHealth() : array
+    {
+        $host = $this->serverSettings->getSmtpHost();
+        $port = $this->serverSettings->getSmtpPort();
+        $user = $this->serverSettings->getSmtpUser();
+        $password = $this->serverSettings->getSmtpPassword();
+
+        // Check if SMTP is configured
+        if (empty($host) || empty($port)) {
+            return [
+                'enabled' => false,
+                'status' => 'down',
+                'message' => 'SMTP not configured',
+                'provider' => 'smtp',
+                'provider_name' => 'Email - SMTP',
+                'latency_ms' => 0,
+                'checked_at' => date('Y-m-d H:i:s'),
+            ];
+        }
+
+        // Check if credentials are configured (if auth is enabled)
+        $withAuth = $this->serverSettings->getSmtpWithAuthentication();
+        if ($withAuth && (empty($user) || empty($password))) {
+            return [
+                'enabled' => true,
+                'status' => 'degraded',
+                'message' => 'SMTP credentials missing',
+                'provider' => 'smtp',
+                'provider_name' => 'Email - SMTP',
+                'latency_ms' => 0,
+                'checked_at' => date('Y-m-d H:i:s'),
+                'smtp_host' => $host,
+                'smtp_port' => $port,
+            ];
+        }
+
+        // SMTP is configured - we can't test connection without actually sending
+        // so just report as configured
+        return [
+            'enabled' => true,
+            'status' => 'healthy',
+            'message' => 'SMTP configured',
+            'provider' => 'smtp',
+            'provider_name' => 'Email - SMTP',
+            'latency_ms' => 0,
+            'checked_at' => date('Y-m-d H:i:s'),
+            'smtp_host' => $host,
+            'smtp_port' => $port,
+        ];
     }
 
     /**
