@@ -78,6 +78,21 @@ class EmailService
             $this->phpMailer->SMTPSecure = false;
         }
 
+        // Validate SMTP credentials before attempting authentication
+        if ($emailAuthMode !== 'smtp_oauth' && $smtpConfig->isWithAuthentication()) {
+            // Only validate when password authentication is enabled
+            // (Skip validation for anonymous relay servers)
+            $username = $smtpConfig->getUser();
+            $password = $smtpConfig->getPassword();
+
+            if (empty($username) || empty($password)) {
+                throw new CannotSendEmailException(
+                    'SMTP authentication credentials not configured. ' .
+                    'Please configure email settings in Admin → Server Management → Email Settings.'
+                );
+            }
+        }
+
         // Configure authentication based on email auth mode
         if ($emailAuthMode === 'smtp_oauth') {
             // OAuth 2.0 authentication
