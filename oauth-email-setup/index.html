@@ -22,7 +22,7 @@
         
       
       
-      <link rel="icon" href="../images/favicon.png">
+      <link rel="icon" href="../images/favicon.ico">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
@@ -53,6 +53,8 @@
       
     
     
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -69,7 +71,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -92,11 +94,11 @@
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="Pathary Documentation" class="md-header__button md-logo" aria-label="Pathary Documentation" data-md-component="logo">
       
-  <img src="../images/favicon.png" alt="logo">
+  <img src="../images/pathary-logo.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -126,20 +128,20 @@
     
     
     
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
     
       <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
       </label>
     
   
     
     
     
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
     
       <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
       </label>
     
   
@@ -170,11 +172,18 @@
       </label>
       <nav class="md-search__options" aria-label="Search">
         
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
       </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
       
     </form>
     <div class="md-search__output">
@@ -206,13 +215,273 @@
     
   </nav>
   
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../install/docker/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Installation
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../initial-user-setup/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Initial User Setup
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../configuration/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../deployment/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Deployment
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../features/movies-and-tmdb/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/architecture/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../security/authentication-and-sessions/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Security
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../operations/logging-and-troubleshooting/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../development/setup/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../issue-labels/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
-        
-          
         
       
       <main class="md-main" data-md-component="main">
@@ -226,12 +495,14 @@
                     
 
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="Pathary Documentation" class="md-nav__button md-logo" aria-label="Pathary Documentation" data-md-component="logo">
       
-  <img src="../images/favicon.png" alt="logo">
+  <img src="../images/pathary-logo.svg" alt="logo">
 
     </a>
     Pathary Documentation
@@ -313,14 +584,27 @@
   
     
     
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -504,14 +788,35 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
         
           
           <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
@@ -691,14 +996,39 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_6" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_6" >
         
           
           <label class="md-nav__link" for="__nav_7_6" id="__nav_7_6_label" tabindex="0">
@@ -977,14 +1307,31 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
         
           
           <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
@@ -1145,17 +1492,35 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
             
   
   
@@ -2123,14 +2488,27 @@
   
     
     
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
         
           
           <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
@@ -2233,14 +2611,31 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_11" >
         
           
           <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
@@ -2399,14 +2794,29 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12" >
         
           
           <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
@@ -3353,9 +3763,9 @@
   
 
 
-<h1 id="oauth-email-setup-guide">OAuth Email Setup Guide</h1>
+<h1 id="oauth-email-setup-guide">OAuth Email Setup Guide<a class="headerlink" href="#oauth-email-setup-guide" title="Permanent link">&para;</a></h1>
 <p>This guide explains how to configure OAuth 2.0 authentication for sending emails from Pathary using Gmail or Microsoft 365.</p>
-<h2 id="table-of-contents">Table of Contents</h2>
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="#overview">Overview</a></li>
 <li><a href="#prerequisites">Prerequisites</a></li>
@@ -3366,7 +3776,7 @@
 <li><a href="#troubleshooting">Troubleshooting</a></li>
 </ul>
 <hr />
-<h2 id="overview">Overview</h2>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>OAuth 2.0 email authentication provides enhanced security over traditional SMTP password authentication:</p>
 <ul>
 <li><strong>No passwords stored</strong> - Uses OAuth access tokens instead of passwords</li>
@@ -3378,45 +3788,45 @@
 - <strong>Gmail</strong> - Personal Gmail or Google Workspace accounts
 - <strong>Microsoft 365</strong> - Microsoft 365 / Outlook.com accounts</p>
 <hr />
-<h2 id="prerequisites">Prerequisites</h2>
-<h3 id="1-enable-https-production">1. Enable HTTPS (Production)</h3>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<h3 id="1-enable-https-production">1. Enable HTTPS (Production)<a class="headerlink" href="#1-enable-https-production" title="Permanent link">&para;</a></h3>
 <p>OAuth providers require HTTPS for redirect URIs (except localhost). Configure your reverse proxy (Nginx, Caddy, Traefik) with SSL/TLS certificates.</p>
 <p>Example Nginx configuration:
-<div class="highlight"><pre><span></span><code><span class="k">server</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">443</span><span class="w"> </span><span class="s">ssl</span><span class="w"> </span><span class="s">http2</span><span class="p">;</span>
-<span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">pathary.example.com</span><span class="p">;</span>
-
-<span class="w">    </span><span class="kn">ssl_certificate</span><span class="w"> </span><span class="s">/path/to/cert.pem</span><span class="p">;</span>
-<span class="w">    </span><span class="kn">ssl_certificate_key</span><span class="w"> </span><span class="s">/path/to/key.pem</span><span class="p">;</span>
-
-<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://localhost:80</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">X-Real-IP</span><span class="w"> </span><span class="nv">$remote_addr</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">X-Forwarded-For</span><span class="w"> </span><span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
-<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">X-Forwarded-Proto</span><span class="w"> </span><span class="nv">$scheme</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></p>
-<h3 id="2-set-application_url">2. Set APPLICATION_URL</h3>
+<div class="language-nginx highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">443</span><span class="w"> </span><span class="s">ssl</span><span class="w"> </span><span class="s">http2</span><span class="p">;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">pathary.example.com</span><span class="p">;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="kn">ssl_certificate</span><span class="w"> </span><span class="s">/path/to/cert.pem</span><span class="p">;</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="kn">ssl_certificate_key</span><span class="w"> </span><span class="s">/path/to/key.pem</span><span class="p">;</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">        </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://localhost:80</span><span class="p">;</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">X-Real-IP</span><span class="w"> </span><span class="nv">$remote_addr</span><span class="p">;</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">X-Forwarded-For</span><span class="w"> </span><span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">X-Forwarded-Proto</span><span class="w"> </span><span class="nv">$scheme</span><span class="p">;</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<h3 id="2-set-application_url">2. Set APPLICATION_URL<a class="headerlink" href="#2-set-application_url" title="Permanent link">&para;</a></h3>
 <p>Set the <code>APPLICATION_URL</code> environment variable to match your public URL:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># .env or .env.local</span>
-<span class="nv">APPLICATION_URL</span><span class="o">=</span>https://pathary.example.com
-</code></pre></div>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># .env or .env.local</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nv">APPLICATION_URL</span><span class="o">=</span>https://pathary.example.com
+</span></code></pre></div>
 <p>For local development:
-<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_URL</span><span class="o">=</span>http://localhost
-</code></pre></div></p>
-<h3 id="3-generate-encryption-key">3. Generate Encryption Key</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">APPLICATION_URL</span><span class="o">=</span>http://localhost
+</span></code></pre></div></p>
+<h3 id="3-generate-encryption-key">3. Generate Encryption Key<a class="headerlink" href="#3-generate-encryption-key" title="Permanent link">&para;</a></h3>
 <p>Generate a strong encryption key for storing OAuth secrets:</p>
-<div class="highlight"><pre><span></span><code>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span>
-</code></pre></div>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span>
+</span></code></pre></div>
 <p>Set as environment variable:
-<div class="highlight"><pre><span></span><code><span class="nv">ENCRYPTION_KEY</span><span class="o">=</span>your_generated_64_character_hex_string
-</code></pre></div></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">ENCRYPTION_KEY</span><span class="o">=</span>your_generated_64_character_hex_string
+</span></code></pre></div></p>
 <p>Or generate via Pathary UI: Admin → Server Management → Email Settings → OAuth tab → "Generate Encryption Key"</p>
 <hr />
-<h2 id="gmail-oauth-setup">Gmail OAuth Setup</h2>
-<h3 id="step-1-create-google-cloud-project">Step 1: Create Google Cloud Project</h3>
+<h2 id="gmail-oauth-setup">Gmail OAuth Setup<a class="headerlink" href="#gmail-oauth-setup" title="Permanent link">&para;</a></h2>
+<h3 id="step-1-create-google-cloud-project">Step 1: Create Google Cloud Project<a class="headerlink" href="#step-1-create-google-cloud-project" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Go to <a href="https://console.cloud.google.com/">Google Cloud Console</a></li>
 <li>Click <strong>Select a project</strong> → <strong>New Project</strong></li>
@@ -3424,14 +3834,14 @@
 <li><strong>Organization</strong>: Select your organization (if applicable)</li>
 <li>Click <strong>Create</strong></li>
 </ol>
-<h3 id="step-2-enable-gmail-api">Step 2: Enable Gmail API</h3>
+<h3 id="step-2-enable-gmail-api">Step 2: Enable Gmail API<a class="headerlink" href="#step-2-enable-gmail-api" title="Permanent link">&para;</a></h3>
 <ol>
 <li>In your project, go to <strong>APIs &amp; Services</strong> → <strong>Library</strong></li>
 <li>Search for <strong>Gmail API</strong></li>
 <li>Click on it and click <strong>Enable</strong></li>
 <li>Wait for activation to complete</li>
 </ol>
-<h3 id="step-3-configure-oauth-consent-screen">Step 3: Configure OAuth Consent Screen</h3>
+<h3 id="step-3-configure-oauth-consent-screen">Step 3: Configure OAuth Consent Screen<a class="headerlink" href="#step-3-configure-oauth-consent-screen" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Go to <strong>APIs &amp; Services</strong> → <strong>OAuth consent screen</strong></li>
 <li><strong>User Type</strong>:</li>
@@ -3454,7 +3864,7 @@
 <li>Click <strong>Save and Continue</strong></li>
 <li>Review summary and click <strong>Back to Dashboard</strong></li>
 </ol>
-<h3 id="step-4-create-oauth-20-client-id">Step 4: Create OAuth 2.0 Client ID</h3>
+<h3 id="step-4-create-oauth-20-client-id">Step 4: Create OAuth 2.0 Client ID<a class="headerlink" href="#step-4-create-oauth-20-client-id" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Go to <strong>APIs &amp; Services</strong> → <strong>Credentials</strong></li>
 <li>Click <strong>Create Credentials</strong> → <strong>OAuth client ID</strong></li>
@@ -3474,7 +3884,7 @@
 8. A popup shows your <strong>Client ID</strong> and <strong>Client Secret</strong>
 9. <strong>Copy both values</strong> - you'll need them for Pathary configuration
 10. Click <strong>OK</strong></p>
-<h3 id="step-5-configure-in-pathary">Step 5: Configure in Pathary</h3>
+<h3 id="step-5-configure-in-pathary">Step 5: Configure in Pathary<a class="headerlink" href="#step-5-configure-in-pathary" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Go to Admin → Server Management → Email Settings → <strong>OAuth</strong> tab</li>
 <li><strong>Email Provider</strong>: Select <strong>Gmail</strong></li>
@@ -3483,7 +3893,7 @@
 <li><strong>From Address</strong>: Enter your Gmail address (e.g., <code>noreply@example.com</code>)</li>
 <li>Click <strong>Save OAuth Settings</strong></li>
 </ol>
-<h3 id="step-6-authorize-gmail-account">Step 6: Authorize Gmail Account</h3>
+<h3 id="step-6-authorize-gmail-account">Step 6: Authorize Gmail Account<a class="headerlink" href="#step-6-authorize-gmail-account" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Click <strong>Connect</strong> button</li>
 <li>You'll be redirected to Google sign-in</li>
@@ -3494,15 +3904,15 @@
 <li>You'll be redirected back to Pathary</li>
 <li>You should see "OAuth authorization successful!"</li>
 </ol>
-<h3 id="step-7-verify-connection">Step 7: Verify Connection</h3>
+<h3 id="step-7-verify-connection">Step 7: Verify Connection<a class="headerlink" href="#step-7-verify-connection" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Check <strong>Connection Status</strong> shows "Connected" with green checkmark</li>
 <li><strong>Token Status</strong> should show "Active"</li>
 <li>Click <strong>Send Test Email</strong> to verify</li>
 </ol>
 <hr />
-<h2 id="microsoft-365-oauth-setup">Microsoft 365 OAuth Setup</h2>
-<h3 id="step-1-register-app-in-azure-portal">Step 1: Register App in Azure Portal</h3>
+<h2 id="microsoft-365-oauth-setup">Microsoft 365 OAuth Setup<a class="headerlink" href="#microsoft-365-oauth-setup" title="Permanent link">&para;</a></h2>
+<h3 id="step-1-register-app-in-azure-portal">Step 1: Register App in Azure Portal<a class="headerlink" href="#step-1-register-app-in-azure-portal" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Go to <a href="https://portal.azure.com/">Azure Portal</a></li>
 <li>Navigate to <strong>Azure Active Directory</strong> (or <strong>Microsoft Entra ID</strong>)</li>
@@ -3525,7 +3935,7 @@
 6. On the <strong>Overview</strong> page, note down:
    - <strong>Application (client) ID</strong> - You'll need this for Pathary
    - <strong>Directory (tenant) ID</strong> - You'll need this for Pathary</p>
-<h3 id="step-2-create-client-secret">Step 2: Create Client Secret</h3>
+<h3 id="step-2-create-client-secret">Step 2: Create Client Secret<a class="headerlink" href="#step-2-create-client-secret" title="Permanent link">&para;</a></h3>
 <ol>
 <li>In your app, go to <strong>Certificates &amp; secrets</strong> in left sidebar</li>
 <li>Click <strong>Client secrets</strong> tab</li>
@@ -3537,9 +3947,9 @@
 <li>Click <strong>Add</strong></li>
 <li><strong>Copy the secret Value immediately</strong> - it will only be shown once!</li>
 </ol>
-<h3 id="step-3-add-api-permissions">Step 3: Add API Permissions</h3>
+<h3 id="step-3-add-api-permissions">Step 3: Add API Permissions<a class="headerlink" href="#step-3-add-api-permissions" title="Permanent link">&para;</a></h3>
 <p>This is the <strong>most critical step</strong> for Microsoft 365 OAuth to work correctly.</p>
-<h4 id="add-office-365-exchange-online-permissions">Add Office 365 Exchange Online Permissions</h4>
+<h4 id="add-office-365-exchange-online-permissions">Add Office 365 Exchange Online Permissions<a class="headerlink" href="#add-office-365-exchange-online-permissions" title="Permanent link">&para;</a></h4>
 <ol>
 <li>Go to <strong>API permissions</strong> in left sidebar</li>
 <li>Click <strong>Add a permission</strong></li>
@@ -3550,7 +3960,7 @@
 <li>Check <strong>SMTP.Send</strong></li>
 <li>Click <strong>Add permissions</strong></li>
 </ol>
-<h4 id="add-microsoft-graph-permissions">Add Microsoft Graph Permissions</h4>
+<h4 id="add-microsoft-graph-permissions">Add Microsoft Graph Permissions<a class="headerlink" href="#add-microsoft-graph-permissions" title="Permanent link">&para;</a></h4>
 <ol>
 <li>Click <strong>Add a permission</strong> again</li>
 <li>Click <strong>Microsoft Graph</strong></li>
@@ -3562,63 +3972,63 @@
 </li>
 <li>Click <strong>Add permissions</strong></li>
 </ol>
-<h4 id="grant-admin-consent">Grant Admin Consent</h4>
+<h4 id="grant-admin-consent">Grant Admin Consent<a class="headerlink" href="#grant-admin-consent" title="Permanent link">&para;</a></h4>
 <ol>
 <li>Click <strong>Grant admin consent for [Your Organization]</strong> button</li>
 <li>Click <strong>Yes</strong> to confirm</li>
 <li>Wait for status to update - all permissions should show green checkmarks under "Status"</li>
 </ol>
 <p><strong>Expected permissions list:</strong>
-<div class="highlight"><pre><span></span><code>API / Permissions name          Type           Status
-──────────────────────────────────────────────────────
-Microsoft Graph
-  offline_access                Delegated      ✓ Granted
-  User.Read                     Delegated      ✓ Granted
-
-Office 365 Exchange Online
-  SMTP.Send                     Delegated      ✓ Granted
-</code></pre></div></p>
-<h3 id="step-4-enable-smtp-auth-critical">Step 4: Enable SMTP AUTH (Critical!)</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>API / Permissions name          Type           Status
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>──────────────────────────────────────────────────────
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Microsoft Graph
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>  offline_access                Delegated      ✓ Granted
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>  User.Read                     Delegated      ✓ Granted
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>Office 365 Exchange Online
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>  SMTP.Send                     Delegated      ✓ Granted
+</span></code></pre></div></p>
+<h3 id="step-4-enable-smtp-auth-critical">Step 4: Enable SMTP AUTH (Critical!)<a class="headerlink" href="#step-4-enable-smtp-auth-critical" title="Permanent link">&para;</a></h3>
 <p>Microsoft 365 requires SMTP AUTH to be enabled at both tenant and mailbox levels.</p>
-<h4 id="check-tenant-level-smtp-auth">Check Tenant-Level SMTP AUTH</h4>
+<h4 id="check-tenant-level-smtp-auth">Check Tenant-Level SMTP AUTH<a class="headerlink" href="#check-tenant-level-smtp-auth" title="Permanent link">&para;</a></h4>
 <p>Connect to Exchange Online PowerShell:
-<div class="highlight"><pre><span></span><code><span class="nb">Install-Module</span> <span class="n">-Name</span> <span class="n">ExchangeOnlineManagement</span>
-<span class="nb">Connect-ExchangeOnline</span> <span class="n">-UserPrincipalName</span> <span class="n">admin</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span>
-</code></pre></div></p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">Install-Module</span> <span class="n">-Name</span> <span class="n">ExchangeOnlineManagement</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">Connect-ExchangeOnline</span> <span class="n">-UserPrincipalName</span> <span class="n">admin</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span>
+</span></code></pre></div></p>
 <p>Check if SMTP AUTH is enabled:
-<div class="highlight"><pre><span></span><code><span class="nb">Get-OrganizationConfig</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
-</code></pre></div></p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">Get-OrganizationConfig</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
+</span></code></pre></div></p>
 <p>If <code>SmtpClientAuthenticationDisabled</code> is <code>True</code>, enable it:
-<div class="highlight"><pre><span></span><code><span class="nb">Set-OrganizationConfig</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
-</code></pre></div></p>
-<h4 id="check-mailbox-level-smtp-auth">Check Mailbox-Level SMTP AUTH</h4>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">Set-OrganizationConfig</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
+</span></code></pre></div></p>
+<h4 id="check-mailbox-level-smtp-auth">Check Mailbox-Level SMTP AUTH<a class="headerlink" href="#check-mailbox-level-smtp-auth" title="Permanent link">&para;</a></h4>
 <p>Check specific mailbox:
-<div class="highlight"><pre><span></span><code><span class="nb">Get-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
-</code></pre></div></p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">Get-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
+</span></code></pre></div></p>
 <p>If disabled, enable it:
-<div class="highlight"><pre><span></span><code><span class="nb">Set-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
-</code></pre></div></p>
-<h4 id="create-authentication-policy-alternative">Create Authentication Policy (Alternative)</h4>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">Set-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
+</span></code></pre></div></p>
+<h4 id="create-authentication-policy-alternative">Create Authentication Policy (Alternative)<a class="headerlink" href="#create-authentication-policy-alternative" title="Permanent link">&para;</a></h4>
 <p>If you want to enable SMTP AUTH only for specific mailboxes:</p>
-<div class="highlight"><pre><span></span><code><span class="c"># Create policy</span>
-<span class="nb">New-AuthenticationPolicy</span> <span class="n">-Name</span> <span class="s2">&quot;Allow SMTP AUTH&quot;</span> <span class="n">-AllowBasicAuthSmtp</span>
-
-<span class="c"># Assign to mailbox</span>
-<span class="nb">Set-User</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="n">-AuthenticationPolicy</span> <span class="s2">&quot;Allow SMTP AUTH&quot;</span>
-</code></pre></div>
-<h3 id="step-5-optional-register-service-principal">Step 5: (Optional) Register Service Principal</h3>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c"># Create policy</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nb">New-AuthenticationPolicy</span> <span class="n">-Name</span> <span class="s2">&quot;Allow SMTP AUTH&quot;</span> <span class="n">-AllowBasicAuthSmtp</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c"># Assign to mailbox</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="nb">Set-User</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="n">-AuthenticationPolicy</span> <span class="s2">&quot;Allow SMTP AUTH&quot;</span>
+</span></code></pre></div>
+<h3 id="step-5-optional-register-service-principal">Step 5: (Optional) Register Service Principal<a class="headerlink" href="#step-5-optional-register-service-principal" title="Permanent link">&para;</a></h3>
 <p>For enhanced permissions (SendAs), register the app as a service principal:</p>
-<div class="highlight"><pre><span></span><code><span class="c"># Get app details from Azure Portal Overview page</span>
-<span class="nv">$appId</span> <span class="p">=</span> <span class="s2">&quot;f2da336d-56cd-4e18-b426-b4567b0ca98c&quot;</span>  <span class="c"># Application (client) ID</span>
-<span class="nv">$objectId</span> <span class="p">=</span> <span class="s2">&quot;bdb51601-5178-4fb3-b4ad-f1e79fef5016&quot;</span>  <span class="c"># Object ID</span>
-
-<span class="c"># Register service principal</span>
-<span class="nb">New-ServicePrincipal</span> <span class="n">-AppId</span> <span class="nv">$appId</span> <span class="n">-ServiceId</span> <span class="nv">$objectId</span>
-
-<span class="c"># Grant SendAs permission</span>
-<span class="nb">Add-RecipientPermission</span> <span class="n">-Identity</span> <span class="s1">&#39;mail@yourdomain.com&#39;</span> <span class="n">-Trustee</span> <span class="nv">$objectId</span> <span class="n">-AccessRights</span> <span class="n">SendAs</span>
-</code></pre></div>
-<h3 id="step-6-configure-in-pathary">Step 6: Configure in Pathary</h3>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c"># Get app details from Azure Portal Overview page</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nv">$appId</span> <span class="p">=</span> <span class="s2">&quot;f2da336d-56cd-4e18-b426-b4567b0ca98c&quot;</span>  <span class="c"># Application (client) ID</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="nv">$objectId</span> <span class="p">=</span> <span class="s2">&quot;bdb51601-5178-4fb3-b4ad-f1e79fef5016&quot;</span>  <span class="c"># Object ID</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c"># Register service principal</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="nb">New-ServicePrincipal</span> <span class="n">-AppId</span> <span class="nv">$appId</span> <span class="n">-ServiceId</span> <span class="nv">$objectId</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c"># Grant SendAs permission</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="nb">Add-RecipientPermission</span> <span class="n">-Identity</span> <span class="s1">&#39;mail@yourdomain.com&#39;</span> <span class="n">-Trustee</span> <span class="nv">$objectId</span> <span class="n">-AccessRights</span> <span class="n">SendAs</span>
+</span></code></pre></div>
+<h3 id="step-6-configure-in-pathary">Step 6: Configure in Pathary<a class="headerlink" href="#step-6-configure-in-pathary" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Go to Admin → Server Management → Email Settings → <strong>OAuth</strong> tab</li>
 <li><strong>Email Provider</strong>: Select <strong>Microsoft 365 / Outlook</strong></li>
@@ -3629,7 +4039,7 @@ Office 365 Exchange Online
 <li><strong>Email From Address</strong>: (Optional) Different from address (e.g., <code>noreply@yourdomain.com</code>)</li>
 <li>Click <strong>Save OAuth Settings</strong></li>
 </ol>
-<h3 id="step-7-authorize-microsoft-account">Step 7: Authorize Microsoft Account</h3>
+<h3 id="step-7-authorize-microsoft-account">Step 7: Authorize Microsoft Account<a class="headerlink" href="#step-7-authorize-microsoft-account" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Click <strong>Connect</strong> button</li>
 <li>You'll be redirected to Microsoft sign-in</li>
@@ -3645,7 +4055,7 @@ Office 365 Exchange Online
 <li>You'll be redirected back to Pathary</li>
 <li>You should see "OAuth authorization successful!"</li>
 </ol>
-<h3 id="step-8-verify-connection">Step 8: Verify Connection</h3>
+<h3 id="step-8-verify-connection">Step 8: Verify Connection<a class="headerlink" href="#step-8-verify-connection" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Check <strong>Connection Status</strong> shows "Connected" with green checkmark</li>
 <li><strong>Token Status</strong> should show "Active"</li>
@@ -3656,15 +4066,15 @@ Office 365 Exchange Online
 <li>Click <strong>Send Test Email</strong> to verify</li>
 </ol>
 <hr />
-<h2 id="pathary-configuration">Pathary Configuration</h2>
-<h3 id="access-oauth-settings">Access OAuth Settings</h3>
+<h2 id="pathary-configuration">Pathary Configuration<a class="headerlink" href="#pathary-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="access-oauth-settings">Access OAuth Settings<a class="headerlink" href="#access-oauth-settings" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Log in to Pathary as admin</li>
 <li>Go to <strong>Admin</strong> → <strong>Server Management</strong></li>
 <li>Click <strong>Email Settings</strong> section</li>
 <li>Click <strong>OAuth</strong> tab</li>
 </ol>
-<h3 id="configuration-fields">Configuration Fields</h3>
+<h3 id="configuration-fields">Configuration Fields<a class="headerlink" href="#configuration-fields" title="Permanent link">&para;</a></h3>
 <p><strong>Email Provider:</strong>
 - Select <code>Gmail</code> or <code>Microsoft 365 / Outlook</code>
 - Shows provider-specific setup instructions when selected</p>
@@ -3689,7 +4099,7 @@ Office 365 Exchange Online
 - Set reminder for client secret expiration (Microsoft 365)
 - Recommended: Set to 23 months if secret expires in 24 months
 - Pathary will show warning when expiry approaches</p>
-<h3 id="switch-between-password-and-oauth">Switch Between Password and OAuth</h3>
+<h3 id="switch-between-password-and-oauth">Switch Between Password and OAuth<a class="headerlink" href="#switch-between-password-and-oauth" title="Permanent link">&para;</a></h3>
 <p><strong>Switch to OAuth:</strong>
 1. Configure OAuth settings in OAuth tab
 2. Click <strong>Connect</strong> to authorize
@@ -3703,8 +4113,8 @@ Office 365 Exchange Online
 5. All emails will now use password authentication</p>
 <p><strong>Note</strong>: OAuth configuration is preserved when switching modes.</p>
 <hr />
-<h2 id="testing">Testing</h2>
-<h3 id="send-test-email">Send Test Email</h3>
+<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
+<h3 id="send-test-email">Send Test Email<a class="headerlink" href="#send-test-email" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Go to Admin → Server Management → Email Settings</li>
 <li>Click <strong>Send Test Email</strong> button</li>
@@ -3712,28 +4122,28 @@ Office 365 Exchange Online
 <li>Email subject: "Test Email from Pathary"</li>
 <li>Email body: "This is a test email sent to check the currently set email settings."</li>
 </ol>
-<h3 id="verify-token-refresh">Verify Token Refresh</h3>
+<h3 id="verify-token-refresh">Verify Token Refresh<a class="headerlink" href="#verify-token-refresh" title="Permanent link">&para;</a></h3>
 <p>OAuth tokens expire after 1 hour. Pathary automatically refreshes them using the refresh token.</p>
 <p><strong>Monitor token refresh:</strong>
 1. Check <strong>Last Token Refresh</strong> timestamp in OAuth tab
 2. Send test email after 1 hour
 3. Token should refresh automatically
 4. <strong>Token Status</strong> should remain "Active"</p>
-<h3 id="check-logs">Check Logs</h3>
+<h3 id="check-logs">Check Logs<a class="headerlink" href="#check-logs" title="Permanent link">&para;</a></h3>
 <p>If email sending fails, check logs:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Docker logs</span>
-docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>app
-
-<span class="c1"># Look for errors containing:</span>
-<span class="c1"># - &quot;OAuth&quot;</span>
-<span class="c1"># - &quot;SMTP&quot;</span>
-<span class="c1"># - &quot;Failed to refresh&quot;</span>
-<span class="c1"># - &quot;Authentication unsuccessful&quot;</span>
-</code></pre></div>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Docker logs</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>app
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Look for errors containing:</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="c1"># - &quot;OAuth&quot;</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="c1"># - &quot;SMTP&quot;</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># - &quot;Failed to refresh&quot;</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="c1"># - &quot;Authentication unsuccessful&quot;</span>
+</span></code></pre></div>
 <hr />
-<h2 id="troubleshooting">Troubleshooting</h2>
-<h3 id="gmail-issues">Gmail Issues</h3>
-<h4 id="error-redirect_uri_mismatch">Error: "redirect_uri_mismatch"</h4>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="gmail-issues">Gmail Issues<a class="headerlink" href="#gmail-issues" title="Permanent link">&para;</a></h3>
+<h4 id="error-redirect_uri_mismatch">Error: "redirect_uri_mismatch"<a class="headerlink" href="#error-redirect_uri_mismatch" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: Redirect URI in Pathary doesn't match Google Cloud Console configuration.</p>
 <p><strong>Fix:</strong>
 1. Check <code>APPLICATION_URL</code> environment variable matches your domain
@@ -3741,14 +4151,14 @@ docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"
 3. Verify <strong>Authorized redirect URIs</strong> contains exact URL:
    - <code>{APPLICATION_URL}/admin/server/email/oauth/callback</code>
 4. Update if needed and try again</p>
-<h4 id="error-invalid_scope">Error: "invalid_scope"</h4>
+<h4 id="error-invalid_scope">Error: "invalid_scope"<a class="headerlink" href="#error-invalid_scope" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: Gmail API not enabled in Google Cloud project.</p>
 <p><strong>Fix:</strong>
 1. Go to Google Cloud Console → APIs &amp; Services → Library
 2. Search for "Gmail API"
 3. Click <strong>Enable</strong>
 4. Wait a few minutes and try again</p>
-<h4 id="error-access-blocked-this-apps-request-is-invalid">Error: "Access blocked: This app's request is invalid"</h4>
+<h4 id="error-access-blocked-this-apps-request-is-invalid">Error: "Access blocked: This app's request is invalid"<a class="headerlink" href="#error-access-blocked-this-apps-request-is-invalid" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: OAuth consent screen not configured or missing required fields.</p>
 <p><strong>Fix:</strong>
 1. Go to Google Cloud Console → APIs &amp; Services → OAuth consent screen
@@ -3757,7 +4167,7 @@ docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"
    - User support email
    - Developer contact information
 3. Click <strong>Save and Continue</strong></p>
-<h4 id="no-refresh-token-received">No refresh token received</h4>
+<h4 id="no-refresh-token-received">No refresh token received<a class="headerlink" href="#no-refresh-token-received" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: OAuth consent screen not showing or user previously authorized.</p>
 <p><strong>Fix:</strong>
 1. Revoke access: https://myaccount.google.com/permissions
@@ -3765,18 +4175,18 @@ docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"
 3. Reconnect OAuth in Pathary
 4. You should see consent screen asking for permissions</p>
 <hr />
-<h3 id="microsoft-365-issues">Microsoft 365 Issues</h3>
-<h4 id="error-535-573-authentication-unsuccessful">Error: "535 5.7.3 Authentication unsuccessful"</h4>
+<h3 id="microsoft-365-issues">Microsoft 365 Issues<a class="headerlink" href="#microsoft-365-issues" title="Permanent link">&para;</a></h3>
+<h4 id="error-535-573-authentication-unsuccessful">Error: "535 5.7.3 Authentication unsuccessful"<a class="headerlink" href="#error-535-573-authentication-unsuccessful" title="Permanent link">&para;</a></h4>
 <p>This is the <strong>most common</strong> Microsoft 365 OAuth error. Several possible causes:</p>
 <p><strong>Cause 1: Wrong token audience</strong></p>
 <p>The token is requested for Azure AD Graph instead of Exchange Online.</p>
 <p><strong>Fix:</strong>
 Verify code uses correct configuration (already fixed in Pathary):
-<div class="highlight"><pre><span></span><code><span class="x">// OAuthTokenService.php and EmailService.php</span>
-<span class="x">&#39;defaultEndPointVersion&#39; =&gt; Azure::ENDPOINT_VERSION_2_0,</span>
-<span class="x">&#39;urlAPI&#39; =&gt; &#39;https://outlook.office365.com/&#39;,</span>
-<span class="x">&#39;resource&#39; =&gt; &#39;https://outlook.office365.com/&#39;,</span>
-</code></pre></div></p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="x">// OAuthTokenService.php and EmailService.php</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="x">&#39;defaultEndPointVersion&#39; =&gt; Azure::ENDPOINT_VERSION_2_0,</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="x">&#39;urlAPI&#39; =&gt; &#39;https://outlook.office365.com/&#39;,</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="x">&#39;resource&#39; =&gt; &#39;https://outlook.office365.com/&#39;,</span>
+</span></code></pre></div></p>
 <p><strong>Cause 2: Missing SMTP.Send scope</strong></p>
 <p>The app doesn't have Exchange Online SMTP.Send permission.</p>
 <p><strong>Fix:</strong>
@@ -3791,41 +4201,41 @@ Verify code uses correct configuration (already fixed in Pathary):
 4. Click <strong>Grant admin consent for [Organization]</strong>
 5. <strong>Disconnect and reconnect</strong> OAuth in Pathary</p>
 <p><strong>Verify granted scopes in database:</strong>
-<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">granted_scopes</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">oauth_email_config</span><span class="p">;</span>
-</code></pre></div>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">granted_scopes</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">oauth_email_config</span><span class="p">;</span>
+</span></code></pre></div>
 Should include: <code>SMTP.Send User.Read offline_access</code></p>
 <p><strong>Cause 3: SMTP AUTH disabled</strong></p>
 <p>SMTP protocol is disabled at tenant or mailbox level.</p>
 <p><strong>Fix:</strong>
-<div class="highlight"><pre><span></span><code><span class="c"># Connect to Exchange Online</span>
-<span class="nb">Connect-ExchangeOnline</span>
-
-<span class="c"># Check tenant level</span>
-<span class="nb">Get-OrganizationConfig</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
-
-<span class="c"># Enable if needed</span>
-<span class="nb">Set-OrganizationConfig</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
-
-<span class="c"># Check mailbox level</span>
-<span class="nb">Get-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
-
-<span class="c"># Enable if needed</span>
-<span class="nb">Set-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
-</code></pre></div></p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c"># Connect to Exchange Online</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nb">Connect-ExchangeOnline</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c"># Check tenant level</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="nb">Get-OrganizationConfig</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="c"># Enable if needed</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="nb">Set-OrganizationConfig</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="c"># Check mailbox level</span>
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="nb">Get-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
+</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>
+</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="c"># Enable if needed</span>
+</span><span id="__span-16-14"><a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="nb">Set-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
+</span></code></pre></div></p>
 <p><strong>Cause 4: Service principal not registered</strong></p>
 <p>App not registered as service principal in Exchange Online.</p>
 <p><strong>Fix:</strong>
-<div class="highlight"><pre><span></span><code><span class="c"># Get app details from Azure Portal</span>
-<span class="nv">$appId</span> <span class="p">=</span> <span class="s2">&quot;YOUR-APPLICATION-CLIENT-ID&quot;</span>
-<span class="nv">$objectId</span> <span class="p">=</span> <span class="s2">&quot;YOUR-APPLICATION-OBJECT-ID&quot;</span>
-
-<span class="c"># Register service principal</span>
-<span class="nb">New-ServicePrincipal</span> <span class="n">-AppId</span> <span class="nv">$appId</span> <span class="n">-ServiceId</span> <span class="nv">$objectId</span>
-
-<span class="c"># Grant SendAs permission</span>
-<span class="nb">Add-RecipientPermission</span> <span class="n">-Identity</span> <span class="s1">&#39;mail@yourdomain.com&#39;</span> <span class="n">-Trustee</span> <span class="nv">$objectId</span> <span class="n">-AccessRights</span> <span class="n">SendAs</span>
-</code></pre></div></p>
-<h4 id="error-aadsts50011-redirect-uri-mismatch">Error: "AADSTS50011: redirect uri mismatch"</h4>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c"># Get app details from Azure Portal</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nv">$appId</span> <span class="p">=</span> <span class="s2">&quot;YOUR-APPLICATION-CLIENT-ID&quot;</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="nv">$objectId</span> <span class="p">=</span> <span class="s2">&quot;YOUR-APPLICATION-OBJECT-ID&quot;</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c"># Register service principal</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="nb">New-ServicePrincipal</span> <span class="n">-AppId</span> <span class="nv">$appId</span> <span class="n">-ServiceId</span> <span class="nv">$objectId</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="c"># Grant SendAs permission</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="nb">Add-RecipientPermission</span> <span class="n">-Identity</span> <span class="s1">&#39;mail@yourdomain.com&#39;</span> <span class="n">-Trustee</span> <span class="nv">$objectId</span> <span class="n">-AccessRights</span> <span class="n">SendAs</span>
+</span></code></pre></div></p>
+<h4 id="error-aadsts50011-redirect-uri-mismatch">Error: "AADSTS50011: redirect uri mismatch"<a class="headerlink" href="#error-aadsts50011-redirect-uri-mismatch" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: Redirect URI in Pathary doesn't match Azure app registration.</p>
 <p><strong>Fix:</strong>
 1. Check <code>APPLICATION_URL</code> environment variable
@@ -3833,14 +4243,14 @@ Should include: <code>SMTP.Send User.Read offline_access</code></p>
 3. Under <strong>Redirect URIs</strong>, verify exact URL exists:
    - <code>{APPLICATION_URL}/admin/server/email/oauth/callback</code>
 4. Add if missing and click <strong>Save</strong></p>
-<h4 id="error-aadsts65001-the-user-or-administrator-has-not-consented">Error: "AADSTS65001: The user or administrator has not consented"</h4>
+<h4 id="error-aadsts65001-the-user-or-administrator-has-not-consented">Error: "AADSTS65001: The user or administrator has not consented"<a class="headerlink" href="#error-aadsts65001-the-user-or-administrator-has-not-consented" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: Admin consent not granted for API permissions.</p>
 <p><strong>Fix:</strong>
 1. Go to Azure Portal → App registrations → Your app → API permissions
 2. Click <strong>Grant admin consent for [Your Organization]</strong>
 3. Click <strong>Yes</strong> to confirm
 4. Verify all permissions show green checkmarks under "Status"</p>
-<h4 id="error-aadsts7000218-the-request-body-must-contain-the-following-parameter-client_assertion-or-client_secret">Error: "AADSTS7000218: The request body must contain the following parameter: 'client_assertion' or 'client_secret'"</h4>
+<h4 id="error-aadsts7000218-the-request-body-must-contain-the-following-parameter-client_assertion-or-client_secret">Error: "AADSTS7000218: The request body must contain the following parameter: 'client_assertion' or 'client_secret'"<a class="headerlink" href="#error-aadsts7000218-the-request-body-must-contain-the-following-parameter-client_assertion-or-client_secret" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: Client secret expired or invalid.</p>
 <p><strong>Fix:</strong>
 1. Go to Azure Portal → App registrations → Your app → Certificates &amp; secrets
@@ -3853,14 +4263,14 @@ Should include: <code>SMTP.Send User.Read offline_access</code></p>
 4. Update client secret in Pathary OAuth settings
 5. Click <strong>Save OAuth Settings</strong>
 6. <strong>Disconnect and reconnect</strong> OAuth</p>
-<h4 id="error-invalid_grant-or-token-has-been-revoked">Error: "invalid_grant" or "Token has been revoked"</h4>
+<h4 id="error-invalid_grant-or-token-has-been-revoked">Error: "invalid_grant" or "Token has been revoked"<a class="headerlink" href="#error-invalid_grant-or-token-has-been-revoked" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: Refresh token expired or user revoked access.</p>
 <p><strong>Fix:</strong>
 1. Go to Pathary → Admin → Email Settings → OAuth tab
 2. Click <strong>Disconnect</strong>
 3. Click <strong>Connect</strong> to re-authorize
 4. Sign in and grant permissions again</p>
-<h4 id="cant-find-office-365-exchange-online-in-api-permissions">Can't find "Office 365 Exchange Online" in API permissions</h4>
+<h4 id="cant-find-office-365-exchange-online-in-api-permissions">Can't find "Office 365 Exchange Online" in API permissions<a class="headerlink" href="#cant-find-office-365-exchange-online-in-api-permissions" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: You're looking in the wrong tab.</p>
 <p><strong>Fix:</strong>
 1. Click <strong>Add a permission</strong>
@@ -3870,15 +4280,15 @@ Should include: <code>SMTP.Send User.Read offline_access</code></p>
 5. Choose <strong>Delegated permissions</strong>
 6. Check <strong>SMTP.Send</strong></p>
 <hr />
-<h3 id="general-issues">General Issues</h3>
-<h4 id="error-oauth-configuration-not-found">Error: "OAuth configuration not found"</h4>
+<h3 id="general-issues">General Issues<a class="headerlink" href="#general-issues" title="Permanent link">&para;</a></h3>
+<h4 id="error-oauth-configuration-not-found">Error: "OAuth configuration not found"<a class="headerlink" href="#error-oauth-configuration-not-found" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: OAuth settings not saved.</p>
 <p><strong>Fix:</strong>
 1. Go to Admin → Email Settings → OAuth tab
 2. Fill in all required fields
 3. Click <strong>Save OAuth Settings</strong>
 4. Verify "Settings saved successfully" message</p>
-<h4 id="error-encryption_key-not-configured">Error: "ENCRYPTION_KEY not configured"</h4>
+<h4 id="error-encryption_key-not-configured">Error: "ENCRYPTION_KEY not configured"<a class="headerlink" href="#error-encryption_key-not-configured" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: Encryption key not set.</p>
 <p><strong>Fix:</strong>
 Option 1 - Generate via UI:
@@ -3886,28 +4296,28 @@ Option 1 - Generate via UI:
 2. Click <strong>Generate Encryption Key</strong>
 3. Key is automatically saved</p>
 <p>Option 2 - Set environment variable:
-<div class="highlight"><pre><span></span><code><span class="c1"># Generate key</span>
-openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span>
-
-<span class="c1"># Add to .env or .env.local</span>
-<span class="nv">ENCRYPTION_KEY</span><span class="o">=</span>your_generated_64_character_hex_string
-
-<span class="c1"># Restart container</span>
-docker<span class="w"> </span>compose<span class="w"> </span>restart<span class="w"> </span>app
-</code></pre></div></p>
-<h4 id="connection-shows-connected-but-emails-fail">Connection shows "Connected" but emails fail</h4>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Generate key</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># Add to .env or .env.local</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="nv">ENCRYPTION_KEY</span><span class="o">=</span>your_generated_64_character_hex_string
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="c1"># Restart container</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>docker<span class="w"> </span>compose<span class="w"> </span>restart<span class="w"> </span>app
+</span></code></pre></div></p>
+<h4 id="connection-shows-connected-but-emails-fail">Connection shows "Connected" but emails fail<a class="headerlink" href="#connection-shows-connected-but-emails-fail" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: Email auth mode not set to OAuth.</p>
 <p><strong>Fix:</strong>
 1. Check database:
-   <div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">server_setting</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;email_auth_mode&#39;</span><span class="p">;</span>
-</code></pre></div>
+   <div class="language-sql highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">server_setting</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;email_auth_mode&#39;</span><span class="p">;</span>
+</span></code></pre></div>
 2. If not <code>smtp_oauth</code>, set it:
-   <div class="highlight"><pre><span></span><code><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">server_setting</span><span class="w"> </span><span class="p">(</span><span class="k">key</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
-<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;email_auth_mode&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;smtp_oauth&#39;</span><span class="p">)</span>
-<span class="k">ON</span><span class="w"> </span><span class="n">DUPLICATE</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;smtp_oauth&#39;</span><span class="p">;</span>
-</code></pre></div>
+   <div class="language-sql highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">server_setting</span><span class="w"> </span><span class="p">(</span><span class="k">key</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;email_auth_mode&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;smtp_oauth&#39;</span><span class="p">)</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="k">ON</span><span class="w"> </span><span class="n">DUPLICATE</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;smtp_oauth&#39;</span><span class="p">;</span>
+</span></code></pre></div>
 3. Or use UI: Click <strong>Switch to OAuth Mode</strong> button</p>
-<h4 id="token-status-shows-error">Token Status shows "Error"</h4>
+<h4 id="token-status-shows-error">Token Status shows "Error"<a class="headerlink" href="#token-status-shows-error" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: Token refresh failed.</p>
 <p><strong>Fix:</strong>
 1. Check error message in <strong>Token Status</strong> field
@@ -3916,7 +4326,7 @@ docker<span class="w"> </span>compose<span class="w"> </span>restart<span class=
    - <strong>"invalid_grant"</strong>: Refresh token expired → Disconnect and reconnect
    - <strong>"unauthorized_client"</strong>: Missing API permissions → Add required permissions
 3. Click <strong>Disconnect</strong> and <strong>Connect</strong> again to re-authorize</p>
-<h4 id="smtp-connect-failed">SMTP connect() failed</h4>
+<h4 id="smtp-connect-failed">SMTP connect() failed<a class="headerlink" href="#smtp-connect-failed" title="Permanent link">&para;</a></h4>
 <p><strong>Cause</strong>: Wrong SMTP host or port for OAuth provider.</p>
 <p><strong>Fix:</strong>
 OAuth mode uses provider defaults (cannot be changed):
@@ -3924,8 +4334,8 @@ OAuth mode uses provider defaults (cannot be changed):
 - <strong>Microsoft 365</strong>: <code>smtp.office365.com:587</code> (TLS)</p>
 <p>Verify <code>email_auth_mode</code> is set to <code>smtp_oauth</code> (not <code>smtp_password</code>).</p>
 <hr />
-<h2 id="security-considerations">Security Considerations</h2>
-<h3 id="client-secret-rotation">Client Secret Rotation</h3>
+<h2 id="security-considerations">Security Considerations<a class="headerlink" href="#security-considerations" title="Permanent link">&para;</a></h2>
+<h3 id="client-secret-rotation">Client Secret Rotation<a class="headerlink" href="#client-secret-rotation" title="Permanent link">&para;</a></h3>
 <p><strong>Microsoft 365</strong> client secrets expire (max 24 months). <strong>Plan ahead:</strong></p>
 <ol>
 <li>Set <strong>Secret Expiry Reminder</strong> in Pathary to 23 months</li>
@@ -3935,7 +4345,7 @@ OAuth mode uses provider defaults (cannot be changed):
 <li>Delete old secret in Azure Portal</li>
 </ol>
 <p><strong>Gmail</strong> client secrets don't expire unless you regenerate them.</p>
-<h3 id="revoking-access">Revoking Access</h3>
+<h3 id="revoking-access">Revoking Access<a class="headerlink" href="#revoking-access" title="Permanent link">&para;</a></h3>
 <p><strong>Gmail:</strong>
 1. Go to https://myaccount.google.com/permissions
 2. Find "Pathary"
@@ -3948,22 +4358,22 @@ OAuth mode uses provider defaults (cannot be changed):
 1. Azure Portal → Enterprise applications
 2. Find your app
 3. Click <strong>Delete</strong> or revoke user consent</p>
-<h3 id="encryption-key-rotation">Encryption Key Rotation</h3>
+<h3 id="encryption-key-rotation">Encryption Key Rotation<a class="headerlink" href="#encryption-key-rotation" title="Permanent link">&para;</a></h3>
 <p>If you rotate <code>ENCRYPTION_KEY</code>:</p>
 <ol>
 <li>All stored secrets become inaccessible</li>
 <li>You must <strong>reconnect OAuth</strong> for all providers</li>
 <li>Plan rotation during maintenance window</li>
 </ol>
-<h3 id="audit-logging">Audit Logging</h3>
+<h3 id="audit-logging">Audit Logging<a class="headerlink" href="#audit-logging" title="Permanent link">&para;</a></h3>
 <p>Monitor OAuth authorization attempts:</p>
-<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">security_audit_log</span>
-<span class="k">WHERE</span><span class="w"> </span><span class="n">event_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;oauth_authorization&#39;</span>
-<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="k">DESC</span>
-<span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
-</code></pre></div>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">security_audit_log</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">event_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;oauth_authorization&#39;</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="k">DESC</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+</span></code></pre></div>
 <hr />
-<h2 id="additional-resources">Additional Resources</h2>
+<h2 id="additional-resources">Additional Resources<a class="headerlink" href="#additional-resources" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="https://developers.google.com/identity/protocols/oauth2">Google OAuth 2.0 Documentation</a></li>
 <li><a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow">Microsoft Identity Platform OAuth 2.0</a></li>
@@ -3972,7 +4382,7 @@ OAuth mode uses provider defaults (cannot be changed):
 <li><a href="https://github.com/benjaminmue/pathary/issues">Pathary Issues</a></li>
 </ul>
 <hr />
-<h2 id="getting-help">Getting Help</h2>
+<h2 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h2>
 <p>If you encounter issues not covered in this guide:</p>
 <ol>
 <li>Check Pathary logs: <code>docker compose logs app</code></li>
@@ -4004,9 +4414,55 @@ OAuth mode uses provider defaults (cannot be changed):
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
       </main>
       
         <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../security/password-policy-and-security/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Password Policy">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Password Policy
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../operations/logging-and-troubleshooting/" class="md-footer__link md-footer__link--next" aria-label="Next: Logging and Troubleshooting">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Logging and Troubleshooting
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -4029,11 +4485,13 @@ OAuth mode uses provider defaults (cannot be changed):
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
     
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.expand", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

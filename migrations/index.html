@@ -22,7 +22,7 @@
         
       
       
-      <link rel="icon" href="../images/favicon.png">
+      <link rel="icon" href="../images/favicon.ico">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
@@ -53,6 +53,8 @@
       
     
     
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -69,7 +71,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -92,11 +94,11 @@
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="Pathary Documentation" class="md-header__button md-logo" aria-label="Pathary Documentation" data-md-component="logo">
       
-  <img src="../images/favicon.png" alt="logo">
+  <img src="../images/pathary-logo.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -126,20 +128,20 @@
     
     
     
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
     
       <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
       </label>
     
   
     
     
     
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
     
       <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
       </label>
     
   
@@ -170,11 +172,18 @@
       </label>
       <nav class="md-search__options" aria-label="Search">
         
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
       </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
       
     </form>
     <div class="md-search__output">
@@ -206,13 +215,273 @@
     
   </nav>
   
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../install/docker/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Installation
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../initial-user-setup/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Initial User Setup
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../configuration/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../deployment/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Deployment
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../features/movies-and-tmdb/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/architecture/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../security/authentication-and-sessions/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Security
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../operations/logging-and-troubleshooting/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../development/setup/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../issue-labels/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
-        
-          
         
       
       <main class="md-main" data-md-component="main">
@@ -226,12 +495,14 @@
                     
 
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="Pathary Documentation" class="md-nav__button md-logo" aria-label="Pathary Documentation" data-md-component="logo">
       
-  <img src="../images/favicon.png" alt="logo">
+  <img src="../images/pathary-logo.svg" alt="logo">
 
     </a>
     Pathary Documentation
@@ -313,14 +584,27 @@
   
     
     
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -504,14 +788,35 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
         
           
           <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
@@ -691,14 +996,39 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_6" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_6" >
         
           
           <label class="md-nav__link" for="__nav_7_6" id="__nav_7_6_label" tabindex="0">
@@ -977,14 +1307,31 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
         
           
           <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
@@ -1143,14 +1490,31 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
         
           
           <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
@@ -1311,17 +1675,31 @@
   
     
     
+      
+        
+      
+        
+      
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
         
           
-          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
             
   
   
@@ -1834,14 +2212,31 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_11" >
         
           
           <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
@@ -2000,14 +2395,29 @@
   
     
     
+      
+        
+      
+        
+      
+        
+      
     
+    
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12" >
         
           
           <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
@@ -2555,277 +2965,277 @@
   
 
 
-<h1 id="migrations">Migrations</h1>
+<h1 id="migrations">Migrations<a class="headerlink" href="#migrations" title="Permanent link">&para;</a></h1>
 <p>This page covers database schema management using Phinx migrations.</p>
-<h2 id="overview">Overview</h2>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>Pathary uses <a href="https://phinx.org/">Phinx</a> for database migrations. Migrations are PHP classes that define schema changes.</p>
-<h2 id="migration-locations">Migration Locations</h2>
-<div class="highlight"><pre><span></span><code>db/migrations/
-├── mysql/      # MySQL-specific migrations
-└── sqlite/     # SQLite-specific migrations
-</code></pre></div>
+<h2 id="migration-locations">Migration Locations<a class="headerlink" href="#migration-locations" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>db/migrations/
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── mysql/      # MySQL-specific migrations
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>└── sqlite/     # SQLite-specific migrations
+</span></code></pre></div>
 <p>Each database type has its own migration set due to syntax differences.</p>
-<h2 id="configuration">Configuration</h2>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <p><strong>File</strong>: <code>settings/phinx.php</code></p>
-<div class="highlight"><pre><span></span><code><span class="x">return [</span>
-<span class="x">    &#39;paths&#39; =&gt; [</span>
-<span class="x">        &#39;migrations&#39; =&gt; &#39;%%PHINX_CONFIG_DIR%%/../db/migrations/&#39; . $databaseMode,</span>
-<span class="x">    ],</span>
-<span class="x">    &#39;environments&#39; =&gt; [</span>
-<span class="x">        &#39;default_environment&#39; =&gt; $databaseMode,</span>
-<span class="x">        &#39;mysql&#39; =&gt; [</span>
-<span class="x">            &#39;adapter&#39; =&gt; &#39;mysql&#39;,</span>
-<span class="x">            &#39;host&#39; =&gt; $config-&gt;getAsString(&#39;DATABASE_MYSQL_HOST&#39;),</span>
-<span class="x">            &#39;name&#39; =&gt; $config-&gt;getAsString(&#39;DATABASE_MYSQL_NAME&#39;),</span>
-<span class="x">            &#39;user&#39; =&gt; $config-&gt;getAsString(&#39;DATABASE_MYSQL_USER&#39;),</span>
-<span class="x">            &#39;pass&#39; =&gt; $config-&gt;getAsString(&#39;DATABASE_MYSQL_PASSWORD&#39;),</span>
-<span class="x">            // ...</span>
-<span class="x">        ],</span>
-<span class="x">        &#39;sqlite&#39; =&gt; [</span>
-<span class="x">            &#39;adapter&#39; =&gt; &#39;sqlite&#39;,</span>
-<span class="x">            &#39;name&#39; =&gt; $config-&gt;getAsString(&#39;DATABASE_SQLITE&#39;),</span>
-<span class="x">        ],</span>
-<span class="x">    ],</span>
-<span class="x">];</span>
-</code></pre></div>
-<h2 id="when-migrations-run">When Migrations Run</h2>
-<h3 id="automatic-container-startup">Automatic (Container Startup)</h3>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="x">return [</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="x">    &#39;paths&#39; =&gt; [</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="x">        &#39;migrations&#39; =&gt; &#39;%%PHINX_CONFIG_DIR%%/../db/migrations/&#39; . $databaseMode,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="x">    ],</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="x">    &#39;environments&#39; =&gt; [</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="x">        &#39;default_environment&#39; =&gt; $databaseMode,</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="x">        &#39;mysql&#39; =&gt; [</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="x">            &#39;adapter&#39; =&gt; &#39;mysql&#39;,</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="x">            &#39;host&#39; =&gt; $config-&gt;getAsString(&#39;DATABASE_MYSQL_HOST&#39;),</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="x">            &#39;name&#39; =&gt; $config-&gt;getAsString(&#39;DATABASE_MYSQL_NAME&#39;),</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="x">            &#39;user&#39; =&gt; $config-&gt;getAsString(&#39;DATABASE_MYSQL_USER&#39;),</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="x">            &#39;pass&#39; =&gt; $config-&gt;getAsString(&#39;DATABASE_MYSQL_PASSWORD&#39;),</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="x">            // ...</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="x">        ],</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="x">        &#39;sqlite&#39; =&gt; [</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="x">            &#39;adapter&#39; =&gt; &#39;sqlite&#39;,</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="x">            &#39;name&#39; =&gt; $config-&gt;getAsString(&#39;DATABASE_SQLITE&#39;),</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="x">        ],</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="x">    ],</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="x">];</span>
+</span></code></pre></div>
+<h2 id="when-migrations-run">When Migrations Run<a class="headerlink" href="#when-migrations-run" title="Permanent link">&para;</a></h2>
+<h3 id="automatic-container-startup">Automatic (Container Startup)<a class="headerlink" href="#automatic-container-startup" title="Permanent link">&para;</a></h3>
 <p><strong>File</strong>: <code>build/scripts/entrypoint.sh</code></p>
-<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$DATABASE_DISABLE_AUTO_MIGRATION</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">  </span><span class="nv">RETRY_COUNT</span><span class="o">=</span><span class="m">0</span>
-<span class="w">  </span><span class="nv">MAX_RETRIES</span><span class="o">=</span><span class="m">5</span>
-
-<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$RETRY_COUNT</span><span class="w"> </span>-lt<span class="w"> </span><span class="nv">$MAX_RETRIES</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<span class="w">    </span>/usr/bin/php<span class="w"> </span>/app/bin/console.php<span class="w"> </span>database:migration:migrate
-
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;SUCCESS: Automatic database migration succeeded&quot;</span>
-<span class="w">      </span><span class="k">break</span>
-<span class="w">    </span><span class="k">else</span>
-<span class="w">      </span><span class="nv">RETRY_COUNT</span><span class="o">=</span><span class="k">$((</span><span class="nv">RETRY_COUNT</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span>
-<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;ERROR: Automatic database migration failed, attempt </span><span class="nv">$RETRY_COUNT</span><span class="s2">&quot;</span>
-<span class="w">      </span>sleep<span class="w"> </span><span class="m">5</span>
-<span class="w">    </span><span class="k">fi</span>
-<span class="w">  </span><span class="k">done</span>
-<span class="k">fi</span>
-</code></pre></div>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$DATABASE_DISABLE_AUTO_MIGRATION</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nv">RETRY_COUNT</span><span class="o">=</span><span class="m">0</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nv">MAX_RETRIES</span><span class="o">=</span><span class="m">5</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$RETRY_COUNT</span><span class="w"> </span>-lt<span class="w"> </span><span class="nv">$MAX_RETRIES</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span>/usr/bin/php<span class="w"> </span>/app/bin/console.php<span class="w"> </span>database:migration:migrate
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;SUCCESS: Automatic database migration succeeded&quot;</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="k">break</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="k">else</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">      </span><span class="nv">RETRY_COUNT</span><span class="o">=</span><span class="k">$((</span><span class="nv">RETRY_COUNT</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;ERROR: Automatic database migration failed, attempt </span><span class="nv">$RETRY_COUNT</span><span class="s2">&quot;</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">      </span>sleep<span class="w"> </span><span class="m">5</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="k">fi</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">  </span><span class="k">done</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="k">fi</span>
+</span></code></pre></div>
 <p>Key behaviors:
 - Runs on every container start (unless disabled)
 - Retries up to 5 times with 5-second delays
 - Useful for waiting on database availability</p>
-<h3 id="disable-auto-migration">Disable Auto-Migration</h3>
-<div class="highlight"><pre><span></span><code>DATABASE_DISABLE_AUTO_MIGRATION=true
-</code></pre></div>
-<h3 id="manual-execution">Manual Execution</h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Inside container</span>
-php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:migrate
-
-<span class="c1"># From host via Docker</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:migrate
-</code></pre></div>
-<h2 id="cli-commands">CLI Commands</h2>
-<h3 id="check-status">Check Status</h3>
-<div class="highlight"><pre><span></span><code>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:status
-</code></pre></div>
+<h3 id="disable-auto-migration">Disable Auto-Migration<a class="headerlink" href="#disable-auto-migration" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>DATABASE_DISABLE_AUTO_MIGRATION=true
+</span></code></pre></div>
+<h3 id="manual-execution">Manual Execution<a class="headerlink" href="#manual-execution" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Inside container</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:migrate
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># From host via Docker</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:migrate
+</span></code></pre></div>
+<h2 id="cli-commands">CLI Commands<a class="headerlink" href="#cli-commands" title="Permanent link">&para;</a></h2>
+<h3 id="check-status">Check Status<a class="headerlink" href="#check-status" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:status
+</span></code></pre></div>
 <p>Output:
-<div class="highlight"><pre><span></span><code> Status  [Migration ID]   Migration Name
------------------------------------------
-     up  20210124104021   SetupBaseTables
-     up  20220510185016   AddUser
-     up  20251214000000   AddWatchedDateAndLocationToMovieUserRating
-</code></pre></div></p>
-<h3 id="run-migrations">Run Migrations</h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run all pending</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:migrate
-
-<span class="c1"># Dry run (show what would run)</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:migrate<span class="w"> </span>--dry-run
-</code></pre></div>
-<h3 id="rollback">Rollback</h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Rollback last migration</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:rollback
-
-<span class="c1"># Rollback to specific version</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:rollback<span class="w"> </span>-t<span class="w"> </span><span class="m">20220510185016</span>
-</code></pre></div>
-<h2 id="migration-structure">Migration Structure</h2>
-<h3 id="file-naming">File Naming</h3>
-<div class="highlight"><pre><span></span><code>{timestamp}_{MigrationName}.php
-
-Example:
-20251214000000_AddWatchedDateAndLocationToMovieUserRating.php
-</code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a> Status  [Migration ID]   Migration Name
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>-----------------------------------------
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>     up  20210124104021   SetupBaseTables
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>     up  20220510185016   AddUser
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>     up  20251214000000   AddWatchedDateAndLocationToMovieUserRating
+</span></code></pre></div></p>
+<h3 id="run-migrations">Run Migrations<a class="headerlink" href="#run-migrations" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Run all pending</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:migrate
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Dry run (show what would run)</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:migrate<span class="w"> </span>--dry-run
+</span></code></pre></div>
+<h3 id="rollback">Rollback<a class="headerlink" href="#rollback" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Rollback last migration</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:rollback
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Rollback to specific version</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:rollback<span class="w"> </span>-t<span class="w"> </span><span class="m">20220510185016</span>
+</span></code></pre></div>
+<h2 id="migration-structure">Migration Structure<a class="headerlink" href="#migration-structure" title="Permanent link">&para;</a></h2>
+<h3 id="file-naming">File Naming<a class="headerlink" href="#file-naming" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>{timestamp}_{MigrationName}.php
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Example:
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>20251214000000_AddWatchedDateAndLocationToMovieUserRating.php
+</span></code></pre></div>
 <p>The timestamp format is <code>YYYYMMDDHHmmss</code>.</p>
-<h3 id="migration-class">Migration Class</h3>
-<div class="highlight"><pre><span></span><code><span class="cp">&lt;?php</span> <span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
-
-<span class="k">use</span> <span class="nx">Phinx\Migration\AbstractMigration</span><span class="p">;</span>
-
-<span class="k">final</span> <span class="k">class</span> <span class="nc">AddWatchedDateAndLocationToMovieUserRating</span> <span class="k">extends</span> <span class="nx">AbstractMigration</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">up</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span>
-            <span class="o">&lt;&lt;&lt;</span><span class="nx">SQL</span>
-            <span class="nx">ALTER</span> <span class="nx">TABLE</span> <span class="nx">movie_user_rating</span>
-                <span class="nx">ADD</span> <span class="nx">COLUMN</span> <span class="nx">watched_year</span> <span class="nx">SMALLINT</span> <span class="nx">UNSIGNED</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
-                <span class="nx">ADD</span> <span class="nx">COLUMN</span> <span class="nx">watched_month</span> <span class="nx">TINYINT</span> <span class="nx">UNSIGNED</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
-                <span class="nx">ADD</span> <span class="nx">COLUMN</span> <span class="nx">watched_day</span> <span class="nx">TINYINT</span> <span class="nx">UNSIGNED</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
-                <span class="nx">ADD</span> <span class="nx">COLUMN</span> <span class="nx">location_id</span> <span class="nx">TINYINT</span> <span class="nx">UNSIGNED</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">;</span>
-            <span class="nx">SQL</span><span class="p">,</span>
-        <span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">down</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span>
-            <span class="o">&lt;&lt;&lt;</span><span class="nx">SQL</span>
-            <span class="nx">ALTER</span> <span class="nx">TABLE</span> <span class="nx">movie_user_rating</span>
-                <span class="nx">DROP</span> <span class="nx">COLUMN</span> <span class="nx">watched_year</span><span class="p">,</span>
-                <span class="nx">DROP</span> <span class="nx">COLUMN</span> <span class="nx">watched_month</span><span class="p">,</span>
-                <span class="nx">DROP</span> <span class="nx">COLUMN</span> <span class="nx">watched_day</span><span class="p">,</span>
-                <span class="nx">DROP</span> <span class="nx">COLUMN</span> <span class="nx">location_id</span><span class="p">;</span>
-            <span class="nx">SQL</span><span class="p">,</span>
-        <span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-<h2 id="creating-a-new-migration">Creating a New Migration</h2>
-<h3 id="1-create-migration-file">1. Create Migration File</h3>
+<h3 id="migration-class">Migration Class<a class="headerlink" href="#migration-class" title="Permanent link">&para;</a></h3>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="cp">&lt;?php</span> <span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">use</span> <span class="nx">Phinx\Migration\AbstractMigration</span><span class="p">;</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="k">final</span> <span class="k">class</span> <span class="nc">AddWatchedDateAndLocationToMovieUserRating</span> <span class="k">extends</span> <span class="nx">AbstractMigration</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="p">{</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="k">public</span> <span class="k">function</span> <span class="nf">up</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="p">{</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>            <span class="o">&lt;&lt;&lt;</span><span class="nx">SQL</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>            <span class="nx">ALTER</span> <span class="nx">TABLE</span> <span class="nx">movie_user_rating</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>                <span class="nx">ADD</span> <span class="nx">COLUMN</span> <span class="nx">watched_year</span> <span class="nx">SMALLINT</span> <span class="nx">UNSIGNED</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>                <span class="nx">ADD</span> <span class="nx">COLUMN</span> <span class="nx">watched_month</span> <span class="nx">TINYINT</span> <span class="nx">UNSIGNED</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>                <span class="nx">ADD</span> <span class="nx">COLUMN</span> <span class="nx">watched_day</span> <span class="nx">TINYINT</span> <span class="nx">UNSIGNED</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>                <span class="nx">ADD</span> <span class="nx">COLUMN</span> <span class="nx">location_id</span> <span class="nx">TINYINT</span> <span class="nx">UNSIGNED</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">;</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>            <span class="nx">SQL</span><span class="p">,</span>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>        <span class="p">);</span>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>    <span class="p">}</span>
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>    <span class="k">public</span> <span class="k">function</span> <span class="nf">down</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
+</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>    <span class="p">{</span>
+</span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span>
+</span><span id="__span-10-23"><a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>            <span class="o">&lt;&lt;&lt;</span><span class="nx">SQL</span>
+</span><span id="__span-10-24"><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>            <span class="nx">ALTER</span> <span class="nx">TABLE</span> <span class="nx">movie_user_rating</span>
+</span><span id="__span-10-25"><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>                <span class="nx">DROP</span> <span class="nx">COLUMN</span> <span class="nx">watched_year</span><span class="p">,</span>
+</span><span id="__span-10-26"><a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a>                <span class="nx">DROP</span> <span class="nx">COLUMN</span> <span class="nx">watched_month</span><span class="p">,</span>
+</span><span id="__span-10-27"><a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>                <span class="nx">DROP</span> <span class="nx">COLUMN</span> <span class="nx">watched_day</span><span class="p">,</span>
+</span><span id="__span-10-28"><a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a>                <span class="nx">DROP</span> <span class="nx">COLUMN</span> <span class="nx">location_id</span><span class="p">;</span>
+</span><span id="__span-10-29"><a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a>            <span class="nx">SQL</span><span class="p">,</span>
+</span><span id="__span-10-30"><a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a>        <span class="p">);</span>
+</span><span id="__span-10-31"><a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a>    <span class="p">}</span>
+</span><span id="__span-10-32"><a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="creating-a-new-migration">Creating a New Migration<a class="headerlink" href="#creating-a-new-migration" title="Permanent link">&para;</a></h2>
+<h3 id="1-create-migration-file">1. Create Migration File<a class="headerlink" href="#1-create-migration-file" title="Permanent link">&para;</a></h3>
 <p>Create matching files for both MySQL and SQLite:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># MySQL</span>
-touch<span class="w"> </span>db/migrations/mysql/20251215120000_AddNewFeature.php
-
-<span class="c1"># SQLite</span>
-touch<span class="w"> </span>db/migrations/sqlite/20251215120000_AddNewFeature.php
-</code></pre></div>
-<h3 id="2-write-migration-logic">2. Write Migration Logic</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># MySQL</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>touch<span class="w"> </span>db/migrations/mysql/20251215120000_AddNewFeature.php
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># SQLite</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>touch<span class="w"> </span>db/migrations/sqlite/20251215120000_AddNewFeature.php
+</span></code></pre></div>
+<h3 id="2-write-migration-logic">2. Write Migration Logic<a class="headerlink" href="#2-write-migration-logic" title="Permanent link">&para;</a></h3>
 <p><strong>MySQL version</strong> (<code>db/migrations/mysql/20251215120000_AddNewFeature.php</code>):</p>
-<div class="highlight"><pre><span></span><code><span class="cp">&lt;?php</span> <span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
-
-<span class="k">use</span> <span class="nx">Phinx\Migration\AbstractMigration</span><span class="p">;</span>
-
-<span class="k">final</span> <span class="k">class</span> <span class="nc">AddNewFeature</span> <span class="k">extends</span> <span class="nx">AbstractMigration</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">up</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span>
-            <span class="o">&lt;&lt;&lt;</span><span class="nx">SQL</span>
-            <span class="nx">ALTER</span> <span class="nx">TABLE</span> <span class="nx">movie</span> <span class="nx">ADD</span> <span class="nx">COLUMN</span> <span class="nx">new_field</span> <span class="nx">VARCHAR</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">;</span>
-            <span class="nx">SQL</span><span class="p">,</span>
-        <span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">down</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span>
-            <span class="o">&lt;&lt;&lt;</span><span class="nx">SQL</span>
-            <span class="nx">ALTER</span> <span class="nx">TABLE</span> <span class="nx">movie</span> <span class="nx">DROP</span> <span class="nx">COLUMN</span> <span class="nx">new_field</span><span class="p">;</span>
-            <span class="nx">SQL</span><span class="p">,</span>
-        <span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="cp">&lt;?php</span> <span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">use</span> <span class="nx">Phinx\Migration\AbstractMigration</span><span class="p">;</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="k">final</span> <span class="k">class</span> <span class="nc">AddNewFeature</span> <span class="k">extends</span> <span class="nx">AbstractMigration</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="p">{</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="k">public</span> <span class="k">function</span> <span class="nf">up</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="p">{</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>            <span class="o">&lt;&lt;&lt;</span><span class="nx">SQL</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>            <span class="nx">ALTER</span> <span class="nx">TABLE</span> <span class="nx">movie</span> <span class="nx">ADD</span> <span class="nx">COLUMN</span> <span class="nx">new_field</span> <span class="nx">VARCHAR</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">;</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>            <span class="nx">SQL</span><span class="p">,</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>        <span class="p">);</span>
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>    <span class="p">}</span>
+</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>
+</span><span id="__span-12-16"><a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>    <span class="k">public</span> <span class="k">function</span> <span class="nf">down</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
+</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>    <span class="p">{</span>
+</span><span id="__span-12-18"><a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span>
+</span><span id="__span-12-19"><a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>            <span class="o">&lt;&lt;&lt;</span><span class="nx">SQL</span>
+</span><span id="__span-12-20"><a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>            <span class="nx">ALTER</span> <span class="nx">TABLE</span> <span class="nx">movie</span> <span class="nx">DROP</span> <span class="nx">COLUMN</span> <span class="nx">new_field</span><span class="p">;</span>
+</span><span id="__span-12-21"><a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a>            <span class="nx">SQL</span><span class="p">,</span>
+</span><span id="__span-12-22"><a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a>        <span class="p">);</span>
+</span><span id="__span-12-23"><a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a>    <span class="p">}</span>
+</span><span id="__span-12-24"><a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="p">}</span>
+</span></code></pre></div>
 <p><strong>SQLite version</strong> (<code>db/migrations/sqlite/20251215120000_AddNewFeature.php</code>):</p>
-<div class="highlight"><pre><span></span><code><span class="cp">&lt;?php</span> <span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
-
-<span class="k">use</span> <span class="nx">Phinx\Migration\AbstractMigration</span><span class="p">;</span>
-
-<span class="k">final</span> <span class="k">class</span> <span class="nc">AddNewFeature</span> <span class="k">extends</span> <span class="nx">AbstractMigration</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">up</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
-    <span class="p">{</span>
-        <span class="c1">// SQLite requires separate ALTER statements</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="s1">&#39;ALTER TABLE movie ADD COLUMN new_field TEXT DEFAULT NULL;&#39;</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="nf">down</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
-    <span class="p">{</span>
-        <span class="c1">// SQLite &lt;3.35 doesn&#39;t support DROP COLUMN</span>
-        <span class="c1">// Use table recreation for older versions</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span>
-            <span class="o">&lt;&lt;&lt;</span><span class="nx">SQL</span>
-            <span class="nx">CREATE</span> <span class="nx">TABLE</span> <span class="nx">movie_backup</span> <span class="k">AS</span> <span class="nx">SELECT</span> <span class="o">...</span> <span class="nx">FROM</span> <span class="nx">movie</span><span class="p">;</span>
-            <span class="nx">DROP</span> <span class="nx">TABLE</span> <span class="nx">movie</span><span class="p">;</span>
-            <span class="nx">CREATE</span> <span class="nx">TABLE</span> <span class="nx">movie</span> <span class="p">(</span><span class="o">...</span><span class="p">);</span>
-            <span class="nx">INSERT</span> <span class="nx">INTO</span> <span class="nx">movie</span> <span class="nx">SELECT</span> <span class="o">...</span> <span class="nx">FROM</span> <span class="nx">movie_backup</span><span class="p">;</span>
-            <span class="nx">DROP</span> <span class="nx">TABLE</span> <span class="nx">movie_backup</span><span class="p">;</span>
-            <span class="nx">SQL</span><span class="p">,</span>
-        <span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="3-test-migration">3. Test Migration</h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run migration</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:migrate
-
-<span class="c1"># Check status</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:status
-
-<span class="c1"># Test rollback</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:rollback
-</code></pre></div>
-<h2 id="conventions">Conventions</h2>
-<h3 id="naming">Naming</h3>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="cp">&lt;?php</span> <span class="k">declare</span><span class="p">(</span><span class="nx">strict_types</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">use</span> <span class="nx">Phinx\Migration\AbstractMigration</span><span class="p">;</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="k">final</span> <span class="k">class</span> <span class="nc">AddNewFeature</span> <span class="k">extends</span> <span class="nx">AbstractMigration</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="p">{</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    <span class="k">public</span> <span class="k">function</span> <span class="nf">up</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    <span class="p">{</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>        <span class="c1">// SQLite requires separate ALTER statements</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="s1">&#39;ALTER TABLE movie ADD COLUMN new_field TEXT DEFAULT NULL;&#39;</span><span class="p">);</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    <span class="p">}</span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>    <span class="k">public</span> <span class="k">function</span> <span class="nf">down</span><span class="p">()</span> <span class="o">:</span> <span class="nx">void</span>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>    <span class="p">{</span>
+</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>        <span class="c1">// SQLite &lt;3.35 doesn&#39;t support DROP COLUMN</span>
+</span><span id="__span-13-16"><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>        <span class="c1">// Use table recreation for older versions</span>
+</span><span id="__span-13-17"><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span>
+</span><span id="__span-13-18"><a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a>            <span class="o">&lt;&lt;&lt;</span><span class="nx">SQL</span>
+</span><span id="__span-13-19"><a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a>            <span class="nx">CREATE</span> <span class="nx">TABLE</span> <span class="nx">movie_backup</span> <span class="k">AS</span> <span class="nx">SELECT</span> <span class="o">...</span> <span class="nx">FROM</span> <span class="nx">movie</span><span class="p">;</span>
+</span><span id="__span-13-20"><a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a>            <span class="nx">DROP</span> <span class="nx">TABLE</span> <span class="nx">movie</span><span class="p">;</span>
+</span><span id="__span-13-21"><a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a>            <span class="nx">CREATE</span> <span class="nx">TABLE</span> <span class="nx">movie</span> <span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</span><span id="__span-13-22"><a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a>            <span class="nx">INSERT</span> <span class="nx">INTO</span> <span class="nx">movie</span> <span class="nx">SELECT</span> <span class="o">...</span> <span class="nx">FROM</span> <span class="nx">movie_backup</span><span class="p">;</span>
+</span><span id="__span-13-23"><a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a>            <span class="nx">DROP</span> <span class="nx">TABLE</span> <span class="nx">movie_backup</span><span class="p">;</span>
+</span><span id="__span-13-24"><a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a>            <span class="nx">SQL</span><span class="p">,</span>
+</span><span id="__span-13-25"><a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a>        <span class="p">);</span>
+</span><span id="__span-13-26"><a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a>    <span class="p">}</span>
+</span><span id="__span-13-27"><a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="3-test-migration">3. Test Migration<a class="headerlink" href="#3-test-migration" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Run migration</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:migrate
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># Check status</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:status
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c1"># Test rollback</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:rollback
+</span></code></pre></div>
+<h2 id="conventions">Conventions<a class="headerlink" href="#conventions" title="Permanent link">&para;</a></h2>
+<h3 id="naming">Naming<a class="headerlink" href="#naming" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Use descriptive names: <code>AddCommentToMovieUserRating</code>, <code>RemoveDeprecatedColumn</code></li>
 <li>Match class name to filename</li>
 </ul>
-<h3 id="sql-syntax">SQL Syntax</h3>
+<h3 id="sql-syntax">SQL Syntax<a class="headerlink" href="#sql-syntax" title="Permanent link">&para;</a></h3>
 <ul>
 <li>MySQL and SQLite have different syntax for some operations</li>
 <li>Always create both versions</li>
 <li>Test both database modes</li>
 </ul>
-<h3 id="down-methods">Down Methods</h3>
+<h3 id="down-methods">Down Methods<a class="headerlink" href="#down-methods" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Always implement <code>down()</code> for rollback capability</li>
 <li>Be careful with data loss (DROP COLUMN deletes data)</li>
 </ul>
-<h3 id="indexes">Indexes</h3>
-<div class="highlight"><pre><span></span><code><span class="x">// MySQL</span>
-<span class="x">$this-&gt;execute(&#39;CREATE INDEX idx_name ON table(column);&#39;);</span>
-
-<span class="x">// SQLite</span>
-<span class="x">$this-&gt;execute(&#39;CREATE INDEX IF NOT EXISTS idx_name ON table(column);&#39;);</span>
-</code></pre></div>
-<h2 id="troubleshooting">Troubleshooting</h2>
-<h3 id="migration-fails-on-startup">Migration Fails on Startup</h3>
+<h3 id="indexes">Indexes<a class="headerlink" href="#indexes" title="Permanent link">&para;</a></h3>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="x">// MySQL</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="x">$this-&gt;execute(&#39;CREATE INDEX idx_name ON table(column);&#39;);</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="x">// SQLite</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="x">$this-&gt;execute(&#39;CREATE INDEX IF NOT EXISTS idx_name ON table(column);&#39;);</span>
+</span></code></pre></div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="migration-fails-on-startup">Migration Fails on Startup<a class="headerlink" href="#migration-fails-on-startup" title="Permanent link">&para;</a></h3>
 <p>Check logs:
-<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>pathary
-</code></pre></div></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>pathary
+</span></code></pre></div></p>
 <p>Common causes:
 - Database not ready (retries should help)
 - Syntax error in migration
 - Missing database permissions</p>
-<h3 id="table-already-exists">"Table already exists"</h3>
+<h3 id="table-already-exists">"Table already exists"<a class="headerlink" href="#table-already-exists" title="Permanent link">&para;</a></h3>
 <p>If a migration partially ran:
-<div class="highlight"><pre><span></span><code><span class="c1"># Check migration status</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:status
-
-<span class="c1"># Manually mark as run (if table exists)</span>
-<span class="c1"># Edit phinxlog table directly</span>
-</code></pre></div></p>
-<h3 id="rollback-fails">Rollback Fails</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Check migration status</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pathary-app<span class="w"> </span>php<span class="w"> </span>bin/console.php<span class="w"> </span>database:migration:status
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Manually mark as run (if table exists)</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c1"># Edit phinxlog table directly</span>
+</span></code></pre></div></p>
+<h3 id="rollback-fails">Rollback Fails<a class="headerlink" href="#rollback-fails" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Check that <code>down()</code> is implemented</li>
 <li>Verify rollback SQL is valid</li>
 <li>Some operations (data deletion) cannot be undone</li>
 </ul>
-<h3 id="sqlite-drop-column-issues">SQLite DROP COLUMN Issues</h3>
+<h3 id="sqlite-drop-column-issues">SQLite DROP COLUMN Issues<a class="headerlink" href="#sqlite-drop-column-issues" title="Permanent link">&para;</a></h3>
 <p>SQLite versions before 3.35.0 don't support <code>DROP COLUMN</code>. Use table recreation:</p>
-<div class="highlight"><pre><span></span><code><span class="x">public function down() : void</span>
-<span class="x">{</span>
-<span class="x">    // Create backup without the column</span>
-<span class="x">    $this-&gt;execute(&#39;CREATE TABLE tmp AS SELECT col1, col2 FROM original;&#39;);</span>
-<span class="x">    $this-&gt;execute(&#39;DROP TABLE original;&#39;);</span>
-<span class="x">    $this-&gt;execute(&#39;ALTER TABLE tmp RENAME TO original;&#39;);</span>
-<span class="x">}</span>
-</code></pre></div>
-<h2 id="migration-history">Migration History</h2>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="x">public function down() : void</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="x">{</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="x">    // Create backup without the column</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="x">    $this-&gt;execute(&#39;CREATE TABLE tmp AS SELECT col1, col2 FROM original;&#39;);</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="x">    $this-&gt;execute(&#39;DROP TABLE original;&#39;);</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="x">    $this-&gt;execute(&#39;ALTER TABLE tmp RENAME TO original;&#39;);</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="x">}</span>
+</span></code></pre></div>
+<h2 id="migration-history">Migration History<a class="headerlink" href="#migration-history" title="Permanent link">&para;</a></h2>
 <p>The <code>phinxlog</code> table tracks which migrations have run:</p>
-<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">phinxlog</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">version</span><span class="w"> </span><span class="k">DESC</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
-</code></pre></div>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">phinxlog</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">version</span><span class="w"> </span><span class="k">DESC</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+</span></code></pre></div>
 <table>
 <thead>
 <tr>
@@ -2846,7 +3256,7 @@ docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </spa
 </tr>
 </tbody>
 </table>
-<h2 id="related-pages">Related Pages</h2>
+<h2 id="related-pages">Related Pages<a class="headerlink" href="#related-pages" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="Database">Database</a>] - Schema overview</li>
 <li><a href="Getting-Started">Getting Started</a>] - Initial setup</li>
@@ -2874,9 +3284,55 @@ docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </spa
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
       </main>
       
         <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../operations/logging-and-troubleshooting/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Logging and Troubleshooting">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Logging and Troubleshooting
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../development/setup/" class="md-footer__link md-footer__link--next" aria-label="Next: Setup">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Setup
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -2899,11 +3355,13 @@ docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </spa
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
     
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.expand", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
