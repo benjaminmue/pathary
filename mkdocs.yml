@@ -1,6 +1,6 @@
 site_name: Pathary Documentation
 site_description: Pathary Documentation (fork of Movary)
-repo_url: https://github.com/benjaminkomen/movary/
+repo_url: https://github.com/benjaminmue/pathary/
 edit_uri: edit/main/docs
 
 theme:
@@ -32,27 +32,53 @@ markdown_extensions:
 
 nav:
   - Home: 'index.md'
+  - Getting Started: 'getting-started.md'
   - Installation:
       - Docker (recommended): install/docker.md
       - Manual: install/manual.md
-  - Getting started: 'getting-started.md'
-  - Initial user setup: 'initial-user-setup.md'
+  - Initial User Setup: 'initial-user-setup.md'
   - Configuration: 'configuration.md'
+  - Deployment: 'deployment.md'
+
   - Features:
+      - Movies and TMDB: features/movies-and-tmdb.md
+      - Ratings and Comments: features/ratings-and-comments.md
       - TMDB Data: features/tmdb-data.md
       - IMDb Rating: features/imdb-rating.md
       - Locations: features/locations.md
-      - Plex: features/plex.md
-      - Jellyfin: features/jellyfin.md
-      - Emby: features/emby.md
-      - Kodi: features/kodi.md
-      - Letterboxd: features/letterboxd.md
-      - Trakt TV: features/trakt.md
-      - Netflix: features/netflix.md
-      - Radarr: features/radarr.md
+      - Integrations:
+          - Plex: features/plex.md
+          - Jellyfin: features/jellyfin.md
+          - Emby: features/emby.md
+          - Kodi: features/kodi.md
+          - Letterboxd: features/letterboxd.md
+          - Trakt TV: features/trakt.md
+          - Netflix: features/netflix.md
+          - Radarr: features/radarr.md
+
+  - Architecture:
+      - Overview: architecture/architecture.md
+      - Database: architecture/database.md
+      - Routing and Controllers: architecture/routing-and-controllers.md
+      - Frontend and UI: architecture/frontend-and-ui.md
+
+  - Security:
+      - Authentication and Sessions: security/authentication-and-sessions.md
+      - Two-Factor Authentication: security/two-factor-authentication.md
+      - Password Policy: security/password-policy-and-security.md
+      - OAuth Email Setup: oauth-email-setup.md
+
+  - Operations:
+      - Logging and Troubleshooting: operations/logging-and-troubleshooting.md
+      - Migrations: migrations.md
+
   - Development:
       - Setup: development/setup.md
-      - Directory structure: development/file-structure.md
-      - How does the backend work?: development/structure.md
-      - Database migrations: development/database-migrations.md
-  - FAQ: 'faq.md'
+      - Directory Structure: development/file-structure.md
+      - Backend Structure: development/structure.md
+      - Database Migrations: development/database-migrations.md
+
+  - Reference:
+      - Issue Labels: 'issue-labels.md'
+      - Changelog: 'changelog.md'
+      - FAQ: 'faq.md'

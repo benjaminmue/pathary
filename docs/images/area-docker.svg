@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="20" viewBox="0 0 90 20" role="img" aria-label="area-docker">
+  <title>area-docker</title>
+  <!-- Pill-shaped background with border -->
+  <rect width="90" height="20" rx="10"
+        fill="#0D2E3D"
+        stroke="#0D4358"
+        stroke-width="1"/>
+  <!-- Centered text -->
+  <text x="45.0" y="13.4375"
+        text-anchor="middle"
+        font-family="system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans,Helvetica,Arial,sans-serif"
+        font-size="11"
+        font-weight="600"
+        fill="#0DBAF1">area-docker</text>
+</svg>

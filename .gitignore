@@ -57,3 +57,4 @@ logs/
 
 # macOS
 .DS_Store
+site/

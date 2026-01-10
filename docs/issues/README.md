@@ -41,7 +41,7 @@ gh issue create \
 
 If you prefer to create issues via the GitHub web interface:
 
-1. Go to: https://github.com/benjaminkomen/movary/issues/new
+1. Go to: https://github.com/benjaminmue/pathary/issues/new
 2. Copy the content from each `.md` file in this directory
 3. Set appropriate labels
 

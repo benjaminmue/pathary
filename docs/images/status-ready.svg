@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="97" height="20" viewBox="0 0 97 20" role="img" aria-label="status-ready">
+  <title>status-ready</title>
+  <!-- Pill-shaped background with border -->
+  <rect width="97" height="20" rx="10"
+        fill="#0D2616"
+        stroke="#10501B"
+        stroke-width="1"/>
+  <!-- Centered text -->
+  <text x="48.5" y="13.4375"
+        text-anchor="middle"
+        font-family="system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans,Helvetica,Arial,sans-serif"
+        font-size="11"
+        font-weight="600"
+        fill="#17E424">status-ready</text>
+</svg>
