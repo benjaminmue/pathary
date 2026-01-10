@@ -13,6 +13,9 @@
 
 ---
 
+!!! info "Documentation Migration Notice"
+    This documentation site was recently created and is actively being updated. I am transitioning away from the GitHub Wiki, which will no longer be maintained. All future documentation updates will be published here at [docs.pathary.tv](https://docs.pathary.tv).
+
 ## What is Pathary?
 
 Imagine **Letterboxd** meets **your own private server** with a **unique popcorn rating system**. That's Pathary!
@@ -158,7 +161,7 @@ Enforced password policy with real-time validation. Security that doesn't compro
     Tired of corporate platforms tracking your every move? Host it yourself, own your data.
 
 !!! example "Power Users"
-    Want integrations with Plex, Jellyfin, Trakt, and Letterboxd? We've got you covered.
+    Want integrations with Plex, Jellyfin, Trakt, and Letterboxd? Pathary has you covered.
 
 ---
 

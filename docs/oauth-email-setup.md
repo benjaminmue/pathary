@@ -119,7 +119,7 @@ Or generate via Pathary UI: Admin → Server Management → Email Settings → O
 - **Developer contact information**: Your email address
 
 4. Click **Save and Continue**
-5. **Scopes**: Skip this step (we'll use Gmail API scope, not Graph scopes)
+5. **Scopes**: Skip this step (Pathary uses Gmail API scope, not Graph scopes)
 6. Click **Save and Continue**
 7. **Test users** (if External): Add email addresses that can use OAuth during testing
 8. Click **Save and Continue**

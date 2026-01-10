@@ -5,14 +5,14 @@
 
 ### Description
 
-Automatically add new [Emby](https://emby.media/) movie plays to Movary. This uses the Emby webhook feature.
+Automatically add new [Emby](https://emby.media/) movie plays to Pathary. This uses the Emby webhook feature.
 
 !!! Info
 
     To use webhooks in Emby an active [Emby Premiere](https://emby.media/premiere.html) license is required.
 
 ### Instruction
-- Generate a webhook url in Movary for your user on the Emby integration settings page (`/settings/integrations/emby`)
+- Generate a webhook url in Pathary for your user on the Emby integration settings page (`/settings/integrations/emby`)
 - Add the generated url as a [webhook to your Emby server](https://emby.media/support/articles/Webhooks.html) to start scrobbling
 
 !!! tip

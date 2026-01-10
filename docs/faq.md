@@ -1,5 +1,5 @@
 
-Q: Will Movary support tv shows or other media types?
+Q: Will Pathary support tv shows or other media types?
 
 A: Currently there is no active development for supporting more media types. Contributions in that directions are welcome!
 

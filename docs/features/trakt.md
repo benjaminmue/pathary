@@ -3,18 +3,18 @@
 
 ## Trakt.tv API Access
 
-Movary needs a Trakt **username** and **Client ID** to access its api. 
-You can configure them in Movary via the user settings page at `/settings/integrations/trakt` or via cli (user update command).
+Pathary needs a Trakt **username** and **Client ID** to access its api.
+You can configure them in Pathary via the user settings page at `/settings/integrations/trakt` or via cli (user update command).
 
 #### How to get a Client ID
-Go to your trakt.tv <a href="https://trakt.tv/oauth/applications" target="_blank">application settings</a> and create an application for Movary.
-Trakt requires a redirect uri which is not used by Movary, you can enter a placeholder like `http://movary`:
+Go to your trakt.tv <a href="https://trakt.tv/oauth/applications" target="_blank">application settings</a> and create an application for Pathary.
+Trakt requires a redirect uri which is not used by Pathary, you can enter a placeholder like `http://pathary`:
 <img src="/assets/trakt-new-application-page.png" alt="Trakt application seeting page with client ID" width="70%"/>
 
 You should be able to see your Client ID now on your applications page:
 <img src="/assets/trakt-view-application-page.png" alt="Trakt application seeting page with client ID" width="70%"/>
 
-Enter the Client ID and your username in Movary, verify the access and save your changes. 
+Enter the Client ID and your username in Pathary, verify the access and save your changes. 
 
 ## Import
 
@@ -22,7 +22,7 @@ Enter the Client ID and your username in Movary, verify the access and save your
 
 You can import your watch history and ratings from Trakt.
 
-The import will only add data missing in Movary on default, it will not overwrite or remove existing data.
+The import will only add data missing in Pathary on default, it will not overwrite or remove existing data.
 
 The import can be triggered via the user settings page at `/settings/integrations/trakt` or via cli.
 
@@ -32,7 +32,7 @@ The import can be triggered via the user settings page at `/settings/integration
 
 !!! Warning
 
-    Currently Movary only supports import from public Trakt accounts. Make sure your account is not set to private during the import.
+    Currently Pathary only supports import from public Trakt accounts. Make sure your account is not set to private during the import.
 
 ### CLI Command
 

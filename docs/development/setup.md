@@ -51,7 +51,7 @@ For example, in VSCode or VSCodium, the following debug configuration would allo
 
 ### IDE recommendation: PhpStorm
 
-We recommend to use PhpStorm and to import the Movary code style scheme (found at `settings/phpstorm.xml`).
+PhpStorm is recommended for development. Import the Pathary code style scheme (found at `settings/phpstorm.xml`).
 For import instructions see the [official docs](https://www.jetbrains.com/help/phpstorm/configuring-code-style.html#import-export-schemes).
 
 To apply the code style rules use at least the following features:
@@ -72,7 +72,7 @@ Notes:
 
 ##### Description
 
-We use [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) for the documentation.
+This project uses [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) for the documentation.
 
 This is part of the default development docker compose setup and can be reached via `http://127.0.0.1:8000`.
 

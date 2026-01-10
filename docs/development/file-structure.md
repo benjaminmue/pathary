@@ -17,8 +17,8 @@ Within the `/src` directory, various other directories are located.
 
 ### Templates
 
-The frontend of Movary is mainly regular HTML5, but it also uses the [twig framework](https://twig.symfony.com/) from Symfony, to use dynamic templates. This allows us to use
-cleaner code when injecting PHP code in HTML. So instead of using `<?php echo $variable ?>`, we can now use `{{ $variable }}` and the twig engine will automatically translate the
+The frontend of Movary is mainly regular HTML5, but it also uses the [twig framework](https://twig.symfony.com/) from Symfony, to use dynamic templates. This allows for
+cleaner code when injecting PHP code in HTML. So instead of using `<?php echo $variable ?>`, you can use `{{ $variable }}` and the twig engine will automatically translate the
 clean code into the PHP code. See their documentation for more information.
 
 ### Frontend assets

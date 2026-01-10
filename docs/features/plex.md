@@ -5,14 +5,14 @@
 
 ### Description
 
-Automatically add new [Plex](https://www.plex.tv/) movie plays and ratings to Movary.
+Automatically add new [Plex](https://www.plex.tv/) movie plays and ratings to Pathary.
 
 !!! Info
 
     To use the required webhooks feature in Plex an active [Plex Pass](https://www.plex.tv/plex-pass/) subscription is neceessary.
 
 ### Instruction
-- Generate a webhook url in Movary for your user on the Plex integration settings page (`/settings/integrations/plex`)
+- Generate a webhook url in Pathary for your user on the Plex integration settings page (`/settings/integrations/plex`)
 - Add the generated url as a [webhook to your Plex server](https://support.plex.tv/articles/115002267687-webhooks/) to start scrobbling
 
 You can select what you want to scrobble (movie plays and/or ratings) via the "Scrobble Options" checkboxes on the settings page.
@@ -24,27 +24,27 @@ You can select what you want to scrobble (movie plays and/or ratings) via the "S
 ## Authentication
 
 Some features require access to protected personal Plex data.
-You can authenticate Movary against Plex on the Plex integration settings page (`/settings/integrations/plex`).
+You can authenticate Pathary against Plex on the Plex integration settings page (`/settings/integrations/plex`).
 
 !!! Info
 
     Requires the server configuration [PLEX_IDENTIFIER](/configuration/#third-party-integrations) to be set.
 
-During the authentication process a Plex access token is generated and stored in Movary. 
+During the authentication process a Plex access token is generated and stored in Pathary. 
 This token will be used in all further Plex API requests.
-When an authentication is removed from Movary, the token will be deleted only in Movary.
+When an authentication is removed from Pathary, the token will be deleted only in Pathary.
 
 !!! Info
 
-    Removing the authentication only deletes the token stored in Movary itself. The token still exists in Plex.
-    To invalidate the access token in Plex, go to your Plex settings at: Account -> Authorized devices -> Click on the red cross for the entry "Movary"
+    Removing the authentication only deletes the token stored in Pathary itself. The token still exists in Plex.
+    To invalidate the access token in Plex, go to your Plex settings at: Account -> Authorized devices -> Click on the red cross for the entry "Pathary"
 
 ## Watchlist import
 
 ### Description
 
-Import missing movies from your Plex Watchlist to your Movary Watchlist.
-Missing movies imported to the Movary Watchlist are put at the beginning of the list in the same order as they are in Plex.
+Import missing movies from your Plex Watchlist to your Pathary Watchlist.
+Missing movies imported to the Pathary Watchlist are put at the beginning of the list in the same order as they are in Plex.
 
 !!! Info
 
