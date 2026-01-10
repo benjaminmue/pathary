@@ -1,7 +1,7 @@
-# Welcome to Pathary 🍿
-
 <div style="text-align: center; padding: 2rem 0;">
-  <h2 style="font-size: 2rem; color: var(--pathary-purple); margin-bottom: 1rem;">
+  <img src="images/pathary-logo.svg" alt="Pathary Logo" style="width: 120px; height: 120px; margin-bottom: 1.5rem;">
+  <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Welcome to Pathary</h1>
+  <h2 style="font-size: 2rem; color: var(--pathary-gold-dark); margin-bottom: 1rem; font-weight: 600;">
     Self-Hosted Movie Tracking for Friend Groups
   </h2>
   <p style="font-size: 1.2rem; color: var(--md-default-fg-color--light);">
@@ -11,7 +11,7 @@
 
 ---
 
-## 🎬 What is Pathary?
+## What is Pathary?
 
 Imagine **Letterboxd** meets **your own private server** with a **unique popcorn rating system**. That's Pathary!
 
@@ -19,25 +19,25 @@ Built for friend groups who love movies, Pathary lets you:
 
 <div class="grid cards" markdown>
 
--   :popcorn: **Popcorn Ratings**
+-   :popcorn: **[Popcorn Ratings](features/ratings-and-comments.md)**
 
     ---
 
     Rate movies from 1-7 popcorns instead of boring stars. More kernels = more fun!
 
--   :busts_in_silhouette: **Group Experience**
+-   :busts_in_silhouette: **[Group Experience](features/movies-and-tmdb.md)**
 
     ---
 
     See what your friends rated each movie. Build your shared cinema culture.
 
--   :lock: **Privacy First**
+-   :lock: **[Privacy First](security/authentication-and-sessions.md)**
 
     ---
 
     Self-hosted on your infrastructure. No tracking, no ads, no corporate overlords.
 
--   :rocket: **Easy Setup**
+-   :rocket: **[Easy Setup](getting-started.md)**
 
     ---
 
@@ -50,7 +50,7 @@ Built for friend groups who love movies, Pathary lets you:
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 Get Pathary running in 3 simple steps:
 
@@ -88,7 +88,7 @@ Get Pathary running in 3 simple steps:
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
 ### For Movie Lovers
 
@@ -144,7 +144,7 @@ Enforced password policy with real-time validation. Security that doesn't compro
 
 ---
 
-## 🎯 Perfect For
+## Perfect For
 
 !!! example "Friend Groups"
     You watch movies together and want to remember what everyone thought. Build your shared movie culture!
@@ -160,7 +160,7 @@ Enforced password policy with real-time validation. Security that doesn't compro
 
 ---
 
-## 🗺️ Explore the Docs
+## Explore the Docs
 
 <div class="grid cards" markdown>
 
@@ -216,7 +216,7 @@ Enforced password policy with real-time validation. Security that doesn't compro
 
 ---
 
-## 🆚 Pathary vs Movary
+## Pathary vs Movary
 
 | Feature | Movary | Pathary |
 |:--------|:------:|:-------:|
@@ -230,7 +230,7 @@ Enforced password policy with real-time validation. Security that doesn't compro
 
 ---
 
-## 💬 Community & Support
+## Community & Support
 
 !!! question "Need Help?"
     - 📖 **Documentation**: You're reading it! Use the search bar above.

@@ -524,3 +524,40 @@ html {
 .md-typeset table tbody tr:hover {
   transform: scale(1.01);
 }
+
+/* ============================================
+   HOMEPAGE SPECIFIC STYLES
+   ============================================ */
+
+/* Make comparison table wider */
+.md-typeset table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: auto;
+}
+
+/* Ensure entire card is clickable in grid cards */
+.md-typeset .grid.cards > * {
+  position: relative;
+  cursor: pointer;
+}
+
+.md-typeset .grid.cards > * a {
+  position: static;
+}
+
+.md-typeset .grid.cards > * a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+/* Keep text links above the pseudo-element */
+.md-typeset .grid.cards > * a:not(:first-child) {
+  position: relative;
+  z-index: 2;
+}
