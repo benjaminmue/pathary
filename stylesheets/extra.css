@@ -529,35 +529,106 @@ html {
    HOMEPAGE SPECIFIC STYLES
    ============================================ */
 
-/* Make comparison table wider */
+/* Make comparison table centered with reasonable width */
+.md-typeset__table {
+  display: flex !important;
+  justify-content: center !important;
+}
+
 .md-typeset table {
-  width: 100%;
-  max-width: 100%;
+  display: table !important;
+  width: auto;
+  max-width: 800px;
   table-layout: auto;
 }
 
-/* Ensure entire card is clickable in grid cards */
-.md-typeset .grid.cards > * {
+/* Ensure entire card is clickable in grid cards - ONLY on homepage */
+.md-content article > .grid.cards > li {
   position: relative;
+}
+
+.md-content article > .grid.cards > li:hover {
   cursor: pointer;
 }
 
-.md-typeset .grid.cards > * a {
-  position: static;
-}
-
-.md-typeset .grid.cards > * a::before {
+.md-content article > .grid.cards > li > p > a::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: 0;
 }
 
-/* Keep text links above the pseudo-element */
-.md-typeset .grid.cards > * a:not(:first-child) {
-  position: relative;
-  z-index: 2;
+/* ============================================
+   ADMONITION BOX STYLING - GOLD THEME
+   ============================================ */
+
+/* Override default admonition borders to match gold theme */
+.md-typeset .admonition.tip {
+  border-left-color: var(--pathary-gold-dark);
+  border-color: var(--pathary-gold-dark);
+}
+
+.md-typeset .admonition.tip > .admonition-title {
+  background-color: rgba(197, 159, 68, 0.1);
+}
+
+.md-typeset .admonition.success {
+  border-left-color: var(--pathary-gold-dark);
+  border-color: var(--pathary-gold-dark);
+}
+
+.md-typeset .admonition.success > .admonition-title {
+  background-color: rgba(197, 159, 68, 0.1);
+}
+
+.md-typeset .admonition.example {
+  border-left-color: var(--pathary-gold-dark);
+  border-color: var(--pathary-gold-dark);
+}
+
+.md-typeset .admonition.example > .admonition-title {
+  background-color: rgba(197, 159, 68, 0.1);
+}
+
+.md-typeset .admonition.question {
+  border-left-color: var(--pathary-gold-dark);
+  border-color: var(--pathary-gold-dark);
+}
+
+.md-typeset .admonition.question > .admonition-title {
+  background-color: rgba(197, 159, 68, 0.1);
+}
+
+.md-typeset .admonition.info {
+  border-left-color: var(--pathary-gold-dark);
+  border-color: var(--pathary-gold-dark);
+}
+
+.md-typeset .admonition.info > .admonition-title {
+  background-color: rgba(197, 159, 68, 0.1);
+}
+
+/* ============================================
+   LOGO STYLING AND HERO SECTION
+   ============================================ */
+
+/* Keep hero section in normal content flow - simpler approach */
+.md-content__inner > div[style*="text-align: center"] {
+  /* Just let it be centered within the content area */
+}
+
+/* Ensure logo displays properly in hero section - using transform for perfect centering */
+.md-typeset img[alt="Pathary Logo"] {
+  display: block !important;
+  width: 200px !important;
+  height: 200px !important;
+  max-height: none !important;
+  margin-bottom: 1.5rem !important;
+  object-fit: contain;
+  position: relative !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
 }
