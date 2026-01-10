@@ -202,7 +202,7 @@ To enable Gmail or Microsoft 365 authentication for outgoing emails:
 3. Generate `ENCRYPTION_KEY`: `openssl rand -hex 32`
 4. Configure in Admin panel → Server Management → Email Settings → OAuth tab
 
-See [Wiki: OAuth Email Setup](https://github.com/benjaminmue/pathary/wiki/OAuth-Email-Setup) for detailed instructions.
+See [Wiki: OAuth Email Setup](https://docs.pathary.tv/oauth-email-setup/) for detailed instructions.
 
 ### Reverse Proxy Setup
 
@@ -221,19 +221,19 @@ See [.env.example](.env.example) for all available configuration options.
 
 ## Documentation
 
-📖 **[Pathary Wiki](https://github.com/benjaminmue/pathary/wiki)** — Comprehensive documentation
+📖 **[Pathary Documentation](https://docs.pathary.tv)** — Comprehensive documentation
 
 ### Popular Pages
 
 | Topic | Description |
 |-------|-------------|
-| [Getting Started](https://github.com/benjaminmue/pathary/wiki/Getting-Started) | Installation and first user setup |
-| [Two-Factor Authentication](https://github.com/benjaminmue/pathary/wiki/Two-Factor-Authentication) | TOTP, recovery codes, trusted devices |
-| [OAuth Email Setup](https://github.com/benjaminmue/pathary/wiki/OAuth-Email-Setup) | Gmail and Microsoft 365 configuration |
-| [Password Policy and Security](https://github.com/benjaminmue/pathary/wiki/Password-Policy-and-Security) | Password requirements and best practices |
-| [Deployment](https://github.com/benjaminmue/pathary/wiki/Deployment) | Production setup and reverse proxy configuration |
-| [Database](https://github.com/benjaminmue/pathary/wiki/Database) | Schema, migrations, and backup |
-| [Troubleshooting](https://github.com/benjaminmue/pathary/wiki/Logging-and-Troubleshooting) | Logs and common issues |
+| [Getting Started](https://docs.pathary.tv/getting-started/) | Installation and first user setup |
+| [Two-Factor Authentication](https://docs.pathary.tv/security/two-factor-authentication/) | TOTP, recovery codes, trusted devices |
+| [OAuth Email Setup](https://docs.pathary.tv/oauth-email-setup/) | Gmail and Microsoft 365 configuration |
+| [Password Policy and Security](https://docs.pathary.tv/security/password-policy-and-security/) | Password requirements and best practices |
+| [Deployment](https://docs.pathary.tv/deployment/) | Production setup and reverse proxy configuration |
+| [Database](https://docs.pathary.tv/architecture/database/) | Schema, migrations, and backup |
+| [Troubleshooting](https://docs.pathary.tv/operations/logging-and-troubleshooting/) | Logs and common issues |
 
 ## Security Notes
 
@@ -313,7 +313,7 @@ Contributions are welcome! Please follow these guidelines:
 
 ### Issue Labels
 
-When creating or triaging issues, use the [Issue Labels](https://github.com/benjaminmue/pathary/wiki/Issue-Labels) system:
+When creating or triaging issues, use the [Issue Labels](https://docs.pathary.tv/issue-labels/) system:
 
 **Every issue MUST have:**
 - Exactly **one Type** label: `bug`, `enhancement`, `documentation`, `security`, `performance`, `refactor`, or `chore`
@@ -328,7 +328,7 @@ See the full [Issue Labels Guide](https://github.com/benjaminmue/pathary/labels)
 
 ### Reporting Issues
 
-📋 **[Issue Creation Guide](https://github.com/benjaminmue/pathary/wiki/Issue-Labels)** — Learn how to create well-labeled issues
+📋 **[Issue Creation Guide](https://docs.pathary.tv/issue-labels/)** — Learn how to create well-labeled issues
 
 - 🐛 **Bug Reports:** [Create an issue](https://github.com/benjaminmue/pathary/issues/new)
 - 💡 **Feature Requests:** [Create an issue](https://github.com/benjaminmue/pathary/issues/new)

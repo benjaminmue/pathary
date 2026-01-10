@@ -1,0 +1,181 @@
+/* Pathary Brand Colors */
+:root {
+  --pathary-purple: #7D49A8;
+  --pathary-gold: #FAC54E;
+  --pathary-cream: #F7EED2;
+  --pathary-purple-light: #9B6BC4;
+  --pathary-purple-dark: #5D2F7E;
+  --pathary-gold-light: #FFDB8B;
+  --pathary-gold-dark: #E5AD2F;
+}
+
+/* Light mode - Pathary Purple primary */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: var(--pathary-purple);
+  --md-primary-fg-color--light: var(--pathary-purple-light);
+  --md-primary-fg-color--dark: var(--pathary-purple-dark);
+  --md-accent-fg-color: var(--pathary-gold);
+  --md-accent-fg-color--transparent: rgba(250, 197, 78, 0.1);
+}
+
+/* Dark mode - Pathary Purple primary with adjusted contrast */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: var(--pathary-purple-light);
+  --md-primary-fg-color--light: var(--pathary-purple);
+  --md-primary-fg-color--dark: var(--pathary-purple-dark);
+  --md-accent-fg-color: var(--pathary-gold);
+  --md-accent-fg-color--transparent: rgba(250, 197, 78, 0.1);
+}
+
+/* Header styling with gradient */
+.md-header {
+  background: linear-gradient(135deg, var(--pathary-purple) 0%, var(--pathary-purple-dark) 100%);
+}
+
+/* Logo styling - make it pop */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Navigation tabs with subtle gradient */
+.md-tabs {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
+}
+
+/* Search bar enhancement */
+.md-search__input {
+  border-radius: 0.5rem;
+}
+
+.md-search__input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(125, 73, 168, 0.25);
+}
+
+/* Links with Pathary gold on hover */
+.md-typeset a {
+  transition: color 0.2s ease;
+}
+
+.md-typeset a:hover {
+  color: var(--pathary-gold-dark);
+}
+
+/* Code blocks with subtle Pathary theme */
+.md-typeset code {
+  background-color: rgba(125, 73, 168, 0.05);
+  border: 1px solid rgba(125, 73, 168, 0.1);
+  border-radius: 0.25rem;
+}
+
+[data-md-color-scheme="slate"] .md-typeset code {
+  background-color: rgba(155, 107, 196, 0.1);
+  border-color: rgba(155, 107, 196, 0.2);
+}
+
+/* Admonitions with Pathary colors */
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-left-color: var(--pathary-purple);
+}
+
+.md-typeset .note > .admonition-title,
+.md-typeset .note > summary {
+  background-color: rgba(125, 73, 168, 0.1);
+}
+
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-left-color: var(--pathary-gold);
+}
+
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary {
+  background-color: rgba(250, 197, 78, 0.1);
+}
+
+/* Footer styling */
+.md-footer {
+  background: linear-gradient(135deg, var(--pathary-purple-dark) 0%, var(--pathary-purple) 100%);
+}
+
+/* Table of contents styling */
+.md-sidebar--secondary {
+  border-left: 1px solid rgba(125, 73, 168, 0.1);
+}
+
+/* Active navigation items */
+.md-nav__item--active > .md-nav__link {
+  color: var(--pathary-purple);
+  font-weight: 600;
+}
+
+[data-md-color-scheme="slate"] .md-nav__item--active > .md-nav__link {
+  color: var(--pathary-gold);
+}
+
+/* Buttons and interactive elements */
+.md-typeset .md-button--primary {
+  background-color: var(--pathary-purple);
+  border-color: var(--pathary-purple);
+  color: white;
+}
+
+.md-typeset .md-button--primary:hover {
+  background-color: var(--pathary-purple-dark);
+  border-color: var(--pathary-purple-dark);
+}
+
+/* Scrollbar styling (webkit browsers) */
+::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--pathary-purple);
+  border-radius: 0.25rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--pathary-purple-dark);
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(125, 73, 168, 0.05);
+}
+
+/* Progress bar for page loading */
+.md-progress {
+  background-color: var(--pathary-gold);
+}
+
+/* Tags styling */
+.md-tag {
+  background-color: rgba(125, 73, 168, 0.1);
+  color: var(--pathary-purple-dark);
+  border: 1px solid rgba(125, 73, 168, 0.2);
+}
+
+[data-md-color-scheme="slate"] .md-tag {
+  background-color: rgba(155, 107, 196, 0.15);
+  color: var(--pathary-gold);
+  border-color: rgba(155, 107, 196, 0.3);
+}
+
+/* Hero section on homepage */
+.md-typeset h1:first-child {
+  color: var(--pathary-purple);
+  font-weight: 700;
+}
+
+[data-md-color-scheme="slate"] .md-typeset h1:first-child {
+  color: var(--pathary-gold);
+}
+
+/* Enhance SVG badge images */
+.md-typeset img[src$=".svg"] {
+  vertical-align: middle;
+  max-height: 1.5rem;
+}
