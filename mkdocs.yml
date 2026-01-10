@@ -15,14 +15,14 @@ theme:
       toggle:
         icon: material/weather-night
         name: Switch to dark mode
-      primary: deep purple
+      primary: indigo
       accent: amber
     # Dark mode
     - scheme: slate
       toggle:
         icon: material/weather-sunny
         name: Switch to light mode
-      primary: deep purple
+      primary: indigo
       accent: amber
   features:
     - announce.dismiss
