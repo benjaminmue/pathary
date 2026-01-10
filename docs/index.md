@@ -1,119 +1,253 @@
-# Pathary Wiki
+# Welcome to Pathary 🍿
 
-Pathary is a self-hosted movie tracking application for friend groups. Rate movies on a 1-7 popcorn scale, see what others thought, and discover new films via TMDB integration.
-
-> **Attribution**: Pathary is a fork of [Movary](https://github.com/leepeuker/movary) by Lee Peuker.
-
-## Who Is This For?
-
-- Friend groups who watch movies together
-- Film clubs wanting a shared rating system
-- Anyone who wants a self-hosted alternative to Letterboxd with group features
-
-## Feature Overview
-
-| Feature | Description |
-|---------|-------------|
-| **Popcorn Ratings** | Rate movies 1-7 on a unique popcorn scale |
-| **Group View** | See aggregate ratings from all users |
-| **Watch History** | Track when and where you watched movies |
-| **TMDB Integration** | Search and add movies from The Movie Database |
-| **Watchlist** | Keep track of movies you want to watch |
-| **Import/Export** | Sync with Trakt, Letterboxd, Plex, Jellyfin |
-| **Profile Images** | Customize your user profile |
-| **Dark Mode** | Built-in dark theme support |
-| **Two-Factor Authentication** | Secure your account with TOTP, recovery codes, and trusted devices |
-| **Password Policy** | Enforced strong password requirements for security |
-| **Security Audit Log** | Track all security events and login activity |
-
-## Architecture Overview
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Reverse Proxy                           │
-│                  (Nginx/Traefik/Caddy)                      │
-└─────────────────────────┬───────────────────────────────────┘
-                          │
-┌─────────────────────────▼───────────────────────────────────┐
-│                    Pathary Container                        │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │              public/index.php                        │   │
-│  │                 (Entry Point)                        │   │
-│  └─────────────────────┬───────────────────────────────┘    │
-│                        │                                    │
-│  ┌─────────────────────▼───────────────────────────────┐    │
-│  │            FastRoute Dispatcher                      │   │
-│  │           settings/routes.php                        │   │
-│  └─────────────────────┬───────────────────────────────┘    │
-│                        │                                    │
-│  ┌─────────────────────▼───────────────────────────────┐    │
-│  │              Middleware Chain                        │   │
-│  │    (Auth, Session, Authorization checks)             │   │
-│  └─────────────────────┬───────────────────────────────┘    │
-│                        │                                    │
-│  ┌─────────────────────▼───────────────────────────────┐    │
-│  │           Controllers (Web & API)                    │   │
-│  │      src/HttpController/{Web,Api}/*.php              │   │
-│  └─────────────────────┬───────────────────────────────┘    │
-│                        │                                    │
-│  ┌─────────────────────▼───────────────────────────────┐    │
-│  │         Services & Domain Logic                      │   │
-│  │   src/Service/*.php  src/Domain/*/*.php              │   │
-│  └─────────────────────┬───────────────────────────────┘    │
-│                        │                                    │
-│  ┌─────────────────────▼───────────────────────────────┐    │
-│  │              Twig Templates                          │   │
-│  │             templates/*.twig                         │   │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 MySQL or SQLite Database                    │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Wiki Navigation
-
-### Getting Started
-- [Getting Started](Getting-Started) - Installation and first run
-
-### Architecture & Code
-- [Architecture](Architecture) - System design and folder structure
-- [Routing and Controllers](Routing-and-Controllers) - Request handling
-
-### Security
-- [Authentication and Sessions](Authentication-and-Sessions) - Login and session management
-- [Two-Factor Authentication](Two-Factor-Authentication) - TOTP, recovery codes, and trusted devices
-- [Password Policy and Security](Password-Policy-and-Security) - Password requirements and best practices
-
-### Data Layer
-- [Database](Database) - Tables, relationships, and queries
-- [Migrations](Migrations) - Schema management with Phinx
-
-### Features
-- [Movies and TMDB](Movies-and-TMDB) - Movie search and data sync
-- [Ratings and Comments](Ratings-and-Comments) - The popcorn rating system
-
-### Frontend
-- [Frontend and UI](Frontend-and-UI) - Templates, CSS, and JavaScript
-
-### Operations
-- [Deployment](Deployment) - Docker, reverse proxy, and production setup
-- [Logging and Troubleshooting](Logging-and-Troubleshooting) - Debugging issues
-
-### Contributing
-- [Issue Labels](Issue-Labels) - Label taxonomy and triage guidelines
+<div style="text-align: center; padding: 2rem 0;">
+  <h2 style="font-size: 2rem; color: var(--pathary-purple); margin-bottom: 1rem;">
+    Self-Hosted Movie Tracking for Friend Groups
+  </h2>
+  <p style="font-size: 1.2rem; color: var(--md-default-fg-color--light);">
+    Rate movies on a 1-7 popcorn scale 🍿 • Share with friends • Track your watch history
+  </p>
+</div>
 
 ---
 
-## Quick Links
+## 🎬 What is Pathary?
 
-| Resource | Location |
-|----------|----------|
-| Source Code | `src/` |
-| Templates | `templates/` |
-| Migrations | `db/migrations/` |
-| Configuration | `.env.example` |
-| Docker Setup | `docker-compose.yml` |
-| API Docs | `/docs/api` (when running) |
+Imagine **Letterboxd** meets **your own private server** with a **unique popcorn rating system**. That's Pathary!
+
+Built for friend groups who love movies, Pathary lets you:
+
+<div class="grid cards" markdown>
+
+-   :popcorn: **Popcorn Ratings**
+
+    ---
+
+    Rate movies from 1-7 popcorns instead of boring stars. More kernels = more fun!
+
+-   :busts_in_silhouette: **Group Experience**
+
+    ---
+
+    See what your friends rated each movie. Build your shared cinema culture.
+
+-   :lock: **Privacy First**
+
+    ---
+
+    Self-hosted on your infrastructure. No tracking, no ads, no corporate overlords.
+
+-   :rocket: **Easy Setup**
+
+    ---
+
+    Docker-based deployment with SQLite. Up and running in 5 minutes.
+
+</div>
+
+!!! tip "Fork Attribution"
+    Pathary is a fork of [Movary](https://github.com/leepeuker/movary) by Lee Peuker, enhanced with enterprise security, OAuth email, and group features.
+
+---
+
+## ⚡ Quick Start
+
+Get Pathary running in 3 simple steps:
+
+=== "Step 1: Clone & Configure"
+
+    ```bash
+    # Clone the repository
+    git clone https://github.com/benjaminmue/pathary.git
+    cd pathary
+
+    # Create your config
+    cp .env.example .env.local
+    nano .env.local  # Add your TMDB API key
+    ```
+
+=== "Step 2: Launch"
+
+    ```bash
+    # Start with Docker
+    docker compose up -d
+
+    # Run database migrations
+    make app_database_migrate
+    ```
+
+=== "Step 3: Create Admin"
+
+    ```bash
+    # Create your first user (admin)
+    docker compose exec app php bin/console user:create
+    ```
+
+!!! success "You're Done!"
+    Visit `http://localhost/` and start rating movies! 🎉
+
+---
+
+## 🌟 Key Features
+
+### For Movie Lovers
+
+<div class="grid" markdown>
+
+:material-star-four-points: **Unique Rating System**
+{ .card }
+
+Rate movies 1-7 on the popcorn scale. Because 5 stars just doesn't cut it when you need to express that a movie is "good but not great."
+
+:material-history: **Watch History**
+{ .card }
+
+Track when and where you watched each movie. Perfect for settling "Did we watch this already?" arguments.
+
+:material-account-group: **Group Ratings**
+{ .card }
+
+See aggregate ratings from all users. Find out if you're the only one who loved that weird art film.
+
+:material-magnify: **Movie Discovery**
+{ .card }
+
+Browse and search 1M+ movies via TMDB integration. Find your next movie night pick.
+
+</div>
+
+### Security & Auth
+
+<div class="grid" markdown>
+
+:material-two-factor-authentication: **2FA Protection**
+{ .card }
+
+TOTP support with recovery codes and trusted device management. Keep your ratings safe!
+
+:material-email-lock: **OAuth Email**
+{ .card }
+
+Gmail and Microsoft 365 OAuth 2.0. No more SMTP passwords lying around.
+
+:material-shield-check: **Audit Logging**
+{ .card }
+
+Track all security events. Know who logged in, when, and from where.
+
+:material-lock-reset: **Strong Passwords**
+{ .card }
+
+Enforced password policy with real-time validation. Security that doesn't compromise.
+
+</div>
+
+---
+
+## 🎯 Perfect For
+
+!!! example "Friend Groups"
+    You watch movies together and want to remember what everyone thought. Build your shared movie culture!
+
+!!! example "Film Clubs"
+    Need a private rating system for your club members? Pathary keeps everything in your control.
+
+!!! example "Privacy Enthusiasts"
+    Tired of corporate platforms tracking your every move? Host it yourself, own your data.
+
+!!! example "Power Users"
+    Want integrations with Plex, Jellyfin, Trakt, and Letterboxd? We've got you covered.
+
+---
+
+## 🗺️ Explore the Docs
+
+<div class="grid cards" markdown>
+
+-   :material-rocket-launch: **[Getting Started](getting-started.md)**
+
+    ---
+
+    Installation guide and initial setup
+
+-   :material-security: **[Security](security/authentication-and-sessions.md)**
+
+    ---
+
+    2FA, OAuth, and password policies
+
+-   :material-cog: **[Configuration](configuration.md)**
+
+    ---
+
+    Environment variables and settings
+
+-   :material-database: **[Architecture](architecture/architecture.md)**
+
+    ---
+
+    How Pathary works under the hood
+
+-   :material-server: **[Deployment](deployment.md)**
+
+    ---
+
+    Production setup and reverse proxy
+
+-   :material-puzzle: **[Features](features/movies-and-tmdb.md)**
+
+    ---
+
+    Movies, ratings, and integrations
+
+-   :material-alert-circle: **[Troubleshooting](operations/logging-and-troubleshooting.md)**
+
+    ---
+
+    Logs, debugging, and common issues
+
+-   :material-update: **[Migrations](migrations.md)**
+
+    ---
+
+    Database migrations and upgrades
+
+</div>
+
+---
+
+## 🆚 Pathary vs Movary
+
+| Feature | Movary | Pathary |
+|:--------|:------:|:-------:|
+| 🔐 **OAuth Email Auth** | ❌ | ✅ Gmail + Microsoft 365 |
+| 🛡️ **Two-Factor Auth** | ❌ | ✅ TOTP + Recovery Codes |
+| 🔑 **Password Policy** | ❌ | ✅ Enforced Requirements |
+| 📊 **Health Dashboard** | ❌ | ✅ System Monitoring |
+| 🔍 **Audit Logging** | ❌ | ✅ Security Events |
+| 👥 **Group Focus** | Individual | Friend Groups |
+| 🎨 **Modern UI** | Bootstrap 4 | Bootstrap 5 Dark Mode |
+
+---
+
+## 💬 Community & Support
+
+!!! question "Need Help?"
+    - 📖 **Documentation**: You're reading it! Use the search bar above.
+    - 🐛 **Bug Reports**: [Create an issue](https://github.com/benjaminmue/pathary/issues/new)
+    - 💡 **Feature Requests**: [Suggest an idea](https://github.com/benjaminmue/pathary/issues/new)
+    - 📝 **Contributing**: Check out [Issue Labels](issue-labels.md)
+
+!!! info "Project Status"
+    Pathary is in **active development**. Expect frequent updates, new features, and improvements. Always back up your data before updating!
+
+---
+
+<div style="text-align: center; padding: 2rem 0; color: var(--md-default-fg-color--light);">
+  <p style="font-size: 1.1rem;">
+    Made with ❤️ for movie lovers everywhere
+  </p>
+  <p>
+    <a href="https://github.com/benjaminmue/pathary">⭐ Star on GitHub</a>
+  </p>
+</div>
