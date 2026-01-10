@@ -1,0 +1,377 @@
+# Pathary Security and Code Audit Report
+# Generated: 2025-12-14
+# Auditor: Claude Code
+
+================================================================================
+## EXECUTIVE SUMMARY
+================================================================================
+
+Categories scanned:
+- Security vulnerabilities
+- Dependency security
+- Performance issues
+- General improvements
+
+Findings summary:
+- Security: 4 findings (1 Medium, 3 Low)
+- Performance: 4 findings (2 Medium, 2 Low)
+- General Improvements: 5 findings (1 Medium, 4 Low)
+
+================================================================================
+## 1. SECURITY FINDINGS
+================================================================================
+
+### SEC-001: Missing CSRF Protection on State-Changing Forms
+Severity: MEDIUM
+Status: CsrfTokenService exists but is NOT used
+
+Affected files:
+- templates/public/movie_detail.twig:473-536 (rating form)
+- templates/page/settings-*.html.twig (all settings forms)
+- src/HttpController/Web/RateMovieController.php:30-96
+
+Description:
+The application has a CsrfTokenService (src/Service/CsrfTokenService.php) that
+generates and validates CSRF tokens, but it is not injected or used in any
+controller. All POST forms lack CSRF token validation.
+
+Proof:
+```bash
+grep -r "CsrfTokenService\|validateToken\|csrf" src/HttpController/
+# Returns no matches
+```
+
+Recommended fix:
+1. Inject CsrfTokenService into controllers handling POST requests
+2. Add hidden CSRF token field to all forms: <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+3. Validate token in controller before processing: $this->csrfTokenService->validateToken($request->getPostParameters()['_csrf_token'])
+
+--------------------------------------------------------------------------------
+
+### SEC-002: Dynamic ORDER BY Without Whitelist (Partial)
+Severity: LOW
+Status: Mostly mitigated via match statements
+
+Affected files:
+- src/Service/GroupMovieService.php:211-217
+- src/Domain/Movie/MovieRepository.php:132, 272, 418, 1012
+- src/Domain/Movie/Watchlist/MovieWatchlistRepository.php:248
+
+Description:
+Several queries use dynamic ORDER BY clauses. Most are protected by match
+statements or whitelisting, but the pattern requires ongoing vigilance.
+
+Current protection in GroupMovieService.php:206-217:
+```php
+$sortOrderSql = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+$orderByClause = match ($sortBy) {
+    'title' => "LOWER(m.title) $sortOrderSql",
+    'release_date' => "...",
+    // etc - safe match statement
+};
+```
+
+Recommended fix:
+Continue using match/switch statements with explicit whitelisted values.
+Document this pattern in a security note for future developers.
+
+--------------------------------------------------------------------------------
+
+### SEC-003: Auth Token Stored in Plaintext Cookie
+Severity: LOW
+Status: Acceptable with mitigations
+
+Affected files:
+- src/Domain/User/Service/Authentication.php:247-257
+
+Description:
+The authentication token is stored directly in a cookie. While the cookie has
+httponly, secure (when HTTPS), and SameSite=Lax flags, the token itself is
+transmitted in plaintext rather than as a hash.
+
+Current implementation:
+```php
+setcookie(
+    self::AUTHENTICATION_COOKIE_NAME,
+    $token,  // Raw token
+    [
+        'httponly' => true,
+        'secure' => $isSecure,
+        'samesite' => 'Lax',
+    ],
+);
+```
+
+Mitigations in place:
+- token_hash column exists for server-side comparison
+- Cookies have proper security flags
+- Session regeneration on login prevents fixation
+
+Recommended fix:
+Consider using a separate session identifier that maps to the token hash
+server-side, rather than transmitting the raw token in cookies.
+
+--------------------------------------------------------------------------------
+
+### SEC-004: Error Messages May Leak Information
+Severity: LOW
+Status: Partially mitigated
+
+Affected files:
+- public/index.php:67-73
+- src/HttpController/Web/ErrorController.php
+
+Description:
+The error handler logs the full exception with stack trace via the logger.
+In production, users see a generic error page, but log files may contain
+sensitive path information.
+
+Current implementation:
+```php
+} catch (Throwable $t) {
+    $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
+    // ...
+}
+```
+
+Recommended fix:
+Ensure log files have proper access restrictions. Consider sanitizing
+sensitive data (passwords, tokens) before logging in specific contexts.
+
+================================================================================
+## 2. DEPENDENCY SECURITY
+================================================================================
+
+Composer audit result: No security vulnerability advisories found.
+
+All PHP dependencies are up to date with no known vulnerabilities.
+
+================================================================================
+## 3. PERFORMANCE FINDINGS
+================================================================================
+
+### PERF-001: Potential N+1 Query in Movie List
+Severity: MEDIUM
+
+Affected files:
+- src/Service/GroupMovieService.php:222-250
+
+Description:
+The getAllMovies() method uses subqueries for avg_popcorn and own_rating
+which execute per-row rather than as a JOIN.
+
+Current query pattern:
+```sql
+SELECT m.id, m.title,
+    (SELECT AVG(mur.rating_popcorn) FROM movie_user_rating mur WHERE mur.movie_id = m.id) AS avg_popcorn,
+    (SELECT mur2.rating_popcorn FROM movie_user_rating mur2 WHERE mur2.movie_id = m.id AND mur2.user_id = ?) AS own_rating
+FROM movie m ...
+```
+
+Recommended fix:
+Refactor to use LEFT JOINs with GROUP BY for aggregate calculations,
+or add composite indexes on (movie_id, rating_popcorn) and (movie_id, user_id).
+
+--------------------------------------------------------------------------------
+
+### PERF-002: Missing Index on movie_user_rating
+Severity: MEDIUM
+
+Affected files:
+- db/migrations/mysql/20251214000000_AddWatchedDateAndLocationToMovieUserRating.php
+
+Description:
+The movie_user_rating table has a composite primary key (movie_id, user_id)
+but queries often filter by movie_id alone or aggregate by movie_id.
+
+Recommended fix:
+Add an index on movie_id alone for faster lookups:
+```sql
+CREATE INDEX idx_movie_user_rating_movie_id ON movie_user_rating(movie_id);
+```
+
+--------------------------------------------------------------------------------
+
+### PERF-003: Unbounded Query in getMovieIndividualRatings
+Severity: LOW
+
+Affected files:
+- src/Service/GroupMovieService.php:113-136
+
+Description:
+The getMovieIndividualRatings() method returns all ratings without pagination.
+For movies with many ratings, this could be slow.
+
+Recommended fix:
+Add optional pagination parameters or a reasonable LIMIT (e.g., 50 ratings).
+
+--------------------------------------------------------------------------------
+
+### PERF-004: No Caching for Aggregate Stats
+Severity: LOW
+
+Affected files:
+- src/Service/GroupMovieService.php:65-95
+
+Description:
+getMovieGroupStats() recalculates averages on every request. For frequently
+viewed movies, this adds unnecessary database load.
+
+Recommended fix:
+Consider caching aggregate stats with a short TTL (e.g., 5 minutes)
+or using a materialized/denormalized column updated on rating changes.
+
+================================================================================
+## 4. GENERAL IMPROVEMENTS
+================================================================================
+
+### IMP-001: Inconsistent Naming (Movary vs Pathary)
+Severity: MEDIUM
+
+Affected files:
+- composer.json:2 ("name": "leepe/movary")
+- All src/ files use namespace Movary\
+- docs/openapi.json references "Movary" throughout
+- .env.example references movary.org docs
+- Multiple GitHub workflow files
+
+Description:
+The project was forked from Movary and renamed to Pathary, but the internal
+namespace and many references still use "Movary". This causes confusion.
+
+Count: 1654 occurrences of "Movary" across 409 PHP/Twig files.
+
+Recommended fix:
+Either:
+1. Complete the rename to Pathary namespace (large refactor)
+2. Document that internal namespace remains Movary while branding is Pathary
+3. Create a phased migration plan
+
+--------------------------------------------------------------------------------
+
+### IMP-002: Unused CsrfTokenService
+Severity: LOW
+
+Affected files:
+- src/Service/CsrfTokenService.php
+
+Description:
+The CSRF token service is implemented but never used. Either implement
+CSRF protection or remove the unused code.
+
+Recommended fix:
+See SEC-001 for implementation guidance.
+
+--------------------------------------------------------------------------------
+
+### IMP-003: Default Credentials in docker-compose.yml
+Severity: LOW
+
+Affected files:
+- docker-compose.yml:23-25, 37-39
+
+Description:
+Default database credentials are "movary"/"movary" which should be changed
+in production but might be overlooked.
+
+Current defaults:
+```yaml
+DATABASE_MYSQL_USER: "${MYSQL_USER:-movary}"
+DATABASE_MYSQL_PASSWORD: "${MYSQL_PASSWORD:-movary}"
+```
+
+Recommended fix:
+Add a comment warning users to change defaults, or use more obvious
+placeholder values like "CHANGE_ME".
+
+--------------------------------------------------------------------------------
+
+### IMP-004: OpenAPI Spec Outdated
+Severity: LOW
+
+Affected files:
+- docs/openapi.json
+
+Description:
+The OpenAPI spec still references "Movary" and may not include newer endpoints
+like the rating system with watched_date and location fields.
+
+Recommended fix:
+Update OpenAPI spec to reflect current API state and Pathary branding.
+
+--------------------------------------------------------------------------------
+
+### IMP-005: Missing Documentation for New Features
+Severity: LOW
+
+Affected files:
+- docs/ directory
+
+Description:
+Recent features like the popcorn rating system, watched date, and location
+fields are not documented in the user-facing docs.
+
+Recommended fix:
+Add documentation for:
+- Rating scale (1-7 popcorn)
+- Partial date support (year/month/day)
+- Location options (Cinema, At Home, Other)
+
+================================================================================
+## 5. POSITIVE FINDINGS (Security Measures in Place)
+================================================================================
+
++ Security headers implemented in public/index.php:
+  - X-Content-Type-Options: nosniff
+  - X-Frame-Options: SAMEORIGIN
+  - Referrer-Policy: strict-origin-when-cross-origin
+  - Content-Security-Policy (with some inline script allowance)
+  - Permissions-Policy
+
++ Session security:
+  - Session regeneration on login (prevents session fixation)
+  - HttpOnly cookies
+  - Secure flag for HTTPS
+  - SameSite=Lax
+
++ Input validation:
+  - Profile image upload validates MIME type via finfo
+  - Image validation via getimagesize()
+  - Random filename generation for uploads
+  - Path traversal protection via basename()
+
++ SQL injection protection:
+  - Parameterized queries throughout
+  - No raw SQL concatenation with user input
+
++ Password hashing:
+  - Uses proper password_verify() for authentication
+
++ File upload security:
+  - MIME type validation
+  - File size limits
+  - Random filename generation
+  - No user-controlled filenames
+
+================================================================================
+## RECOMMENDATIONS PRIORITY
+================================================================================
+
+HIGH PRIORITY:
+1. Implement CSRF protection (SEC-001)
+
+MEDIUM PRIORITY:
+2. Add index on movie_user_rating.movie_id (PERF-002)
+3. Refactor subqueries to JOINs where possible (PERF-001)
+4. Document Movary/Pathary naming decision (IMP-001)
+
+LOW PRIORITY:
+5. Add pagination to rating lists (PERF-003)
+6. Consider caching for aggregate stats (PERF-004)
+7. Update OpenAPI spec (IMP-004)
+8. Add documentation for new features (IMP-005)
+9. Update default credentials warning (IMP-003)
+
+================================================================================
+## END OF REPORT
+================================================================================

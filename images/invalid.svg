@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="63" height="20" viewBox="0 0 63 20" role="img" aria-label="invalid">
+  <title>invalid</title>
+  <!-- Pill-shaped background with border -->
+  <rect width="63" height="20" rx="10"
+        fill="#333725"
+        stroke="#4D502F"
+        stroke-width="1"/>
+  <!-- Centered text -->
+  <text x="31.5" y="13.4375"
+        text-anchor="middle"
+        font-family="system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans,Helvetica,Arial,sans-serif"
+        font-size="11"
+        font-weight="600"
+        fill="#E4E668">invalid</text>
+</svg>

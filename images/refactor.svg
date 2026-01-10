@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="70" height="20" viewBox="0 0 70 20" role="img" aria-label="refactor">
+  <title>refactor</title>
+  <!-- Pill-shaped background with border -->
+  <rect width="70" height="20" rx="10"
+        fill="#35383D"
+        stroke="#505357"
+        stroke-width="1"/>
+  <!-- Centered text -->
+  <text x="35.0" y="13.4375"
+        text-anchor="middle"
+        font-family="system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans,Helvetica,Arial,sans-serif"
+        font-size="11"
+        font-weight="600"
+        fill="#ECECEC">refactor</text>
+</svg>

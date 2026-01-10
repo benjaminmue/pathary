@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="138" height="20" viewBox="0 0 138 20" role="img" aria-label="status-in-progress">
+  <title>status-in-progress</title>
+  <!-- Pill-shaped background with border -->
+  <rect width="138" height="20" rx="10"
+        fill="#0F233A"
+        stroke="#283D56"
+        stroke-width="1"/>
+  <!-- Centered text -->
+  <text x="69.0" y="13.4375"
+        text-anchor="middle"
+        font-family="system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans,Helvetica,Arial,sans-serif"
+        font-size="11"
+        font-weight="600"
+        fill="#69A6EB">status-in-progress</text>
+</svg>

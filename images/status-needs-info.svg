@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="131" height="20" viewBox="0 0 131 20" role="img" aria-label="status-needs-info">
+  <title>status-needs-info</title>
+  <!-- Pill-shaped background with border -->
+  <rect width="131" height="20" rx="10"
+        fill="#31233B"
+        stroke="#4A3254"
+        stroke-width="1"/>
+  <!-- Centered text -->
+  <text x="65.5" y="13.4375"
+        text-anchor="middle"
+        font-family="system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans,Helvetica,Arial,sans-serif"
+        font-size="11"
+        font-weight="600"
+        fill="#DA80E5">status-needs-info</text>
+</svg>

@@ -1,0 +1,95 @@
+# Route Smoke Test Checklist
+# Run these curl commands to verify all routes work correctly.
+# Replace localhost:8080 with your actual host:port.
+
+# =============================================================================
+# PUBLIC ROUTES (No authentication required)
+# =============================================================================
+
+# Home page - should return 200 with HTML
+curl -i http://localhost:8080/
+
+# Login page - should return 200 with login form
+curl -i http://localhost:8080/login
+
+# Movie detail - should return 200 (use a valid movie ID)
+curl -i http://localhost:8080/movie/1
+
+# Profile images - should return 200 or 404 depending on file
+curl -i http://localhost:8080/profile-images/test.jpg
+
+# =============================================================================
+# AUTHENTICATED ROUTES (Should redirect to /login or return 401/403)
+# =============================================================================
+
+# Search - should redirect to login when not authenticated
+curl -i http://localhost:8080/search?q=test
+
+# All movies list - should redirect to login
+curl -i http://localhost:8080/movies
+
+# Profile - should redirect to login
+curl -i http://localhost:8080/profile
+
+# TMDB movie detail - should redirect to login
+curl -i http://localhost:8080/tmdb/movie/550
+
+# =============================================================================
+# AUTHENTICATED SESSION TEST
+# =============================================================================
+
+# 1. Login and capture cookies
+curl -i -c cookies.txt -X POST http://localhost:8080/api/authentication/token \
+  -H "Content-Type: application/json" \
+  -d '{"email":"your@email.com","password":"yourpassword"}'
+
+# 2. Test protected routes with cookie
+curl -i -b cookies.txt http://localhost:8080/search?q=test
+curl -i -b cookies.txt http://localhost:8080/movies
+curl -i -b cookies.txt http://localhost:8080/profile
+
+# 3. Logout
+curl -i -b cookies.txt -X DELETE http://localhost:8080/api/authentication/token
+
+# =============================================================================
+# EXPECTED STATUS CODES
+# =============================================================================
+#
+# Route                          | Unauth | Auth
+# -------------------------------|--------|------
+# GET /                          | 200    | 200
+# GET /login                     | 200    | 302 (redirect to user page)
+# GET /movie/{id}                | 200    | 200
+# GET /search                    | 302    | 200
+# GET /movies                    | 302    | 200
+# GET /profile                   | 302    | 200
+# GET /tmdb/movie/{tmdbId}       | 302    | 200
+# POST /movie/{id}/rate          | 302    | 200/302
+# POST /tmdb/movie/{tmdbId}/add  | 302    | 200/302
+# POST /profile                  | 302    | 302
+# DELETE /api/authentication/token | 200  | 200
+#
+# Note: 302 redirects go to /login for unauthenticated users.
+# The /login page redirects authenticated users to their profile.
+
+# =============================================================================
+# ROUTE TABLE
+# =============================================================================
+#
+# Method | Path                        | Controller                      | Auth
+# -------|-----------------------------|---------------------------------|-----
+# GET    | /                           | PublicHomeController::index     | No
+# GET    | /login                      | AuthenticationController::renderLoginPage | No*
+# GET    | /movie/{id}                 | PublicMovieController::detail   | No
+# POST   | /movie/{id}/rate            | RateMovieController::rate       | Yes
+# GET    | /search                     | SearchController::search        | Yes
+# GET    | /movies                     | AllMoviesController::index      | Yes
+# GET    | /profile                    | ProfileController::show         | Yes
+# POST   | /profile                    | ProfileController::update       | Yes
+# GET    | /profile-images/{filename}  | ProfileController::serveImage   | No
+# GET    | /tmdb/movie/{tmdbId}        | TmdbMovieController::detail     | Yes
+# POST   | /tmdb/movie/{tmdbId}/add    | TmdbMovieController::add        | Yes
+# DELETE | /api/authentication/token   | Api\AuthenticationController::destroyToken | No
+# POST   | /api/authentication/token   | Api\AuthenticationController::createToken  | No
+#
+# * /login has UserIsUnauthenticated middleware - redirects logged-in users

@@ -1,0 +1,4041 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Pathary Documentation (fork of Movary)">
+      
+      
+      
+      
+        <link rel="prev" href="../security/password-policy-and-security/">
+      
+      
+        <link rel="next" href="../operations/logging-and-troubleshooting/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>OAuth Email Setup - Pathary Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#oauth-email-setup-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Pathary Documentation" class="md-header__button md-logo" aria-label="Pathary Documentation" data-md-component="logo">
+      
+  <img src="../images/favicon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Pathary Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              OAuth Email Setup
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/benjaminmue/pathary/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Pathary Documentation" class="md-nav__button md-logo" aria-label="Pathary Documentation" data-md-component="logo">
+      
+  <img src="../images/favicon.png" alt="logo">
+
+    </a>
+    Pathary Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/benjaminmue/pathary/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Installation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker (recommended)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/manual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../initial-user-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initial User Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Features
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Features
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/movies-and-tmdb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Movies and TMDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/ratings-and-comments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ratings and Comments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/tmdb-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TMDB Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/imdb-rating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IMDb Rating
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/locations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Locations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_6" id="__nav_7_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/plex/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plex
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/jellyfin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jellyfin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/emby/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emby
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/kodi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kodi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/letterboxd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Letterboxd
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/trakt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trakt TV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/netflix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Netflix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/radarr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Radarr
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/routing-and-controllers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Routing and Controllers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/frontend-and-ui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend and UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/authentication-and-sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication and Sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/two-factor-authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Two-Factor Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/password-policy-and-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Password Policy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OAuth Email Setup
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OAuth Email Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-enable-https-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Enable HTTPS (Production)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-set-application_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Set APPLICATION_URL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-generate-encryption-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Generate Encryption Key
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gmail-oauth-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gmail OAuth Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gmail OAuth Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-create-google-cloud-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Create Google Cloud Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-enable-gmail-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Enable Gmail API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-configure-oauth-consent-screen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Configure OAuth Consent Screen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-create-oauth-20-client-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Create OAuth 2.0 Client ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-configure-in-pathary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: Configure in Pathary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-authorize-gmail-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: Authorize Gmail Account
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-verify-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7: Verify Connection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#microsoft-365-oauth-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Microsoft 365 OAuth Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Microsoft 365 OAuth Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-register-app-in-azure-portal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Register App in Azure Portal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-create-client-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Create Client Secret
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-add-api-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Add API Permissions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Add API Permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#add-office-365-exchange-online-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add Office 365 Exchange Online Permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add-microsoft-graph-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add Microsoft Graph Permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grant-admin-consent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grant Admin Consent
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-enable-smtp-auth-critical" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Enable SMTP AUTH (Critical!)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 4: Enable SMTP AUTH (Critical!)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#check-tenant-level-smtp-auth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Tenant-Level SMTP AUTH
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-mailbox-level-smtp-auth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Mailbox-Level SMTP AUTH
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-authentication-policy-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Authentication Policy (Alternative)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-optional-register-service-principal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: (Optional) Register Service Principal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-configure-in-pathary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: Configure in Pathary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-authorize-microsoft-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7: Authorize Microsoft Account
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-8-verify-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8: Verify Connection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pathary-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pathary Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pathary Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#access-oauth-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Access OAuth Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#switch-between-password-and-oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switch Between Password and OAuth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#send-test-email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Send Test Email
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-token-refresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Token Refresh
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gmail-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gmail Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gmail Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-redirect_uri_mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "redirect_uri_mismatch"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-invalid_scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "invalid_scope"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-access-blocked-this-apps-request-is-invalid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "Access blocked: This app's request is invalid"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-refresh-token-received" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No refresh token received
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#microsoft-365-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Microsoft 365 Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Microsoft 365 Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-535-573-authentication-unsuccessful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "535 5.7.3 Authentication unsuccessful"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-aadsts50011-redirect-uri-mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "AADSTS50011: redirect uri mismatch"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-aadsts65001-the-user-or-administrator-has-not-consented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "AADSTS65001: The user or administrator has not consented"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-aadsts7000218-the-request-body-must-contain-the-following-parameter-client_assertion-or-client_secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "AADSTS7000218: The request body must contain the following parameter: 'client_assertion' or 'client_secret'"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-invalid_grant-or-token-has-been-revoked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "invalid_grant" or "Token has been revoked"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cant-find-office-365-exchange-online-in-api-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Can't find "Office 365 Exchange Online" in API permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#general-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-oauth-configuration-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "OAuth configuration not found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-encryption_key-not-configured" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "ENCRYPTION_KEY not configured"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connection-shows-connected-but-emails-fail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connection shows "Connected" but emails fail
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#token-status-shows-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token Status shows "Error"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#smtp-connect-failed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SMTP connect() failed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#client-secret-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Secret Rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#revoking-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revoking Access
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encryption-key-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encryption Key Rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audit Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Help
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operations/logging-and-troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging and Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migrations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migrations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/file-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directory Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/database-migrations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Migrations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../issue-labels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Issue Labels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-enable-https-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Enable HTTPS (Production)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-set-application_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Set APPLICATION_URL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-generate-encryption-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Generate Encryption Key
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gmail-oauth-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gmail OAuth Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gmail OAuth Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-create-google-cloud-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Create Google Cloud Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-enable-gmail-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Enable Gmail API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-configure-oauth-consent-screen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Configure OAuth Consent Screen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-create-oauth-20-client-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Create OAuth 2.0 Client ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-configure-in-pathary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: Configure in Pathary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-authorize-gmail-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: Authorize Gmail Account
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-verify-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7: Verify Connection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#microsoft-365-oauth-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Microsoft 365 OAuth Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Microsoft 365 OAuth Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-register-app-in-azure-portal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Register App in Azure Portal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-create-client-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Create Client Secret
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-add-api-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Add API Permissions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Add API Permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#add-office-365-exchange-online-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add Office 365 Exchange Online Permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add-microsoft-graph-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add Microsoft Graph Permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grant-admin-consent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grant Admin Consent
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-enable-smtp-auth-critical" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Enable SMTP AUTH (Critical!)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 4: Enable SMTP AUTH (Critical!)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#check-tenant-level-smtp-auth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Tenant-Level SMTP AUTH
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-mailbox-level-smtp-auth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Mailbox-Level SMTP AUTH
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-authentication-policy-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Authentication Policy (Alternative)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-optional-register-service-principal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: (Optional) Register Service Principal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-configure-in-pathary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: Configure in Pathary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-authorize-microsoft-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7: Authorize Microsoft Account
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-8-verify-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8: Verify Connection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pathary-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pathary Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pathary Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#access-oauth-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Access OAuth Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#switch-between-password-and-oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switch Between Password and OAuth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#send-test-email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Send Test Email
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-token-refresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Token Refresh
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gmail-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gmail Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gmail Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-redirect_uri_mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "redirect_uri_mismatch"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-invalid_scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "invalid_scope"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-access-blocked-this-apps-request-is-invalid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "Access blocked: This app's request is invalid"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-refresh-token-received" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No refresh token received
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#microsoft-365-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Microsoft 365 Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Microsoft 365 Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-535-573-authentication-unsuccessful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "535 5.7.3 Authentication unsuccessful"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-aadsts50011-redirect-uri-mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "AADSTS50011: redirect uri mismatch"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-aadsts65001-the-user-or-administrator-has-not-consented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "AADSTS65001: The user or administrator has not consented"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-aadsts7000218-the-request-body-must-contain-the-following-parameter-client_assertion-or-client_secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "AADSTS7000218: The request body must contain the following parameter: 'client_assertion' or 'client_secret'"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-invalid_grant-or-token-has-been-revoked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "invalid_grant" or "Token has been revoked"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cant-find-office-365-exchange-online-in-api-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Can't find "Office 365 Exchange Online" in API permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#general-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-oauth-configuration-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "OAuth configuration not found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-encryption_key-not-configured" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error: "ENCRYPTION_KEY not configured"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connection-shows-connected-but-emails-fail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connection shows "Connected" but emails fail
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#token-status-shows-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token Status shows "Error"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#smtp-connect-failed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SMTP connect() failed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#client-secret-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Secret Rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#revoking-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revoking Access
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encryption-key-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encryption Key Rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audit Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Help
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/benjaminmue/pathary/edit/main/docs/oauth-email-setup.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/benjaminmue/pathary/raw/main/docs/oauth-email-setup.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="oauth-email-setup-guide">OAuth Email Setup Guide</h1>
+<p>This guide explains how to configure OAuth 2.0 authentication for sending emails from Pathary using Gmail or Microsoft 365.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#gmail-oauth-setup">Gmail OAuth Setup</a></li>
+<li><a href="#microsoft-365-oauth-setup">Microsoft 365 OAuth Setup</a></li>
+<li><a href="#pathary-configuration">Pathary Configuration</a></li>
+<li><a href="#testing">Testing</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>OAuth 2.0 email authentication provides enhanced security over traditional SMTP password authentication:</p>
+<ul>
+<li><strong>No passwords stored</strong> - Uses OAuth access tokens instead of passwords</li>
+<li><strong>Granular permissions</strong> - Only grants email sending permissions</li>
+<li><strong>Automatic token refresh</strong> - Tokens refresh automatically without re-authorization</li>
+<li><strong>Revocable access</strong> - Can revoke access from provider without changing password</li>
+</ul>
+<p><strong>Supported Providers:</strong>
+- <strong>Gmail</strong> - Personal Gmail or Google Workspace accounts
+- <strong>Microsoft 365</strong> - Microsoft 365 / Outlook.com accounts</p>
+<hr />
+<h2 id="prerequisites">Prerequisites</h2>
+<h3 id="1-enable-https-production">1. Enable HTTPS (Production)</h3>
+<p>OAuth providers require HTTPS for redirect URIs (except localhost). Configure your reverse proxy (Nginx, Caddy, Traefik) with SSL/TLS certificates.</p>
+<p>Example Nginx configuration:
+<div class="highlight"><pre><span></span><code><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">443</span><span class="w"> </span><span class="s">ssl</span><span class="w"> </span><span class="s">http2</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">pathary.example.com</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kn">ssl_certificate</span><span class="w"> </span><span class="s">/path/to/cert.pem</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">ssl_certificate_key</span><span class="w"> </span><span class="s">/path/to/key.pem</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://localhost:80</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">X-Real-IP</span><span class="w"> </span><span class="nv">$remote_addr</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">X-Forwarded-For</span><span class="w"> </span><span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+<span class="w">        </span><span class="kn">proxy_set_header</span><span class="w"> </span><span class="s">X-Forwarded-Proto</span><span class="w"> </span><span class="nv">$scheme</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h3 id="2-set-application_url">2. Set APPLICATION_URL</h3>
+<p>Set the <code>APPLICATION_URL</code> environment variable to match your public URL:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># .env or .env.local</span>
+<span class="nv">APPLICATION_URL</span><span class="o">=</span>https://pathary.example.com
+</code></pre></div>
+<p>For local development:
+<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_URL</span><span class="o">=</span>http://localhost
+</code></pre></div></p>
+<h3 id="3-generate-encryption-key">3. Generate Encryption Key</h3>
+<p>Generate a strong encryption key for storing OAuth secrets:</p>
+<div class="highlight"><pre><span></span><code>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span>
+</code></pre></div>
+<p>Set as environment variable:
+<div class="highlight"><pre><span></span><code><span class="nv">ENCRYPTION_KEY</span><span class="o">=</span>your_generated_64_character_hex_string
+</code></pre></div></p>
+<p>Or generate via Pathary UI: Admin → Server Management → Email Settings → OAuth tab → "Generate Encryption Key"</p>
+<hr />
+<h2 id="gmail-oauth-setup">Gmail OAuth Setup</h2>
+<h3 id="step-1-create-google-cloud-project">Step 1: Create Google Cloud Project</h3>
+<ol>
+<li>Go to <a href="https://console.cloud.google.com/">Google Cloud Console</a></li>
+<li>Click <strong>Select a project</strong> → <strong>New Project</strong></li>
+<li><strong>Project name</strong>: <code>Pathary Email OAuth</code> (or any name you prefer)</li>
+<li><strong>Organization</strong>: Select your organization (if applicable)</li>
+<li>Click <strong>Create</strong></li>
+</ol>
+<h3 id="step-2-enable-gmail-api">Step 2: Enable Gmail API</h3>
+<ol>
+<li>In your project, go to <strong>APIs &amp; Services</strong> → <strong>Library</strong></li>
+<li>Search for <strong>Gmail API</strong></li>
+<li>Click on it and click <strong>Enable</strong></li>
+<li>Wait for activation to complete</li>
+</ol>
+<h3 id="step-3-configure-oauth-consent-screen">Step 3: Configure OAuth Consent Screen</h3>
+<ol>
+<li>Go to <strong>APIs &amp; Services</strong> → <strong>OAuth consent screen</strong></li>
+<li><strong>User Type</strong>:</li>
+<li><strong>Internal</strong> (for Google Workspace - only users in your organization)</li>
+<li><strong>External</strong> (for personal Gmail - available to any Google account)</li>
+<li>Click <strong>Create</strong></li>
+</ol>
+<p><strong>Fill in the form:</strong>
+- <strong>App name</strong>: <code>Pathary</code>
+- <strong>User support email</strong>: Your email address
+- <strong>App logo</strong>: (Optional) Upload Pathary logo
+- <strong>Application home page</strong>: Your Pathary URL (e.g., <code>https://pathary.example.com</code>)
+- <strong>Authorized domains</strong>: Your domain (e.g., <code>example.com</code>)
+- <strong>Developer contact information</strong>: Your email address</p>
+<ol>
+<li>Click <strong>Save and Continue</strong></li>
+<li><strong>Scopes</strong>: Skip this step (we'll use Gmail API scope, not Graph scopes)</li>
+<li>Click <strong>Save and Continue</strong></li>
+<li><strong>Test users</strong> (if External): Add email addresses that can use OAuth during testing</li>
+<li>Click <strong>Save and Continue</strong></li>
+<li>Review summary and click <strong>Back to Dashboard</strong></li>
+</ol>
+<h3 id="step-4-create-oauth-20-client-id">Step 4: Create OAuth 2.0 Client ID</h3>
+<ol>
+<li>Go to <strong>APIs &amp; Services</strong> → <strong>Credentials</strong></li>
+<li>Click <strong>Create Credentials</strong> → <strong>OAuth client ID</strong></li>
+<li><strong>Application type</strong>: Select <strong>Web application</strong></li>
+<li><strong>Name</strong>: <code>Pathary Email Client</code> (or any name you prefer)</li>
+</ol>
+<p><strong>Configure Authorized Redirect URIs:</strong>
+5. Under <strong>Authorized redirect URIs</strong>, click <strong>Add URI</strong>
+6. Enter your OAuth callback URL:
+   - Format: <code>{APPLICATION_URL}/admin/server/email/oauth/callback</code>
+   - Example production: <code>https://pathary.example.com/admin/server/email/oauth/callback</code>
+   - Example local: <code>http://localhost/admin/server/email/oauth/callback</code></p>
+<ol>
+<li>Click <strong>Create</strong></li>
+</ol>
+<p><strong>Save Credentials:</strong>
+8. A popup shows your <strong>Client ID</strong> and <strong>Client Secret</strong>
+9. <strong>Copy both values</strong> - you'll need them for Pathary configuration
+10. Click <strong>OK</strong></p>
+<h3 id="step-5-configure-in-pathary">Step 5: Configure in Pathary</h3>
+<ol>
+<li>Go to Admin → Server Management → Email Settings → <strong>OAuth</strong> tab</li>
+<li><strong>Email Provider</strong>: Select <strong>Gmail</strong></li>
+<li><strong>Client ID</strong>: Paste the Client ID from step 8</li>
+<li><strong>Client Secret</strong>: Paste the Client Secret from step 8</li>
+<li><strong>From Address</strong>: Enter your Gmail address (e.g., <code>noreply@example.com</code>)</li>
+<li>Click <strong>Save OAuth Settings</strong></li>
+</ol>
+<h3 id="step-6-authorize-gmail-account">Step 6: Authorize Gmail Account</h3>
+<ol>
+<li>Click <strong>Connect</strong> button</li>
+<li>You'll be redirected to Google sign-in</li>
+<li>Sign in with your Gmail account</li>
+<li><strong>Grant permissions</strong>: Review and click <strong>Allow</strong></li>
+<li>You should see: "Pathary wants to access your Google Account"</li>
+<li>Permission: "Read, compose, send, and permanently delete all your email from Gmail"</li>
+<li>You'll be redirected back to Pathary</li>
+<li>You should see "OAuth authorization successful!"</li>
+</ol>
+<h3 id="step-7-verify-connection">Step 7: Verify Connection</h3>
+<ol>
+<li>Check <strong>Connection Status</strong> shows "Connected" with green checkmark</li>
+<li><strong>Token Status</strong> should show "Active"</li>
+<li>Click <strong>Send Test Email</strong> to verify</li>
+</ol>
+<hr />
+<h2 id="microsoft-365-oauth-setup">Microsoft 365 OAuth Setup</h2>
+<h3 id="step-1-register-app-in-azure-portal">Step 1: Register App in Azure Portal</h3>
+<ol>
+<li>Go to <a href="https://portal.azure.com/">Azure Portal</a></li>
+<li>Navigate to <strong>Azure Active Directory</strong> (or <strong>Microsoft Entra ID</strong>)</li>
+<li>Click <strong>App registrations</strong> in left sidebar</li>
+<li>Click <strong>New registration</strong></li>
+</ol>
+<p><strong>Fill in the form:</strong>
+- <strong>Name</strong>: <code>Pathary Email OAuth</code> (or any name you prefer)
+- <strong>Supported account types</strong>:
+  - <strong>Single tenant</strong> (only your organization) - Recommended
+  - <strong>Multitenant</strong> (any Azure AD directory) - If you have multiple tenants
+  - <strong>Personal accounts</strong> - Include personal Microsoft accounts
+- <strong>Redirect URI</strong>:
+  - Platform: <strong>Web</strong>
+  - URI: Your OAuth callback URL (e.g., <code>https://pathary.example.com/admin/server/email/oauth/callback</code>)</p>
+<ol>
+<li>Click <strong>Register</strong></li>
+</ol>
+<p><strong>Save Application Details:</strong>
+6. On the <strong>Overview</strong> page, note down:
+   - <strong>Application (client) ID</strong> - You'll need this for Pathary
+   - <strong>Directory (tenant) ID</strong> - You'll need this for Pathary</p>
+<h3 id="step-2-create-client-secret">Step 2: Create Client Secret</h3>
+<ol>
+<li>In your app, go to <strong>Certificates &amp; secrets</strong> in left sidebar</li>
+<li>Click <strong>Client secrets</strong> tab</li>
+<li>Click <strong>New client secret</strong></li>
+<li><strong>Description</strong>: <code>Pathary Email OAuth Secret</code></li>
+<li><strong>Expires</strong>: Select expiration period</li>
+<li><strong>Recommended</strong>: 24 months (maximum)</li>
+<li><strong>Important</strong>: You must renew before expiration</li>
+<li>Click <strong>Add</strong></li>
+<li><strong>Copy the secret Value immediately</strong> - it will only be shown once!</li>
+</ol>
+<h3 id="step-3-add-api-permissions">Step 3: Add API Permissions</h3>
+<p>This is the <strong>most critical step</strong> for Microsoft 365 OAuth to work correctly.</p>
+<h4 id="add-office-365-exchange-online-permissions">Add Office 365 Exchange Online Permissions</h4>
+<ol>
+<li>Go to <strong>API permissions</strong> in left sidebar</li>
+<li>Click <strong>Add a permission</strong></li>
+<li>Click <strong>APIs my organization uses</strong> tab</li>
+<li>Search for <strong>Office 365 Exchange Online</strong></li>
+<li>Click on it</li>
+<li>Click <strong>Delegated permissions</strong></li>
+<li>Check <strong>SMTP.Send</strong></li>
+<li>Click <strong>Add permissions</strong></li>
+</ol>
+<h4 id="add-microsoft-graph-permissions">Add Microsoft Graph Permissions</h4>
+<ol>
+<li>Click <strong>Add a permission</strong> again</li>
+<li>Click <strong>Microsoft Graph</strong></li>
+<li>Click <strong>Delegated permissions</strong></li>
+<li>Search and check:<ul>
+<li><strong>User.Read</strong></li>
+<li><strong>offline_access</strong></li>
+</ul>
+</li>
+<li>Click <strong>Add permissions</strong></li>
+</ol>
+<h4 id="grant-admin-consent">Grant Admin Consent</h4>
+<ol>
+<li>Click <strong>Grant admin consent for [Your Organization]</strong> button</li>
+<li>Click <strong>Yes</strong> to confirm</li>
+<li>Wait for status to update - all permissions should show green checkmarks under "Status"</li>
+</ol>
+<p><strong>Expected permissions list:</strong>
+<div class="highlight"><pre><span></span><code>API / Permissions name          Type           Status
+──────────────────────────────────────────────────────
+Microsoft Graph
+  offline_access                Delegated      ✓ Granted
+  User.Read                     Delegated      ✓ Granted
+
+Office 365 Exchange Online
+  SMTP.Send                     Delegated      ✓ Granted
+</code></pre></div></p>
+<h3 id="step-4-enable-smtp-auth-critical">Step 4: Enable SMTP AUTH (Critical!)</h3>
+<p>Microsoft 365 requires SMTP AUTH to be enabled at both tenant and mailbox levels.</p>
+<h4 id="check-tenant-level-smtp-auth">Check Tenant-Level SMTP AUTH</h4>
+<p>Connect to Exchange Online PowerShell:
+<div class="highlight"><pre><span></span><code><span class="nb">Install-Module</span> <span class="n">-Name</span> <span class="n">ExchangeOnlineManagement</span>
+<span class="nb">Connect-ExchangeOnline</span> <span class="n">-UserPrincipalName</span> <span class="n">admin</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span>
+</code></pre></div></p>
+<p>Check if SMTP AUTH is enabled:
+<div class="highlight"><pre><span></span><code><span class="nb">Get-OrganizationConfig</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
+</code></pre></div></p>
+<p>If <code>SmtpClientAuthenticationDisabled</code> is <code>True</code>, enable it:
+<div class="highlight"><pre><span></span><code><span class="nb">Set-OrganizationConfig</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
+</code></pre></div></p>
+<h4 id="check-mailbox-level-smtp-auth">Check Mailbox-Level SMTP AUTH</h4>
+<p>Check specific mailbox:
+<div class="highlight"><pre><span></span><code><span class="nb">Get-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
+</code></pre></div></p>
+<p>If disabled, enable it:
+<div class="highlight"><pre><span></span><code><span class="nb">Set-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
+</code></pre></div></p>
+<h4 id="create-authentication-policy-alternative">Create Authentication Policy (Alternative)</h4>
+<p>If you want to enable SMTP AUTH only for specific mailboxes:</p>
+<div class="highlight"><pre><span></span><code><span class="c"># Create policy</span>
+<span class="nb">New-AuthenticationPolicy</span> <span class="n">-Name</span> <span class="s2">&quot;Allow SMTP AUTH&quot;</span> <span class="n">-AllowBasicAuthSmtp</span>
+
+<span class="c"># Assign to mailbox</span>
+<span class="nb">Set-User</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="n">-AuthenticationPolicy</span> <span class="s2">&quot;Allow SMTP AUTH&quot;</span>
+</code></pre></div>
+<h3 id="step-5-optional-register-service-principal">Step 5: (Optional) Register Service Principal</h3>
+<p>For enhanced permissions (SendAs), register the app as a service principal:</p>
+<div class="highlight"><pre><span></span><code><span class="c"># Get app details from Azure Portal Overview page</span>
+<span class="nv">$appId</span> <span class="p">=</span> <span class="s2">&quot;f2da336d-56cd-4e18-b426-b4567b0ca98c&quot;</span>  <span class="c"># Application (client) ID</span>
+<span class="nv">$objectId</span> <span class="p">=</span> <span class="s2">&quot;bdb51601-5178-4fb3-b4ad-f1e79fef5016&quot;</span>  <span class="c"># Object ID</span>
+
+<span class="c"># Register service principal</span>
+<span class="nb">New-ServicePrincipal</span> <span class="n">-AppId</span> <span class="nv">$appId</span> <span class="n">-ServiceId</span> <span class="nv">$objectId</span>
+
+<span class="c"># Grant SendAs permission</span>
+<span class="nb">Add-RecipientPermission</span> <span class="n">-Identity</span> <span class="s1">&#39;mail@yourdomain.com&#39;</span> <span class="n">-Trustee</span> <span class="nv">$objectId</span> <span class="n">-AccessRights</span> <span class="n">SendAs</span>
+</code></pre></div>
+<h3 id="step-6-configure-in-pathary">Step 6: Configure in Pathary</h3>
+<ol>
+<li>Go to Admin → Server Management → Email Settings → <strong>OAuth</strong> tab</li>
+<li><strong>Email Provider</strong>: Select <strong>Microsoft 365 / Outlook</strong></li>
+<li><strong>Client ID</strong>: Paste the Application (client) ID from Azure</li>
+<li><strong>Client Secret</strong>: Paste the secret Value from step 2</li>
+<li><strong>Tenant ID</strong>: Paste the Directory (tenant) ID from Azure</li>
+<li><strong>Authentication Mailbox</strong>: Enter your Microsoft 365 email (e.g., <code>mail@yourdomain.com</code>)</li>
+<li><strong>Email From Address</strong>: (Optional) Different from address (e.g., <code>noreply@yourdomain.com</code>)</li>
+<li>Click <strong>Save OAuth Settings</strong></li>
+</ol>
+<h3 id="step-7-authorize-microsoft-account">Step 7: Authorize Microsoft Account</h3>
+<ol>
+<li>Click <strong>Connect</strong> button</li>
+<li>You'll be redirected to Microsoft sign-in</li>
+<li>Sign in with your Microsoft 365 account</li>
+<li><strong>Grant permissions</strong>: Review and click <strong>Accept</strong></li>
+<li>You should see: "Pathary wants to access your account"</li>
+<li>Permissions requested:<ul>
+<li>Send mail as you</li>
+<li>Maintain access to data you have given it access to</li>
+<li>Sign you in and read your profile</li>
+</ul>
+</li>
+<li>You'll be redirected back to Pathary</li>
+<li>You should see "OAuth authorization successful!"</li>
+</ol>
+<h3 id="step-8-verify-connection">Step 8: Verify Connection</h3>
+<ol>
+<li>Check <strong>Connection Status</strong> shows "Connected" with green checkmark</li>
+<li><strong>Token Status</strong> should show "Active"</li>
+<li><strong>Granted Scopes</strong> should include:</li>
+<li><code>SMTP.Send</code></li>
+<li><code>User.Read</code></li>
+<li><code>offline_access</code></li>
+<li>Click <strong>Send Test Email</strong> to verify</li>
+</ol>
+<hr />
+<h2 id="pathary-configuration">Pathary Configuration</h2>
+<h3 id="access-oauth-settings">Access OAuth Settings</h3>
+<ol>
+<li>Log in to Pathary as admin</li>
+<li>Go to <strong>Admin</strong> → <strong>Server Management</strong></li>
+<li>Click <strong>Email Settings</strong> section</li>
+<li>Click <strong>OAuth</strong> tab</li>
+</ol>
+<h3 id="configuration-fields">Configuration Fields</h3>
+<p><strong>Email Provider:</strong>
+- Select <code>Gmail</code> or <code>Microsoft 365 / Outlook</code>
+- Shows provider-specific setup instructions when selected</p>
+<p><strong>Client ID:</strong>
+- Gmail: From Google Cloud Console → Credentials
+- Microsoft: Application (client) ID from Azure Portal</p>
+<p><strong>Client Secret:</strong>
+- Gmail: From Google Cloud Console → Credentials
+- Microsoft: Secret Value from Azure Portal (Certificates &amp; secrets)</p>
+<p><strong>Tenant ID</strong> (Microsoft 365 only):
+- Directory (tenant) ID from Azure Portal
+- Leave blank for multi-tenant apps (uses <code>common</code>)</p>
+<p><strong>Authentication Mailbox:</strong>
+- The email account used for OAuth authorization
+- Gmail: Your Gmail address (e.g., <code>you@gmail.com</code>)
+- Microsoft: Your Microsoft 365 address (e.g., <code>mail@yourdomain.com</code>)</p>
+<p><strong>Email From Address</strong> (Optional):
+- Different email shown as sender
+- Must be an alias or have SendAs permissions
+- Leave blank to use Authentication Mailbox as From address</p>
+<p><strong>Secret Expiry Reminder</strong> (Optional):
+- Set reminder for client secret expiration (Microsoft 365)
+- Recommended: Set to 23 months if secret expires in 24 months
+- Pathary will show warning when expiry approaches</p>
+<h3 id="switch-between-password-and-oauth">Switch Between Password and OAuth</h3>
+<p><strong>Switch to OAuth:</strong>
+1. Configure OAuth settings in OAuth tab
+2. Click <strong>Connect</strong> to authorize
+3. Click <strong>Switch to OAuth Mode</strong> button
+4. All emails will now use OAuth authentication</p>
+<p><strong>Switch to Password:</strong>
+1. Go to <strong>Password</strong> tab
+2. Configure SMTP settings (host, port, username, password)
+3. Click <strong>Save SMTP Settings</strong>
+4. Click <strong>Switch to Password Mode</strong> button
+5. All emails will now use password authentication</p>
+<p><strong>Note</strong>: OAuth configuration is preserved when switching modes.</p>
+<hr />
+<h2 id="testing">Testing</h2>
+<h3 id="send-test-email">Send Test Email</h3>
+<ol>
+<li>Go to Admin → Server Management → Email Settings</li>
+<li>Click <strong>Send Test Email</strong> button</li>
+<li>Check your inbox for test email</li>
+<li>Email subject: "Test Email from Pathary"</li>
+<li>Email body: "This is a test email sent to check the currently set email settings."</li>
+</ol>
+<h3 id="verify-token-refresh">Verify Token Refresh</h3>
+<p>OAuth tokens expire after 1 hour. Pathary automatically refreshes them using the refresh token.</p>
+<p><strong>Monitor token refresh:</strong>
+1. Check <strong>Last Token Refresh</strong> timestamp in OAuth tab
+2. Send test email after 1 hour
+3. Token should refresh automatically
+4. <strong>Token Status</strong> should remain "Active"</p>
+<h3 id="check-logs">Check Logs</h3>
+<p>If email sending fails, check logs:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Docker logs</span>
+docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>app
+
+<span class="c1"># Look for errors containing:</span>
+<span class="c1"># - &quot;OAuth&quot;</span>
+<span class="c1"># - &quot;SMTP&quot;</span>
+<span class="c1"># - &quot;Failed to refresh&quot;</span>
+<span class="c1"># - &quot;Authentication unsuccessful&quot;</span>
+</code></pre></div>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="gmail-issues">Gmail Issues</h3>
+<h4 id="error-redirect_uri_mismatch">Error: "redirect_uri_mismatch"</h4>
+<p><strong>Cause</strong>: Redirect URI in Pathary doesn't match Google Cloud Console configuration.</p>
+<p><strong>Fix:</strong>
+1. Check <code>APPLICATION_URL</code> environment variable matches your domain
+2. Go to Google Cloud Console → Credentials → Your OAuth Client
+3. Verify <strong>Authorized redirect URIs</strong> contains exact URL:
+   - <code>{APPLICATION_URL}/admin/server/email/oauth/callback</code>
+4. Update if needed and try again</p>
+<h4 id="error-invalid_scope">Error: "invalid_scope"</h4>
+<p><strong>Cause</strong>: Gmail API not enabled in Google Cloud project.</p>
+<p><strong>Fix:</strong>
+1. Go to Google Cloud Console → APIs &amp; Services → Library
+2. Search for "Gmail API"
+3. Click <strong>Enable</strong>
+4. Wait a few minutes and try again</p>
+<h4 id="error-access-blocked-this-apps-request-is-invalid">Error: "Access blocked: This app's request is invalid"</h4>
+<p><strong>Cause</strong>: OAuth consent screen not configured or missing required fields.</p>
+<p><strong>Fix:</strong>
+1. Go to Google Cloud Console → APIs &amp; Services → OAuth consent screen
+2. Ensure all required fields are filled:
+   - App name
+   - User support email
+   - Developer contact information
+3. Click <strong>Save and Continue</strong></p>
+<h4 id="no-refresh-token-received">No refresh token received</h4>
+<p><strong>Cause</strong>: OAuth consent screen not showing or user previously authorized.</p>
+<p><strong>Fix:</strong>
+1. Revoke access: https://myaccount.google.com/permissions
+2. Find "Pathary" and click <strong>Remove access</strong>
+3. Reconnect OAuth in Pathary
+4. You should see consent screen asking for permissions</p>
+<hr />
+<h3 id="microsoft-365-issues">Microsoft 365 Issues</h3>
+<h4 id="error-535-573-authentication-unsuccessful">Error: "535 5.7.3 Authentication unsuccessful"</h4>
+<p>This is the <strong>most common</strong> Microsoft 365 OAuth error. Several possible causes:</p>
+<p><strong>Cause 1: Wrong token audience</strong></p>
+<p>The token is requested for Azure AD Graph instead of Exchange Online.</p>
+<p><strong>Fix:</strong>
+Verify code uses correct configuration (already fixed in Pathary):
+<div class="highlight"><pre><span></span><code><span class="x">// OAuthTokenService.php and EmailService.php</span>
+<span class="x">&#39;defaultEndPointVersion&#39; =&gt; Azure::ENDPOINT_VERSION_2_0,</span>
+<span class="x">&#39;urlAPI&#39; =&gt; &#39;https://outlook.office365.com/&#39;,</span>
+<span class="x">&#39;resource&#39; =&gt; &#39;https://outlook.office365.com/&#39;,</span>
+</code></pre></div></p>
+<p><strong>Cause 2: Missing SMTP.Send scope</strong></p>
+<p>The app doesn't have Exchange Online SMTP.Send permission.</p>
+<p><strong>Fix:</strong>
+1. Go to Azure Portal → App registrations → Your app → API permissions
+2. Verify <strong>Office 365 Exchange Online</strong> → <strong>SMTP.Send</strong> exists and is granted
+3. If missing, add it:
+   - Click <strong>Add a permission</strong>
+   - Click <strong>APIs my organization uses</strong> tab
+   - Search for <strong>Office 365 Exchange Online</strong>
+   - Select <strong>Delegated permissions</strong> → Check <strong>SMTP.Send</strong>
+   - Click <strong>Add permissions</strong>
+4. Click <strong>Grant admin consent for [Organization]</strong>
+5. <strong>Disconnect and reconnect</strong> OAuth in Pathary</p>
+<p><strong>Verify granted scopes in database:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">granted_scopes</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">oauth_email_config</span><span class="p">;</span>
+</code></pre></div>
+Should include: <code>SMTP.Send User.Read offline_access</code></p>
+<p><strong>Cause 3: SMTP AUTH disabled</strong></p>
+<p>SMTP protocol is disabled at tenant or mailbox level.</p>
+<p><strong>Fix:</strong>
+<div class="highlight"><pre><span></span><code><span class="c"># Connect to Exchange Online</span>
+<span class="nb">Connect-ExchangeOnline</span>
+
+<span class="c"># Check tenant level</span>
+<span class="nb">Get-OrganizationConfig</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
+
+<span class="c"># Enable if needed</span>
+<span class="nb">Set-OrganizationConfig</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
+
+<span class="c"># Check mailbox level</span>
+<span class="nb">Get-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">SmtpClientAuthenticationDisabled</span>
+
+<span class="c"># Enable if needed</span>
+<span class="nb">Set-CASMailbox</span> <span class="n">-Identity</span> <span class="n">mail</span><span class="nv">@yourdomain</span><span class="p">.</span><span class="n">com</span> <span class="n">-SmtpClientAuthenticationDisabled</span> <span class="nv">$false</span>
+</code></pre></div></p>
+<p><strong>Cause 4: Service principal not registered</strong></p>
+<p>App not registered as service principal in Exchange Online.</p>
+<p><strong>Fix:</strong>
+<div class="highlight"><pre><span></span><code><span class="c"># Get app details from Azure Portal</span>
+<span class="nv">$appId</span> <span class="p">=</span> <span class="s2">&quot;YOUR-APPLICATION-CLIENT-ID&quot;</span>
+<span class="nv">$objectId</span> <span class="p">=</span> <span class="s2">&quot;YOUR-APPLICATION-OBJECT-ID&quot;</span>
+
+<span class="c"># Register service principal</span>
+<span class="nb">New-ServicePrincipal</span> <span class="n">-AppId</span> <span class="nv">$appId</span> <span class="n">-ServiceId</span> <span class="nv">$objectId</span>
+
+<span class="c"># Grant SendAs permission</span>
+<span class="nb">Add-RecipientPermission</span> <span class="n">-Identity</span> <span class="s1">&#39;mail@yourdomain.com&#39;</span> <span class="n">-Trustee</span> <span class="nv">$objectId</span> <span class="n">-AccessRights</span> <span class="n">SendAs</span>
+</code></pre></div></p>
+<h4 id="error-aadsts50011-redirect-uri-mismatch">Error: "AADSTS50011: redirect uri mismatch"</h4>
+<p><strong>Cause</strong>: Redirect URI in Pathary doesn't match Azure app registration.</p>
+<p><strong>Fix:</strong>
+1. Check <code>APPLICATION_URL</code> environment variable
+2. Go to Azure Portal → App registrations → Your app → Authentication
+3. Under <strong>Redirect URIs</strong>, verify exact URL exists:
+   - <code>{APPLICATION_URL}/admin/server/email/oauth/callback</code>
+4. Add if missing and click <strong>Save</strong></p>
+<h4 id="error-aadsts65001-the-user-or-administrator-has-not-consented">Error: "AADSTS65001: The user or administrator has not consented"</h4>
+<p><strong>Cause</strong>: Admin consent not granted for API permissions.</p>
+<p><strong>Fix:</strong>
+1. Go to Azure Portal → App registrations → Your app → API permissions
+2. Click <strong>Grant admin consent for [Your Organization]</strong>
+3. Click <strong>Yes</strong> to confirm
+4. Verify all permissions show green checkmarks under "Status"</p>
+<h4 id="error-aadsts7000218-the-request-body-must-contain-the-following-parameter-client_assertion-or-client_secret">Error: "AADSTS7000218: The request body must contain the following parameter: 'client_assertion' or 'client_secret'"</h4>
+<p><strong>Cause</strong>: Client secret expired or invalid.</p>
+<p><strong>Fix:</strong>
+1. Go to Azure Portal → App registrations → Your app → Certificates &amp; secrets
+2. Check if secret is expired under <strong>Client secrets</strong>
+3. If expired, create new secret:
+   - Click <strong>New client secret</strong>
+   - Set expiration period
+   - Click <strong>Add</strong>
+   - <strong>Copy the Value immediately</strong>
+4. Update client secret in Pathary OAuth settings
+5. Click <strong>Save OAuth Settings</strong>
+6. <strong>Disconnect and reconnect</strong> OAuth</p>
+<h4 id="error-invalid_grant-or-token-has-been-revoked">Error: "invalid_grant" or "Token has been revoked"</h4>
+<p><strong>Cause</strong>: Refresh token expired or user revoked access.</p>
+<p><strong>Fix:</strong>
+1. Go to Pathary → Admin → Email Settings → OAuth tab
+2. Click <strong>Disconnect</strong>
+3. Click <strong>Connect</strong> to re-authorize
+4. Sign in and grant permissions again</p>
+<h4 id="cant-find-office-365-exchange-online-in-api-permissions">Can't find "Office 365 Exchange Online" in API permissions</h4>
+<p><strong>Cause</strong>: You're looking in the wrong tab.</p>
+<p><strong>Fix:</strong>
+1. Click <strong>Add a permission</strong>
+2. <strong>Important</strong>: Click <strong>APIs my organization uses</strong> tab (NOT "Microsoft APIs")
+3. Search for <strong>Office 365 Exchange Online</strong>
+4. Select it
+5. Choose <strong>Delegated permissions</strong>
+6. Check <strong>SMTP.Send</strong></p>
+<hr />
+<h3 id="general-issues">General Issues</h3>
+<h4 id="error-oauth-configuration-not-found">Error: "OAuth configuration not found"</h4>
+<p><strong>Cause</strong>: OAuth settings not saved.</p>
+<p><strong>Fix:</strong>
+1. Go to Admin → Email Settings → OAuth tab
+2. Fill in all required fields
+3. Click <strong>Save OAuth Settings</strong>
+4. Verify "Settings saved successfully" message</p>
+<h4 id="error-encryption_key-not-configured">Error: "ENCRYPTION_KEY not configured"</h4>
+<p><strong>Cause</strong>: Encryption key not set.</p>
+<p><strong>Fix:</strong>
+Option 1 - Generate via UI:
+1. Go to Admin → Email Settings → OAuth tab
+2. Click <strong>Generate Encryption Key</strong>
+3. Key is automatically saved</p>
+<p>Option 2 - Set environment variable:
+<div class="highlight"><pre><span></span><code><span class="c1"># Generate key</span>
+openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span>
+
+<span class="c1"># Add to .env or .env.local</span>
+<span class="nv">ENCRYPTION_KEY</span><span class="o">=</span>your_generated_64_character_hex_string
+
+<span class="c1"># Restart container</span>
+docker<span class="w"> </span>compose<span class="w"> </span>restart<span class="w"> </span>app
+</code></pre></div></p>
+<h4 id="connection-shows-connected-but-emails-fail">Connection shows "Connected" but emails fail</h4>
+<p><strong>Cause</strong>: Email auth mode not set to OAuth.</p>
+<p><strong>Fix:</strong>
+1. Check database:
+   <div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">server_setting</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;email_auth_mode&#39;</span><span class="p">;</span>
+</code></pre></div>
+2. If not <code>smtp_oauth</code>, set it:
+   <div class="highlight"><pre><span></span><code><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">server_setting</span><span class="w"> </span><span class="p">(</span><span class="k">key</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;email_auth_mode&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;smtp_oauth&#39;</span><span class="p">)</span>
+<span class="k">ON</span><span class="w"> </span><span class="n">DUPLICATE</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;smtp_oauth&#39;</span><span class="p">;</span>
+</code></pre></div>
+3. Or use UI: Click <strong>Switch to OAuth Mode</strong> button</p>
+<h4 id="token-status-shows-error">Token Status shows "Error"</h4>
+<p><strong>Cause</strong>: Token refresh failed.</p>
+<p><strong>Fix:</strong>
+1. Check error message in <strong>Token Status</strong> field
+2. Common errors:
+   - <strong>"invalid_client"</strong>: Client ID or secret incorrect → Update credentials
+   - <strong>"invalid_grant"</strong>: Refresh token expired → Disconnect and reconnect
+   - <strong>"unauthorized_client"</strong>: Missing API permissions → Add required permissions
+3. Click <strong>Disconnect</strong> and <strong>Connect</strong> again to re-authorize</p>
+<h4 id="smtp-connect-failed">SMTP connect() failed</h4>
+<p><strong>Cause</strong>: Wrong SMTP host or port for OAuth provider.</p>
+<p><strong>Fix:</strong>
+OAuth mode uses provider defaults (cannot be changed):
+- <strong>Gmail</strong>: <code>smtp.gmail.com:587</code> (TLS)
+- <strong>Microsoft 365</strong>: <code>smtp.office365.com:587</code> (TLS)</p>
+<p>Verify <code>email_auth_mode</code> is set to <code>smtp_oauth</code> (not <code>smtp_password</code>).</p>
+<hr />
+<h2 id="security-considerations">Security Considerations</h2>
+<h3 id="client-secret-rotation">Client Secret Rotation</h3>
+<p><strong>Microsoft 365</strong> client secrets expire (max 24 months). <strong>Plan ahead:</strong></p>
+<ol>
+<li>Set <strong>Secret Expiry Reminder</strong> in Pathary to 23 months</li>
+<li>Before expiry, create new secret in Azure Portal</li>
+<li>Update client secret in Pathary</li>
+<li>Click <strong>Disconnect</strong> and <strong>Connect</strong> to get new token</li>
+<li>Delete old secret in Azure Portal</li>
+</ol>
+<p><strong>Gmail</strong> client secrets don't expire unless you regenerate them.</p>
+<h3 id="revoking-access">Revoking Access</h3>
+<p><strong>Gmail:</strong>
+1. Go to https://myaccount.google.com/permissions
+2. Find "Pathary"
+3. Click <strong>Remove access</strong></p>
+<p><strong>Microsoft 365:</strong>
+1. Go to https://myaccount.microsoft.com/privacy/app-permissions
+2. Find "Pathary Email OAuth"
+3. Click <strong>Remove</strong></p>
+<p>Or via Azure Portal:
+1. Azure Portal → Enterprise applications
+2. Find your app
+3. Click <strong>Delete</strong> or revoke user consent</p>
+<h3 id="encryption-key-rotation">Encryption Key Rotation</h3>
+<p>If you rotate <code>ENCRYPTION_KEY</code>:</p>
+<ol>
+<li>All stored secrets become inaccessible</li>
+<li>You must <strong>reconnect OAuth</strong> for all providers</li>
+<li>Plan rotation during maintenance window</li>
+</ol>
+<h3 id="audit-logging">Audit Logging</h3>
+<p>Monitor OAuth authorization attempts:</p>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">security_audit_log</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">event_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;oauth_authorization&#39;</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="k">DESC</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+</code></pre></div>
+<hr />
+<h2 id="additional-resources">Additional Resources</h2>
+<ul>
+<li><a href="https://developers.google.com/identity/protocols/oauth2">Google OAuth 2.0 Documentation</a></li>
+<li><a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow">Microsoft Identity Platform OAuth 2.0</a></li>
+<li><a href="https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission">Office 365 Exchange Online SMTP AUTH</a></li>
+<li><a href="https://github.com/benjaminmue/pathary">Pathary GitHub Repository</a></li>
+<li><a href="https://github.com/benjaminmue/pathary/issues">Pathary Issues</a></li>
+</ul>
+<hr />
+<h2 id="getting-help">Getting Help</h2>
+<p>If you encounter issues not covered in this guide:</p>
+<ol>
+<li>Check Pathary logs: <code>docker compose logs app</code></li>
+<li>Verify all prerequisites are met</li>
+<li>Search <a href="https://github.com/benjaminmue/pathary/issues">existing issues</a></li>
+<li>Create a <a href="https://github.com/benjaminmue/pathary/issues/new">new issue</a> with:</li>
+<li>Provider (Gmail or Microsoft 365)</li>
+<li>Error message</li>
+<li>Steps to reproduce</li>
+<li>Log output (redact secrets!)</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
