@@ -1,3 +1,6 @@
+!!! warning "Integration Under Development"
+    This integration feature is currently being worked on and may not be fully functional. Please check back for updates.
+
 ## Import
 You can import your watch history and ratings from Letterboxd to Movary.
 

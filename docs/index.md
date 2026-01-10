@@ -1,11 +1,13 @@
 <div style="text-align: center; padding: 2rem 0;">
-  <img src="images/pathary-logo.svg" alt="Pathary Logo" style="width: 120px; height: 120px; margin-bottom: 1.5rem;">
+  <img src="images/pathary-logo.svg" alt="Pathary Logo">
   <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Welcome to Pathary</h1>
   <h2 style="font-size: 2rem; color: var(--pathary-gold-dark); margin-bottom: 1rem; font-weight: 600;">
     Self-Hosted Movie Tracking for Friend Groups
   </h2>
-  <p style="font-size: 1.2rem; color: var(--md-default-fg-color--light);">
-    Rate movies on a 1-7 popcorn scale 🍿 • Share with friends • Track your watch history
+  <p style="font-size: 1.2rem; color: var(--md-default-fg-color--light); line-height: 2;">
+    • Rate movies on a 1-7 popcorn scale 🍿 •<br>
+    • Share with friends •<br>
+    • Track your watch history •
   </p>
 </div>
 
