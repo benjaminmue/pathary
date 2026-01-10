@@ -19,7 +19,7 @@
 
 1. Clone the repository
 ```
-git clone https://github.com/leepeuker/movary.git .
+git clone https://github.com/benjaminmue/pathary.git .
 ```
 
 2. Install composer dependencies (recommended to install after every update)
@@ -54,7 +54,7 @@ Use the `public` directory as the document root of the web server.
 
 ### Job processing
 
-The `jobs:process` cli command has to be executed to keep the Movary data up to date and process all background jobs.
+The `jobs:process` cli command has to be executed to keep the Pathary data up to date and process all background jobs.
 
 Here are two recommended ways.
 

@@ -5,10 +5,10 @@ Movies without IMDb ratings or updated the longest time ago are prioritized.
 
 !!! Info
 
-    Movary scrapes the IMDb website for the ratings.
+    Pathary scrapes the IMDb website for the ratings.
     Changes to the IMDb website structure can break the scraping and have to be fixed.
     This happens from time to time.
-    Please [report problems](https://github.com/leepeuker/movary/issues) so that this can be quickly handled.
+    Please [report problems](https://github.com/benjaminmue/pathary/issues) so that this can be quickly handled.
 
 ## Command
 ```shell
