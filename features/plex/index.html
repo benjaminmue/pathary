@@ -2472,14 +2472,14 @@
 </div>
 <h2 id="webhook-scrobbler">Webhook (Scrobbler)<a class="headerlink" href="#webhook-scrobbler" title="Permanent link">&para;</a></h2>
 <h3 id="description">Description<a class="headerlink" href="#description" title="Permanent link">&para;</a></h3>
-<p>Automatically add new <a href="https://www.plex.tv/">Plex</a> movie plays and ratings to Movary.</p>
+<p>Automatically add new <a href="https://www.plex.tv/">Plex</a> movie plays and ratings to Pathary.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>To use the required webhooks feature in Plex an active <a href="https://www.plex.tv/plex-pass/">Plex Pass</a> subscription is neceessary.</p>
 </div>
 <h3 id="instruction">Instruction<a class="headerlink" href="#instruction" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Generate a webhook url in Movary for your user on the Plex integration settings page (<code>/settings/integrations/plex</code>)</li>
+<li>Generate a webhook url in Pathary for your user on the Plex integration settings page (<code>/settings/integrations/plex</code>)</li>
 <li>Add the generated url as a <a href="https://support.plex.tv/articles/115002267687-webhooks/">webhook to your Plex server</a> to start scrobbling</li>
 </ul>
 <p>You can select what you want to scrobble (movie plays and/or ratings) via the "Scrobble Options" checkboxes on the settings page.</p>
@@ -2489,23 +2489,23 @@
 </div>
 <h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
 <p>Some features require access to protected personal Plex data.
-You can authenticate Movary against Plex on the Plex integration settings page (<code>/settings/integrations/plex</code>).</p>
+You can authenticate Pathary against Plex on the Plex integration settings page (<code>/settings/integrations/plex</code>).</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Requires the server configuration <a href="/configuration/#third-party-integrations">PLEX_IDENTIFIER</a> to be set.</p>
 </div>
-<p>During the authentication process a Plex access token is generated and stored in Movary. 
+<p>During the authentication process a Plex access token is generated and stored in Pathary. 
 This token will be used in all further Plex API requests.
-When an authentication is removed from Movary, the token will be deleted only in Movary.</p>
+When an authentication is removed from Pathary, the token will be deleted only in Pathary.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>Removing the authentication only deletes the token stored in Movary itself. The token still exists in Plex.
-To invalidate the access token in Plex, go to your Plex settings at: Account -&gt; Authorized devices -&gt; Click on the red cross for the entry "Movary"</p>
+<p>Removing the authentication only deletes the token stored in Pathary itself. The token still exists in Plex.
+To invalidate the access token in Plex, go to your Plex settings at: Account -&gt; Authorized devices -&gt; Click on the red cross for the entry "Pathary"</p>
 </div>
 <h2 id="watchlist-import">Watchlist import<a class="headerlink" href="#watchlist-import" title="Permanent link">&para;</a></h2>
 <h3 id="description_1">Description<a class="headerlink" href="#description_1" title="Permanent link">&para;</a></h3>
-<p>Import missing movies from your Plex Watchlist to your Movary Watchlist.
-Missing movies imported to the Movary Watchlist are put at the beginning of the list in the same order as they are in Plex.</p>
+<p>Import missing movies from your Plex Watchlist to your Pathary Watchlist.
+Missing movies imported to the Pathary Watchlist are put at the beginning of the list in the same order as they are in Plex.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Plex <a href="#authentication">authentication</a> is required.</p>

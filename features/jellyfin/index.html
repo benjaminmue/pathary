@@ -2550,14 +2550,14 @@
 </div>
 <h2 id="webhook-scrobbler">Webhook (Scrobbler)<a class="headerlink" href="#webhook-scrobbler" title="Permanent link">&para;</a></h2>
 <h3 id="description">Description<a class="headerlink" href="#description" title="Permanent link">&para;</a></h3>
-<p>Automatically add new <a href="https://jellyfin.org/">Jellyin</a> movie plays to Movary.</p>
+<p>Automatically add new <a href="https://jellyfin.org/">Jellyin</a> movie plays to Pathary.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Requires the <a href="https://github.com/jellyfin/jellyfin-plugin-webhook">webhook plugin</a> to be installed and active in Jellyfin.</p>
 </div>
 <h3 id="instruction">Instruction<a class="headerlink" href="#instruction" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Generate a webhook url in Movary for your user on the Jellyfin integration settings page (<code>/settings/integrations/jellyfin</code>)</li>
+<li>Generate a webhook url in Pathary for your user on the Jellyfin integration settings page (<code>/settings/integrations/jellyfin</code>)</li>
 <li>Add the generated url in the Jellyfin webhook plugin as a <code>Generic Destination</code> and activate only:<ul>
 <li>Notification Type =&gt; "Playback Stop"</li>
 <li>User Filter =&gt; Choose your user</li>
@@ -2571,14 +2571,14 @@
 </div>
 <h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
 <p>Some features require access to protected personal Jellyfin data.
-You can authenticate Movary against Jellyfin on the Jellyfin integration settings page (<code>/settings/integrations/jellyfin</code>).</p>
+You can authenticate Pathary against Jellyfin on the Jellyfin integration settings page (<code>/settings/integrations/jellyfin</code>).</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Requires the server configuration <a href="/configuration/#third-party-integrations">JELLYFIN_DEVICE_ID</a> to be set.</p>
 </div>
-<p>During the authentication process a Jellyfin access token is generated and stored in Movary.
+<p>During the authentication process a Jellyfin access token is generated and stored in Pathary.
 This token will be used in all further Jellyfin API requests.
-When an authentication is removed from Movary, the token will be deleted in Movary and the Jellyfin server.</p>
+When an authentication is removed from Pathary, the token will be deleted in Pathary and the Jellyfin server.</p>
 <h2 id="sync">Sync<a class="headerlink" href="#sync" title="Permanent link">&para;</a></h2>
 <p>General notes:</p>
 <ul>
@@ -2587,36 +2587,36 @@ When an authentication is removed from Movary, the token will be deleted in Mova
 <li>Backup your Jellyfin database regularly in case something goes wrong!</li>
 </ul>
 <h3 id="automatic-sync">Automatic sync<a class="headerlink" href="#automatic-sync" title="Permanent link">&para;</a></h3>
-<p>You can keep your Jellyfin libraries automatically up to date with your latest Movary watch history changes.</p>
+<p>You can keep your Jellyfin libraries automatically up to date with your latest Pathary watch history changes.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Jellyfin <a href="#authentication">authentication</a> is required.  </p>
 </div>
-<p>If the automatic sync is enabled (e.g. on <code>/settings/integrations/jellyfin</code>) new watch dates added to Movary are automatically pushed as plays to Jellyfin.
-If a movie has its last watch date removed in Movary it is set to unwatched in Jellyfin.</p>
+<p>If the automatic sync is enabled (e.g. on <code>/settings/integrations/jellyfin</code>) new watch dates added to Pathary are automatically pushed as plays to Jellyfin.
+If a movie has its last watch date removed in Pathary it is set to unwatched in Jellyfin.</p>
 <h3 id="export">Export<a class="headerlink" href="#export" title="Permanent link">&para;</a></h3>
 <h4 id="description_1">Description<a class="headerlink" href="#description_1" title="Permanent link">&para;</a></h4>
-<p>You can export your Movary watch dates as plays to Jellyfin.</p>
+<p>You can export your Pathary watch dates as plays to Jellyfin.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Jellyfin <a href="#authentication">authentication</a> is required.  </p>
 </div>
-<p>Movary will compare its movie watch dates against the Jellyfin movie plays.
-Movies not marked as watched in Jellyfin but with watch dates in Movary are marked as watched and get the latest watch date set as the last play date.
+<p>Pathary will compare its movie watch dates against the Jellyfin movie plays.
+Movies not marked as watched in Jellyfin but with watch dates in Pathary are marked as watched and get the latest watch date set as the last play date.
 Movies already marked as watched are updated with the latest watch date as the last play date if the dates are not the same.</p>
 <h4 id="cli-command">CLI command<a class="headerlink" href="#cli-command" title="Permanent link">&para;</a></h4>
 <div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>php<span class="w"> </span>bin/console.php<span class="w"> </span>jellyfin:export<span class="w"> </span>&lt;userId&gt;
 </span></code></pre></div>
 <h3 id="import">Import<a class="headerlink" href="#import" title="Permanent link">&para;</a></h3>
 <h4 id="description_2">Description<a class="headerlink" href="#description_2" title="Permanent link">&para;</a></h4>
-<p>You can import your Jellyfin plays as Movary watch dates.</p>
+<p>You can import your Jellyfin plays as Pathary watch dates.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Jellyfin <a href="#authentication">authentication</a> is required.  </p>
 </div>
-<p>Movary will compare the Jellyfin movie plays against its movie watch dates.
+<p>Pathary will compare the Jellyfin movie plays against its movie watch dates.
 Movies with multiple plays in Jellyfin are handled as one watch date, using the date of the latest play.
-Watch dates are added to Movary if they are missing, existing watch dates are not changed. </p>
+Watch dates are added to Pathary if they are missing, existing watch dates are not changed. </p>
 <h4 id="cli-command_1">CLI command<a class="headerlink" href="#cli-command_1" title="Permanent link">&para;</a></h4>
 <div class="language-shell highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>php<span class="w"> </span>bin/console.php<span class="w"> </span>jellyfin:import<span class="w"> </span>&lt;userId&gt;
 </span></code></pre></div>

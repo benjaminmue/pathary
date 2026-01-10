@@ -2427,19 +2427,19 @@
 <p>This integration feature is currently being worked on and may not be fully functional. Please check back for updates.</p>
 </div>
 <h2 id="trakttv-api-access">Trakt.tv API Access<a class="headerlink" href="#trakttv-api-access" title="Permanent link">&para;</a></h2>
-<p>Movary needs a Trakt <strong>username</strong> and <strong>Client ID</strong> to access its api. 
-You can configure them in Movary via the user settings page at <code>/settings/integrations/trakt</code> or via cli (user update command).</p>
+<p>Pathary needs a Trakt <strong>username</strong> and <strong>Client ID</strong> to access its api.
+You can configure them in Pathary via the user settings page at <code>/settings/integrations/trakt</code> or via cli (user update command).</p>
 <h4 id="how-to-get-a-client-id">How to get a Client ID<a class="headerlink" href="#how-to-get-a-client-id" title="Permanent link">&para;</a></h4>
-<p>Go to your trakt.tv <a href="https://trakt.tv/oauth/applications" target="_blank">application settings</a> and create an application for Movary.
-Trakt requires a redirect uri which is not used by Movary, you can enter a placeholder like <code>http://movary</code>:
+<p>Go to your trakt.tv <a href="https://trakt.tv/oauth/applications" target="_blank">application settings</a> and create an application for Pathary.
+Trakt requires a redirect uri which is not used by Pathary, you can enter a placeholder like <code>http://pathary</code>:
 <img src="/assets/trakt-new-application-page.png" alt="Trakt application seeting page with client ID" width="70%"/></p>
 <p>You should be able to see your Client ID now on your applications page:
 <img src="/assets/trakt-view-application-page.png" alt="Trakt application seeting page with client ID" width="70%"/></p>
-<p>Enter the Client ID and your username in Movary, verify the access and save your changes. </p>
+<p>Enter the Client ID and your username in Pathary, verify the access and save your changes. </p>
 <h2 id="import">Import<a class="headerlink" href="#import" title="Permanent link">&para;</a></h2>
 <h3 id="description">Description<a class="headerlink" href="#description" title="Permanent link">&para;</a></h3>
 <p>You can import your watch history and ratings from Trakt.</p>
-<p>The import will only add data missing in Movary on default, it will not overwrite or remove existing data.</p>
+<p>The import will only add data missing in Pathary on default, it will not overwrite or remove existing data.</p>
 <p>The import can be triggered via the user settings page at <code>/settings/integrations/trakt</code> or via cli.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -2447,7 +2447,7 @@ Trakt requires a redirect uri which is not used by Movary, you can enter a place
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Currently Movary only supports import from public Trakt accounts. Make sure your account is not set to private during the import.</p>
+<p>Currently Pathary only supports import from public Trakt accounts. Make sure your account is not set to private during the import.</p>
 </div>
 <h3 id="cli-command">CLI Command<a class="headerlink" href="#cli-command" title="Permanent link">&para;</a></h3>
 <div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>php<span class="w"> </span>bin/console.php<span class="w"> </span>trakt:import
