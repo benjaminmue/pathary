@@ -1,5 +1,6 @@
 site_name: Pathary Documentation
 site_description: Pathary Documentation (fork of Movary)
+site_url: https://docs.pathary.tv
 repo_url: https://github.com/benjaminmue/pathary/
 edit_uri: edit/main/docs
 
