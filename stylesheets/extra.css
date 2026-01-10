@@ -179,3 +179,235 @@
   vertical-align: middle;
   max-height: 1.5rem;
 }
+
+/* ============================================
+   ENHANCED VISUAL ELEMENTS FOR FUN DOCS
+   ============================================ */
+
+/* Grid cards with hover effects */
+.md-typeset .grid.cards > * {
+  border: 1px solid rgba(125, 73, 168, 0.15);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, rgba(125, 73, 168, 0.03), rgba(250, 197, 78, 0.03));
+}
+
+.md-typeset .grid.cards > *:hover {
+  border-color: var(--pathary-purple);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(125, 73, 168, 0.15);
+  background: linear-gradient(135deg, rgba(125, 73, 168, 0.08), rgba(250, 197, 78, 0.08));
+}
+
+[data-md-color-scheme="slate"] .md-typeset .grid.cards > * {
+  background: linear-gradient(135deg, rgba(155, 107, 196, 0.08), rgba(255, 219, 139, 0.05));
+  border-color: rgba(155, 107, 196, 0.2);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .grid.cards > *:hover {
+  border-color: var(--pathary-gold);
+  box-shadow: 0 8px 16px rgba(250, 197, 78, 0.2);
+  background: linear-gradient(135deg, rgba(155, 107, 196, 0.15), rgba(255, 219, 139, 0.1));
+}
+
+/* Material icons in cards */
+.md-typeset .grid.cards .twemoji,
+.md-typeset .grid.cards .material-icons {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--pathary-purple);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .grid.cards .twemoji,
+[data-md-color-scheme="slate"] .md-typeset .grid.cards .material-icons {
+  color: var(--pathary-gold);
+}
+
+/* Tabbed content styling */
+.md-typeset .tabbed-set {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(125, 73, 168, 0.1);
+}
+
+.md-typeset .tabbed-labels > label {
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.md-typeset .tabbed-labels > label:hover {
+  background-color: rgba(125, 73, 168, 0.05);
+  color: var(--pathary-purple);
+}
+
+/* Admonition enhancements */
+.md-typeset .admonition {
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.md-typeset .admonition:hover {
+  box-shadow: 0 4px 12px rgba(125, 73, 168, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Success callout with popcorn theme */
+.md-typeset .admonition.success {
+  border-left-color: var(--pathary-gold);
+}
+
+.md-typeset .success > .admonition-title {
+  background-color: rgba(250, 197, 78, 0.1);
+}
+
+.md-typeset .success > .admonition-title::before {
+  background-color: var(--pathary-gold);
+}
+
+/* Example callouts with purple */
+.md-typeset .admonition.example {
+  border-left-color: var(--pathary-purple);
+}
+
+.md-typeset .example > .admonition-title {
+  background-color: rgba(125, 73, 168, 0.1);
+}
+
+/* Hero section styling */
+.md-typeset h1:first-child + div[style*="text-align: center"] h2 {
+  background: linear-gradient(135deg, var(--pathary-purple), var(--pathary-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+/* Comparison tables */
+.md-typeset table {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.md-typeset table thead {
+  background: linear-gradient(135deg, var(--pathary-purple), var(--pathary-purple-dark));
+  color: white;
+}
+
+.md-typeset table tbody tr:hover {
+  background-color: rgba(125, 73, 168, 0.05);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table tbody tr:hover {
+  background-color: rgba(155, 107, 196, 0.1);
+}
+
+/* Emoji sizing and spacing */
+.md-typeset h2 .twemoji,
+.md-typeset h3 .twemoji {
+  height: 1.2em;
+  vertical-align: -0.15em;
+  margin-right: 0.2em;
+}
+
+/* Code blocks with gradient border */
+.md-typeset pre > code {
+  border-left: 3px solid var(--pathary-purple);
+  border-radius: 0.25rem;
+}
+
+/* Hover effect on navigation cards */
+.md-typeset .grid.cards a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.md-typeset .grid.cards a:hover {
+  color: var(--pathary-purple);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .grid.cards a:hover {
+  color: var(--pathary-gold);
+}
+
+/* Animated underline for inline links */
+.md-typeset a {
+  position: relative;
+}
+
+.md-typeset a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background: linear-gradient(90deg, var(--pathary-purple), var(--pathary-gold));
+  transition: width 0.3s ease;
+}
+
+.md-typeset a:hover::after {
+  width: 100%;
+}
+
+/* Remove underline for card links */
+.md-typeset .grid.cards a::after {
+  display: none;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Add subtle animation to page load */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.md-content__inner {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Highlight important content */
+.md-typeset mark {
+  background: linear-gradient(135deg, rgba(250, 197, 78, 0.3), rgba(250, 197, 78, 0.1));
+  padding: 0.1em 0.3em;
+  border-radius: 0.2em;
+}
+
+/* Better blockquote styling */
+.md-typeset blockquote {
+  border-left: 4px solid var(--pathary-purple);
+  background: linear-gradient(90deg, rgba(125, 73, 168, 0.05), transparent);
+  border-radius: 0.25rem;
+  padding: 1rem 1.5rem;
+}
+
+/* Horizontal rules with gradient */
+.md-typeset hr {
+  background: linear-gradient(90deg, transparent, var(--pathary-purple), transparent);
+  height: 2px;
+  border: none;
+  margin: 2rem 0;
+}
+
+/* Call-to-action buttons */
+.md-typeset .md-button {
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.md-typeset .md-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(125, 73, 168, 0.3);
+}
