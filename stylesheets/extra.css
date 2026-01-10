@@ -7,29 +7,30 @@
   --pathary-purple-dark: #5D2F7E;
   --pathary-gold-light: #FFDB8B;
   --pathary-gold-dark: #E5AD2F;
+  --pathary-gold-darker: #C89825;
 }
 
-/* Light mode - Pathary Purple primary */
+/* Light mode - Gold primary with purple accents */
 [data-md-color-scheme="default"] {
-  --md-primary-fg-color: var(--pathary-purple);
-  --md-primary-fg-color--light: var(--pathary-purple-light);
-  --md-primary-fg-color--dark: var(--pathary-purple-dark);
-  --md-accent-fg-color: var(--pathary-gold);
-  --md-accent-fg-color--transparent: rgba(250, 197, 78, 0.1);
+  --md-primary-fg-color: var(--pathary-gold-dark);
+  --md-primary-fg-color--light: var(--pathary-gold);
+  --md-primary-fg-color--dark: var(--pathary-gold-darker);
+  --md-accent-fg-color: var(--pathary-purple);
+  --md-accent-fg-color--transparent: rgba(125, 73, 168, 0.1);
 }
 
-/* Dark mode - Pathary Purple primary with adjusted contrast */
+/* Dark mode - Gold primary with purple accents */
 [data-md-color-scheme="slate"] {
-  --md-primary-fg-color: var(--pathary-purple-light);
-  --md-primary-fg-color--light: var(--pathary-purple);
-  --md-primary-fg-color--dark: var(--pathary-purple-dark);
-  --md-accent-fg-color: var(--pathary-gold);
-  --md-accent-fg-color--transparent: rgba(250, 197, 78, 0.1);
+  --md-primary-fg-color: var(--pathary-gold);
+  --md-primary-fg-color--light: var(--pathary-gold-light);
+  --md-primary-fg-color--dark: var(--pathary-gold-dark);
+  --md-accent-fg-color: var(--pathary-purple-light);
+  --md-accent-fg-color--transparent: rgba(155, 107, 196, 0.1);
 }
 
-/* Header styling with gradient */
+/* Header styling with gradient - warm gold tones */
 .md-header {
-  background: linear-gradient(135deg, var(--pathary-purple) 0%, var(--pathary-purple-dark) 100%);
+  background: linear-gradient(135deg, var(--pathary-gold-dark) 0%, var(--pathary-gold-darker) 100%);
 }
 
 /* Logo styling - make it pop */
@@ -50,7 +51,7 @@
 }
 
 .md-search__input:focus {
-  box-shadow: 0 0 0 0.2rem rgba(125, 73, 168, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(250, 197, 78, 0.35);
 }
 
 /* Links with Pathary gold on hover */
@@ -62,27 +63,27 @@
   color: var(--pathary-gold-dark);
 }
 
-/* Code blocks with subtle Pathary theme */
+/* Code blocks with subtle cream theme */
 .md-typeset code {
-  background-color: rgba(125, 73, 168, 0.05);
-  border: 1px solid rgba(125, 73, 168, 0.1);
+  background-color: rgba(247, 238, 210, 0.15);
+  border: 1px solid rgba(250, 197, 78, 0.2);
   border-radius: 0.25rem;
 }
 
 [data-md-color-scheme="slate"] .md-typeset code {
-  background-color: rgba(155, 107, 196, 0.1);
-  border-color: rgba(155, 107, 196, 0.2);
+  background-color: rgba(250, 197, 78, 0.08);
+  border-color: rgba(250, 197, 78, 0.15);
 }
 
-/* Admonitions with Pathary colors */
+/* Admonitions with gold and cream colors */
 .md-typeset .admonition.note,
 .md-typeset details.note {
-  border-left-color: var(--pathary-purple);
+  border-left-color: var(--pathary-gold-dark);
 }
 
 .md-typeset .note > .admonition-title,
 .md-typeset .note > summary {
-  background-color: rgba(125, 73, 168, 0.1);
+  background-color: rgba(250, 197, 78, 0.12);
 }
 
 .md-typeset .admonition.tip,
@@ -92,22 +93,22 @@
 
 .md-typeset .tip > .admonition-title,
 .md-typeset .tip > summary {
-  background-color: rgba(250, 197, 78, 0.1);
+  background-color: rgba(250, 197, 78, 0.15);
 }
 
-/* Footer styling */
+/* Footer styling with warm tones */
 .md-footer {
-  background: linear-gradient(135deg, var(--pathary-purple-dark) 0%, var(--pathary-purple) 100%);
+  background: linear-gradient(135deg, var(--pathary-gold-darker) 0%, var(--pathary-gold-dark) 100%);
 }
 
 /* Table of contents styling */
 .md-sidebar--secondary {
-  border-left: 1px solid rgba(125, 73, 168, 0.1);
+  border-left: 1px solid rgba(250, 197, 78, 0.15);
 }
 
-/* Active navigation items */
+/* Active navigation items - gold emphasis */
 .md-nav__item--active > .md-nav__link {
-  color: var(--pathary-purple);
+  color: var(--pathary-gold-dark);
   font-weight: 600;
 }
 
@@ -115,35 +116,36 @@
   color: var(--pathary-gold);
 }
 
-/* Buttons and interactive elements */
+/* Buttons with gold theme */
 .md-typeset .md-button--primary {
-  background-color: var(--pathary-purple);
-  border-color: var(--pathary-purple);
-  color: white;
+  background-color: var(--pathary-gold-dark);
+  border-color: var(--pathary-gold-dark);
+  color: #1a1a1a;
+  font-weight: 600;
 }
 
 .md-typeset .md-button--primary:hover {
-  background-color: var(--pathary-purple-dark);
-  border-color: var(--pathary-purple-dark);
+  background-color: var(--pathary-gold-darker);
+  border-color: var(--pathary-gold-darker);
 }
 
-/* Scrollbar styling (webkit browsers) */
+/* Scrollbar styling (webkit browsers) - gold tones */
 ::-webkit-scrollbar {
   width: 0.5rem;
   height: 0.5rem;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--pathary-purple);
+  background-color: var(--pathary-gold-dark);
   border-radius: 0.25rem;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--pathary-purple-dark);
+  background-color: var(--pathary-gold-darker);
 }
 
 ::-webkit-scrollbar-track {
-  background-color: rgba(125, 73, 168, 0.05);
+  background-color: rgba(250, 197, 78, 0.08);
 }
 
 /* Progress bar for page loading */
@@ -151,22 +153,22 @@
   background-color: var(--pathary-gold);
 }
 
-/* Tags styling */
+/* Tags styling with gold tones */
 .md-tag {
-  background-color: rgba(125, 73, 168, 0.1);
-  color: var(--pathary-purple-dark);
-  border: 1px solid rgba(125, 73, 168, 0.2);
+  background-color: rgba(250, 197, 78, 0.15);
+  color: var(--pathary-gold-darker);
+  border: 1px solid rgba(250, 197, 78, 0.3);
 }
 
 [data-md-color-scheme="slate"] .md-tag {
-  background-color: rgba(155, 107, 196, 0.15);
-  color: var(--pathary-gold);
-  border-color: rgba(155, 107, 196, 0.3);
+  background-color: rgba(250, 197, 78, 0.12);
+  color: var(--pathary-gold-light);
+  border-color: rgba(250, 197, 78, 0.25);
 }
 
-/* Hero section on homepage */
+/* Hero section with gold emphasis */
 .md-typeset h1:first-child {
-  color: var(--pathary-purple);
+  color: var(--pathary-gold-darker);
   font-weight: 700;
 }
 
@@ -184,39 +186,39 @@
    ENHANCED VISUAL ELEMENTS FOR FUN DOCS
    ============================================ */
 
-/* Grid cards with hover effects */
+/* Grid cards with warm gold theme and hover effects */
 .md-typeset .grid.cards > * {
-  border: 1px solid rgba(125, 73, 168, 0.15);
+  border: 1px solid rgba(250, 197, 78, 0.25);
   border-radius: 0.5rem;
   padding: 1.5rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(135deg, rgba(125, 73, 168, 0.03), rgba(250, 197, 78, 0.03));
+  background: linear-gradient(135deg, rgba(250, 197, 78, 0.05), rgba(247, 238, 210, 0.08));
 }
 
 .md-typeset .grid.cards > *:hover {
-  border-color: var(--pathary-purple);
+  border-color: var(--pathary-gold-dark);
   transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(125, 73, 168, 0.15);
-  background: linear-gradient(135deg, rgba(125, 73, 168, 0.08), rgba(250, 197, 78, 0.08));
+  box-shadow: 0 8px 16px rgba(250, 197, 78, 0.25);
+  background: linear-gradient(135deg, rgba(250, 197, 78, 0.12), rgba(247, 238, 210, 0.15));
 }
 
 [data-md-color-scheme="slate"] .md-typeset .grid.cards > * {
-  background: linear-gradient(135deg, rgba(155, 107, 196, 0.08), rgba(255, 219, 139, 0.05));
-  border-color: rgba(155, 107, 196, 0.2);
+  background: linear-gradient(135deg, rgba(250, 197, 78, 0.08), rgba(247, 238, 210, 0.05));
+  border-color: rgba(250, 197, 78, 0.2);
 }
 
 [data-md-color-scheme="slate"] .md-typeset .grid.cards > *:hover {
   border-color: var(--pathary-gold);
-  box-shadow: 0 8px 16px rgba(250, 197, 78, 0.2);
-  background: linear-gradient(135deg, rgba(155, 107, 196, 0.15), rgba(255, 219, 139, 0.1));
+  box-shadow: 0 8px 16px rgba(250, 197, 78, 0.3);
+  background: linear-gradient(135deg, rgba(250, 197, 78, 0.15), rgba(247, 238, 210, 0.12));
 }
 
-/* Material icons in cards */
+/* Material icons in cards - gold accent */
 .md-typeset .grid.cards .twemoji,
 .md-typeset .grid.cards .material-icons {
   font-size: 2rem;
   margin-bottom: 0.5rem;
-  color: var(--pathary-purple);
+  color: var(--pathary-gold-dark);
 }
 
 [data-md-color-scheme="slate"] .md-typeset .grid.cards .twemoji,
@@ -224,11 +226,11 @@
   color: var(--pathary-gold);
 }
 
-/* Tabbed content styling */
+/* Tabbed content with gold accents */
 .md-typeset .tabbed-set {
   border-radius: 0.5rem;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(125, 73, 168, 0.1);
+  box-shadow: 0 2px 8px rgba(250, 197, 78, 0.15);
 }
 
 .md-typeset .tabbed-labels > label {
@@ -237,11 +239,11 @@
 }
 
 .md-typeset .tabbed-labels > label:hover {
-  background-color: rgba(125, 73, 168, 0.05);
-  color: var(--pathary-purple);
+  background-color: rgba(250, 197, 78, 0.1);
+  color: var(--pathary-gold-dark);
 }
 
-/* Admonition enhancements */
+/* Admonition enhancements with warm tones */
 .md-typeset .admonition {
   border-radius: 0.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -249,7 +251,7 @@
 }
 
 .md-typeset .admonition:hover {
-  box-shadow: 0 4px 12px rgba(125, 73, 168, 0.15);
+  box-shadow: 0 4px 12px rgba(250, 197, 78, 0.2);
   transform: translateY(-2px);
 }
 
@@ -266,25 +268,25 @@
   background-color: var(--pathary-gold);
 }
 
-/* Example callouts with purple */
+/* Example callouts with gold */
 .md-typeset .admonition.example {
-  border-left-color: var(--pathary-purple);
+  border-left-color: var(--pathary-gold-dark);
 }
 
 .md-typeset .example > .admonition-title {
-  background-color: rgba(125, 73, 168, 0.1);
+  background-color: rgba(250, 197, 78, 0.12);
 }
 
-/* Hero section styling */
+/* Hero section styling with gold gradient */
 .md-typeset h1:first-child + div[style*="text-align: center"] h2 {
-  background: linear-gradient(135deg, var(--pathary-purple), var(--pathary-gold));
+  background: linear-gradient(135deg, var(--pathary-gold), var(--pathary-gold-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 700;
 }
 
-/* Comparison tables */
+/* Comparison tables with gold header */
 .md-typeset table {
   border-radius: 0.5rem;
   overflow: hidden;
@@ -292,16 +294,17 @@
 }
 
 .md-typeset table thead {
-  background: linear-gradient(135deg, var(--pathary-purple), var(--pathary-purple-dark));
-  color: white;
+  background: linear-gradient(135deg, var(--pathary-gold-dark), var(--pathary-gold-darker));
+  color: #1a1a1a;
+  font-weight: 600;
 }
 
 .md-typeset table tbody tr:hover {
-  background-color: rgba(125, 73, 168, 0.05);
+  background-color: rgba(250, 197, 78, 0.08);
 }
 
 [data-md-color-scheme="slate"] .md-typeset table tbody tr:hover {
-  background-color: rgba(155, 107, 196, 0.1);
+  background-color: rgba(250, 197, 78, 0.12);
 }
 
 /* Emoji sizing and spacing */
@@ -312,20 +315,20 @@
   margin-right: 0.2em;
 }
 
-/* Code blocks with gradient border */
+/* Code blocks with gold accent border */
 .md-typeset pre > code {
-  border-left: 3px solid var(--pathary-purple);
+  border-left: 3px solid var(--pathary-gold-dark);
   border-radius: 0.25rem;
 }
 
-/* Hover effect on navigation cards */
+/* Hover effect on navigation cards with gold */
 .md-typeset .grid.cards a {
   text-decoration: none;
   color: inherit;
 }
 
 .md-typeset .grid.cards a:hover {
-  color: var(--pathary-purple);
+  color: var(--pathary-gold-dark);
 }
 
 [data-md-color-scheme="slate"] .md-typeset .grid.cards a:hover {
@@ -344,7 +347,7 @@
   height: 2px;
   bottom: -2px;
   left: 0;
-  background: linear-gradient(90deg, var(--pathary-purple), var(--pathary-gold));
+  background: linear-gradient(90deg, var(--pathary-gold-dark), var(--pathary-gold-light));
   transition: width 0.3s ease;
 }
 
@@ -385,17 +388,17 @@ html {
   border-radius: 0.2em;
 }
 
-/* Better blockquote styling */
+/* Better blockquote styling with gold accent */
 .md-typeset blockquote {
-  border-left: 4px solid var(--pathary-purple);
-  background: linear-gradient(90deg, rgba(125, 73, 168, 0.05), transparent);
+  border-left: 4px solid var(--pathary-gold-dark);
+  background: linear-gradient(90deg, rgba(250, 197, 78, 0.08), transparent);
   border-radius: 0.25rem;
   padding: 1rem 1.5rem;
 }
 
-/* Horizontal rules with gradient */
+/* Horizontal rules with gold gradient */
 .md-typeset hr {
-  background: linear-gradient(90deg, transparent, var(--pathary-purple), transparent);
+  background: linear-gradient(90deg, transparent, var(--pathary-gold), transparent);
   height: 2px;
   border: none;
   margin: 2rem 0;
@@ -409,5 +412,115 @@ html {
 
 .md-typeset .md-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(125, 73, 168, 0.3);
+  box-shadow: 0 4px 12px rgba(250, 197, 78, 0.4);
+}
+
+/* ============================================
+   PARALLAX AND SCROLL EFFECTS
+   ============================================ */
+
+/* Smooth parallax scroll for hero section */
+.md-content__inner > article > h1:first-child {
+  transform: translateZ(0);
+  will-change: transform;
+  transition: transform 0.2s ease-out;
+}
+
+/* Parallax effect for first content div after h1 */
+.md-content__inner > article > h1:first-child + div {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Layered parallax for grid cards */
+.md-typeset .grid.cards > *:nth-child(1) { animation-delay: 0ms; }
+.md-typeset .grid.cards > *:nth-child(2) { animation-delay: 50ms; }
+.md-typeset .grid.cards > *:nth-child(3) { animation-delay: 100ms; }
+.md-typeset .grid.cards > *:nth-child(4) { animation-delay: 150ms; }
+.md-typeset .grid.cards > *:nth-child(5) { animation-delay: 200ms; }
+.md-typeset .grid.cards > *:nth-child(6) { animation-delay: 250ms; }
+
+/* Staggered fade-in animation for cards */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.md-typeset .grid.cards > * {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Floating animation for hero section */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.md-typeset h1:first-child .twemoji {
+  animation: float 3s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* Subtle background gradient animation */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Animated gradient background for header */
+.md-header {
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+}
+
+/* 3D card lift effect on hover */
+.md-typeset .grid.cards > *:hover {
+  transform: translateY(-8px) scale(1.02);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Depth effect for admonitions on scroll */
+.md-typeset .admonition {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Smooth scroll reveal for sections */
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.md-typeset h2 {
+  animation: slideInFromLeft 0.6s ease-out;
+}
+
+/* Parallax table rows */
+.md-typeset table tbody tr {
+  transition: transform 0.2s ease;
+}
+
+.md-typeset table tbody tr:hover {
+  transform: scale(1.01);
 }
