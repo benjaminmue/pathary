@@ -81,6 +81,10 @@
          <lastmod>2026-01-12</lastmod>
     </url>
     <url>
+         <loc>https://docs.pathary.tv/deployment/automated-sync/</loc>
+         <lastmod>2026-01-12</lastmod>
+    </url>
+    <url>
          <loc>https://docs.pathary.tv/development/database-migrations/</loc>
          <lastmod>2026-01-12</lastmod>
     </url>
@@ -98,10 +102,6 @@
     </url>
     <url>
          <loc>https://docs.pathary.tv/features/emby/</loc>
-         <lastmod>2026-01-12</lastmod>
-    </url>
-    <url>
-         <loc>https://docs.pathary.tv/features/imdb-rating/</loc>
          <lastmod>2026-01-12</lastmod>
     </url>
     <url>
@@ -129,6 +129,10 @@
          <lastmod>2026-01-12</lastmod>
     </url>
     <url>
+         <loc>https://docs.pathary.tv/features/omdb-rating/</loc>
+         <lastmod>2026-01-12</lastmod>
+    </url>
+    <url>
          <loc>https://docs.pathary.tv/features/plex/</loc>
          <lastmod>2026-01-12</lastmod>
     </url>
@@ -138,6 +142,10 @@
     </url>
     <url>
          <loc>https://docs.pathary.tv/features/ratings-and-comments/</loc>
+         <lastmod>2026-01-12</lastmod>
+    </url>
+    <url>
+         <loc>https://docs.pathary.tv/features/scheduled-sync/</loc>
          <lastmod>2026-01-12</lastmod>
     </url>
     <url>
