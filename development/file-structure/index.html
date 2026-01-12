@@ -2300,18 +2300,18 @@
 <p>Within the <code>/src</code> directory, various other directories are located.</p>
 <ul>
 <li><code>/src/Api</code> - Contains usage of external APIs (such as Trakt, Plex, Jellyfin, etc.)</li>
-<li><code>/src/Command</code> - Contains Movary CLI commands  (which can be executed via <code>php /bin/console.php</code>)</li>
+<li><code>/src/Command</code> - Contains Pathary CLI commands  (which can be executed via <code>php /bin/console.php</code>)</li>
 <li><code>/src/HttpController</code> - Contains files processing HTTP requests. Controllers and middleware are located here, for both the HTTP requests directed at the API and just the usual
   web interface.</li>
-<li><code>/src/Service</code> - Contains core Movary components, such as the routing system, the processing of external API data and some other stuff. Note: The <code>/src/api</code> directory is mainly
+<li><code>/src/Service</code> - Contains core Pathary components, such as the routing system, the processing of external API data and some other stuff. Note: The <code>/src/api</code> directory is mainly
   meant for <em>connecting</em> with the external APIs and sending HTTP requests, whereas the external API stuff in <code>/src/Service</code> mainly handles how to process the data from those
   external APIs.</li>
 <li><code>/src/Util</code> - Contains basic utility files to keep consistency throughout the project</li>
-<li><code>/src/Domain</code> - Contains the core Movary domain implementation, e.g. what is a movie in Movary (required movary and tmdb ids) or a watch date (required user and movary ids) and
+<li><code>/src/Domain</code> - Contains the core Pathary domain implementation, e.g. what is a movie in Pathary (required Pathary and TMDB IDs) or a watch date (required user and Pathary IDs) and
   how to create or delete those</li>
 </ul>
 <h3 id="templates">Templates<a class="headerlink" href="#templates" title="Permanent link">&para;</a></h3>
-<p>The frontend of Movary is mainly regular HTML5, but it also uses the <a href="https://twig.symfony.com/">twig framework</a> from Symfony, to use dynamic templates. This allows for
+<p>The frontend of Pathary is mainly regular HTML5, but it also uses the <a href="https://twig.symfony.com/">twig framework</a> from Symfony, to use dynamic templates. This allows for
 cleaner code when injecting PHP code in HTML. So instead of using <code>&lt;?php echo $variable ?&gt;</code>, you can use <code>{{ $variable }}</code> and the twig engine will automatically translate the
 clean code into the PHP code. See their documentation for more information.</p>
 <h3 id="frontend-assets">Frontend assets<a class="headerlink" href="#frontend-assets" title="Permanent link">&para;</a></h3>

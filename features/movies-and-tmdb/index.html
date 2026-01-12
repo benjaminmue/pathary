@@ -2986,7 +2986,7 @@
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        ↓
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>SearchController::search()
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        ↓
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>TmdbApi::searchMovies($query)
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>TmdbApi::searchMovie($query)
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        ↓
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>TMDB API: /search/movie
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        ↓
@@ -2994,7 +2994,7 @@
 </span></code></pre></div>
 <h3 id="search-implementation">Search Implementation<a class="headerlink" href="#search-implementation" title="Permanent link">&para;</a></h3>
 <p><strong>File</strong>: <code>src/Api/Tmdb/TmdbApi.php</code></p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="x">public function searchMovies(string $query, int $page = 1) : array</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="x">public function searchMovie(string $query, int $page = 1) : array</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="x">{</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="x">    $response = $this-&gt;client-&gt;get(&#39;/search/movie&#39;, [</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="x">        &#39;query&#39; =&gt; [</span>
@@ -3121,7 +3121,7 @@
 </span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>│                       TmdbApi                                   │
 </span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>│               src/Api/Tmdb/TmdbApi.php                          │
 </span><span id="__span-12-16"><a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>│                                                                 │
-</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>│   searchMovies()  getMovie()  getPerson()  getCredits()         │
+</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>│   searchMovie()  getMovie()  getPerson()  getCredits()         │
 </span><span id="__span-12-18"><a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>└────────────────────────────┬────────────────────────────────────┘
 </span><span id="__span-12-19"><a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>                             │
 </span><span id="__span-12-20"><a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>                             ▼
@@ -3210,12 +3210,10 @@
 </span></code></pre></div>
 <h2 id="related-pages">Related Pages<a class="headerlink" href="#related-pages" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="Ratings-and-Comments">Ratings and Comments</a>] - User ratings for movies</li>
-<li><a href="Database">Database</a>] - Movie table schema</li>
-<li><a href="Frontend-and-UI">Frontend and UI</a>] - Movie display templates</li>
+<li><a href="../ratings-and-comments/">Ratings and Comments</a> - User ratings for movies</li>
+<li><a href="../../architecture/database/">Database</a> - Movie table schema</li>
+<li><a href="../../architecture/frontend-and-ui/">Frontend and UI</a> - Movie display templates</li>
 </ul>
-<hr />
-<p><a href="Home">← Back to Wiki Home</a></p>
 
 
 

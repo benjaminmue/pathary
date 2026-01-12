@@ -2396,17 +2396,20 @@
   <h1>Backend Structure</h1>
 
 <h3 id="routing">Routing<a class="headerlink" href="#routing" title="Permanent link">&para;</a></h3>
-<p>When someone visits Movary, a request wil be sent to the Router, which is configured via <code>/settings/routes.php</code>.</p>
+<p>When someone visits Pathary, a request will be sent to the Router, which is configured via <code>/settings/routes.php</code>.</p>
 <p>To add a new route, go to the file <code>settings/routes.php</code> and add this new line:</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="x">$routes-&gt;add(&#39;&lt;HTTP_METHOD&gt;&#39;, &#39;/your/url/path&#39;, [Web\Some\Controller::class, &#39;Method&#39;]);</span>
 </span></code></pre></div>
 <p>Replace <HTTPMethod> with either <code>GET</code>, <code>POST</code>, <code>PUT</code> or <code>DELETE</code> and put this line of code in either the <code>addWebRoutes</code> function or the <code>addApiRoutes</code> function. It should be
 in <code>addWebRoutes</code> if it's a route that the user will be visiting on the website and in the <code>addApiRoutes</code> if it's not.</p>
-<p>Movary uses <a href="https://github.com/nikic/FastRoute">FastRoute</a> to manage most of the routing stuff (only the middleware is added by us) and for more info, visit their git repo.</p>
+<p>Pathary uses <a href="https://github.com/nikic/FastRoute">FastRoute</a> to manage most of the routing stuff (only the middleware is added by us) and for more info, visit their git repo.</p>
 <h3 id="middleware">Middleware<a class="headerlink" href="#middleware" title="Permanent link">&para;</a></h3>
 <p>Middlewares are methods that check if the user is allowed to do this. For example, to check if someone is allowed to access the settings page, the middleware <code>UserIsAuthenticated</code>
 will be used and to check if the user is an admin, the middleware <code>UserIsAdmin</code> is used.</p>
 <p>All the middleware are in the namespace <code>Movary\HttpController\Web\Middleware</code> and use the interface <code>MiddlewareInterface</code>.</p>
+<blockquote>
+<p><strong>Note</strong>: The codebase internally uses the <code>Movary\</code> namespace (inherited from the original Movary project). This is intentional and does not affect functionality.</p>
+</blockquote>
 <h4 id="writing-new-middlewares">Writing new middlewares<a class="headerlink" href="#writing-new-middlewares" title="Permanent link">&para;</a></h4>
 <p>To add new middlewares, first create a new file like <code>/src/HttpController/Web/Middleware/MyNewMiddleware.php</code>.</p>
 <p>Then copy-paste this in the new file:</p>
@@ -2430,9 +2433,12 @@ route and the route is visited by an user.</p>
 </span></code></pre></div>
 <h3 id="http-controllers">HTTP Controllers<a class="headerlink" href="#http-controllers" title="Permanent link">&para;</a></h3>
 <p>The HTTP controllers are all located in <code>/src/HttpController</code>. These are the methods that will be executed when the route is visited.</p>
-<p>The controllers for the website have the namespace <code>namespace Movary\HttpController\Web</code> and the API-related controllers have <code>namespace Movary\HttpController\Web</code>.</p>
+<p>The controllers for the website have the namespace <code>Movary\HttpController\Web</code> and the API-related controllers have <code>Movary\HttpController\Api</code>.</p>
+<blockquote>
+<p><strong>Note</strong>: The codebase internally uses the <code>Movary\</code> namespace (inherited from the original Movary project).</p>
+</blockquote>
 <h3 id="data-transfer-objects-dto">Data Transfer Objects (DTO)<a class="headerlink" href="#data-transfer-objects-dto" title="Permanent link">&para;</a></h3>
-<p>Data Transfer Objects (DTO) are frequently used in Movary and can be found throughout the whole backend.</p>
+<p>Data Transfer Objects (DTO) are frequently used in Pathary and can be found throughout the whole backend.</p>
 <p>A DOT is used to transfer data between classes and processes in a statically defined typesafe manner (in opposite to for example arrays).</p>
 <p>For a different (perhaps better) explanation, visit this <a href="https://stackoverflow.com/q/1051182/12096297">Stackoverflow thread</a></p>
 <h3 id="dependency-injections-bootstrapping-and-the-factory">Dependency injections, bootstrapping and the Factory<a class="headerlink" href="#dependency-injections-bootstrapping-and-the-factory" title="Permanent link">&para;</a></h3>

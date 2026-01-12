@@ -2595,14 +2595,8 @@
 <h2 id="key-design-decisions">Key Design Decisions<a class="headerlink" href="#key-design-decisions" title="Permanent link">&para;</a></h2>
 <h3 id="1-php-di-for-dependency-injection">1. PHP-DI for Dependency Injection<a class="headerlink" href="#1-php-di-for-dependency-injection" title="Permanent link">&para;</a></h3>
 <p>The application uses PHP-DI with factory methods defined in <code>src/Factory.php</code>. Services are created lazily and injected automatically.</p>
-<p><strong>Key file</strong>: <code>bootstrap.php</code>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="x">$builder = new DI\ContainerBuilder();</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="x">$builder-&gt;addDefinitions([</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="x">    Config::class =&gt; DI\factory([Factory::class, &#39;createConfig&#39;]),</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="x">    Connection::class =&gt; DI\factory([Factory::class, &#39;createDbConnection&#39;]),</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="x">    // ...</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="x">]);</span>
-</span></code></pre></div></p>
+<p><strong>File</strong>: <code>bootstrap.php</code></p>
+<p>The DI container builder configures definitions using fully-qualified class names with leading backslashes (e.g., <code>\Movary\ValueObject\Config::class</code>). Each dependency is registered using <code>DI\factory()</code> pointing to factory methods in <code>Factory::class</code> (e.g., <code>createConfig()</code>, <code>createDbConnection()</code>, etc.). The container is built with compilation enabled in production for better performance.</p>
 <h3 id="2-fastroute-for-routing">2. FastRoute for Routing<a class="headerlink" href="#2-fastroute-for-routing" title="Permanent link">&para;</a></h3>
 <p>Routes are defined in <code>settings/routes.php</code> with support for:
 - Route groups (web vs API)
@@ -2620,11 +2614,11 @@
 - Migrations via Phinx</p>
 <h3 id="5-repository-pattern">5. Repository Pattern<a class="headerlink" href="#5-repository-pattern" title="Permanent link">&para;</a></h3>
 <p>Data access is organized by domain:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>src/Domain/Movie/
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>├── MovieApi.php           # High-level API
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├── MovieRepository.php    # Database queries
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>├── MovieEntity.php        # Data structure
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>└── MovieEntityList.php    # Collection
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>src/Domain/Movie/
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>├── MovieApi.php           # High-level API
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>├── MovieRepository.php    # Database queries
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>├── MovieEntity.php        # Data structure
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>└── MovieEntityList.php    # Collection
 </span></code></pre></div></p>
 <h3 id="6-group-focused-design">6. Group-Focused Design<a class="headerlink" href="#6-group-focused-design" title="Permanent link">&para;</a></h3>
 <p>Unlike single-user movie trackers, Pathary is designed for groups:
@@ -2670,12 +2664,10 @@
 </table>
 <h2 id="related-pages">Related Pages<a class="headerlink" href="#related-pages" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="Routing-and-Controllers">Routing and Controllers</a>] - Detailed route documentation</li>
-<li><a href="Database">Database</a>] - Schema and queries</li>
-<li><a href="Authentication-and-Sessions">Authentication</a>] - Security implementation</li>
+<li><a href="../routing-and-controllers/">Routing and Controllers</a> - Detailed route documentation</li>
+<li><a href="../database/">Database</a> - Schema and queries</li>
+<li><a href="../../security/authentication-and-sessions/">Authentication and Sessions</a> - Security implementation</li>
 </ul>
-<hr />
-<p><a href="Home">← Back to Wiki Home</a></p>
 
 
 

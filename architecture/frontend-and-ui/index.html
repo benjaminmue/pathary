@@ -1645,17 +1645,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#logo-styling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Logo Styling
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2685,17 +2674,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#logo-styling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Logo Styling
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2982,7 +2960,7 @@
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>templates/
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── base.html.twig              # Root layout
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── component/                  # Reusable components
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── navbar_app.twig         # Authenticated navbar
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── navbar.html.twig        # Authenticated navbar
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── navbar_public.twig      # Public navbar
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── modal_log_play.twig     # Log play modal
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   └── ...
@@ -3003,37 +2981,7 @@
 </span></code></pre></div>
 <h2 id="base-layout">Base Layout<a class="headerlink" href="#base-layout" title="Permanent link">&para;</a></h2>
 <p><strong>File</strong>: <code>templates/base.html.twig</code></p>
-<p>All pages use a flexbox sticky footer pattern with consistent bottom spacing:</p>
-<div class="language-twig highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="x">&lt;!DOCTYPE html&gt;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="x">&lt;html data-bs-theme=&quot;</span><span class="cp">{{</span> <span class="nv">theme</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="x">&lt;head&gt;</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="x">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="x">    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="x">    &lt;title&gt;</span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">title</span> <span class="cp">%}</span><span class="x">Pathary</span><span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span><span class="x"> | </span><span class="cp">{{</span> <span class="nv">applicationName</span> <span class="cp">}}</span><span class="x">&lt;/title&gt;</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="x">    &lt;!-- Bootstrap CSS --&gt;</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="x">    &lt;link href=&quot;/css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&gt;</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="x">    &lt;link href=&quot;/css/bootstrap-icons-1.10.2.css&quot; rel=&quot;stylesheet&quot;&gt;</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="x">    </span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">styles</span> <span class="cp">%}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="x">&lt;/head&gt;</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="x">&lt;body class=&quot;d-flex flex-column min-vh-100&quot;&gt;</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="x">    </span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">navbar</span> <span class="cp">%}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="x">    &lt;div class=&quot;flex-grow-1 pb-4&quot;&gt;</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="x">        </span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">body</span> <span class="cp">%}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="x">    &lt;/div&gt;</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="x">    </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">showFooter</span> <span class="k">is</span> <span class="k">not</span> <span class="nf">defined</span> <span class="k">or</span> <span class="nv">showFooter</span> <span class="cp">%}</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="x">        </span><span class="cp">{%</span> <span class="k">include</span> <span class="s1">&#39;partials/footer.twig&#39;</span> <span class="cp">%}</span>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="x">    </span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="x">    &lt;!-- Bootstrap JS --&gt;</span>
-</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="x">    &lt;script src=&quot;/js/bootstrap.bundle.min.js&quot;&gt;&lt;/script&gt;</span>
-</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="x">    </span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">scripts</span> <span class="cp">%}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
-</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="x">&lt;/body&gt;</span>
-</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="x">&lt;/html&gt;</span>
-</span></code></pre></div>
+<p>The base template provides the foundational HTML structure for all pages, implementing a flexbox sticky footer pattern with consistent bottom spacing. It includes comprehensive meta tags for SEO and PWA support (CSRF token, canonical link, OpenGraph tags, favicon, manifest, theme color), CSS resources (Bootstrap, Bootstrap Icons, datepicker, global styles), hidden input fields for user preferences (date formats, current user data), JavaScript initialization (APPLICATION_URL window variable, jQuery, Bootstrap bundle, datepicker), and the footer partial. The layout uses <code>data-bs-theme</code> attribute for dark mode support, <code>min-vh-100</code> + <code>flex-column</code> + <code>flex-grow-1</code> for sticky footer behavior, and allows pages to hide the footer via <code>showFooter</code> variable. Note: The template does NOT include a navbar block - pages must include the navbar component separately if needed.</p>
 <h3 id="layout-features">Layout Features<a class="headerlink" href="#layout-features" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Sticky Footer</strong>: Uses <code>min-vh-100</code> + <code>flex-column</code> + <code>flex-grow-1</code> pattern</li>
@@ -3043,26 +2991,7 @@
 </ul>
 <h2 id="footer-navigation">Footer Navigation<a class="headerlink" href="#footer-navigation" title="Permanent link">&para;</a></h2>
 <p><strong>File</strong>: <code>templates/partials/footer.twig</code></p>
-<p>A sticky footer is included on all pages (except login) with links to project resources:</p>
-<div class="language-twig highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="x">&lt;footer class=&quot;footer mt-auto py-3 bg-body-tertiary border-top&quot;&gt;</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="x">    &lt;div class=&quot;container&quot;&gt;</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="x">        &lt;div class=&quot;d-flex flex-wrap justify-content-center gap-3 small&quot;&gt;</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="x">            &lt;a href=&quot;https://github.com/benjaminmue/pathary&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="x">               class=&quot;text-body-secondary text-decoration-none&quot;&gt;</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="x">                &lt;i class=&quot;bi bi-github me-1&quot;&gt;&lt;/i&gt;GitHub</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="x">            &lt;/a&gt;</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="x">            &lt;a href=&quot;https://github.com/benjaminmue/pathary/wiki&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="x">               class=&quot;text-body-secondary text-decoration-none&quot;&gt;</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="x">                &lt;i class=&quot;bi bi-book me-1&quot;&gt;&lt;/i&gt;Wiki</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="x">            &lt;/a&gt;</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="x">            &lt;a href=&quot;https://github.com/benjaminmue/pathary/issues/new&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="x">               class=&quot;text-body-secondary text-decoration-none&quot;&gt;</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="x">                &lt;i class=&quot;bi bi-bug me-1&quot;&gt;&lt;/i&gt;Report Issue</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="x">            &lt;/a&gt;</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="x">        &lt;/div&gt;</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="x">    &lt;/div&gt;</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="x">&lt;/footer&gt;</span>
-</span></code></pre></div>
+<p>The footer component includes an embedded style block that forces dark styling in light mode (ensuring footer matches the dark navbar), followed by a sticky footer with centered flexbox links to project resources (GitHub repository, Wiki documentation, Issue reporting). Each link uses Bootstrap Icons, external link safety attributes (<code>rel="noopener noreferrer"</code>), responsive wrapping on mobile (<code>flex-wrap</code>), and muted text styling (<code>text-body-secondary</code>). The footer is conditionally hidden on the login page via the <code>showFooter</code> variable.</p>
 <h3 id="footer-features">Footer Features<a class="headerlink" href="#footer-features" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Sticky Positioning</strong>: Uses <code>mt-auto</code> with flexbox container</li>
@@ -3073,67 +3002,21 @@
 </ul>
 <h2 id="dark-mode">Dark Mode<a class="headerlink" href="#dark-mode" title="Permanent link">&para;</a></h2>
 <p>Pathary uses Bootstrap 5's built-in dark mode with <code>data-bs-theme</code> attribute:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">&lt;</span><span class="nt">html</span> <span class="na">data-bs-theme</span><span class="o">=</span><span class="s">&quot;dark&quot;</span><span class="p">&gt;</span>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">&lt;</span><span class="nt">html</span> <span class="na">data-bs-theme</span><span class="o">=</span><span class="s">&quot;dark&quot;</span><span class="p">&gt;</span>
 </span></code></pre></div>
 <p>The theme can be dynamically set per-user or globally.</p>
 <h3 id="custom-colors">Custom Colors<a class="headerlink" href="#custom-colors" title="Permanent link">&para;</a></h3>
 <p><strong>File</strong>: <code>templates/public/movie_detail.twig</code> (and other pages)</p>
-<div class="language-css highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">:</span><span class="nd">root</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nv">--pathe-yellow</span><span class="p">:</span><span class="w"> </span><span class="mh">#f5c518</span><span class="p">;</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nv">--pathe-dark</span><span class="p">:</span><span class="w"> </span><span class="mh">#1a1a1a</span><span class="p">;</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nv">--accent-purple</span><span class="p">:</span><span class="w"> </span><span class="mh">#6f2dbd</span><span class="p">;</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
+<div class="language-css highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">:</span><span class="nd">root</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="nv">--pathe-yellow</span><span class="p">:</span><span class="w"> </span><span class="mh">#f5c518</span><span class="p">;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nv">--pathe-dark</span><span class="p">:</span><span class="w"> </span><span class="mh">#1a1a1a</span><span class="p">;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nv">--accent-purple</span><span class="p">:</span><span class="w"> </span><span class="mh">#6f2dbd</span><span class="p">;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="navbar">Navbar<a class="headerlink" href="#navbar" title="Permanent link">&para;</a></h2>
 <h3 id="authenticated-navbar">Authenticated Navbar<a class="headerlink" href="#authenticated-navbar" title="Permanent link">&para;</a></h3>
-<p><strong>File</strong>: <code>templates/component/navbar_app.twig</code></p>
-<p>Features:
-- Logo with SVG image
-- Search button
-- User dropdown
-- Dark theme styling</p>
-<div class="language-twig highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="x">&lt;nav class=&quot;navbar navbar-expand-lg navbar-dark bg-dark&quot;&gt;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="x">    &lt;div class=&quot;container&quot;&gt;</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="x">        &lt;a class=&quot;navbar-brand d-flex align-items-center&quot; href=&quot;/&quot;&gt;</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="x">            &lt;img src=&quot;/images/logo.svg&quot; alt=&quot;Pathary&quot; class=&quot;navbar-logo me-2&quot;&gt;</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="x">            </span><span class="cp">{{</span> <span class="nv">applicationName</span> <span class="cp">}}</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="x">        &lt;/a&gt;</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="x">        &lt;button class=&quot;navbar-toggler&quot; data-bs-toggle=&quot;collapse&quot; data-bs-target=&quot;#navbarNav&quot;&gt;</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="x">            &lt;span class=&quot;navbar-toggler-icon&quot;&gt;&lt;/span&gt;</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="x">        &lt;/button&gt;</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="x">        &lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;navbarNav&quot;&gt;</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="x">            &lt;ul class=&quot;navbar-nav me-auto&quot;&gt;</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="x">                &lt;li class=&quot;nav-item&quot;&gt;</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="x">                    &lt;a class=&quot;nav-link&quot; href=&quot;/movies&quot;&gt;All Movies&lt;/a&gt;</span>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="x">                &lt;/li&gt;</span>
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="x">            &lt;/ul&gt;</span>
-</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="x">            &lt;ul class=&quot;navbar-nav&quot;&gt;</span>
-</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="x">                &lt;li class=&quot;nav-item dropdown&quot;&gt;</span>
-</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="x">                    &lt;a class=&quot;nav-link dropdown-toggle&quot; href=&quot;#&quot; data-bs-toggle=&quot;dropdown&quot;&gt;</span>
-</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="x">                        </span><span class="cp">{{</span> <span class="nv">currentUser.name</span> <span class="cp">}}</span>
-</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="x">                    &lt;/a&gt;</span>
-</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="x">                    &lt;ul class=&quot;dropdown-menu dropdown-menu-end&quot;&gt;</span>
-</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="x">                        &lt;li&gt;&lt;a class=&quot;dropdown-item&quot; href=&quot;/profile&quot;&gt;Profile&lt;/a&gt;&lt;/li&gt;</span>
-</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="x">                        &lt;li&gt;&lt;a class=&quot;dropdown-item&quot; href=&quot;/settings/account/general&quot;&gt;Settings&lt;/a&gt;&lt;/li&gt;</span>
-</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="x">                        &lt;li&gt;&lt;hr class=&quot;dropdown-divider&quot;&gt;&lt;/li&gt;</span>
-</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="x">                        &lt;li&gt;&lt;a class=&quot;dropdown-item&quot; href=&quot;#&quot; onclick=&quot;logout()&quot;&gt;Logout&lt;/a&gt;&lt;/li&gt;</span>
-</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="x">                    &lt;/ul&gt;</span>
-</span><span id="__span-5-29"><a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="x">                &lt;/li&gt;</span>
-</span><span id="__span-5-30"><a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="x">            &lt;/ul&gt;</span>
-</span><span id="__span-5-31"><a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="x">        &lt;/div&gt;</span>
-</span><span id="__span-5-32"><a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="x">    &lt;/div&gt;</span>
-</span><span id="__span-5-33"><a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a><span class="x">&lt;/nav&gt;</span>
-</span></code></pre></div>
-<h3 id="logo-styling">Logo Styling<a class="headerlink" href="#logo-styling" title="Permanent link">&para;</a></h3>
-<p><strong>File</strong>: <code>public/css/global.css</code></p>
-<div class="language-css highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">.</span><span class="nc">navbar-logo</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="k">height</span><span class="p">:</span><span class="w"> </span><span class="mi">32</span><span class="kt">px</span><span class="p">;</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="k">object-fit</span><span class="p">:</span><span class="w"> </span><span class="kc">contain</span><span class="p">;</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
-</span></code></pre></div>
+<p><strong>File</strong>: <code>templates/component/navbar.html.twig</code></p>
+<p>The authenticated navbar uses a simple dark design without responsive expansion/collapse. It displays the application logo and name on the left, and on the right shows an "Add movie" button (for logged-in users) followed by a 3-dots dropdown menu. The dropdown contains navigation links with active state highlighting using regex pattern matching (Dashboard, History, Watchlist, All Movies, Top Actors, Top Directors), a dark mode toggle switch with sun/moon icons, and logout functionality. The navbar uses inline border styles (<code>style="border-color: #9d9d9d"</code>) on certain elements and includes the logo styling CSS in <code>public/css/global.css</code> (32px height, auto width, object-fit contain).</p>
 <h2 id="login-page">Login Page<a class="headerlink" href="#login-page" title="Permanent link">&para;</a></h2>
 <p><strong>File</strong>: <code>templates/page/login.html.twig</code></p>
 <p>Features:
@@ -3141,26 +3024,26 @@
 - Animated falling popcorn background
 - Dark theme</p>
 <h3 id="logo-container">Logo Container<a class="headerlink" href="#logo-container" title="Permanent link">&para;</a></h3>
-<div class="language-css highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">.</span><span class="nc">login-logo-container</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">relative</span><span class="p">;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">150</span><span class="kt">px</span><span class="p">;</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="k">height</span><span class="p">:</span><span class="w"> </span><span class="mi">150</span><span class="kt">px</span><span class="p">;</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="kt">%</span><span class="p">;</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="k">overflow</span><span class="p">:</span><span class="w"> </span><span class="kc">hidden</span><span class="p">;</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="p">}</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="p">.</span><span class="nc">login-logo-container</span><span class="p">::</span><span class="nd">before</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="k">content</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">;</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">absolute</span><span class="p">;</span>
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="k">inset</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">    </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="kt">%</span><span class="p">;</span>
-</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">    </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="kt">px</span><span class="p">;</span>
-</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">    </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nb">linear-gradient</span><span class="p">(</span><span class="mi">135</span><span class="kt">deg</span><span class="p">,</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--pathe-yellow</span><span class="p">),</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--accent-purple</span><span class="p">));</span>
-</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">    </span><span class="kp">-webkit-</span><span class="k">mask</span><span class="p">:</span><span class="w"> </span><span class="nb">linear-gradient</span><span class="p">(</span><span class="mh">#fff</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="kc">content-box</span><span class="p">,</span><span class="w"> </span><span class="nb">linear-gradient</span><span class="p">(</span><span class="mh">#fff</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">    </span><span class="kp">-webkit-</span><span class="k">mask-composite</span><span class="p">:</span><span class="w"> </span><span class="n">xor</span><span class="p">;</span>
-</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">    </span><span class="k">mask-composite</span><span class="p">:</span><span class="w"> </span><span class="n">exclude</span><span class="p">;</span>
-</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">    </span><span class="k">box-shadow</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">20</span><span class="kt">px</span><span class="w"> </span><span class="nb">rgba</span><span class="p">(</span><span class="mi">245</span><span class="p">,</span><span class="w"> </span><span class="mi">197</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mf">0.3</span><span class="p">);</span>
-</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="p">}</span>
+<div class="language-css highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">.</span><span class="nc">login-logo-container</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">relative</span><span class="p">;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">150</span><span class="kt">px</span><span class="p">;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="k">height</span><span class="p">:</span><span class="w"> </span><span class="mi">150</span><span class="kt">px</span><span class="p">;</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="kt">%</span><span class="p">;</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="k">overflow</span><span class="p">:</span><span class="w"> </span><span class="kc">hidden</span><span class="p">;</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">}</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">.</span><span class="nc">login-logo-container</span><span class="p">::</span><span class="nd">before</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="k">content</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">absolute</span><span class="p">;</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="k">inset</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="kt">%</span><span class="p">;</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="kt">px</span><span class="p">;</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">    </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nb">linear-gradient</span><span class="p">(</span><span class="mi">135</span><span class="kt">deg</span><span class="p">,</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--pathe-yellow</span><span class="p">),</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--accent-purple</span><span class="p">));</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">    </span><span class="kp">-webkit-</span><span class="k">mask</span><span class="p">:</span><span class="w"> </span><span class="nb">linear-gradient</span><span class="p">(</span><span class="mh">#fff</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="kc">content-box</span><span class="p">,</span><span class="w"> </span><span class="nb">linear-gradient</span><span class="p">(</span><span class="mh">#fff</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">    </span><span class="kp">-webkit-</span><span class="k">mask-composite</span><span class="p">:</span><span class="w"> </span><span class="n">xor</span><span class="p">;</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">    </span><span class="k">mask-composite</span><span class="p">:</span><span class="w"> </span><span class="n">exclude</span><span class="p">;</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">    </span><span class="k">box-shadow</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">20</span><span class="kt">px</span><span class="w"> </span><span class="nb">rgba</span><span class="p">(</span><span class="mi">245</span><span class="p">,</span><span class="w"> </span><span class="mi">197</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mf">0.3</span><span class="p">);</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="popcorn-animation">Popcorn Animation<a class="headerlink" href="#popcorn-animation" title="Permanent link">&para;</a></h3>
 <p><strong>File</strong>: <code>public/js/login-bg.js</code></p>
@@ -3168,25 +3051,25 @@
 <h2 id="movie-grid">Movie Grid<a class="headerlink" href="#movie-grid" title="Permanent link">&para;</a></h2>
 <p><strong>File</strong>: <code>templates/partials/movie_grid.twig</code></p>
 <p>Displays movies in a responsive grid:</p>
-<div class="language-twig highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="x">&lt;div class=&quot;movie-grid&quot;&gt;</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="x">    </span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">movie</span> <span class="k">in</span> <span class="nv">movies</span> <span class="cp">%}</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="x">        &lt;a href=&quot;/movie/</span><span class="cp">{{</span> <span class="nv">movie.movie_id</span> <span class="cp">}}</span><span class="x">&quot; class=&quot;movie-card&quot;&gt;</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="x">            &lt;div class=&quot;movie-poster&quot;&gt;</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="x">                </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">movie.poster_src</span> <span class="cp">%}</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="x">                    &lt;img src=&quot;</span><span class="cp">{{</span> <span class="nv">movie.poster_src</span> <span class="cp">}}</span><span class="x">&quot; alt=&quot;</span><span class="cp">{{</span> <span class="nv">movie.title</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="x">                </span><span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="x">                    &lt;div class=&quot;poster-placeholder&quot;&gt;</span><span class="cp">{{</span> <span class="nv">movie.title</span> <span class="cp">}}</span><span class="x">&lt;/div&gt;</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="x">                </span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="x">            &lt;/div&gt;</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="x">            &lt;div class=&quot;movie-title&quot;&gt;</span><span class="cp">{{</span> <span class="nv">movie.title</span> <span class="cp">}}</span><span class="x">&lt;/div&gt;</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="x">            </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">movie.avg_popcorn</span> <span class="cp">%}</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="x">                &lt;div class=&quot;movie-rating&quot;&gt;</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="x">                    </span><span class="cp">{{</span> <span class="nv">movie.avg_popcorn</span><span class="o">|</span><span class="nf">number_format</span><span class="o">(</span><span class="m">1</span><span class="o">)</span> <span class="cp">}}</span><span class="x"> 🍿</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="x">                &lt;/div&gt;</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="x">            </span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="x">        &lt;/a&gt;</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="x">    </span><span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="x">&lt;/div&gt;</span>
+<div class="language-twig highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="x">&lt;div class=&quot;movie-grid&quot;&gt;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="x">    </span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">movie</span> <span class="k">in</span> <span class="nv">movies</span> <span class="cp">%}</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="x">        &lt;a href=&quot;/movie/</span><span class="cp">{{</span> <span class="nv">movie.movie_id</span> <span class="cp">}}</span><span class="x">&quot; class=&quot;movie-card&quot;&gt;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="x">            &lt;div class=&quot;movie-poster&quot;&gt;</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="x">                </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">movie.poster_src</span> <span class="cp">%}</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="x">                    &lt;img src=&quot;</span><span class="cp">{{</span> <span class="nv">movie.poster_src</span> <span class="cp">}}</span><span class="x">&quot; alt=&quot;</span><span class="cp">{{</span> <span class="nv">movie.title</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="x">                </span><span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="x">                    &lt;div class=&quot;poster-placeholder&quot;&gt;</span><span class="cp">{{</span> <span class="nv">movie.title</span> <span class="cp">}}</span><span class="x">&lt;/div&gt;</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="x">                </span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="x">            &lt;/div&gt;</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="x">            &lt;div class=&quot;movie-title&quot;&gt;</span><span class="cp">{{</span> <span class="nv">movie.title</span> <span class="cp">}}</span><span class="x">&lt;/div&gt;</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="x">            </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">movie.avg_popcorn</span> <span class="cp">%}</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="x">                &lt;div class=&quot;movie-rating&quot;&gt;</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="x">                    </span><span class="cp">{{</span> <span class="nv">movie.avg_popcorn</span><span class="o">|</span><span class="nf">number_format</span><span class="o">(</span><span class="m">1</span><span class="o">)</span> <span class="cp">}}</span><span class="x"> 🍿</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="x">                &lt;/div&gt;</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="x">            </span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="x">        &lt;/a&gt;</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="x">    </span><span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="x">&lt;/div&gt;</span>
 </span></code></pre></div>
 <h2 id="movie-detail-page">Movie Detail Page<a class="headerlink" href="#movie-detail-page" title="Permanent link">&para;</a></h2>
 <p><strong>File</strong>: <code>templates/public/movie_detail.twig</code></p>
@@ -3207,24 +3090,24 @@
 <p>Modes:
 - <code>display</code>: Read-only popcorn display
 - <code>input</code>: Interactive rating selector</p>
-<div class="language-twig highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="cp">{%</span> <span class="k">if</span> <span class="nv">mode</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span> <span class="cp">%}</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="x">    &lt;div class=&quot;popcorn-rating popcorn-rating--input&quot;&gt;</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="x">        &lt;input type=&quot;hidden&quot; name=&quot;</span><span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span><span class="x">&quot; value=&quot;</span><span class="cp">{{</span> <span class="nv">valueInt</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="x">        </span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">i</span> <span class="k">in</span> <span class="m">1..7</span> <span class="cp">%}</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="x">            &lt;button type=&quot;button&quot;</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="x">                    class=&quot;popcorn-rating__item </span><span class="cp">{{</span> <span class="nv">i</span> <span class="o">&lt;=</span> <span class="nv">valueInt</span> <span class="o">?</span> <span class="s1">&#39;popcorn-on&#39;</span> <span class="o">:</span> <span class="s1">&#39;popcorn-off&#39;</span> <span class="cp">}}</span><span class="x">&quot;</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="x">                    data-value=&quot;</span><span class="cp">{{</span> <span class="nv">i</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="x">                🍿</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="x">            &lt;/button&gt;</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="x">        </span><span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="x">    &lt;/div&gt;</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="x">    &lt;div class=&quot;popcorn-rating&quot; aria-label=&quot;Rating: </span><span class="cp">{{</span> <span class="nv">valueInt</span> <span class="cp">}}</span><span class="x"> out of 7&quot;&gt;</span>
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="x">        </span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">i</span> <span class="k">in</span> <span class="m">1..7</span> <span class="cp">%}</span>
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="x">            &lt;span class=&quot;popcorn-rating__item </span><span class="cp">{{</span> <span class="nv">i</span> <span class="o">&lt;=</span> <span class="nv">valueInt</span> <span class="o">?</span> <span class="s1">&#39;popcorn-on&#39;</span> <span class="o">:</span> <span class="s1">&#39;popcorn-off&#39;</span> <span class="cp">}}</span><span class="x">&quot;&gt;🍿&lt;/span&gt;</span>
-</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="x">        </span><span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
-</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="x">    &lt;/div&gt;</span>
-</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+<div class="language-twig highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cp">{%</span> <span class="k">if</span> <span class="nv">mode</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span> <span class="cp">%}</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="x">    &lt;div class=&quot;popcorn-rating popcorn-rating--input&quot;&gt;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="x">        &lt;input type=&quot;hidden&quot; name=&quot;</span><span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span><span class="x">&quot; value=&quot;</span><span class="cp">{{</span> <span class="nv">valueInt</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="x">        </span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">i</span> <span class="k">in</span> <span class="m">1..7</span> <span class="cp">%}</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="x">            &lt;button type=&quot;button&quot;</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="x">                    class=&quot;popcorn-rating__item </span><span class="cp">{{</span> <span class="nv">i</span> <span class="o">&lt;=</span> <span class="nv">valueInt</span> <span class="o">?</span> <span class="s1">&#39;popcorn-on&#39;</span> <span class="o">:</span> <span class="s1">&#39;popcorn-off&#39;</span> <span class="cp">}}</span><span class="x">&quot;</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="x">                    data-value=&quot;</span><span class="cp">{{</span> <span class="nv">i</span> <span class="cp">}}</span><span class="x">&quot;&gt;</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="x">                🍿</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="x">            &lt;/button&gt;</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="x">        </span><span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="x">    &lt;/div&gt;</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="x">    &lt;div class=&quot;popcorn-rating&quot; aria-label=&quot;Rating: </span><span class="cp">{{</span> <span class="nv">valueInt</span> <span class="cp">}}</span><span class="x"> out of 7&quot;&gt;</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="x">        </span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">i</span> <span class="k">in</span> <span class="m">1..7</span> <span class="cp">%}</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="x">            &lt;span class=&quot;popcorn-rating__item </span><span class="cp">{{</span> <span class="nv">i</span> <span class="o">&lt;=</span> <span class="nv">valueInt</span> <span class="o">?</span> <span class="s1">&#39;popcorn-on&#39;</span> <span class="o">:</span> <span class="s1">&#39;popcorn-off&#39;</span> <span class="cp">}}</span><span class="x">&quot;&gt;🍿&lt;/span&gt;</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="x">        </span><span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="x">    &lt;/div&gt;</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
 </span></code></pre></div>
 <h2 id="javascript-files">JavaScript Files<a class="headerlink" href="#javascript-files" title="Permanent link">&para;</a></h2>
 <table>
@@ -3259,29 +3142,7 @@
 </table>
 <h3 id="login-form">Login Form<a class="headerlink" href="#login-form" title="Permanent link">&para;</a></h3>
 <p><strong>File</strong>: <code>public/js/login.js</code></p>
-<div class="language-javascript highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;loginForm&#39;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/api/authentication/token&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">        </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">        </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">            </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">            </span><span class="s1">&#39;X-Movary-Client&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;pathary-web&#39;</span><span class="p">,</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">        </span><span class="p">},</span>
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">        </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
-</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">            </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
-</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">            </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
-</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">            </span><span class="nx">rememberMe</span><span class="o">:</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;rememberMe&#39;</span><span class="p">).</span><span class="nx">checked</span><span class="p">,</span>
-</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">        </span><span class="p">}),</span>
-</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">    </span><span class="p">});</span>
-</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>
-</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">        </span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;/&#39;</span><span class="p">;</span>
-</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">        </span><span class="nx">showError</span><span class="p">(</span><span class="s1">&#39;Invalid credentials&#39;</span><span class="p">);</span>
-</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="p">});</span>
-</span></code></pre></div>
+<p>The login form handler uses a <code>submitCredentials()</code> function that validates redirect URLs with <code>getSafeRedirect()</code> (comparing against <code>APPLICATION_URL</code>), makes an API call to <code>/api/authentication/token</code> with the <code>Pathary Web</code> client identifier, and handles multiple response scenarios. Success (200) redirects to the safe redirect URL. Authentication failures (400) trigger complex 2FA/recovery code logic including TOTP verification, recovery code consumption, trusted device handling, and multiple error states (invalid credentials, device token, TOTP code). Server errors (500+) display generic error messages. The implementation includes separate functions for credential submission, login requests, error display, and safe redirect validation.</p>
 <h2 id="css-files">CSS Files<a class="headerlink" href="#css-files" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -3319,16 +3180,16 @@
 </table>
 <h2 id="responsive-design">Responsive Design<a class="headerlink" href="#responsive-design" title="Permanent link">&para;</a></h2>
 <p>Bootstrap breakpoints are used throughout:</p>
-<div class="language-css highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">@</span><span class="k">media</span><span class="w"> </span><span class="o">(</span><span class="nt">max-width</span><span class="o">:</span><span class="w"> </span><span class="nt">768px</span><span class="o">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="p">.</span><span class="nc">rating-form-row</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">        </span><span class="k">flex-direction</span><span class="p">:</span><span class="w"> </span><span class="kc">column</span><span class="p">;</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">        </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="p">.</span><span class="nc">rating-form-divider</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">        </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">}</span>
+<div class="language-css highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">@</span><span class="k">media</span><span class="w"> </span><span class="o">(</span><span class="nt">max-width</span><span class="o">:</span><span class="w"> </span><span class="nt">768px</span><span class="o">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="p">.</span><span class="nc">rating-form-row</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">        </span><span class="k">flex-direction</span><span class="p">:</span><span class="w"> </span><span class="kc">column</span><span class="p">;</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">        </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="p">.</span><span class="nc">rating-form-divider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">        </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="icons">Icons<a class="headerlink" href="#icons" title="Permanent link">&para;</a></h2>
 <p>Bootstrap Icons (version 1.10.2) are used throughout the application via CSS classes.</p>
@@ -3460,28 +3321,26 @@
 </tbody>
 </table>
 <h3 id="usage-example">Usage Example<a class="headerlink" href="#usage-example" title="Permanent link">&para;</a></h3>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="cm">&lt;!-- Basic icon --&gt;</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;bi bi-calendar-event&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="cm">&lt;!-- Icon with margin --&gt;</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;bi bi-github me-1&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>GitHub
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="cm">&lt;!-- Icon in button --&gt;</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span><span class="p">&gt;</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    <span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;bi bi-search me-2&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>Search Movies
-</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
-</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="cm">&lt;!-- Icon with color --&gt;</span>
-</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;bi bi-lock-fill text-success&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span> 2FA Enabled
+<div class="language-html highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="cm">&lt;!-- Basic icon --&gt;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;bi bi-calendar-event&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="cm">&lt;!-- Icon with margin --&gt;</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;bi bi-github me-1&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>GitHub
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="cm">&lt;!-- Icon in button --&gt;</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span><span class="p">&gt;</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;bi bi-search me-2&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>Search Movies
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="cm">&lt;!-- Icon with color --&gt;</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;bi bi-lock-fill text-success&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span> 2FA Enabled
 </span></code></pre></div>
 <h2 id="related-pages">Related Pages<a class="headerlink" href="#related-pages" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="Ratings-and-Comments">Ratings and Comments</a>] - Rating UI components</li>
-<li><a href="Routing-and-Controllers">Routing and Controllers</a>] - Template rendering</li>
-<li><a href="Architecture">Architecture</a>] - Twig integration</li>
+<li><a href="../../features/ratings-and-comments/">Ratings and Comments</a> - Rating UI components</li>
+<li><a href="../routing-and-controllers/">Routing and Controllers</a> - Template rendering</li>
+<li><a href="../architecture/">Architecture</a> - Twig integration</li>
 </ul>
-<hr />
-<p><a href="Home">← Back to Wiki Home</a></p>
 
 
 

@@ -2925,49 +2925,11 @@
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>Sets cookie + returns token
 </span></code></pre></div>
 <h3 id="3-authentication-service">3. Authentication Service<a class="headerlink" href="#3-authentication-service" title="Permanent link">&para;</a></h3>
-<p><strong>File</strong>: <code>src/Domain/User/Service/Authentication.php</code></p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="x">public function login(</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="x">    string $email,</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="x">    string $password,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="x">    bool $rememberMe,</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="x">    string $deviceName,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="x">    string $userAgent,</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="x">    ?int $userTotpInput = null,</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="x">) : array {</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="x">    // Verify credentials</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="x">    $user = $this-&gt;findUserAndVerifyAuthentication($email, $password, $userTotpInput);</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="x">    // Create expiration (1 day or 10 years for &quot;remember me&quot;)</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="x">    $authTokenExpirationDate = $this-&gt;createExpirationDate();</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="x">    if ($rememberMe === true) {</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="x">        $authTokenExpirationDate = $this-&gt;createExpirationDate(3650); // 10 years</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="x">    }</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="x">    // Generate and store token</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="x">    $token = $this-&gt;setAuthenticationToken($user-&gt;getId(), $deviceName, $userAgent, $authTokenExpirationDate);</span>
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
-</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="x">    // Set cookie for web clients</span>
-</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="x">    if ($deviceName === CreateUserController::PATHARY_WEB_CLIENT) {</span>
-</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="x">        $this-&gt;setAuthenticationCookieAndNewSession($user-&gt;getId(), $token, $authTokenExpirationDate);</span>
-</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="x">    }</span>
-</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>
-</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="x">    return [&#39;user&#39; =&gt; $user, &#39;token&#39; =&gt; $token];</span>
-</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="x">}</span>
-</span></code></pre></div>
+<p><strong>File</strong>: <code>src/Domain/User/Service/Authentication.php:login()</code></p>
+<p>The login service verifies credentials, generates authentication tokens, and optionally sets cookies for web clients. It supports both standard logins and "remember me" functionality (token expiration: 1 day vs 10 years). For web clients, it sets the authentication cookie and regenerates the session ID. Returns the authenticated user and token.</p>
 <h2 id="cookie-configuration">Cookie Configuration<a class="headerlink" href="#cookie-configuration" title="Permanent link">&para;</a></h2>
-<p><strong>File</strong>: <code>src/Domain/User/Service/Authentication.php:247-257</code></p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="x">setcookie(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="x">    &#39;id&#39;,                              // Cookie name</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="x">    $token,                            // Auth token value</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="x">    [</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="x">        &#39;expires&#39; =&gt; $expirationTimestamp,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="x">        &#39;path&#39; =&gt; &#39;/&#39;,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="x">        &#39;secure&#39; =&gt; $isSecure,         // HTTPS only when available</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="x">        &#39;httponly&#39; =&gt; true,            // No JavaScript access</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="x">        &#39;samesite&#39; =&gt; &#39;Lax&#39;,           // CSRF protection</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="x">    ],</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="x">);</span>
-</span></code></pre></div>
+<p><strong>File</strong>: <code>src/Domain/User/Service/Authentication.php:setAuthenticationCookieAndNewSession()</code></p>
+<p>Pathary uses the <code>id</code> cookie to store authentication tokens with security flags: <code>httponly</code> (prevents XSS token theft), <code>secure</code> (auto-detected for HTTPS), <code>samesite=Lax</code> (CSRF protection), and site-wide path (<code>/</code>).</p>
 <h3 id="security-properties">Security Properties<a class="headerlink" href="#security-properties" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -3005,17 +2967,8 @@
 <p><strong>File</strong>: <code>src/HttpController/Web/Middleware/StartSession.php</code></p>
 <p>Sessions are started automatically for web requests.</p>
 <h3 id="session-regeneration">Session Regeneration<a class="headerlink" href="#session-regeneration" title="Permanent link">&para;</a></h3>
-<p>On login, session IDs are regenerated to prevent session fixation:</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="x">public function setAuthenticationCookieAndNewSession(int $userId, string $token, DateTime $expirationDate) : void</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="x">{</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="x">    $this-&gt;sessionWrapper-&gt;destroy();</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="x">    $this-&gt;sessionWrapper-&gt;start();</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="x">    $this-&gt;sessionWrapper-&gt;regenerateId();  // Prevent session fixation</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="x">    // Set cookie and session data...</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="x">    $this-&gt;sessionWrapper-&gt;set(&#39;userId&#39;, $userId);</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="x">}</span>
-</span></code></pre></div>
+<p><strong>File</strong>: <code>src/Domain/User/Service/Authentication.php:setAuthenticationCookieAndNewSession()</code></p>
+<p>On login, the session is destroyed and restarted with a new session ID (via <code>SessionWrapper::regenerateId()</code>) to prevent session fixation attacks. The user ID is stored in the session after regeneration.</p>
 <h2 id="token-storage">Token Storage<a class="headerlink" href="#token-storage" title="Permanent link">&para;</a></h2>
 <p>Auth tokens are stored in the <code>user_auth_token</code> table:</p>
 <table>
@@ -3075,13 +3028,8 @@
 </tbody>
 </table>
 <h3 id="token-lookup">Token Lookup<a class="headerlink" href="#token-lookup" title="Permanent link">&para;</a></h3>
-<p>The system looks up tokens by hash for security:</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="x">// UserRepository.php</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="x">$this-&gt;dbConnection-&gt;fetchAssociative(</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="x">    &#39;SELECT * FROM user_auth_token WHERE token_hash = ? OR token = ?&#39;,</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="x">    [$tokenHash, $token],</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="x">);</span>
-</span></code></pre></div>
+<p><strong>File</strong>: <code>src/Domain/User/Repository/UserRepository.php</code></p>
+<p>The system looks up tokens by SHA-256 hash for security. For backwards compatibility, it also checks the plain token field during migration periods.</p>
 <h2 id="two-factor-authentication-2fa">Two-Factor Authentication (2FA)<a class="headerlink" href="#two-factor-authentication-2fa" title="Permanent link">&para;</a></h2>
 <p>Pathary provides comprehensive 2FA with TOTP, recovery codes, and trusted device support.</p>
 <h3 id="overview_1">Overview<a class="headerlink" href="#overview_1" title="Permanent link">&para;</a></h3>
@@ -3091,15 +3039,15 @@
 - <strong>Trusted Devices</strong> - Skip 2FA for 30 days on trusted devices
 - <strong>Security Audit Log</strong> - Track all security events</p>
 <p>For complete 2FA documentation, see:
-- <a href="Two-Factor-Authentication">Two-Factor Authentication</a> - Detailed guide to all 2FA features</p>
+- <a href="../two-factor-authentication/">Two-Factor Authentication</a> - Detailed guide to all 2FA features</p>
 <h3 id="enable-2fa">Enable 2FA<a class="headerlink" href="#enable-2fa" title="Permanent link">&para;</a></h3>
 <p>Users can enable 2FA from their security settings:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Profile → Security Tab → Enable 2FA
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Profile → Security Tab → Enable 2FA
 </span></code></pre></div>
 <p><strong>Routes</strong>:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>POST /profile/security/totp/enable      # Generate QR code
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>POST /profile/security/totp/verify      # Verify and save TOTP
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>POST /profile/security/totp/disable     # Disable 2FA
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>POST /profile/security/totp/enable      # Generate QR code
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>POST /profile/security/totp/verify      # Verify and save TOTP
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>POST /profile/security/totp/disable     # Disable 2FA
 </span></code></pre></div></p>
 <h3 id="login-with-2fa">Login with 2FA<a class="headerlink" href="#login-with-2fa" title="Permanent link">&para;</a></h3>
 <p>When 2FA is enabled, users must provide either:
@@ -3107,62 +3055,23 @@
 2. A recovery code</p>
 <p><strong>Optional</strong>: Users can check "Trust this device" to skip 2FA for 30 days.</p>
 <p><strong>File</strong>: <code>src/Domain/User/Service/Authentication.php:findUserAndVerifyAuthentication()</code></p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="x">public function findUserAndVerifyAuthentication(</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="x">    string $email,</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="x">    string $password,</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="x">    ?int $userTotpCode = null,</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="x">    ?string $recoveryCode = null,</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="x">    ?string $deviceToken = null,</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="x">) : UserEntity {</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="x">    // Verify password first</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="x">    $user = $this-&gt;repository-&gt;findUserByEmail($email);</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="x">    if ($this-&gt;userApi-&gt;isValidPassword($user-&gt;getId(), $password) === false) {</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="x">        throw InvalidPassword::create();</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="x">    }</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="x">    // Check if device is trusted</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="x">    if ($deviceToken !== null) {</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="x">        if ($this-&gt;trustedDeviceService-&gt;isDeviceTrusted($user-&gt;getId(), $deviceToken)) {</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="x">            return $user;  // Skip 2FA</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="x">        }</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="x">    }</span>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>
-</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="x">    // Check if TOTP is required</span>
-</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="x">    $totpUri = $this-&gt;userApi-&gt;findTotpUri($user-&gt;getId());</span>
-</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="x">    if ($totpUri !== null) {</span>
-</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="x">        // Require either TOTP code or recovery code</span>
-</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="x">        if ($userTotpCode === null &amp;&amp; $recoveryCode === null) {</span>
-</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="x">            throw MissingTotpCode::create();</span>
-</span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="x">        }</span>
-</span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>
-</span><span id="__span-8-29"><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="x">        // Verify TOTP code</span>
-</span><span id="__span-8-30"><a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="x">        if ($userTotpCode !== null) {</span>
-</span><span id="__span-8-31"><a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="x">            if ($this-&gt;twoFactorAuthenticationApi-&gt;verifyTotpUri($user-&gt;getId(), $userTotpCode) === false) {</span>
-</span><span id="__span-8-32"><a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a><span class="x">                throw InvalidTotpCode::create();</span>
-</span><span id="__span-8-33"><a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a><span class="x">            }</span>
-</span><span id="__span-8-34"><a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a><span class="x">        }</span>
-</span><span id="__span-8-35"><a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a>
-</span><span id="__span-8-36"><a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a><span class="x">        // Verify recovery code</span>
-</span><span id="__span-8-37"><a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a><span class="x">        if ($recoveryCode !== null) {</span>
-</span><span id="__span-8-38"><a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a><span class="x">            if ($this-&gt;recoveryCodeService-&gt;verifyAndConsumeCode($user-&gt;getId(), $recoveryCode) === false) {</span>
-</span><span id="__span-8-39"><a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a><span class="x">                throw InvalidRecoveryCode::create();</span>
-</span><span id="__span-8-40"><a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a><span class="x">            }</span>
-</span><span id="__span-8-41"><a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a><span class="x">        }</span>
-</span><span id="__span-8-42"><a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a><span class="x">    }</span>
-</span><span id="__span-8-43"><a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a>
-</span><span id="__span-8-44"><a id="__codelineno-8-44" name="__codelineno-8-44" href="#__codelineno-8-44"></a><span class="x">    return $user;</span>
-</span><span id="__span-8-45"><a id="__codelineno-8-45" name="__codelineno-8-45" href="#__codelineno-8-45"></a><span class="x">}</span>
-</span></code></pre></div>
+<p>The authentication verification flow:
+1. Verifies password using <code>UserApi::isValidPassword()</code>
+2. If trusted device token provided, checks if device is trusted (skips 2FA if valid)
+3. If TOTP enabled, requires either authenticator code OR recovery code
+4. Verifies TOTP code via <code>TwoFactorAuthenticationApi::verifyTotpUri()</code>
+5. Verifies recovery code via <code>RecoveryCodeService::verifyRecoveryCode()</code> (consumes code on success)
+6. Throws exceptions for invalid credentials, missing 2FA codes, or verification failures</p>
 <h2 id="api-authentication">API Authentication<a class="headerlink" href="#api-authentication" title="Permanent link">&para;</a></h2>
 <h3 id="token-creation">Token Creation<a class="headerlink" href="#token-creation" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://pathary.example.com/api/authentication/token<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-Movary-Client: my-app&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;email&quot;:&quot;user@example.com&quot;,&quot;password&quot;:&quot;secret&quot;}&#39;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://pathary.example.com/api/authentication/token<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-Movary-Client: my-app&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;email&quot;:&quot;user@example.com&quot;,&quot;password&quot;:&quot;secret&quot;}&#39;</span>
 </span></code></pre></div>
 <h3 id="using-api-token">Using API Token<a class="headerlink" href="#using-api-token" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>https://pathary.example.com/api/users/john/history/movies<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-Movary-Token: your_token_here&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>https://pathary.example.com/api/users/john/history/movies<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;X-Movary-Token: your_token_here&quot;</span>
 </span></code></pre></div>
 <h3 id="required-headers">Required Headers<a class="headerlink" href="#required-headers" title="Permanent link">&para;</a></h3>
 <table>
@@ -3188,10 +3097,10 @@
 </table>
 <h2 id="reverse-proxy-considerations">Reverse Proxy Considerations<a class="headerlink" href="#reverse-proxy-considerations" title="Permanent link">&para;</a></h2>
 <p>When running behind a reverse proxy, ensure these headers are forwarded:</p>
-<div class="language-nginx highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">proxy_set_header</span><span class="w"> </span><span class="s">X-Real-IP</span><span class="w"> </span><span class="nv">$remote_addr</span><span class="p">;</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">proxy_set_header</span><span class="w"> </span><span class="s">X-Forwarded-For</span><span class="w"> </span><span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">proxy_set_header</span><span class="w"> </span><span class="s">X-Forwarded-Proto</span><span class="w"> </span><span class="nv">$scheme</span><span class="p">;</span>
+<div class="language-nginx highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">proxy_set_header</span><span class="w"> </span><span class="s">Host</span><span class="w"> </span><span class="nv">$host</span><span class="p">;</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">proxy_set_header</span><span class="w"> </span><span class="s">X-Real-IP</span><span class="w"> </span><span class="nv">$remote_addr</span><span class="p">;</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">proxy_set_header</span><span class="w"> </span><span class="s">X-Forwarded-For</span><span class="w"> </span><span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">proxy_set_header</span><span class="w"> </span><span class="s">X-Forwarded-Proto</span><span class="w"> </span><span class="nv">$scheme</span><span class="p">;</span>
 </span></code></pre></div>
 <h3 id="https-detection">HTTPS Detection<a class="headerlink" href="#https-detection" title="Permanent link">&para;</a></h3>
 <p>The application detects HTTPS from:
@@ -3202,53 +3111,25 @@
 - Generated URLs</p>
 <h2 id="logout">Logout<a class="headerlink" href="#logout" title="Permanent link">&para;</a></h2>
 <h3 id="web-logout">Web Logout<a class="headerlink" href="#web-logout" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>POST /api/authentication/token (DELETE method)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>POST /api/authentication/token (DELETE method)
 </span></code></pre></div>
-<p><strong>File</strong>: <code>src/Domain/User/Service/Authentication.php:209-235</code></p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="x">public function logout() : void</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="x">{</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="x">    $token = filter_input(INPUT_COOKIE, &#39;id&#39;);</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="x">    if ($token !== &#39;&#39;) {</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="x">        // Delete token from database</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="x">        $this-&gt;deleteToken($token);</span>
-</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>
-</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="x">        // Clear cookie</span>
-</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="x">        setcookie(&#39;id&#39;, &#39;&#39;, [</span>
-</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="x">            &#39;expires&#39; =&gt; 1,  // Past timestamp</span>
-</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="x">            &#39;path&#39; =&gt; &#39;/&#39;,</span>
-</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="x">            &#39;secure&#39; =&gt; $isSecure,</span>
-</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="x">            &#39;httponly&#39; =&gt; true,</span>
-</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="x">            &#39;samesite&#39; =&gt; &#39;Lax&#39;,</span>
-</span><span id="__span-13-16"><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="x">        ]);</span>
-</span><span id="__span-13-17"><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="x">    }</span>
-</span><span id="__span-13-18"><a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a>
-</span><span id="__span-13-19"><a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="x">    // Destroy and restart session</span>
-</span><span id="__span-13-20"><a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="x">    $this-&gt;sessionWrapper-&gt;destroy();</span>
-</span><span id="__span-13-21"><a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="x">    $this-&gt;sessionWrapper-&gt;start();</span>
-</span><span id="__span-13-22"><a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="x">}</span>
-</span></code></pre></div>
+<p><strong>File</strong>: <code>src/Domain/User/Service/Authentication.php:logout()</code></p>
+<p>The logout process deletes the authentication token from the database, clears the <code>id</code> cookie (by setting expiration to past timestamp), and destroys the current session before starting a new one.</p>
 <h2 id="security-headers">Security Headers<a class="headerlink" href="#security-headers" title="Permanent link">&para;</a></h2>
-<p><strong>File</strong>: <code>public/index.php:13-20</code></p>
-<p>Applied to all responses:</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="x">$securityHeaders = [</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="x">    &#39;X-Content-Type-Options&#39; =&gt; &#39;nosniff&#39;,</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="x">    &#39;X-Frame-Options&#39; =&gt; &#39;SAMEORIGIN&#39;,</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="x">    &#39;Referrer-Policy&#39; =&gt; &#39;strict-origin-when-cross-origin&#39;,</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="x">    &#39;Permissions-Policy&#39; =&gt; &#39;accelerometer=(), camera=(), ...&#39;,</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="x">    &#39;Content-Security-Policy&#39; =&gt; &quot;default-src &#39;self&#39;; ...&quot;,</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="x">];</span>
-</span></code></pre></div>
+<p><strong>File</strong>: <code>public/index.php</code></p>
+<p>Pathary applies comprehensive security headers to all HTTP responses, including:
+- <code>X-Content-Type-Options: nosniff</code> - Prevents MIME type sniffing
+- <code>X-Frame-Options: SAMEORIGIN</code> - Prevents clickjacking attacks
+- <code>Referrer-Policy: strict-origin-when-cross-origin</code> - Controls referrer information
+- <code>Permissions-Policy</code> - Disables unnecessary browser features (accelerometer, camera, geolocation, etc.)
+- <code>Content-Security-Policy</code> - Restricts resource loading to prevent XSS attacks</p>
 <h2 id="related-pages">Related Pages<a class="headerlink" href="#related-pages" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="Two-Factor-Authentication">Two-Factor Authentication</a> - Comprehensive 2FA guide</li>
-<li><a href="Password-Policy-and-Security">Password Policy and Security</a> - Password requirements</li>
-<li><a href="Routing-and-Controllers">Routing and Controllers</a> - Route authentication middleware</li>
-<li><a href="Database">Database</a> - Token storage schema</li>
-<li><a href="Deployment">Deployment</a> - Reverse proxy configuration</li>
+<li><a href="../two-factor-authentication/">Two-Factor Authentication</a> - Comprehensive 2FA guide</li>
+<li><a href="../password-policy-and-security/">Password Policy and Security</a> - Password requirements</li>
+<li><a href="../../architecture/routing-and-controllers/">Routing and Controllers</a> - Route authentication middleware</li>
+<li><a href="../../architecture/database/">Database</a> - Token storage schema</li>
 </ul>
-<hr />
-<p><a href="Home">← Back to Wiki Home</a></p>
 
 
 

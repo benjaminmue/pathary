@@ -2883,11 +2883,8 @@
 <li>A QR code will be displayed</li>
 <li>Scan the QR code with your authenticator app</li>
 </ol>
-<p><strong>File</strong>: <code>src/HttpController/Web/ProfileSecurityController.php:enableTotp()</code></p>
-<p>The system generates a secret key using:
-<div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="x">$totpSecret = $this-&gt;twoFactorAuthenticationApi-&gt;generateTotpSecret();</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="x">$totpUri = $this-&gt;twoFactorAuthenticationApi-&gt;buildTotpUri($user-&gt;getName(), $totpSecret);</span>
-</span></code></pre></div></p>
+<p><strong>Implementation</strong>: <code>src/HttpController/Web/ProfileSecurityController.php:enableTotp()</code></p>
+<p>The system generates a TOTP secret and QR code URI using <code>TwoFactorAuthenticationFactory::createTotp()</code>, which creates a TOTP instance compatible with RFC 6238 standard authenticator apps.</p>
 <h3 id="step-3-verify-totp-code">Step 3: Verify TOTP Code<a class="headerlink" href="#step-3-verify-totp-code" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Enter the 6-digit code from your authenticator app</li>
@@ -2905,24 +2902,11 @@
 - <strong>Confirmation Required</strong>: You must check "I have saved these codes" AND enter one of the codes to confirm
 - <strong>Security</strong>: Codes are hashed using bcrypt before storage
 - <strong>Progressive UI</strong>: Shows step-by-step progress through confirmation</p>
-<p><strong>File</strong>: <code>src/Domain/User/Service/RecoveryCodeService.php:generateRecoveryCodes()</code></p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="x">public function generateRecoveryCodes(int $userId) : array</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="x">{</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="x">    // Generate 10 random codes</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="x">    for ($i = 0; $i &lt; 10; $i++) {</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="x">        $code = $this-&gt;generateRandomCode();</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="x">        $codes[] = $code;</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="x">        // Hash and store</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="x">        $this-&gt;repository-&gt;create($userId, password_hash($code, PASSWORD_DEFAULT));</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="x">    }</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="x">    return $codes;</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="x">}</span>
-</span></code></pre></div>
+<p><strong>Implementation</strong>: <code>src/Domain/User/Service/RecoveryCodeService.php:generateRecoveryCodes()</code></p>
+<p>The service generates 10 cryptographically secure random codes, normalizes them (removes dashes for consistent hashing), hashes them with bcrypt, and stores the hashes. Returns formatted codes with dashes for display. Existing codes are deleted before generating new ones.</p>
 <h3 id="regenerating-recovery-codes">Regenerating Recovery Codes<a class="headerlink" href="#regenerating-recovery-codes" title="Permanent link">&para;</a></h3>
 <p>You can regenerate all recovery codes at any time:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Profile → Security Tab → Recovery Codes section → Regenerate Codes
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Profile → Security Tab → Recovery Codes section → Regenerate Codes
 </span></code></pre></div>
 <p><strong>Warning</strong>: Regenerating codes will invalidate all previous codes.</p>
 <p><strong>Route</strong>: <code>POST /profile/security/recovery-codes/regenerate</code></p>
@@ -2932,14 +2916,8 @@
 2. Click "Use Recovery Code" instead of entering authenticator code
 3. Enter one of your recovery codes
 4. The code will be consumed and cannot be used again</p>
-<p><strong>File</strong>: <code>src/Domain/User/Service/Authentication.php:login()</code></p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="x">// Check if recovery code is provided</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="x">if ($recoveryCode !== null) {</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="x">    if ($this-&gt;recoveryCodeService-&gt;verifyAndConsumeCode($user-&gt;getId(), $recoveryCode) === false) {</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="x">        throw InvalidRecoveryCode::create();</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="x">    }</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="x">}</span>
-</span></code></pre></div>
+<p><strong>Implementation</strong>: <code>src/Domain/User/Service/Authentication.php:login()</code></p>
+<p>The authentication service verifies the recovery code using <code>RecoveryCodeService::verifyRecoveryCode()</code>, which normalizes the input, checks it against stored hashes, deletes the code upon successful verification, and logs both success and failure attempts to the security audit log.</p>
 <h3 id="recovery-code-storage">Recovery Code Storage<a class="headerlink" href="#recovery-code-storage" title="Permanent link">&para;</a></h3>
 <p>Recovery codes are stored in the <code>recovery_codes</code> table:</p>
 <table>
@@ -2991,20 +2969,8 @@
 1. Enter your authenticator code or recovery code
 2. Check "Trust this device for 30 days"
 3. Complete login</p>
-<p><strong>File</strong>: <code>src/Domain/User/Service/TrustedDeviceService.php:createTrustedDevice()</code></p>
-<p>A secure cookie is set:
-<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="x">setcookie(</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="x">    &#39;trusted_device&#39;,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="x">    $deviceToken,</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="x">    [</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="x">        &#39;expires&#39; =&gt; time() + (30 * 24 * 60 * 60),  // 30 days</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="x">        &#39;path&#39; =&gt; &#39;/&#39;,</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="x">        &#39;secure&#39; =&gt; true,</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="x">        &#39;httponly&#39; =&gt; true,</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="x">        &#39;samesite&#39; =&gt; &#39;Lax&#39;,</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="x">    ],</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="x">);</span>
-</span></code></pre></div></p>
+<p><strong>Implementation</strong>: <code>src/Domain/User/Service/TrustedDeviceService.php:createTrustedDevice()</code></p>
+<p>A secure cookie (<code>pathary_trusted_device</code>) is set with httpOnly and SameSite flags. The secure flag is dynamically detected based on HTTPS/X-Forwarded-Proto headers for reverse proxy compatibility. Cookie expires in 30 days. See <code>src/Util/TrustedDeviceCookie.php</code> for cookie management.</p>
 <h3 id="device-limits">Device Limits<a class="headerlink" href="#device-limits" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Maximum of <strong>10 trusted devices</strong> per user</li>
@@ -3013,7 +2979,7 @@
 </ul>
 <h3 id="managing-trusted-devices">Managing Trusted Devices<a class="headerlink" href="#managing-trusted-devices" title="Permanent link">&para;</a></h3>
 <p>View and manage trusted devices in your security settings:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Profile → Security Tab → Trusted Devices section
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Profile → Security Tab → Trusted Devices section
 </span></code></pre></div>
 <p>You can see:
 - Device name (parsed from user agent)
@@ -3023,9 +2989,9 @@
 - <strong>Revoke Single Device</strong>: <code>POST /profile/security/trusted-devices/{deviceId}/revoke</code>
 - <strong>Revoke All Devices</strong>: <code>POST /profile/security/trusted-devices/revoke-all</code></p>
 <p><strong>File</strong>: <code>src/Util/DeviceNameParser.php</code> parses user agents to friendly names:
-- Chrome on Windows → "Chrome (Windows)"
-- Safari on iPhone → "Safari (iPhone)"
-- Firefox on macOS → "Firefox (macOS)"</p>
+- Chrome on Windows → "Chrome on Windows"
+- Safari on iPhone → "Safari on iOS"
+- Firefox on macOS → "Firefox on macOS"</p>
 <h3 id="trusted-device-storage">Trusted Device Storage<a class="headerlink" href="#trusted-device-storage" title="Permanent link">&para;</a></h3>
 <p>Trusted devices are stored in the <code>trusted_devices</code> table:</p>
 <table>
@@ -3097,27 +3063,31 @@
 </thead>
 <tbody>
 <tr>
-<td><code>2fa_enabled</code></td>
+<td><code>totp_enabled</code></td>
 <td>User enabled 2FA</td>
 </tr>
 <tr>
-<td><code>2fa_disabled</code></td>
+<td><code>totp_disabled</code></td>
 <td>User disabled 2FA</td>
 </tr>
 <tr>
-<td><code>2fa_verified</code></td>
-<td>Successful 2FA login</td>
+<td><code>login_success</code></td>
+<td>Successful login (with or without 2FA)</td>
 </tr>
 <tr>
-<td><code>2fa_failed</code></td>
+<td><code>login_failed_totp</code></td>
 <td>Failed 2FA attempt</td>
+</tr>
+<tr>
+<td><code>login_failed_recovery_code</code></td>
+<td>Failed recovery code attempt</td>
 </tr>
 <tr>
 <td><code>recovery_code_used</code></td>
 <td>Recovery code used for login</td>
 </tr>
 <tr>
-<td><code>recovery_codes_regenerated</code></td>
+<td><code>recovery_codes_generated</code></td>
 <td>New recovery codes generated</td>
 </tr>
 <tr>
@@ -3125,8 +3095,12 @@
 <td>Device marked as trusted</td>
 </tr>
 <tr>
-<td><code>trusted_device_revoked</code></td>
-<td>Trusted device revoked</td>
+<td><code>trusted_device_removed</code></td>
+<td>Single trusted device revoked</td>
+</tr>
+<tr>
+<td><code>all_trusted_devices_removed</code></td>
+<td>All trusted devices revoked</td>
 </tr>
 <tr>
 <td><code>password_changed</code></td>
@@ -3135,7 +3109,7 @@
 </tbody>
 </table>
 <h3 id="viewing-audit-log">Viewing Audit Log<a class="headerlink" href="#viewing-audit-log" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Profile → Security Tab → Security Activity section
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Profile → Security Tab → Security Activity section
 </span></code></pre></div>
 <p><strong>Route</strong>: <code>GET /profile/security/events</code></p>
 <p>Events are displayed with:
@@ -3143,59 +3117,31 @@
 - Timestamp
 - Device information
 - IP address (if available)</p>
-<p><strong>File</strong>: <code>src/Domain/User/Service/SecurityAuditService.php</code></p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="x">public function logEvent(</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="x">    int $userId,</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="x">    string $eventType,</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="x">    ?string $deviceName = null,</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="x">    ?string $ipAddress = null,</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="x">    ?array $metadata = null</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="x">) : void {</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="x">    $this-&gt;repository-&gt;create(</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="x">        $userId,</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="x">        $eventType,</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="x">        $deviceName,</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="x">        $ipAddress,</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="x">        $metadata ? json_encode($metadata) : null</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="x">    );</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="x">}</span>
-</span></code></pre></div>
+<p><strong>Implementation</strong>: <code>src/Domain/User/Service/SecurityAuditService.php</code></p>
+<p>Events are logged using <code>SecurityAuditService::log()</code> with user ID, event type constant, IP address, user agent, and optional metadata array (automatically JSON-encoded). All event type constants are defined in the SecurityAuditService class.</p>
 <h2 id="login-flow-with-2fa">Login Flow with 2FA<a class="headerlink" href="#login-flow-with-2fa" title="Permanent link">&para;</a></h2>
 <h3 id="without-trusted-device">Without Trusted Device<a class="headerlink" href="#without-trusted-device" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>1. Enter email + password
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>2. Submit login form
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>3. If 2FA enabled:
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>   a. Show 2FA code input
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>   b. Enter authenticator code OR recovery code
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>   c. Optionally check &quot;Trust this device&quot;
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>4. Complete login
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>1. Enter email + password
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>2. Submit login form
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>3. If 2FA enabled:
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>   a. Show 2FA code input
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>   b. Enter authenticator code OR recovery code
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>   c. Optionally check &quot;Trust this device&quot;
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>4. Complete login
 </span></code></pre></div>
 <h3 id="with-trusted-device">With Trusted Device<a class="headerlink" href="#with-trusted-device" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>1. Enter email + password
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>2. Submit login form
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>3. System checks for valid trusted_device cookie
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>4. If valid and not expired:
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>   → Skip 2FA verification
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>5. Complete login immediately
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>1. Enter email + password
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>2. Submit login form
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>3. System checks for valid trusted_device cookie
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>4. If valid and not expired:
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>   → Skip 2FA verification
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>5. Complete login immediately
 </span></code></pre></div>
-<p><strong>File</strong>: <code>src/Domain/User/Service/Authentication.php:findUserAndVerifyAuthentication()</code></p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="x">// Check if device is trusted</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="x">if ($this-&gt;trustedDeviceService-&gt;isDeviceTrusted($user-&gt;getId(), $deviceToken)) {</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="x">    // Skip 2FA verification</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="x">    return $user;</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="x">}</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="x">// Otherwise, require 2FA</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="x">if ($totpUri !== null) {</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="x">    if ($userTotpCode === null &amp;&amp; $recoveryCode === null) {</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="x">        throw MissingTotpCode::create();</span>
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="x">    }</span>
-</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="x">    // Verify TOTP or recovery code...</span>
-</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="x">}</span>
-</span></code></pre></div>
+<p><strong>Implementation</strong>: <code>src/Domain/User/Service/Authentication.php:findUserAndVerifyAuthentication()</code></p>
+<p>The authentication service checks for a trusted device token cookie and verifies it using <code>TrustedDeviceService::verifyTrustedDevice()</code>. If valid and not expired, 2FA is skipped and a login success event is logged with trusted device metadata. Otherwise, TOTP or recovery code verification is required.</p>
 <h2 id="disabling-2fa">Disabling 2FA<a class="headerlink" href="#disabling-2fa" title="Permanent link">&para;</a></h2>
 <p>To disable 2FA:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Profile → Security Tab → Two-Factor Authentication section → Disable 2FA
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Profile → Security Tab → Two-Factor Authentication section → Disable 2FA
 </span></code></pre></div>
 <p><strong>Route</strong>: <code>POST /profile/security/totp/disable</code></p>
 <p><strong>Effects</strong>:
@@ -3289,12 +3235,10 @@
 </ol>
 <h2 id="related-pages">Related Pages<a class="headerlink" href="#related-pages" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="Authentication-and-Sessions">Authentication and Sessions</a> - Login and session management</li>
-<li><a href="Password-Policy-and-Security">Password Policy and Security</a> - Password requirements</li>
-<li><a href="Database">Database</a> - Security-related table schemas</li>
+<li><a href="../authentication-and-sessions/">Authentication and Sessions</a> - Login and session management</li>
+<li><a href="../password-policy-and-security/">Password Policy and Security</a> - Password requirements</li>
+<li><a href="../../architecture/database/">Database</a> - Security-related table schemas</li>
 </ul>
-<hr />
-<p><a href="Home">← Back to Wiki Home</a></p>
 
 
 

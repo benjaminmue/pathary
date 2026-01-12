@@ -2440,7 +2440,7 @@
   <h1>Docker (recommended)</h1>
 
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
-<p>It is recommended to host Pathary with the <a href="https://github.com/benjaminkomen/pathary/pkgs/container/pathary">official Docker image</a> from GitHub Container Registry.</p>
+<p>It is recommended to host Pathary with the <a href="https://github.com/benjaminmue/pathary/pkgs/container/pathary">official Docker image</a> from GitHub Container Registry.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>After the <strong>initial installation</strong> and every update containing database changes the database migrations must be executed:</p>
@@ -2486,7 +2486,7 @@ Many features of the application will not work correctly without it.</p>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">TMDB_API_KEY</span><span class="o">=</span><span class="s2">&quot;&lt;tmdb_key&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">DATABASE_MODE</span><span class="o">=</span><span class="s2">&quot;sqlite&quot;</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span>-v<span class="w"> </span>pathary-storage:/app/storage<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span>ghcr.io/benjaminkomen/pathary:latest
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span>ghcr.io/benjaminmue/pathary:latest
 </span></code></pre></div>
 <h3 id="with-mysql">With MySQL<a class="headerlink" href="#with-mysql" title="Permanent link">&para;</a></h3>
 <div class="language-shell highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$<span class="w"> </span>docker<span class="w"> </span>volume<span class="w"> </span>create<span class="w"> </span>pathary-storage
@@ -2500,12 +2500,12 @@ Many features of the application will not work correctly without it.</p>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">DATABASE_MYSQL_USER</span><span class="o">=</span><span class="s2">&quot;&lt;db_user&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">DATABASE_MYSQL_PASSWORD</span><span class="o">=</span><span class="s2">&quot;&lt;db_password&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span>-v<span class="w"> </span>pathary-storage:/app/storage<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span>ghcr.io/benjaminkomen/pathary:latest
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span>ghcr.io/benjaminmue/pathary:latest
 </span></code></pre></div>
 <h3 id="docker-composeyml-with-mysql">docker-compose.yml with MySQL<a class="headerlink" href="#docker-composeyml-with-mysql" title="Permanent link">&para;</a></h3>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">services</span><span class="p">:</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">pathary</span><span class="p">:</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/benjaminkomen/pathary:latest</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/benjaminmue/pathary:latest</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pathary</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;80:80&quot;</span>
@@ -2536,7 +2536,7 @@ Many features of the application will not work correctly without it.</p>
 <h3 id="docker-composeyml-with-mysql-and-secrets">docker-compose.yml with MySQL and secrets<a class="headerlink" href="#docker-composeyml-with-mysql-and-secrets" title="Permanent link">&para;</a></h3>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">services</span><span class="p">:</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">pathary</span><span class="p">:</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/benjaminkomen/pathary:latest</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/benjaminmue/pathary:latest</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pathary</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;80:80&quot;</span>

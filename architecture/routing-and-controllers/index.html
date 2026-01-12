@@ -1603,6 +1603,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Available Middleware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#web-middleware-srchttpcontrollerwebmiddleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web Middleware (src/HttpController/Web/Middleware/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-middleware-srchttpcontrollerapimiddleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Middleware (src/HttpController/Api/Middleware/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -2520,6 +2548,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Available Middleware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#web-middleware-srchttpcontrollerwebmiddleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web Middleware (src/HttpController/Web/Middleware/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-middleware-srchttpcontrollerapimiddleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Middleware (src/HttpController/Api/Middleware/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -2646,17 +2702,7 @@
 <h1 id="routing-and-controllers">Routing and Controllers<a class="headerlink" href="#routing-and-controllers" title="Permanent link">&para;</a></h1>
 <p>This page documents how HTTP requests are routed to controllers in Pathary.</p>
 <h2 id="route-configuration">Route Configuration<a class="headerlink" href="#route-configuration" title="Permanent link">&para;</a></h2>
-<p>Routes are defined in <code>settings/routes.php</code> using FastRoute.</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="x">return function (FastRoute\RouteCollector $routeCollector) {</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="x">    $routerService = new RouterService();</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="x">    // Web routes (HTML pages)</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="x">    $routeCollector-&gt;addGroup(&#39;&#39;, fn($r) =&gt; addWebRoutes($routerService, $r));</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="x">    // API routes (JSON)</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="x">    $routeCollector-&gt;addGroup(&#39;/api&#39;, fn($r) =&gt; addApiRoutes($routerService, $r));</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="x">};</span>
-</span></code></pre></div>
+<p>Routes are defined in <code>settings/routes.php</code> using FastRoute with a RouteList pattern. The RouterService coordinates route registration by grouping routes into web routes (HTML pages) and API routes (JSON). Routes are added to a RouteList, then registered with the RouteCollector via <code>RouterService::addRoutesToRouteCollector()</code>.</p>
 <h2 id="route-table">Route Table<a class="headerlink" href="#route-table" title="Permanent link">&para;</a></h2>
 <h3 id="public-routes-no-authentication">Public Routes (No Authentication)<a class="headerlink" href="#public-routes-no-authentication" title="Permanent link">&para;</a></h3>
 <table>
@@ -2787,6 +2833,9 @@
 </tbody>
 </table>
 <h3 id="settings-routes">Settings Routes<a class="headerlink" href="#settings-routes" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p><strong>Note</strong>: Settings routes currently use the <code>/old/</code> prefix (e.g., <code>/old/settings/account/general</code>). This prefix is being phased out. See CLAUDE.md for migration plan. Documentation shows clean paths for clarity, but actual routes require the <code>/old/</code> prefix.</p>
+</blockquote>
 <table>
 <thead>
 <tr>
@@ -2799,37 +2848,37 @@
 <tbody>
 <tr>
 <td>GET</td>
-<td><code>/settings/account/general</code></td>
+<td><code>/old/settings/account/general</code></td>
 <td><code>SettingsController::renderGeneralAccountPage</code></td>
 <td>Account settings</td>
 </tr>
 <tr>
 <td>GET</td>
-<td><code>/settings/account/security</code></td>
+<td><code>/old/settings/account/security</code></td>
 <td><code>SettingsController::renderSecurityAccountPage</code></td>
 <td>Security settings</td>
 </tr>
 <tr>
 <td>GET</td>
-<td><code>/settings/integrations/trakt</code></td>
+<td><code>/old/settings/integrations/trakt</code></td>
 <td><code>SettingsController::renderTraktPage</code></td>
 <td>Trakt integration</td>
 </tr>
 <tr>
 <td>GET</td>
-<td><code>/settings/integrations/plex</code></td>
+<td><code>/old/settings/integrations/plex</code></td>
 <td><code>SettingsController::renderPlexPage</code></td>
 <td>Plex integration</td>
 </tr>
 <tr>
 <td>GET</td>
-<td><code>/settings/integrations/jellyfin</code></td>
+<td><code>/old/settings/integrations/jellyfin</code></td>
 <td><code>SettingsController::renderJellyfinPage</code></td>
 <td>Jellyfin integration</td>
 </tr>
 <tr>
 <td>GET</td>
-<td><code>/settings/server/general</code></td>
+<td><code>/old/settings/server/general</code></td>
 <td><code>SettingsController::renderServerGeneralPage</code></td>
 <td>Server settings</td>
 </tr>
@@ -2964,74 +3013,118 @@
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong>Note</strong>: Additional routes not listed above include Admin routes (<code>/admin/*</code>), Person routes (<code>/person/{id}</code>), Watchlist route (<code>/watchlist</code>), API Admin routes (<code>/api/admin/*</code>), API Played routes (<code>/api/users/{username}/played/movies</code>), Radarr feed (<code>/api/feed/radarr/{id}</code>), and Dev routes (<code>/dev/*</code>). See <code>settings/routes.php</code> for the complete list of 100+ routes.</p>
+</blockquote>
 <h2 id="middleware">Middleware<a class="headerlink" href="#middleware" title="Permanent link">&para;</a></h2>
 <p>Middleware runs before controllers to perform checks.</p>
 <h3 id="available-middleware">Available Middleware<a class="headerlink" href="#available-middleware" title="Permanent link">&para;</a></h3>
+<h4 id="web-middleware-srchttpcontrollerwebmiddleware">Web Middleware (<code>src/HttpController/Web/Middleware/</code>)<a class="headerlink" href="#web-middleware-srchttpcontrollerwebmiddleware" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
 <th>Middleware</th>
-<th>Location</th>
 <th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>UserIsAuthenticated</code></td>
-<td><code>Web/Middleware/</code></td>
 <td>Requires login</td>
 </tr>
 <tr>
 <td><code>UserIsUnauthenticated</code></td>
-<td><code>Web/Middleware/</code></td>
 <td>Must NOT be logged in</td>
 </tr>
 <tr>
 <td><code>UserIsAdmin</code></td>
-<td><code>Web/Middleware/</code></td>
 <td>Requires admin role</td>
 </tr>
 <tr>
 <td><code>ServerHasNoUsers</code></td>
-<td><code>Web/Middleware/</code></td>
 <td>First-run check</td>
 </tr>
 <tr>
 <td><code>ServerHasUsers</code></td>
-<td><code>Web/Middleware/</code></td>
 <td>Has existing users</td>
 </tr>
 <tr>
 <td><code>ServerHasRegistrationEnabled</code></td>
-<td><code>Web/Middleware/</code></td>
 <td>Registration allowed</td>
 </tr>
 <tr>
 <td><code>IsAuthorizedToReadUserData</code></td>
-<td><code>Web/Middleware/</code></td>
 <td>Can view user profile</td>
 </tr>
 <tr>
 <td><code>UserHasJellyfinToken</code></td>
-<td><code>Web/Middleware/</code></td>
 <td>Has Jellyfin configured</td>
 </tr>
 <tr>
 <td><code>StartSession</code></td>
-<td><code>Web/Middleware/</code></td>
 <td>Initialize PHP session</td>
+</tr>
+<tr>
+<td><code>CsrfProtection</code></td>
+<td>CSRF token validation (POST/PUT/DELETE)</td>
+</tr>
+<tr>
+<td><code>RateLimited</code></td>
+<td>Rate limiting for sensitive operations</td>
+</tr>
+<tr>
+<td><code>MovieSlugRedirector</code></td>
+<td>Redirects to correct movie slug URL</td>
+</tr>
+<tr>
+<td><code>PersonSlugRedirector</code></td>
+<td>Redirects to correct person slug URL</td>
+</tr>
+<tr>
+<td><code>OAuthLazyMonitoring</code></td>
+<td>OAuth connection monitoring</td>
+</tr>
+</tbody>
+</table>
+<h4 id="api-middleware-srchttpcontrollerapimiddleware">API Middleware (<code>src/HttpController/Api/Middleware/</code>)<a class="headerlink" href="#api-middleware-srchttpcontrollerapimiddleware" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Middleware</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IsAuthenticated</code></td>
+<td>API token authentication</td>
+</tr>
+<tr>
+<td><code>IsAdmin</code></td>
+<td>API admin check</td>
+</tr>
+<tr>
+<td><code>IsAuthorizedToReadUserData</code></td>
+<td>Read permission check</td>
+</tr>
+<tr>
+<td><code>IsAuthorizedToWriteUserData</code></td>
+<td>Write permission check</td>
 </tr>
 </tbody>
 </table>
 <h3 id="middleware-chain-example">Middleware Chain Example<a class="headerlink" href="#middleware-chain-example" title="Permanent link">&para;</a></h3>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="x">$routes-&gt;add(&#39;POST&#39;, &#39;/settings/server/general&#39;,</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="x">    [SettingsController::class, &#39;updateServerGeneral&#39;],</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="x">    [</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="x">        Web\Middleware\UserIsAuthenticated::class,</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="x">        Web\Middleware\UserIsAdmin::class</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="x">    ]</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="x">);</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="x">$routes-&gt;add(&#39;POST&#39;, &#39;/movie/{id}/rate&#39;,</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="x">    [RateMovieController::class, &#39;rate&#39;],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="x">    [</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="x">        Web\Middleware\UserIsAuthenticated::class,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="x">        Web\Middleware\CsrfProtection::class  // Required for all POST/PUT/DELETE</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="x">    ]</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="x">);</span>
 </span></code></pre></div>
+<blockquote>
+<p><strong>Note</strong>: All POST, PUT, and DELETE routes should include <code>CsrfProtection</code> middleware to prevent Cross-Site Request Forgery attacks.</p>
+</blockquote>
 <h2 id="controller-locations">Controller Locations<a class="headerlink" href="#controller-locations" title="Permanent link">&para;</a></h2>
 <h3 id="web-controllers-srchttpcontrollerweb">Web Controllers (<code>src/HttpController/Web/</code>)<a class="headerlink" href="#web-controllers-srchttpcontrollerweb" title="Permanent link">&para;</a></h3>
 <table>
@@ -3120,48 +3213,46 @@
 </tbody>
 </table>
 <h2 id="requestresponse-flow">Request/Response Flow<a class="headerlink" href="#requestresponse-flow" title="Permanent link">&para;</a></h2>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="x">// public/index.php</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="x">$routeInfo = $dispatcher-&gt;dispatch($_SERVER[&#39;REQUEST_METHOD&#39;], $uri);</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="x">switch ($routeInfo[0]) {</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="x">    case FastRoute\Dispatcher::FOUND:</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="x">        $handler = $routeInfo[1][&#39;handler&#39;];</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="x">        // Run middleware chain</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="x">        foreach ($routeInfo[1][&#39;middleware&#39;] as $middleware) {</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="x">            $middlewareResponse = $container-&gt;call($middleware, [$httpRequest]);</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="x">            if ($middlewareResponse instanceof Response) {</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="x">                return $middlewareResponse; // Short-circuit</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="x">            }</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="x">        }</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="x">        // Call controller</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="x">        $response = $container-&gt;call($handler, [$httpRequest]);</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="x">        break;</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="x">}</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="x">// public/index.php</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="x">$routeInfo = $dispatcher-&gt;dispatch($_SERVER[&#39;REQUEST_METHOD&#39;], $uri);</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="x">switch ($routeInfo[0]) {</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="x">    case FastRoute\Dispatcher::FOUND:</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="x">        $handler = $routeInfo[1][&#39;handler&#39;];</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="x">        // Run middleware chain</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="x">        foreach ($routeInfo[1][&#39;middleware&#39;] as $middleware) {</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="x">            $middlewareResponse = $container-&gt;call($middleware, [$httpRequest]);</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="x">            if ($middlewareResponse instanceof Response) {</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="x">                return $middlewareResponse; // Short-circuit</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="x">            }</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="x">        }</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="x">        // Call controller</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="x">        $response = $container-&gt;call($handler, [$httpRequest]);</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="x">        break;</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="x">}</span>
 </span></code></pre></div>
 <h2 id="route-parameters">Route Parameters<a class="headerlink" href="#route-parameters" title="Permanent link">&para;</a></h2>
 <p>Routes support regex-validated parameters:</p>
-<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="x">// Numeric ID only</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="x">&#39;/movie/{id:[0-9]+}&#39;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="x">// Alphanumeric username</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="x">&#39;/users/{username:[a-zA-Z0-9]+}&#39;</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="x">// Any characters</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="x">&#39;/profile-images/{filename:.+}&#39;</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="x">// Optional slug suffix</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="x">&#39;/users/{username}/movies/{id:\d+}[-{nameSlugSuffix:[^/]*}]&#39;</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="x">// Numeric ID only</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="x">&#39;/movie/{id:[0-9]+}&#39;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="x">// Alphanumeric username</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="x">&#39;/users/{username:[a-zA-Z0-9]+}&#39;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="x">// Any characters</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="x">&#39;/profile-images/{filename:.+}&#39;</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="x">// Optional slug suffix</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="x">&#39;/users/{username}/movies/{id:\d+}[-{nameSlugSuffix:[^/]*}]&#39;</span>
 </span></code></pre></div>
 <h2 id="related-pages">Related Pages<a class="headerlink" href="#related-pages" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="Architecture">Architecture</a>] - System overview</li>
-<li><a href="Authentication-and-Sessions">Authentication and Sessions</a>] - Login flow</li>
-<li><a href="Frontend-and-UI">Frontend and UI</a>] - Template rendering</li>
+<li><a href="../architecture/">Architecture</a> - System overview</li>
+<li><a href="../../security/authentication-and-sessions/">Authentication and Sessions</a> - Login flow</li>
+<li><a href="../frontend-and-ui/">Frontend and UI</a> - Template rendering</li>
 </ul>
-<hr />
-<p><a href="Home">← Back to Wiki Home</a></p>
 
 
 

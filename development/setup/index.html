@@ -1940,10 +1940,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ide-recommendation-phpstorm" class="md-nav__link">
+  <a href="#code-style" class="md-nav__link">
     <span class="md-ellipsis">
       
-        IDE recommendation: PhpStorm
+        Code Style
       
     </span>
   </a>
@@ -2328,10 +2328,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ide-recommendation-phpstorm" class="md-nav__link">
+  <a href="#code-style" class="md-nav__link">
     <span class="md-ellipsis">
       
-        IDE recommendation: PhpStorm
+        Code Style
       
     </span>
   </a>
@@ -2499,21 +2499,9 @@
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="p">]</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">}</span>
 </span></code></pre></div>
-<h3 id="ide-recommendation-phpstorm">IDE recommendation: PhpStorm<a class="headerlink" href="#ide-recommendation-phpstorm" title="Permanent link">&para;</a></h3>
-<p>PhpStorm is recommended for development. Import the Pathary code style scheme (found at <code>settings/phpstorm.xml</code>).
-For import instructions see the <a href="https://www.jetbrains.com/help/phpstorm/configuring-code-style.html#import-export-schemes">official docs</a>.</p>
-<p>To apply the code style rules use at least the following features:</p>
-<ul>
-<li><code>Reformat code</code> (more info <a href="https://www.jetbrains.com/help/phpstorm/rearrange-code.html">here</a>)</li>
-<li><code>Rearrange code</code> (more info <a href="https://www.jetbrains.com/help/phpstorm/rearrange-code.html">here</a>)</li>
-<li><code>Optimize imports</code></li>
-</ul>
-<p>Notes:</p>
-<ul>
-<li>Please apply the code style rules for every file you changed</li>
-<li>To find the default shortcuts for the features and/or customize search for them in Settings -&gt; Keymap</li>
-<li>If you use the PhpStorm UI for git you can execute the features automatically before every commit (Settings -&gt; Version Control -&gt; Commit -&gt; Commit Checks)</li>
-</ul>
+<h3 id="code-style">Code Style<a class="headerlink" href="#code-style" title="Permanent link">&para;</a></h3>
+<p>Code style is enforced via PHP_CodeSniffer using <code>settings/phpcs.xml</code>. Run <code>composer test-cs</code> to check your code against the project standards.</p>
+<p>Most modern PHP IDEs (PhpStorm, VSCode with PHP extensions, etc.) can auto-format based on the phpcs.xml configuration.</p>
 <h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
 <h4 id="general">General<a class="headerlink" href="#general" title="Permanent link">&para;</a></h4>
 <h5 id="description">Description<a class="headerlink" href="#description" title="Permanent link">&para;</a></h5>
