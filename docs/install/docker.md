@@ -1,6 +1,6 @@
 ## Introduction
 
-It is recommended to host Pathary with the [official Docker image](https://github.com/benjaminkomen/pathary/pkgs/container/pathary) from GitHub Container Registry.
+It is recommended to host Pathary with the [official Docker image](https://github.com/benjaminmue/pathary/pkgs/container/pathary) from GitHub Container Registry.
 
 !!! warning
 
@@ -60,7 +60,7 @@ $ docker run --rm -d \
   -e TMDB_API_KEY="<tmdb_key>" \
   -e DATABASE_MODE="sqlite" \
   -v pathary-storage:/app/storage \
-  ghcr.io/benjaminkomen/pathary:latest
+  ghcr.io/benjaminmue/pathary:latest
 ```
 
 ### With MySQL
@@ -77,7 +77,7 @@ $ docker run --rm -d \
   -e DATABASE_MYSQL_USER="<db_user>" \
   -e DATABASE_MYSQL_PASSWORD="<db_password>" \
   -v pathary-storage:/app/storage \
-  ghcr.io/benjaminkomen/pathary:latest
+  ghcr.io/benjaminmue/pathary:latest
 ```
 
 ### docker-compose.yml with MySQL
@@ -85,7 +85,7 @@ $ docker run --rm -d \
 ```yaml
 services:
   pathary:
-    image: ghcr.io/benjaminkomen/pathary:latest
+    image: ghcr.io/benjaminmue/pathary:latest
     container_name: pathary
     ports:
       - "80:80"
@@ -119,7 +119,7 @@ volumes:
 ```yaml
 services:
   pathary:
-    image: ghcr.io/benjaminkomen/pathary:latest
+    image: ghcr.io/benjaminmue/pathary:latest
     container_name: pathary
     ports:
       - "80:80"

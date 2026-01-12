@@ -763,7 +763,15 @@ Monitor OAuth authorization attempts:
 
 ```sql
 SELECT * FROM security_audit_log
-WHERE event_type = 'oauth_authorization'
+WHERE event_type IN (
+    'oauth_connected',
+    'oauth_disconnected',
+    'oauth_callback_failed',
+    'oauth_config_created',
+    'oauth_config_updated',
+    'oauth_config_deleted',
+    'oauth_encryption_key_generated'
+)
 ORDER BY created_at DESC
 LIMIT 20;
 ```

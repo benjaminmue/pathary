@@ -186,58 +186,15 @@ Pathary calculates an average rating across all users.
 
 ### GroupMovieService
 
-**File**: `src/Service/GroupMovieService.php`
+**File**: `src/Service/GroupMovieService.php:getMovieGroupStats()`
 
-```php
-public function getMovieGroupStats(int $movieId) : array
-{
-    $ratingStats = $this->dbConnection->fetchAssociative(
-        <<<SQL
-        SELECT
-            AVG(rating_popcorn) AS avg_popcorn,
-            COUNT(rating_popcorn) AS rating_count,
-            MAX(updated_at) AS last_rating_activity
-        FROM movie_user_rating
-        WHERE movie_id = ? AND rating_popcorn IS NOT NULL
-        SQL,
-        [$movieId],
-    );
-
-    return [
-        'avg_popcorn' => round((float)$ratingStats['avg_popcorn'], 1),
-        'rating_count' => (int)$ratingStats['rating_count'],
-        'last_activity_at' => $ratingStats['last_rating_activity'],
-    ];
-}
-```
+Calculates movie statistics by querying average popcorn rating and rating count from `movie_user_rating` (filtering for non-null popcorn ratings). Also queries `movie_user_watch_dates` for watch activity. Returns rounded average (null if no ratings), rating count, and the latest timestamp from either rating updates or watch dates.
 
 ### Individual Ratings
 
-```php
-public function getMovieIndividualRatings(int $movieId) : array
-{
-    $ratings = $this->dbConnection->fetchAllAssociative(
-        <<<SQL
-        SELECT
-            u.name AS user_name,
-            mur.rating_popcorn,
-            mur.comment,
-            mur.watched_year,
-            mur.watched_month,
-            mur.watched_day,
-            mur.location_id,
-            COALESCE(mur.updated_at, mur.created_at) AS updated_at
-        FROM movie_user_rating mur
-        JOIN user u ON u.id = mur.user_id
-        WHERE mur.movie_id = ?
-        SQL,
-        [$movieId],
-    );
+**File**: `src/Service/GroupMovieService.php:getMovieIndividualRatings()`
 
-    shuffle($ratings); // Randomize order
-    return $ratings;
-}
-```
+Fetches individual user ratings for a movie by joining `movie_user_rating` with `user` table. Filters out completely empty ratings (requires at least one of: popcorn rating, comment, watched date, or location). Returns rating data with user name, shuffled in random order.
 
 ## UI Components
 
@@ -391,10 +348,6 @@ function updateDayOptions(year, month) {
 
 ## Related Pages
 
-- [Database](Database)] - Rating table schema
-- [Movies and TMDB](Movies-and-TMDB)] - Movie data
-- [Frontend and UI](Frontend-and-UI)] - UI components
-
----
-
-[← Back to Wiki Home](Home)
+- [Database](../architecture/database.md) - Rating table schema
+- [Movies and TMDB](movies-and-tmdb.md) - Movie data
+- [Frontend and UI](../architecture/frontend-and-ui.md) - UI components

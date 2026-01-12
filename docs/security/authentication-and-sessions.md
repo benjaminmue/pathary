@@ -34,55 +34,15 @@ Sets cookie + returns token
 
 ### 3. Authentication Service
 
-**File**: `src/Domain/User/Service/Authentication.php`
+**File**: `src/Domain/User/Service/Authentication.php:login()`
 
-```php
-public function login(
-    string $email,
-    string $password,
-    bool $rememberMe,
-    string $deviceName,
-    string $userAgent,
-    ?int $userTotpInput = null,
-) : array {
-    // Verify credentials
-    $user = $this->findUserAndVerifyAuthentication($email, $password, $userTotpInput);
-
-    // Create expiration (1 day or 10 years for "remember me")
-    $authTokenExpirationDate = $this->createExpirationDate();
-    if ($rememberMe === true) {
-        $authTokenExpirationDate = $this->createExpirationDate(3650); // 10 years
-    }
-
-    // Generate and store token
-    $token = $this->setAuthenticationToken($user->getId(), $deviceName, $userAgent, $authTokenExpirationDate);
-
-    // Set cookie for web clients
-    if ($deviceName === CreateUserController::PATHARY_WEB_CLIENT) {
-        $this->setAuthenticationCookieAndNewSession($user->getId(), $token, $authTokenExpirationDate);
-    }
-
-    return ['user' => $user, 'token' => $token];
-}
-```
+The login service verifies credentials, generates authentication tokens, and optionally sets cookies for web clients. It supports both standard logins and "remember me" functionality (token expiration: 1 day vs 10 years). For web clients, it sets the authentication cookie and regenerates the session ID. Returns the authenticated user and token.
 
 ## Cookie Configuration
 
-**File**: `src/Domain/User/Service/Authentication.php:247-257`
+**File**: `src/Domain/User/Service/Authentication.php:setAuthenticationCookieAndNewSession()`
 
-```php
-setcookie(
-    'id',                              // Cookie name
-    $token,                            // Auth token value
-    [
-        'expires' => $expirationTimestamp,
-        'path' => '/',
-        'secure' => $isSecure,         // HTTPS only when available
-        'httponly' => true,            // No JavaScript access
-        'samesite' => 'Lax',           // CSRF protection
-    ],
-);
-```
+Pathary uses the `id` cookie to store authentication tokens with security flags: `httponly` (prevents XSS token theft), `secure` (auto-detected for HTTPS), `samesite=Lax` (CSRF protection), and site-wide path (`/`).
 
 ### Security Properties
 
@@ -103,19 +63,9 @@ Sessions are started automatically for web requests.
 
 ### Session Regeneration
 
-On login, session IDs are regenerated to prevent session fixation:
+**File**: `src/Domain/User/Service/Authentication.php:setAuthenticationCookieAndNewSession()`
 
-```php
-public function setAuthenticationCookieAndNewSession(int $userId, string $token, DateTime $expirationDate) : void
-{
-    $this->sessionWrapper->destroy();
-    $this->sessionWrapper->start();
-    $this->sessionWrapper->regenerateId();  // Prevent session fixation
-
-    // Set cookie and session data...
-    $this->sessionWrapper->set('userId', $userId);
-}
-```
+On login, the session is destroyed and restarted with a new session ID (via `SessionWrapper::regenerateId()`) to prevent session fixation attacks. The user ID is stored in the session after regeneration.
 
 ## Token Storage
 
@@ -135,15 +85,9 @@ Auth tokens are stored in the `user_auth_token` table:
 
 ### Token Lookup
 
-The system looks up tokens by hash for security:
+**File**: `src/Domain/User/Repository/UserRepository.php`
 
-```php
-// UserRepository.php
-$this->dbConnection->fetchAssociative(
-    'SELECT * FROM user_auth_token WHERE token_hash = ? OR token = ?',
-    [$tokenHash, $token],
-);
-```
+The system looks up tokens by SHA-256 hash for security. For backwards compatibility, it also checks the plain token field during migration periods.
 
 ## Two-Factor Authentication (2FA)
 
@@ -158,7 +102,7 @@ The 2FA system includes:
 - **Security Audit Log** - Track all security events
 
 For complete 2FA documentation, see:
-- [Two-Factor Authentication](Two-Factor-Authentication) - Detailed guide to all 2FA features
+- [Two-Factor Authentication](two-factor-authentication.md) - Detailed guide to all 2FA features
 
 ### Enable 2FA
 
@@ -185,53 +129,13 @@ When 2FA is enabled, users must provide either:
 
 **File**: `src/Domain/User/Service/Authentication.php:findUserAndVerifyAuthentication()`
 
-```php
-public function findUserAndVerifyAuthentication(
-    string $email,
-    string $password,
-    ?int $userTotpCode = null,
-    ?string $recoveryCode = null,
-    ?string $deviceToken = null,
-) : UserEntity {
-    // Verify password first
-    $user = $this->repository->findUserByEmail($email);
-    if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
-        throw InvalidPassword::create();
-    }
-
-    // Check if device is trusted
-    if ($deviceToken !== null) {
-        if ($this->trustedDeviceService->isDeviceTrusted($user->getId(), $deviceToken)) {
-            return $user;  // Skip 2FA
-        }
-    }
-
-    // Check if TOTP is required
-    $totpUri = $this->userApi->findTotpUri($user->getId());
-    if ($totpUri !== null) {
-        // Require either TOTP code or recovery code
-        if ($userTotpCode === null && $recoveryCode === null) {
-            throw MissingTotpCode::create();
-        }
-
-        // Verify TOTP code
-        if ($userTotpCode !== null) {
-            if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpCode) === false) {
-                throw InvalidTotpCode::create();
-            }
-        }
-
-        // Verify recovery code
-        if ($recoveryCode !== null) {
-            if ($this->recoveryCodeService->verifyAndConsumeCode($user->getId(), $recoveryCode) === false) {
-                throw InvalidRecoveryCode::create();
-            }
-        }
-    }
-
-    return $user;
-}
-```
+The authentication verification flow:
+1. Verifies password using `UserApi::isValidPassword()`
+2. If trusted device token provided, checks if device is trusted (skips 2FA if valid)
+3. If TOTP enabled, requires either authenticator code OR recovery code
+4. Verifies TOTP code via `TwoFactorAuthenticationApi::verifyTotpUri()`
+5. Verifies recovery code via `RecoveryCodeService::verifyRecoveryCode()` (consumes code on success)
+6. Throws exceptions for invalid credentials, missing 2FA codes, or verification failures
 
 ## API Authentication
 
@@ -287,57 +191,24 @@ This affects:
 POST /api/authentication/token (DELETE method)
 ```
 
-**File**: `src/Domain/User/Service/Authentication.php:209-235`
+**File**: `src/Domain/User/Service/Authentication.php:logout()`
 
-```php
-public function logout() : void
-{
-    $token = filter_input(INPUT_COOKIE, 'id');
-
-    if ($token !== '') {
-        // Delete token from database
-        $this->deleteToken($token);
-
-        // Clear cookie
-        setcookie('id', '', [
-            'expires' => 1,  // Past timestamp
-            'path' => '/',
-            'secure' => $isSecure,
-            'httponly' => true,
-            'samesite' => 'Lax',
-        ]);
-    }
-
-    // Destroy and restart session
-    $this->sessionWrapper->destroy();
-    $this->sessionWrapper->start();
-}
-```
+The logout process deletes the authentication token from the database, clears the `id` cookie (by setting expiration to past timestamp), and destroys the current session before starting a new one.
 
 ## Security Headers
 
-**File**: `public/index.php:13-20`
+**File**: `public/index.php`
 
-Applied to all responses:
-
-```php
-$securityHeaders = [
-    'X-Content-Type-Options' => 'nosniff',
-    'X-Frame-Options' => 'SAMEORIGIN',
-    'Referrer-Policy' => 'strict-origin-when-cross-origin',
-    'Permissions-Policy' => 'accelerometer=(), camera=(), ...',
-    'Content-Security-Policy' => "default-src 'self'; ...",
-];
-```
+Pathary applies comprehensive security headers to all HTTP responses, including:
+- `X-Content-Type-Options: nosniff` - Prevents MIME type sniffing
+- `X-Frame-Options: SAMEORIGIN` - Prevents clickjacking attacks
+- `Referrer-Policy: strict-origin-when-cross-origin` - Controls referrer information
+- `Permissions-Policy` - Disables unnecessary browser features (accelerometer, camera, geolocation, etc.)
+- `Content-Security-Policy` - Restricts resource loading to prevent XSS attacks
 
 ## Related Pages
 
-- [Two-Factor Authentication](Two-Factor-Authentication) - Comprehensive 2FA guide
-- [Password Policy and Security](Password-Policy-and-Security) - Password requirements
-- [Routing and Controllers](Routing-and-Controllers) - Route authentication middleware
-- [Database](Database) - Token storage schema
-- [Deployment](Deployment) - Reverse proxy configuration
-
----
-
-[← Back to Wiki Home](Home)
+- [Two-Factor Authentication](two-factor-authentication.md) - Comprehensive 2FA guide
+- [Password Policy and Security](password-policy-and-security.md) - Password requirements
+- [Routing and Controllers](../architecture/routing-and-controllers.md) - Route authentication middleware
+- [Database](../architecture/database.md) - Token storage schema

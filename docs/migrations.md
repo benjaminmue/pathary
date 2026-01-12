@@ -354,10 +354,6 @@ SELECT * FROM phinxlog ORDER BY version DESC LIMIT 5;
 
 ## Related Pages
 
-- [Database](Database)] - Schema overview
-- [Getting Started](Getting-Started)] - Initial setup
-- [Deployment](Deployment)] - Production considerations
-
----
-
-[← Back to Wiki Home](Home)
+- [Database](architecture/database.md) - Schema overview
+- [Getting Started](getting-started.md) - Initial setup
+- [Deployment](deployment.md) - Production considerations

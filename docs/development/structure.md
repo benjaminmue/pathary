@@ -1,6 +1,6 @@
 ### Routing
 
-When someone visits Movary, a request wil be sent to the Router, which is configured via `/settings/routes.php`.
+When someone visits Pathary, a request will be sent to the Router, which is configured via `/settings/routes.php`.
 
 To add a new route, go to the file `settings/routes.php` and add this new line:
 
@@ -11,7 +11,7 @@ $routes->add('<HTTP_METHOD>', '/your/url/path', [Web\Some\Controller::class, 'Me
 Replace <HTTPMethod> with either `GET`, `POST`, `PUT` or `DELETE` and put this line of code in either the `addWebRoutes` function or the `addApiRoutes` function. It should be
 in `addWebRoutes` if it's a route that the user will be visiting on the website and in the `addApiRoutes` if it's not.
 
-Movary uses [FastRoute](https://github.com/nikic/FastRoute) to manage most of the routing stuff (only the middleware is added by us) and for more info, visit their git repo.
+Pathary uses [FastRoute](https://github.com/nikic/FastRoute) to manage most of the routing stuff (only the middleware is added by us) and for more info, visit their git repo.
 
 ### Middleware
 
@@ -19,6 +19,8 @@ Middlewares are methods that check if the user is allowed to do this. For exampl
 will be used and to check if the user is an admin, the middleware `UserIsAdmin` is used.
 
 All the middleware are in the namespace `Movary\HttpController\Web\Middleware` and use the interface `MiddlewareInterface`.
+
+> **Note**: The codebase internally uses the `Movary\` namespace (inherited from the original Movary project). This is intentional and does not affect functionality.
 
 #### Writing new middlewares
 
@@ -55,11 +57,13 @@ $routes->add('<HTTPMETHOD>', '/your/url/path', [Web\Some\Controller::class, 'Met
 
 The HTTP controllers are all located in `/src/HttpController`. These are the methods that will be executed when the route is visited.
 
-The controllers for the website have the namespace `namespace Movary\HttpController\Web` and the API-related controllers have `namespace Movary\HttpController\Web`.
+The controllers for the website have the namespace `Movary\HttpController\Web` and the API-related controllers have `Movary\HttpController\Api`.
+
+> **Note**: The codebase internally uses the `Movary\` namespace (inherited from the original Movary project).
 
 ### Data Transfer Objects (DTO)
 
-Data Transfer Objects (DTO) are frequently used in Movary and can be found throughout the whole backend.
+Data Transfer Objects (DTO) are frequently used in Pathary and can be found throughout the whole backend.
 
 A DOT is used to transfer data between classes and processes in a statically defined typesafe manner (in opposite to for example arrays).
 

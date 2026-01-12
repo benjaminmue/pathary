@@ -48,7 +48,7 @@ GET /search?query=...
         ↓
 SearchController::search()
         ↓
-TmdbApi::searchMovies($query)
+TmdbApi::searchMovie($query)
         ↓
 TMDB API: /search/movie
         ↓
@@ -60,7 +60,7 @@ Results displayed in UI
 **File**: `src/Api/Tmdb/TmdbApi.php`
 
 ```php
-public function searchMovies(string $query, int $page = 1) : array
+public function searchMovie(string $query, int $page = 1) : array
 {
     $response = $this->client->get('/search/movie', [
         'query' => [
@@ -230,7 +230,7 @@ class TmdbClient
 │                       TmdbApi                                   │
 │               src/Api/Tmdb/TmdbApi.php                          │
 │                                                                 │
-│   searchMovies()  getMovie()  getPerson()  getCredits()         │
+│   searchMovie()  getMovie()  getPerson()  getCredits()         │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              ▼
@@ -295,10 +295,6 @@ docker exec pathary-app php bin/console.php tmdb:person:sync
 
 ## Related Pages
 
-- [Ratings and Comments](Ratings-and-Comments)] - User ratings for movies
-- [Database](Database)] - Movie table schema
-- [Frontend and UI](Frontend-and-UI)] - Movie display templates
-
----
-
-[← Back to Wiki Home](Home)
+- [Ratings and Comments](ratings-and-comments.md) - User ratings for movies
+- [Database](../architecture/database.md) - Movie table schema
+- [Frontend and UI](../architecture/frontend-and-ui.md) - Movie display templates

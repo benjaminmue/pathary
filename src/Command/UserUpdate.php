@@ -104,7 +104,7 @@ class UserUpdate extends Command
 
             return Command::FAILURE;
         } catch (PasswordTooShort $e) {
-            $this->generateOutput($output, 'Could not update user: Password must contain at least 8 characters');
+            $this->generateOutput($output, 'Could not update user: Password must contain at least ' . Validator::PASSWORD_MIN_LENGTH . ' characters');
 
             return Command::FAILURE;
         } catch (UsernameInvalidFormat $e) {

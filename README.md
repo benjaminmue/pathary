@@ -55,7 +55,6 @@ Built for privacy and control, Pathary runs entirely on your own infrastructure 
 - **Password Security**
   - Enforced password policy (10+ chars, mixed case, numbers, special characters)
   - Bcrypt hashing with automatic salt generation
-  - Rate limiting on failed login attempts (5 attempts = 15 min lockout)
   - Session regeneration to prevent session fixation
 
 - **OAuth Email Authentication**
@@ -170,9 +169,9 @@ Pathary is a **fork of Movary** with significant enhancements and new features:
 
 ```bash
 docker compose exec app php bin/console.php user:create \
-  --email admin@example.com \
-  --password "SecurePass123!" \
-  --name "Admin"
+  admin@example.com \
+  "SecurePass123!" \
+  "Admin"
 ```
 
 ## Configuration

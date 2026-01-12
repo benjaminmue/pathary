@@ -209,10 +209,6 @@ environment:
 
 ## Next Steps
 
-- [Architecture](Architecture)] - Understand the codebase structure
-- [Authentication](Authentication-and-Sessions)] - Learn about login and sessions
-- [Deployment](Deployment)] - Production deployment guide
-
----
-
-[← Back to Wiki Home](Home)
+- [Architecture](architecture/architecture.md) - Understand the codebase structure
+- [Authentication and Sessions](security/authentication-and-sessions.md) - Learn about login and sessions
+- [Deployment](deployment.md) - Production deployment guide

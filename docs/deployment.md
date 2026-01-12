@@ -314,10 +314,6 @@ docker exec pathary chmod -R 755 /app/storage
 
 ## Related Pages
 
-- [Getting Started](Getting-Started)] - Initial setup
-- [Logging and Troubleshooting](Logging-and-Troubleshooting)] - Debugging
-- [Migrations](Migrations)] - Database updates
-
----
-
-[← Back to Wiki Home](Home)
+- [Getting Started](getting-started.md) - Initial setup
+- [Logging and Troubleshooting](operations/logging-and-troubleshooting.md) - Debugging
+- [Migrations](migrations.md) - Database updates

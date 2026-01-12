@@ -24,13 +24,9 @@ Profile → Security Tab → Two-Factor Authentication section
 2. A QR code will be displayed
 3. Scan the QR code with your authenticator app
 
-**File**: `src/HttpController/Web/ProfileSecurityController.php:enableTotp()`
+**Implementation**: `src/HttpController/Web/ProfileSecurityController.php:enableTotp()`
 
-The system generates a secret key using:
-```php
-$totpSecret = $this->twoFactorAuthenticationApi->generateTotpSecret();
-$totpUri = $this->twoFactorAuthenticationApi->buildTotpUri($user->getName(), $totpSecret);
-```
+The system generates a TOTP secret and QR code URI using `TwoFactorAuthenticationFactory::createTotp()`, which creates a TOTP instance compatible with RFC 6238 standard authenticator apps.
 
 ### Step 3: Verify TOTP Code
 
@@ -55,23 +51,9 @@ When you enable 2FA, 10 recovery codes are automatically generated and displayed
 - **Security**: Codes are hashed using bcrypt before storage
 - **Progressive UI**: Shows step-by-step progress through confirmation
 
-**File**: `src/Domain/User/Service/RecoveryCodeService.php:generateRecoveryCodes()`
+**Implementation**: `src/Domain/User/Service/RecoveryCodeService.php:generateRecoveryCodes()`
 
-```php
-public function generateRecoveryCodes(int $userId) : array
-{
-    // Generate 10 random codes
-    for ($i = 0; $i < 10; $i++) {
-        $code = $this->generateRandomCode();
-        $codes[] = $code;
-
-        // Hash and store
-        $this->repository->create($userId, password_hash($code, PASSWORD_DEFAULT));
-    }
-
-    return $codes;
-}
-```
+The service generates 10 cryptographically secure random codes, normalizes them (removes dashes for consistent hashing), hashes them with bcrypt, and stores the hashes. Returns formatted codes with dashes for display. Existing codes are deleted before generating new ones.
 
 ### Regenerating Recovery Codes
 
@@ -93,16 +75,9 @@ When logging in with 2FA enabled:
 3. Enter one of your recovery codes
 4. The code will be consumed and cannot be used again
 
-**File**: `src/Domain/User/Service/Authentication.php:login()`
+**Implementation**: `src/Domain/User/Service/Authentication.php:login()`
 
-```php
-// Check if recovery code is provided
-if ($recoveryCode !== null) {
-    if ($this->recoveryCodeService->verifyAndConsumeCode($user->getId(), $recoveryCode) === false) {
-        throw InvalidRecoveryCode::create();
-    }
-}
-```
+The authentication service verifies the recovery code using `RecoveryCodeService::verifyRecoveryCode()`, which normalizes the input, checks it against stored hashes, deletes the code upon successful verification, and logs both success and failure attempts to the security audit log.
 
 ### Recovery Code Storage
 
@@ -130,22 +105,9 @@ When logging in with 2FA:
 2. Check "Trust this device for 30 days"
 3. Complete login
 
-**File**: `src/Domain/User/Service/TrustedDeviceService.php:createTrustedDevice()`
+**Implementation**: `src/Domain/User/Service/TrustedDeviceService.php:createTrustedDevice()`
 
-A secure cookie is set:
-```php
-setcookie(
-    'trusted_device',
-    $deviceToken,
-    [
-        'expires' => time() + (30 * 24 * 60 * 60),  // 30 days
-        'path' => '/',
-        'secure' => true,
-        'httponly' => true,
-        'samesite' => 'Lax',
-    ],
-);
-```
+A secure cookie (`pathary_trusted_device`) is set with httpOnly and SameSite flags. The secure flag is dynamically detected based on HTTPS/X-Forwarded-Proto headers for reverse proxy compatibility. Cookie expires in 30 days. See `src/Util/TrustedDeviceCookie.php` for cookie management.
 
 ### Device Limits
 
@@ -171,9 +133,9 @@ You can see:
 - **Revoke All Devices**: `POST /profile/security/trusted-devices/revoke-all`
 
 **File**: `src/Util/DeviceNameParser.php` parses user agents to friendly names:
-- Chrome on Windows → "Chrome (Windows)"
-- Safari on iPhone → "Safari (iPhone)"
-- Firefox on macOS → "Firefox (macOS)"
+- Chrome on Windows → "Chrome on Windows"
+- Safari on iPhone → "Safari on iOS"
+- Firefox on macOS → "Firefox on macOS"
 
 ### Trusted Device Storage
 
@@ -201,14 +163,16 @@ All security events are logged in the `security_audit_log` table for monitoring 
 
 | Event Type | Description |
 |------------|-------------|
-| `2fa_enabled` | User enabled 2FA |
-| `2fa_disabled` | User disabled 2FA |
-| `2fa_verified` | Successful 2FA login |
-| `2fa_failed` | Failed 2FA attempt |
+| `totp_enabled` | User enabled 2FA |
+| `totp_disabled` | User disabled 2FA |
+| `login_success` | Successful login (with or without 2FA) |
+| `login_failed_totp` | Failed 2FA attempt |
+| `login_failed_recovery_code` | Failed recovery code attempt |
 | `recovery_code_used` | Recovery code used for login |
-| `recovery_codes_regenerated` | New recovery codes generated |
+| `recovery_codes_generated` | New recovery codes generated |
 | `trusted_device_added` | Device marked as trusted |
-| `trusted_device_revoked` | Trusted device revoked |
+| `trusted_device_removed` | Single trusted device revoked |
+| `all_trusted_devices_removed` | All trusted devices revoked |
 | `password_changed` | Password changed |
 
 ### Viewing Audit Log
@@ -225,25 +189,9 @@ Events are displayed with:
 - Device information
 - IP address (if available)
 
-**File**: `src/Domain/User/Service/SecurityAuditService.php`
+**Implementation**: `src/Domain/User/Service/SecurityAuditService.php`
 
-```php
-public function logEvent(
-    int $userId,
-    string $eventType,
-    ?string $deviceName = null,
-    ?string $ipAddress = null,
-    ?array $metadata = null
-) : void {
-    $this->repository->create(
-        $userId,
-        $eventType,
-        $deviceName,
-        $ipAddress,
-        $metadata ? json_encode($metadata) : null
-    );
-}
-```
+Events are logged using `SecurityAuditService::log()` with user ID, event type constant, IP address, user agent, and optional metadata array (automatically JSON-encoded). All event type constants are defined in the SecurityAuditService class.
 
 ## Login Flow with 2FA
 
@@ -270,23 +218,9 @@ public function logEvent(
 5. Complete login immediately
 ```
 
-**File**: `src/Domain/User/Service/Authentication.php:findUserAndVerifyAuthentication()`
+**Implementation**: `src/Domain/User/Service/Authentication.php:findUserAndVerifyAuthentication()`
 
-```php
-// Check if device is trusted
-if ($this->trustedDeviceService->isDeviceTrusted($user->getId(), $deviceToken)) {
-    // Skip 2FA verification
-    return $user;
-}
-
-// Otherwise, require 2FA
-if ($totpUri !== null) {
-    if ($userTotpCode === null && $recoveryCode === null) {
-        throw MissingTotpCode::create();
-    }
-    // Verify TOTP or recovery code...
-}
-```
+The authentication service checks for a trusted device token cookie and verifies it using `TrustedDeviceService::verifyTrustedDevice()`. If valid and not expired, 2FA is skipped and a login success event is logged with trusted device metadata. Otherwise, TOTP or recovery code verification is required.
 
 ## Disabling 2FA
 
@@ -338,10 +272,6 @@ Profile → Security Tab → Two-Factor Authentication section → Disable 2FA
 
 ## Related Pages
 
-- [Authentication and Sessions](Authentication-and-Sessions) - Login and session management
-- [Password Policy and Security](Password-Policy-and-Security) - Password requirements
-- [Database](Database) - Security-related table schemas
-
----
-
-[← Back to Wiki Home](Home)
+- [Authentication and Sessions](authentication-and-sessions.md) - Login and session management
+- [Password Policy and Security](password-policy-and-security.md) - Password requirements
+- [Database](../architecture/database.md) - Security-related table schemas

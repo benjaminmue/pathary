@@ -2,37 +2,15 @@
 
 How to create the first user account for a fresh Pathary installation.
 
+> **Note:** A web-based `/init` setup wizard is planned for first-time installation. See [GitHub Issue #45](https://github.com/benjaminmue/pathary/issues/45). Currently, use the CLI method below for initial user creation.
+
 ## Prerequisites
 
 - Pathary is running (Docker or local)
 - Database migrations have been executed
-- You have access to either the web interface or CLI
+- You have CLI access to the container or server
 
-## Method 1: Web UI (Recommended)
-
-On a fresh install with no users, Pathary automatically redirects to the registration page.
-
-### Steps
-
-1. Open `http://localhost:8080/` in your browser
-2. You'll be redirected to `/create-user`
-3. Fill in the form:
-   - **Email**: `admin@example.com`
-   - **Username**: `admin` (letters and numbers only)
-   - **Password**: minimum 8 characters
-   - **Repeat Password**: same as above
-4. Click **Create**
-
-The first user is automatically granted admin privileges.
-
-### Why this works
-
-When no users exist:
-- The `ServerHasNoUsers` middleware redirects all visitors to `/create-user`
-- The `ServerHasUsers` middleware allows access to the registration form
-- `CreateUserController` sets `isAdmin = true` for the first user
-
-## Method 2: CLI Command
+## Method 1: CLI Command (Recommended)
 
 Use the `user:create` command for headless or scripted setups.
 
@@ -69,7 +47,7 @@ php bin/console.php user:create \
 | Argument | Required | Description |
 |----------|----------|-------------|
 | `email` | Yes | Valid email address |
-| `password` | Yes | Minimum 8 characters |
+| `password` | Yes | Minimum 10 characters |
 | `name` | Yes | Username (letters and numbers only, e.g. `admin123`) |
 | `isAdmin` | No | `true` or `false` (default: `false`) |
 
@@ -84,13 +62,13 @@ User created.
 | Error | Cause |
 |-------|-------|
 | `Email already in use` | Email exists in database |
-| `Password must contain at least 8 characters` | Password too short |
+| `Password must contain at least 10 characters` | Password too short |
 | `Name must only consist of numbers and letters` | Invalid characters in username |
 | `Name already in use` | Username already taken |
 
-## Method 3: Direct Database Insert (Last Resort)
+## Method 2: Direct Database Insert (Last Resort)
 
-Only use this if Methods 1 and 2 fail.
+Only use this if the CLI method fails.
 
 ### Generate Password Hash
 
@@ -130,20 +108,11 @@ For MySQL, use `NOW()` instead of `datetime('now')`.
 
 ## Troubleshooting
 
-### "403 Forbidden" on /create-user
+### Cannot create first user via web interface
 
-**Cause**: Users already exist in database, and `ENABLE_REGISTRATION=0` (default).
+**Cause**: The `/init` setup wizard is not yet implemented (see [GitHub Issue #45](https://github.com/benjaminmue/pathary/issues/45)).
 
-**Solutions**:
-- Use CLI method instead
-- Set `ENABLE_REGISTRATION=1` environment variable (then disable after)
-- Use admin panel at `/settings/users` if you have an admin account
-
-### "404 Not Found" on /create-user
-
-**Cause**: URL rewriting not configured.
-
-**Solution**: Ensure Apache `.htaccess` is present in `public/` directory and `mod_rewrite` is enabled.
+**Solution**: Use the CLI method (`user:create` command) to create the first user.
 
 ### Database connection errors
 
@@ -192,7 +161,7 @@ After creating your first user:
 - [ ] Can search for movies
 - [ ] Can add a movie to library
 - [ ] Can rate a movie (1-7 popcorns)
-- [ ] Admin settings accessible at `/settings/users` (if admin)
+- [ ] Admin settings accessible at `/admin/users` (if admin)
 
 ## User Management Commands
 

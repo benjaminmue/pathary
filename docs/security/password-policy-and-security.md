@@ -18,7 +18,7 @@ All passwords must meet the following criteria:
 
 Password policy is enforced at:
 
-1. **User Registration** - `/create-user`
+1. **User Registration** - `/admin/users`
 2. **Password Change** - `/profile/security/password`
 3. **Admin User Creation** - CLI command `bin/console.php user:create`
 4. **Profile Updates** - Any password modification
@@ -29,42 +29,119 @@ Password policy is enforced at:
 
 ## Validation Logic
 
-**File**: `src/Domain/User/Service/Validator.php:validatePassword()`
+### Password Requirements
 
-```php
-public function validatePassword(string $password) : void
-{
-    if (strlen($password) < 10) {
-        throw PasswordPolicyViolation::create(
-            'Password must be at least 10 characters long'
-        );
-    }
+All passwords must meet ALL of the following criteria:
 
-    if (!preg_match('/[A-Z]/', $password)) {
-        throw PasswordPolicyViolation::create(
-            'Password must contain at least one uppercase letter'
-        );
-    }
+- **Minimum length**: 10 characters
+- **Uppercase letter**: At least one (A-Z)
+- **Lowercase letter**: At least one (a-z)
+- **Number**: At least one (0-9)
+- **Special character**: At least one (any non-alphanumeric)
 
-    if (!preg_match('/[a-z]/', $password)) {
-        throw PasswordPolicyViolation::create(
-            'Password must contain at least one lowercase letter'
-        );
-    }
+**Configuration**: `src/Domain/User/Service/Validator.php`
+- `PASSWORD_MIN_LENGTH = 10` (constant)
+- `ensurePasswordIsValid()` method enforces all requirements
 
-    if (!preg_match('/[0-9]/', $password)) {
-        throw PasswordPolicyViolation::create(
-            'Password must contain at least one number'
-        );
-    }
+### Validation Implementation
 
-    if (!preg_match('/[^A-Za-z0-9]/', $password)) {
-        throw PasswordPolicyViolation::create(
-            'Password must contain at least one special character'
-        );
-    }
-}
-```
+**Backend**: `Validator::ensurePasswordIsValid()`
+- Checks all requirements
+- Collects violations into array
+- Throws `PasswordPolicyViolation` with all unmet requirements
+
+**Frontend**: `public/js/profile-security.js:validatePasswordPolicy()`
+- Provides real-time feedback as user types
+- Updates visual indicators for each requirement
+- Prevents form submission if policy not met
+
+## Two-Factor Authentication (2FA)
+
+Pathary implements comprehensive 2FA to add an additional security layer beyond passwords.
+
+### Implementation
+
+**Method**: Time-based One-Time Password (TOTP)
+- **Standard**: RFC 6238 (compatible with Google Authenticator, Authy, 1Password, etc.)
+- **QR Code Setup**: Users scan QR code during enrollment
+- **Verification**: 6-digit codes rotate every 30 seconds
+
+**Files**:
+- `src/Domain/User/Service/Authentication.php` - Core 2FA authentication logic
+- `src/Domain/User/Service/TotpService.php` - TOTP generation and verification
+- `src/Domain/User/Service/RecoveryCodeService.php` - Backup code management
+- `src/Domain/User/Service/TrustedDeviceService.php` - Trusted device tracking
+
+### Recovery Codes
+
+When 2FA is enabled, 10 single-use recovery codes are automatically generated:
+
+- **Purpose**: Backup access if authenticator app is lost or unavailable
+- **Storage**: Bcrypt-hashed in `recovery_codes` table (same security as passwords)
+- **Usage**: Single-use only - each code is deleted after successful login
+- **Regeneration**: Users can regenerate all codes at any time from Security settings
+- **Display**: Shown once during generation with copy/download options
+
+**Important**: Recovery codes should be stored securely (password manager, encrypted backup).
+
+### Trusted Devices
+
+Users can mark devices as trusted to skip 2FA for 30 days:
+
+- **Duration**: 30-day trust period per device
+- **Storage**: Cookie-based with secure, httpOnly flags
+- **Token**: Cryptographically secure random token stored in `trusted_devices` table
+- **Revocation**: Users can remove individual devices or revoke all trusted devices
+- **Expiration**: Automatically deleted after 30 days
+
+## Security Activity Logging
+
+All security-related events are logged to the `user_security_audit_log` table and displayed in the user profile.
+
+### Logged Events
+
+**Authentication Events**:
+- Login success/failure (password, 2FA, recovery code)
+- Logout events
+- Rate limit exceeded (when implemented - see Issue #44)
+
+**2FA Events**:
+- 2FA enabled/disabled
+- Recovery codes generated/used
+- Trusted device added/removed
+
+**Password Events**:
+- Password changed (by user or admin)
+
+**User Management** (admin only):
+- User created/updated/deleted
+- Welcome emails sent/failed
+
+**OAuth Email Events** (admin only):
+- OAuth configuration changes
+- Token refresh warnings/failures
+- Authentication mode changes
+
+### Viewing Activity Logs
+
+**User Profile**:
+- Location: `Profile → Security Tab → Activity Log`
+- Shows: Recent 20 events with timestamp, event type, IP address
+- Route: `/profile/security` (embedded in page)
+
+**Admin Panel** (admins only):
+- Location: `Admin → Events`
+- Route: `/admin/events`
+- Features: Filter by event type, user, date range, IP address
+- Export: CSV download for compliance/analysis
+- Retention: Events older than 90 days are automatically deleted
+
+**Files**:
+- `src/Domain/User/Service/SecurityAuditService.php` - Event logging service
+- `src/Domain/User/Repository/SecurityAuditRepository.php` - Database operations
+- `src/HttpController/Web/ProfileSecurityController.php` - User-facing logs display
+
+For detailed 2FA setup and usage instructions, see [Two-Factor Authentication](two-factor-authentication.md).
 
 ## Frontend Validation
 
@@ -72,64 +149,17 @@ public function validatePassword(string $password) : void
 
 Password inputs include real-time validation with visual feedback showing which requirements are met.
 
-**File**: `public/js/profile-security.js`
-
-```javascript
-function updatePasswordRequirements(password) {
-    const requirements = {
-        length: password.length >= 10,
-        uppercase: /[A-Z]/.test(password),
-        lowercase: /[a-z]/.test(password),
-        number: /[0-9]/.test(password),
-        special: /[^A-Za-z0-9]/.test(password)
-    };
-
-    // Update UI indicators
-    document.getElementById('req-length').classList.toggle('met', requirements.length);
-    document.getElementById('req-uppercase').classList.toggle('met', requirements.uppercase);
-    // ... etc
-}
-```
+**Implementation**: `public/js/profile-security.js:validatePasswordPolicy()`
+- Tests password against each requirement using regex patterns
+- Updates UI indicators (checkmarks) as user types
+- Matches the same validation rules as backend
+- Prevents form submission if policy not met
 
 ### Visual Indicators
 
 **File**: `templates/page/settings-account-security.html.twig`
 
-Requirements are displayed as a checklist:
-```html
-<ul class="password-requirements">
-    <li id="req-length" class="requirement">
-        <i class="bi bi-check-circle"></i> At least 10 characters
-    </li>
-    <li id="req-uppercase" class="requirement">
-        <i class="bi bi-check-circle"></i> One uppercase letter (A-Z)
-    </li>
-    <li id="req-lowercase" class="requirement">
-        <i class="bi bi-check-circle"></i> One lowercase letter (a-z)
-    </li>
-    <li id="req-number" class="requirement">
-        <i class="bi bi-check-circle"></i> One number (0-9)
-    </li>
-    <li id="req-special" class="requirement">
-        <i class="bi bi-check-circle"></i> One special character (!@#$%...)
-    </li>
-</ul>
-```
-
-CSS styling:
-```css
-.password-requirements .requirement {
-    color: var(--bs-secondary);
-}
-
-.password-requirements .requirement.met {
-    color: var(--bs-success);
-}
-
-.password-requirements .requirement.met i {
-    color: var(--bs-success);
-}
-```
+Requirements are displayed as a checklist with Bootstrap Icons checkmarks that change color when met (gray → green).
 
 ## Password Storage
 
@@ -175,12 +205,14 @@ Administrators can reset passwords via CLI:
 
 ```bash
 docker compose exec app php bin/console.php user:create \
-  --email user@example.com \
-  --password "NewSecurePass123!" \
-  --name "Username"
+  user@example.com \
+  "NewSecurePass123!" \
+  "Username"
 ```
 
 Password policy is enforced for CLI operations as well.
+
+> **Note:** A web-based `/init` setup wizard is planned for first-time installation. See [GitHub Issue #45](https://github.com/benjaminmue/pathary/issues/45). The CLI command will remain available for emergency admin creation.
 
 **File**: `src/Command/UserCreate.php`
 
@@ -216,24 +248,10 @@ If PHP version is upgraded and `PASSWORD_DEFAULT` changes (e.g., to Argon2), exi
 3. **Set Strong Example** - Use strong passwords yourself
 4. **Educate Users** - Share password best practices with your group
 
-## Failed Login Protection
-
-Pathary includes rate limiting for login attempts:
-
-| Threshold | Lockout Duration |
-|-----------|-----------------|
-| 5 failed attempts | 15 minutes |
-
-**File**: `src/Domain/User/Service/Authentication.php`
-
-Failed attempts are tracked per email address and reset upon successful login.
+> **Note:** Login rate limiting is not currently implemented but is planned. See [GitHub Issue #44](https://github.com/benjaminmue/pathary/issues/44) for progress. Failed login attempts are logged to the security audit log but not blocked.
 
 ## Related Pages
 
-- [Two-Factor Authentication](Two-Factor-Authentication) - TOTP, recovery codes, trusted devices
-- [Authentication and Sessions](Authentication-and-Sessions) - Login flow and session management
-- [Database](Database) - User table schema
-
----
-
-[← Back to Wiki Home](Home)
+- [Two-Factor Authentication](two-factor-authentication.md) - TOTP, recovery codes, trusted devices
+- [Authentication and Sessions](authentication-and-sessions.md) - Login flow and session management
+- [Database](../architecture/database.md) - User table schema

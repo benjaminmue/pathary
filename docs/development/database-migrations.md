@@ -1,4 +1,4 @@
-Movary uses [phinx](https://phinx.org/) to manage database migrations
+Pathary uses [phinx](https://phinx.org/) to manage database migrations
 
 In order to create a new migration, run the following command:
 

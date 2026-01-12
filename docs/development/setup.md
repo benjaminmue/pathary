@@ -49,22 +49,11 @@ For example, in VSCode or VSCodium, the following debug configuration would allo
 }
 ```
 
-### IDE recommendation: PhpStorm
+### Code Style
 
-PhpStorm is recommended for development. Import the Pathary code style scheme (found at `settings/phpstorm.xml`).
-For import instructions see the [official docs](https://www.jetbrains.com/help/phpstorm/configuring-code-style.html#import-export-schemes).
+Code style is enforced via PHP_CodeSniffer using `settings/phpcs.xml`. Run `composer test-cs` to check your code against the project standards.
 
-To apply the code style rules use at least the following features:
-
-- `Reformat code` (more info [here](https://www.jetbrains.com/help/phpstorm/rearrange-code.html))
-- `Rearrange code` (more info [here](https://www.jetbrains.com/help/phpstorm/rearrange-code.html))
-- `Optimize imports`
-
-Notes:
-
-- Please apply the code style rules for every file you changed
-- To find the default shortcuts for the features and/or customize search for them in Settings -> Keymap
-- If you use the PhpStorm UI for git you can execute the features automatically before every commit (Settings -> Version Control -> Commit -> Commit Checks)
+Most modern PHP IDEs (PhpStorm, VSCode with PHP extensions, etc.) can auto-format based on the phpcs.xml configuration.
 
 ### Documentation
 

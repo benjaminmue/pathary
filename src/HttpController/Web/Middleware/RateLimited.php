@@ -153,7 +153,8 @@ class RateLimited implements MiddlewareInterface
                 return $this->authenticationService->getCurrentUserId();
             }
         } catch (\Exception $e) {
-            // User not authenticated, use fallback
+            // User not authenticated, fall through to return fallback ID
+            return 0;
         }
 
         return 0;
@@ -211,7 +212,8 @@ class RateLimited implements MiddlewareInterface
             }
         } catch (\Exception $e) {
             // Silently fail logging to avoid breaking the request
-            // In production, this could be logged to error_log
+            // Log to PHP error log instead of breaking the response
+            error_log('Failed to log rate limit event: ' . $e->getMessage());
         }
     }
 

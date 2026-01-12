@@ -18,7 +18,7 @@ This page covers Pathary's frontend architecture, templates, and styling.
 templates/
 ├── base.html.twig              # Root layout
 ├── component/                  # Reusable components
-│   ├── navbar_app.twig         # Authenticated navbar
+│   ├── navbar.html.twig        # Authenticated navbar
 │   ├── navbar_public.twig      # Public navbar
 │   ├── modal_log_play.twig     # Log play modal
 │   └── ...
@@ -42,39 +42,7 @@ templates/
 
 **File**: `templates/base.html.twig`
 
-All pages use a flexbox sticky footer pattern with consistent bottom spacing:
-
-```twig
-<!DOCTYPE html>
-<html data-bs-theme="{{ theme }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Pathary{% endblock %} | {{ applicationName }}</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/bootstrap-icons-1.10.2.css" rel="stylesheet">
-
-    {% block styles %}{% endblock %}
-</head>
-<body class="d-flex flex-column min-vh-100">
-    {% block navbar %}{% endblock %}
-
-    <div class="flex-grow-1 pb-4">
-        {% block body %}{% endblock %}
-    </div>
-
-    {% if showFooter is not defined or showFooter %}
-        {% include 'partials/footer.twig' %}
-    {% endif %}
-
-    <!-- Bootstrap JS -->
-    <script src="/js/bootstrap.bundle.min.js"></script>
-    {% block scripts %}{% endblock %}
-</body>
-</html>
-```
+The base template provides the foundational HTML structure for all pages, implementing a flexbox sticky footer pattern with consistent bottom spacing. It includes comprehensive meta tags for SEO and PWA support (CSRF token, canonical link, OpenGraph tags, favicon, manifest, theme color), CSS resources (Bootstrap, Bootstrap Icons, datepicker, global styles), hidden input fields for user preferences (date formats, current user data), JavaScript initialization (APPLICATION_URL window variable, jQuery, Bootstrap bundle, datepicker), and the footer partial. The layout uses `data-bs-theme` attribute for dark mode support, `min-vh-100` + `flex-column` + `flex-grow-1` for sticky footer behavior, and allows pages to hide the footer via `showFooter` variable. Note: The template does NOT include a navbar block - pages must include the navbar component separately if needed.
 
 ### Layout Features
 
@@ -87,28 +55,7 @@ All pages use a flexbox sticky footer pattern with consistent bottom spacing:
 
 **File**: `templates/partials/footer.twig`
 
-A sticky footer is included on all pages (except login) with links to project resources:
-
-```twig
-<footer class="footer mt-auto py-3 bg-body-tertiary border-top">
-    <div class="container">
-        <div class="d-flex flex-wrap justify-content-center gap-3 small">
-            <a href="https://github.com/benjaminmue/pathary" target="_blank" rel="noopener noreferrer"
-               class="text-body-secondary text-decoration-none">
-                <i class="bi bi-github me-1"></i>GitHub
-            </a>
-            <a href="https://github.com/benjaminmue/pathary/wiki" target="_blank" rel="noopener noreferrer"
-               class="text-body-secondary text-decoration-none">
-                <i class="bi bi-book me-1"></i>Wiki
-            </a>
-            <a href="https://github.com/benjaminmue/pathary/issues/new" target="_blank" rel="noopener noreferrer"
-               class="text-body-secondary text-decoration-none">
-                <i class="bi bi-bug me-1"></i>Report Issue
-            </a>
-        </div>
-    </div>
-</footer>
-```
+The footer component includes an embedded style block that forces dark styling in light mode (ensuring footer matches the dark navbar), followed by a sticky footer with centered flexbox links to project resources (GitHub repository, Wiki documentation, Issue reporting). Each link uses Bootstrap Icons, external link safety attributes (`rel="noopener noreferrer"`), responsive wrapping on mobile (`flex-wrap`), and muted text styling (`text-body-secondary`). The footer is conditionally hidden on the login page via the `showFooter` variable.
 
 ### Footer Features
 
@@ -144,61 +91,9 @@ The theme can be dynamically set per-user or globally.
 
 ### Authenticated Navbar
 
-**File**: `templates/component/navbar_app.twig`
+**File**: `templates/component/navbar.html.twig`
 
-Features:
-- Logo with SVG image
-- Search button
-- User dropdown
-- Dark theme styling
-
-```twig
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="/">
-            <img src="/images/logo.svg" alt="Pathary" class="navbar-logo me-2">
-            {{ applicationName }}
-        </a>
-
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/movies">All Movies</a>
-                </li>
-            </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        {{ currentUser.name }}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                        <li><a class="dropdown-item" href="/settings/account/general">Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-```
-
-### Logo Styling
-
-**File**: `public/css/global.css`
-
-```css
-.navbar-logo {
-    width: auto;
-    height: 32px;
-    object-fit: contain;
-}
-```
+The authenticated navbar uses a simple dark design without responsive expansion/collapse. It displays the application logo and name on the left, and on the right shows an "Add movie" button (for logged-in users) followed by a 3-dots dropdown menu. The dropdown contains navigation links with active state highlighting using regex pattern matching (Dashboard, History, Watchlist, All Movies, Top Actors, Top Directors), a dark mode toggle switch with sun/moon icons, and logout functionality. The navbar uses inline border styles (`style="border-color: #9d9d9d"`) on certain elements and includes the logo styling CSS in `public/css/global.css` (32px height, auto width, object-fit contain).
 
 ## Login Page
 
@@ -330,30 +225,7 @@ Modes:
 
 **File**: `public/js/login.js`
 
-```javascript
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const response = await fetch('/api/authentication/token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Movary-Client': 'pathary-web',
-        },
-        body: JSON.stringify({
-            email: document.getElementById('email').value,
-            password: document.getElementById('password').value,
-            rememberMe: document.getElementById('rememberMe').checked,
-        }),
-    });
-
-    if (response.ok) {
-        window.location.href = '/';
-    } else {
-        showError('Invalid credentials');
-    }
-});
-```
+The login form handler uses a `submitCredentials()` function that validates redirect URLs with `getSafeRedirect()` (comparing against `APPLICATION_URL`), makes an API call to `/api/authentication/token` with the `Pathary Web` client identifier, and handles multiple response scenarios. Success (200) redirects to the safe redirect URL. Authentication failures (400) trigger complex 2FA/recovery code logic including TOTP verification, recovery code consumption, trusted device handling, and multiple error states (invalid credentials, device token, TOTP code). Server errors (500+) display generic error messages. The implementation includes separate functions for credential submission, login requests, error display, and safe redirect validation.
 
 ## CSS Files
 
@@ -442,10 +314,6 @@ Bootstrap Icons (version 1.10.2) are used throughout the application via CSS cla
 
 ## Related Pages
 
-- [Ratings and Comments](Ratings-and-Comments)] - Rating UI components
-- [Routing and Controllers](Routing-and-Controllers)] - Template rendering
-- [Architecture](Architecture)] - Twig integration
-
----
-
-[← Back to Wiki Home](Home)
+- [Ratings and Comments](../features/ratings-and-comments.md) - Rating UI components
+- [Routing and Controllers](routing-and-controllers.md) - Template rendering
+- [Architecture](architecture.md) - Twig integration

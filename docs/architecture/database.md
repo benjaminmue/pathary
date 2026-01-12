@@ -32,33 +32,12 @@ DATABASE_MYSQL_CHARSET=utf8mb4
 
 ## Connection Setup
 
-**File**: `src/Factory.php`
+Database connections are automatically configured based on environment variables. The connection factory (`Factory::createDbConnection()`) handles:
 
-```php
-public static function createDbConnection(ContainerInterface $container) : Connection
-{
-    $config = $container->get(Config::class);
-    $databaseMode = $config->getAsString('DATABASE_MODE', 'sqlite');
+- **SQLite**: Creates connection to local file with foreign key constraints and busy timeout
+- **MySQL**: Creates connection using Doctrine DBAL with configured credentials
 
-    if ($databaseMode === 'mysql') {
-        return DBAL\DriverManager::getConnection([
-            'dbname' => $config->getAsString('DATABASE_MYSQL_NAME'),
-            'user' => $config->getAsString('DATABASE_MYSQL_USER'),
-            'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
-            'host' => $config->getAsString('DATABASE_MYSQL_HOST'),
-            'port' => $config->getAsInt('DATABASE_MYSQL_PORT', 3306),
-            'driver' => 'pdo_mysql',
-            'charset' => $config->getAsString('DATABASE_MYSQL_CHARSET', 'utf8mb4'),
-        ]);
-    }
-
-    // SQLite
-    return DBAL\DriverManager::getConnection([
-        'path' => $config->getAsString('DATABASE_SQLITE', 'storage/movary.sqlite'),
-        'driver' => 'pdo_sqlite',
-    ]);
-}
-```
+For implementation details, see `src/Factory.php`.
 
 ## Table Overview
 
@@ -269,24 +248,9 @@ public function findById(int $id) : ?array
 
 ### Group Statistics
 
-**File**: `src/Service/GroupMovieService.php`
+**File**: `src/Service/GroupMovieService.php:getMovieGroupStats()`
 
-```php
-public function getMovieGroupStats(int $movieId) : array
-{
-    return $this->dbConnection->fetchAssociative(
-        <<<SQL
-        SELECT
-            AVG(rating_popcorn) AS avg_popcorn,
-            COUNT(rating_popcorn) AS rating_count,
-            MAX(updated_at) AS last_rating_activity
-        FROM movie_user_rating
-        WHERE movie_id = ? AND rating_popcorn IS NOT NULL
-        SQL,
-        [$movieId],
-    );
-}
-```
+Calculates movie statistics by querying average popcorn rating and rating count from `movie_user_rating` (filtering for non-null popcorn ratings). Also queries `movie_user_watch_dates` for watch activity. Returns rounded average (null if no ratings), rating count, and the latest timestamp from either rating updates or watch dates.
 
 ## Inspecting Data Locally
 
@@ -349,10 +313,6 @@ docker cp ./backup.sqlite pathary-app:/app/storage/movary.sqlite
 
 ## Related Pages
 
-- [Migrations](Migrations)] - Schema changes
-- [Ratings and Comments](Ratings-and-Comments)] - Rating data model
-- [Architecture](Architecture)] - Data access layer
-
----
-
-[← Back to Wiki Home](Home)
+- [Migrations](../migrations.md) - Schema changes
+- [Ratings and Comments](../features/ratings-and-comments.md) - Rating data model
+- [Architecture](architecture.md) - Data access layer

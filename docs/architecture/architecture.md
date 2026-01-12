@@ -117,15 +117,9 @@ pathary/
 
 The application uses PHP-DI with factory methods defined in `src/Factory.php`. Services are created lazily and injected automatically.
 
-**Key file**: `bootstrap.php`
-```php
-$builder = new DI\ContainerBuilder();
-$builder->addDefinitions([
-    Config::class => DI\factory([Factory::class, 'createConfig']),
-    Connection::class => DI\factory([Factory::class, 'createDbConnection']),
-    // ...
-]);
-```
+**File**: `bootstrap.php`
+
+The DI container builder configures definitions using fully-qualified class names with leading backslashes (e.g., `\Movary\ValueObject\Config::class`). Each dependency is registered using `DI\factory()` pointing to factory methods in `Factory::class` (e.g., `createConfig()`, `createDbConnection()`, etc.). The container is built with compilation enabled in production for better performance.
 
 ### 2. FastRoute for Routing
 
@@ -178,10 +172,6 @@ Unlike single-user movie trackers, Pathary is designed for groups:
 
 ## Related Pages
 
-- [Routing and Controllers](Routing-and-Controllers)] - Detailed route documentation
-- [Database](Database)] - Schema and queries
-- [Authentication](Authentication-and-Sessions)] - Security implementation
-
----
-
-[← Back to Wiki Home](Home)
+- [Routing and Controllers](routing-and-controllers.md) - Detailed route documentation
+- [Database](database.md) - Schema and queries
+- [Authentication and Sessions](../security/authentication-and-sessions.md) - Security implementation

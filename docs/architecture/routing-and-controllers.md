@@ -4,19 +4,7 @@ This page documents how HTTP requests are routed to controllers in Pathary.
 
 ## Route Configuration
 
-Routes are defined in `settings/routes.php` using FastRoute.
-
-```php
-return function (FastRoute\RouteCollector $routeCollector) {
-    $routerService = new RouterService();
-
-    // Web routes (HTML pages)
-    $routeCollector->addGroup('', fn($r) => addWebRoutes($routerService, $r));
-
-    // API routes (JSON)
-    $routeCollector->addGroup('/api', fn($r) => addApiRoutes($routerService, $r));
-};
-```
+Routes are defined in `settings/routes.php` using FastRoute with a RouteList pattern. The RouterService coordinates route registration by grouping routes into web routes (HTML pages) and API routes (JSON). Routes are added to a RouteList, then registered with the RouteCollector via `RouterService::addRoutesToRouteCollector()`.
 
 ## Route Table
 
@@ -49,14 +37,16 @@ return function (FastRoute\RouteCollector $routeCollector) {
 
 ### Settings Routes
 
+> **Note**: Settings routes currently use the `/old/` prefix (e.g., `/old/settings/account/general`). This prefix is being phased out. See CLAUDE.md for migration plan. Documentation shows clean paths for clarity, but actual routes require the `/old/` prefix.
+
 | Method | Path | Controller | Description |
 |--------|------|------------|-------------|
-| GET | `/settings/account/general` | `SettingsController::renderGeneralAccountPage` | Account settings |
-| GET | `/settings/account/security` | `SettingsController::renderSecurityAccountPage` | Security settings |
-| GET | `/settings/integrations/trakt` | `SettingsController::renderTraktPage` | Trakt integration |
-| GET | `/settings/integrations/plex` | `SettingsController::renderPlexPage` | Plex integration |
-| GET | `/settings/integrations/jellyfin` | `SettingsController::renderJellyfinPage` | Jellyfin integration |
-| GET | `/settings/server/general` | `SettingsController::renderServerGeneralPage` | Server settings |
+| GET | `/old/settings/account/general` | `SettingsController::renderGeneralAccountPage` | Account settings |
+| GET | `/old/settings/account/security` | `SettingsController::renderSecurityAccountPage` | Security settings |
+| GET | `/old/settings/integrations/trakt` | `SettingsController::renderTraktPage` | Trakt integration |
+| GET | `/old/settings/integrations/plex` | `SettingsController::renderPlexPage` | Plex integration |
+| GET | `/old/settings/integrations/jellyfin` | `SettingsController::renderJellyfinPage` | Jellyfin integration |
+| GET | `/old/settings/server/general` | `SettingsController::renderServerGeneralPage` | Server settings |
 
 ### User Media Routes
 
@@ -88,35 +78,55 @@ return function (FastRoute\RouteCollector $routeCollector) {
 | POST | `/api/webhook/emby/{id}` | `EmbyController::handleEmbyWebhook` | Emby scrobble |
 | POST | `/api/webhook/kodi/{id}` | `KodiController::handleKodiWebhook` | Kodi scrobble |
 
+> **Note**: Additional routes not listed above include Admin routes (`/admin/*`), Person routes (`/person/{id}`), Watchlist route (`/watchlist`), API Admin routes (`/api/admin/*`), API Played routes (`/api/users/{username}/played/movies`), Radarr feed (`/api/feed/radarr/{id}`), and Dev routes (`/dev/*`). See `settings/routes.php` for the complete list of 100+ routes.
+
 ## Middleware
 
 Middleware runs before controllers to perform checks.
 
 ### Available Middleware
 
-| Middleware | Location | Purpose |
-|------------|----------|---------|
-| `UserIsAuthenticated` | `Web/Middleware/` | Requires login |
-| `UserIsUnauthenticated` | `Web/Middleware/` | Must NOT be logged in |
-| `UserIsAdmin` | `Web/Middleware/` | Requires admin role |
-| `ServerHasNoUsers` | `Web/Middleware/` | First-run check |
-| `ServerHasUsers` | `Web/Middleware/` | Has existing users |
-| `ServerHasRegistrationEnabled` | `Web/Middleware/` | Registration allowed |
-| `IsAuthorizedToReadUserData` | `Web/Middleware/` | Can view user profile |
-| `UserHasJellyfinToken` | `Web/Middleware/` | Has Jellyfin configured |
-| `StartSession` | `Web/Middleware/` | Initialize PHP session |
+#### Web Middleware (`src/HttpController/Web/Middleware/`)
+
+| Middleware | Purpose |
+|------------|---------|
+| `UserIsAuthenticated` | Requires login |
+| `UserIsUnauthenticated` | Must NOT be logged in |
+| `UserIsAdmin` | Requires admin role |
+| `ServerHasNoUsers` | First-run check |
+| `ServerHasUsers` | Has existing users |
+| `ServerHasRegistrationEnabled` | Registration allowed |
+| `IsAuthorizedToReadUserData` | Can view user profile |
+| `UserHasJellyfinToken` | Has Jellyfin configured |
+| `StartSession` | Initialize PHP session |
+| `CsrfProtection` | CSRF token validation (POST/PUT/DELETE) |
+| `RateLimited` | Rate limiting for sensitive operations |
+| `MovieSlugRedirector` | Redirects to correct movie slug URL |
+| `PersonSlugRedirector` | Redirects to correct person slug URL |
+| `OAuthLazyMonitoring` | OAuth connection monitoring |
+
+#### API Middleware (`src/HttpController/Api/Middleware/`)
+
+| Middleware | Purpose |
+|------------|---------|
+| `IsAuthenticated` | API token authentication |
+| `IsAdmin` | API admin check |
+| `IsAuthorizedToReadUserData` | Read permission check |
+| `IsAuthorizedToWriteUserData` | Write permission check |
 
 ### Middleware Chain Example
 
 ```php
-$routes->add('POST', '/settings/server/general',
-    [SettingsController::class, 'updateServerGeneral'],
+$routes->add('POST', '/movie/{id}/rate',
+    [RateMovieController::class, 'rate'],
     [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\CsrfProtection::class  // Required for all POST/PUT/DELETE
     ]
 );
 ```
+
+> **Note**: All POST, PUT, and DELETE routes should include `CsrfProtection` middleware to prevent Cross-Site Request Forgery attacks.
 
 ## Controller Locations
 
@@ -190,10 +200,6 @@ Routes support regex-validated parameters:
 
 ## Related Pages
 
-- [Architecture](Architecture)] - System overview
-- [Authentication and Sessions](Authentication-and-Sessions)] - Login flow
-- [Frontend and UI](Frontend-and-UI)] - Template rendering
-
----
-
-[← Back to Wiki Home](Home)
+- [Architecture](architecture.md) - System overview
+- [Authentication and Sessions](../security/authentication-and-sessions.md) - Login flow
+- [Frontend and UI](frontend-and-ui.md) - Template rendering
