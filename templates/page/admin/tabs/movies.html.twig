@@ -116,6 +116,32 @@
             </div>
         </div>
 
+        <!-- Locations Management Section -->
+        <div class="mt-5 pt-4 border-top">
+            <h6 class="mb-3"><i class="bi bi-pin-map-fill me-2"></i>Watch Locations</h6>
+            <p class="text-muted small mb-3">
+                Manage system-wide locations available to all users when logging movie watches.
+            </p>
+
+            <!-- Add New Location Form -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <label for="newLocationName" class="form-label">Location Name</label>
+                    <input type="text" class="form-control" id="newLocationName" placeholder="e.g., Home, Cinema, Other">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button class="btn btn-primary w-100" onclick="createLocation()">
+                        <i class="bi bi-plus-circle me-1"></i>Add Location
+                    </button>
+                </div>
+            </div>
+
+            <!-- Existing Locations List -->
+            <div id="locationsList" class="list-group">
+                <!-- Populated by loadLocations() -->
+            </div>
+        </div>
+
         <!-- Bulk Operations Section -->
         <div class="mt-5 pt-4 border-top">
             <h6 class="mb-3"><i class="bi bi-tools me-2"></i>Bulk Operations</h6>
@@ -149,6 +175,209 @@
 
 <script>
     let currentMovieId = null;
+
+    // ========== Location Management Functions ==========
+
+    // Load locations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadLocations();
+    });
+
+    async function loadLocations() {
+        try {
+            const response = await fetch('{{ applicationUrl }}/old/settings/locations');
+            if (!response.ok) {
+                throw new Error('Failed to fetch locations');
+            }
+
+            const locations = await response.json();
+            displayLocations(locations);
+        } catch (error) {
+            showToast('Error loading locations: ' + error.message, 'danger');
+        }
+    }
+
+    function displayLocations(locations) {
+        const container = document.getElementById('locationsList');
+        if (locations.length === 0) {
+            container.innerHTML = '<p class="text-muted text-center py-3">No locations yet. Add one above to get started.</p>';
+            return;
+        }
+
+        container.innerHTML = locations.map(location => `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="bi bi-pin-map-fill me-2"></i>
+                    <strong>${escapeHtml(location.name)}</strong>
+                </div>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary btn-edit-location" data-location-id="${location.id}" data-location-name="${escapeHtml(location.name)}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger btn-delete-location" data-location-id="${location.id}" data-location-name="${escapeHtml(location.name)}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        // Add event listeners using event delegation
+        container.querySelectorAll('.btn-edit-location').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = parseInt(this.dataset.locationId);
+                const name = this.dataset.locationName;
+                editLocation(id, name);
+            });
+        });
+
+        container.querySelectorAll('.btn-delete-location').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = parseInt(this.dataset.locationId);
+                const name = this.dataset.locationName;
+                confirmDeleteLocation(id, name);
+            });
+        });
+    }
+
+    async function createLocation() {
+        const name = document.getElementById('newLocationName').value.trim();
+
+        if (!name) {
+            showToast('Please enter a location name', 'warning');
+            return;
+        }
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/old/settings/locations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, isCinema: false, _csrf_token: '{{ csrf }}' })
+            });
+
+            if (response.ok) {
+                showToast('Location created successfully', 'success');
+                document.getElementById('newLocationName').value = '';
+                await loadLocations();
+            } else {
+                showToast('Failed to create location', 'danger');
+            }
+        } catch (error) {
+            showToast('Error creating location: ' + error.message, 'danger');
+        }
+    }
+
+    function editLocation(id, name) {
+        // Pre-fill the form with existing values
+        document.getElementById('newLocationName').value = name;
+
+        // Create update button to replace add button temporarily
+        const addButton = document.querySelector('button[onclick="createLocation()"]');
+        const originalHTML = addButton.innerHTML;
+
+        addButton.innerHTML = '<i class="bi bi-check-circle me-1"></i>Update Location';
+        addButton.onclick = async function() {
+            await updateLocation(id);
+            // Restore original button
+            addButton.innerHTML = originalHTML;
+            addButton.onclick = createLocation;
+        };
+
+        // Scroll to form
+        document.getElementById('newLocationName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.getElementById('newLocationName').focus();
+    }
+
+    async function updateLocation(id) {
+        const name = document.getElementById('newLocationName').value.trim();
+
+        if (!name) {
+            showToast('Please enter a location name', 'warning');
+            return;
+        }
+
+        try {
+            const response = await fetch(`{{ applicationUrl }}/old/settings/locations/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, isCinema: false, _csrf_token: '{{ csrf }}' })
+            });
+
+            if (response.ok) {
+                showToast('Location updated successfully', 'success');
+                document.getElementById('newLocationName').value = '';
+                await loadLocations();
+            } else {
+                showToast('Failed to update location', 'danger');
+            }
+        } catch (error) {
+            showToast('Error updating location: ' + error.message, 'danger');
+        }
+    }
+
+    function confirmDeleteLocation(id, name) {
+        showConfirmModal(
+            `Delete location "${name}"? This cannot be undone.`,
+            async () => {
+                await deleteLocation(id);
+            }
+        );
+    }
+
+    async function deleteLocation(id) {
+        try {
+            const response = await fetch(`{{ applicationUrl }}/old/settings/locations/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ _csrf_token: '{{ csrf }}' })
+            });
+
+            if (response.ok) {
+                showToast('Location deleted successfully', 'success');
+                await loadLocations();
+            } else {
+                // Try to get error message from response
+                let errorMessage = 'Failed to delete location';
+                try {
+                    const data = await response.json();
+                    if (data.error) {
+                        errorMessage = data.error;
+                    }
+                } catch (e) {
+                    // Response wasn't JSON, use default message
+                    console.error('Failed to parse error response:', e);
+                }
+
+                showToast(errorMessage, response.status === 409 ? 'warning' : 'danger');
+            }
+        } catch (error) {
+            showToast('Error deleting location: ' + error.message, 'danger');
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function escapeJsString(text) {
+        // Escape characters that could break out of JavaScript strings
+        return text
+            .replace(/\\/g, '\\\\')  // Backslash
+            .replace(/'/g, "\\'")     // Single quote
+            .replace(/"/g, '\\"')     // Double quote
+            .replace(/\n/g, '\\n')    // Newline
+            .replace(/\r/g, '\\r')    // Carriage return
+            .replace(/\t/g, '\\t');   // Tab
+    }
+
+    // ========== Movie Management Functions ==========
 
     async function searchMovies() {
         const query = document.getElementById('movieSearch').value.trim();

@@ -99,16 +99,10 @@ class GroupMovieService
      * Get individual ratings from all users for a movie.
      * Returns shuffled results for random order on each request.
      *
-     * @return array<int, array{
-     *     user_name: string,
-     *     rating_popcorn: ?int,
-     *     comment: ?string,
-     *     watched_year: ?int,
-     *     watched_month: ?int,
-     *     watched_day: ?int,
-     *     location_id: ?int,
-     *     updated_at: ?string
-     * }>
+     * Expected fields: user_name, rating_popcorn, comment, watched_year,
+     * watched_month, watched_day, location_id, location_name, updated_at
+     *
+     * @return list<array<string, mixed>>
      */
     public function getMovieIndividualRatings(int $movieId) : array
     {
@@ -122,9 +116,11 @@ class GroupMovieService
                 mur.watched_month,
                 mur.watched_day,
                 mur.location_id,
+                l.name AS location_name,
                 COALESCE(mur.updated_at, mur.created_at) AS updated_at
             FROM movie_user_rating mur
             JOIN user u ON u.id = mur.user_id
+            LEFT JOIN location l ON l.id = mur.location_id
             WHERE mur.movie_id = ? AND (mur.rating_popcorn IS NOT NULL OR mur.comment IS NOT NULL OR mur.watched_year IS NOT NULL OR mur.location_id IS NOT NULL)
             SQL,
             [$movieId],

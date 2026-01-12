@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController\Web;
 
+use Movary\Domain\Movie\History\Location\MovieHistoryLocationApi;
 use Movary\Domain\Movie\MovieRepository;
 use Movary\Domain\User\Service\Authentication;
 use Movary\ValueObject\Http\Request;
@@ -10,20 +11,10 @@ use Movary\ValueObject\PopcornRating;
 
 class RateMovieController
 {
-    // Location constants
-    public const int LOCATION_CINEMA = 1;
-    public const int LOCATION_AT_HOME = 2;
-    public const int LOCATION_OTHER = 3;
-
-    public const array LOCATION_LABELS = [
-        self::LOCATION_CINEMA => 'Cinema',
-        self::LOCATION_AT_HOME => 'At Home',
-        self::LOCATION_OTHER => 'Other',
-    ];
-
     public function __construct(
         private readonly MovieRepository $movieRepository,
         private readonly Authentication $authenticationService,
+        private readonly MovieHistoryLocationApi $locationApi,
     ) {
     }
 
@@ -77,8 +68,14 @@ class RateMovieController
 
         // Parse location
         $locationId = $this->parseIntOrNull($postData['location_id'] ?? null);
-        if ($locationId !== null && !array_key_exists($locationId, self::LOCATION_LABELS)) {
-            $locationId = null; // Invalid location
+
+        // Validate location ID against database (system-wide locations only)
+        if ($locationId !== null) {
+            $location = $this->locationApi->findLocationById($locationId);
+            if ($location === null || $location->getUserId() !== null) {
+                // Location doesn't exist or is not a system-wide location
+                $locationId = null;
+            }
         }
 
         $this->movieRepository->upsertUserRatingWithComment(

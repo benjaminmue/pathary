@@ -8,6 +8,7 @@ use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 
 class LocationController
 {
@@ -20,11 +21,11 @@ class LocationController
 
     public function createLocation(Request $request) : Response
     {
-        $currentUser = $this->authenticationService->getCurrentUser();
         $requestData = Json::decode($request->getBody());
 
+        // Create system-wide location (user_id = NULL)
         $this->locationApi->createLocation(
-            $currentUser->getId(),
+            null,
             $requestData['name'],
             empty($requestData['isCinema']) === false,
         );
@@ -35,7 +36,6 @@ class LocationController
     public function deleteLocation(Request $request) : Response
     {
         $locationId = (int)$request->getRouteParameters()['locationId'];
-        $currentUser = $this->authenticationService->getCurrentUser();
 
         $location = $this->locationApi->findLocationById($locationId);
 
@@ -43,20 +43,34 @@ class LocationController
             return Response::createOk();
         }
 
-        if ($location->getUserId() !== $currentUser->getId()) {
+        // Only allow deleting system-wide locations (user_id = NULL)
+        if ($location->getUserId() !== null) {
             return Response::createForbidden();
         }
 
-        $this->locationApi->deleteLocation($locationId);
+        try {
+            $this->locationApi->deleteLocation($locationId);
+        } catch (\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException $e) {
+            // Location is in use - cannot delete
+            return Response::createJson(
+                Json::encode(['error' => 'Cannot delete location - it is currently in use by one or more movie ratings or watch dates.']),
+                StatusCode::createConflict()
+            );
+        } catch (\Exception $e) {
+            // Catch any other database errors
+            return Response::createJson(
+                Json::encode(['error' => 'Cannot delete location - it may be in use. Error: ' . $e->getMessage()]),
+                StatusCode::createConflict()
+            );
+        }
 
         return Response::createOk();
     }
 
     public function fetchLocations() : Response
     {
-        $currentUser = $this->authenticationService->getCurrentUser();
-
-        $locations = $this->locationApi->findLocationsByUserId($currentUser->getId());
+        // Fetch system-wide locations (user_id = NULL)
+        $locations = $this->locationApi->findLocationsByUserId(null);
 
         return Response::createJson(Json::encode($locations));
     }
@@ -76,7 +90,6 @@ class LocationController
 
     public function updateLocation(Request $request) : Response
     {
-        $currentUser = $this->authenticationService->getCurrentUser();
         $locationId = (int)$request->getRouteParameters()['locationId'];
         $requestData = Json::decode($request->getBody());
 
@@ -86,7 +99,8 @@ class LocationController
             return Response::createOk();
         }
 
-        if ($location->getUserId() !== $currentUser->getId()) {
+        // Only allow updating system-wide locations (user_id = NULL)
+        if ($location->getUserId() !== null) {
             return Response::createForbidden();
         }
 

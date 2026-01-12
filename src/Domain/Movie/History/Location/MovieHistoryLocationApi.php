@@ -10,7 +10,7 @@ class MovieHistoryLocationApi
     {
     }
 
-    public function createLocation(int $userId, string $name, bool $isCinema) : void
+    public function createLocation(?int $userId, string $name, bool $isCinema) : void
     {
         $this->locationRepository->createLocation($userId, $name, $isCinema);
     }
@@ -54,7 +54,7 @@ class MovieHistoryLocationApi
         return $this->locationRepository->findLocationByName($userId, $locationName);
     }
 
-    public function findLocationsByUserId(int $userId) : MovieHistoryLocationEntityList
+    public function findLocationsByUserId(?int $userId) : MovieHistoryLocationEntityList
     {
         return $this->locationRepository->findLocationsByUserId($userId);
     }

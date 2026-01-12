@@ -535,10 +535,11 @@
                         <label>Location</label>
                         <select name="location_id" id="location_id">
                             <option value="">Select location</option>
-                            <option value="1" {{ (userRating.location_id ?? '') == 1 ? 'selected' : '' }}>Cinema</option>
-                            <option value="2" {{ (userRating.location_id ?? '') == 2 ? 'selected' : '' }}>At Home</option>
-                            <option value="3" {{ (userRating.location_id ?? '') == 3 ? 'selected' : '' }}>Other</option>
+                            <!-- Populated dynamically from database -->
                         </select>
+                        <div id="no-locations-message" class="alert alert-info" style="display: none; margin-top: 0.5rem; font-size: 0.875rem;">
+                            No locations have been set up. Ask an admin to navigate to <a href="{{ applicationUrl }}/admin/movies" class="alert-link">Admin → Movies</a> to add custom locations.
+                        </div>
                     </div>
                 </div>
 
@@ -572,6 +573,7 @@
             const yearSelect = document.getElementById('watched_year');
             const monthSelect = document.getElementById('watched_month');
             const daySelect = document.getElementById('watched_day');
+            const locationSelect = document.getElementById('location_id');
 
             function updateDateDropdowns() {
                 const year = yearSelect.value;
@@ -621,11 +623,55 @@
                 }
             }
 
+            // Load locations from database
+            async function loadLocations() {
+                const noLocationsMessage = document.getElementById('no-locations-message');
+
+                try {
+                    const response = await fetch('{{ applicationUrl }}/old/settings/locations');
+                    if (!response.ok) {
+                        console.error('Failed to load locations');
+                        return;
+                    }
+
+                    const locations = await response.json();
+                    const currentLocationId = {{ userRating.location_id ?? 'null' }};
+
+                    // Clear existing options except the first (placeholder)
+                    while (locationSelect.options.length > 1) {
+                        locationSelect.remove(1);
+                    }
+
+                    // Show message if no locations available
+                    if (locations.length === 0) {
+                        noLocationsMessage.style.display = 'block';
+                        locationSelect.disabled = true;
+                    } else {
+                        noLocationsMessage.style.display = 'none';
+                        locationSelect.disabled = false;
+
+                        // Populate with locations from database
+                        locations.forEach(location => {
+                            const option = document.createElement('option');
+                            option.value = location.id;
+                            option.text = location.name;
+                            if (currentLocationId && currentLocationId === location.id) {
+                                option.selected = true;
+                            }
+                            locationSelect.add(option);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error loading locations:', error);
+                }
+            }
+
             yearSelect.addEventListener('change', updateDateDropdowns);
             monthSelect.addEventListener('change', updateDateDropdowns);
 
             // Initialize state
             updateDateDropdowns();
+            loadLocations();
         });
         </script>
     {% endif %}
@@ -671,10 +717,10 @@
                                 </span>
                             {% endif %}
 
-                            {% if rating.location_id %}
+                            {% if rating.location_name %}
                                 <span class="rating-location">
                                     <i class="bi bi-geo-alt"></i>
-                                    {% if rating.location_id == 1 %}Cinema{% elseif rating.location_id == 2 %}At Home{% else %}Other{% endif %}
+                                    {{ rating.location_name }}
                                 </span>
                             {% endif %}
                         </div>

@@ -8,7 +8,7 @@ class MovieHistoryLocationEntity implements JsonSerializable
 {
     private function __construct(
         private readonly int $id,
-        private readonly int $userId,
+        private readonly ?int $userId,
         private readonly string $name,
         private readonly bool $isCinema,
     ) {
@@ -18,7 +18,7 @@ class MovieHistoryLocationEntity implements JsonSerializable
     {
         return new self(
             (int)$data['id'],
-            (int)$data['user_id'],
+            isset($data['user_id']) ? (int)$data['user_id'] : null,
             (string)$data['name'],
             (bool)$data['is_cinema'],
         );
@@ -29,7 +29,7 @@ class MovieHistoryLocationEntity implements JsonSerializable
         return $this->id;
     }
 
-    public function getUserId() : int
+    public function getUserId() : ?int
     {
         return $this->userId;
     }

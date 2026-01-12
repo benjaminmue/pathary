@@ -11,7 +11,7 @@ class MovieHistoryLocationRepository
     {
     }
 
-    public function createLocation(int $userId, string $name, bool $isCinema) : void
+    public function createLocation(?int $userId, string $name, bool $isCinema) : void
     {
         $timestamp = DateTime::create();
 
@@ -55,15 +55,25 @@ class MovieHistoryLocationRepository
         return $data === false ? null : MovieHistoryLocationEntity::createFromArray($data);
     }
 
-    public function findLocationsByUserId(int $userId) : MovieHistoryLocationEntityList
+    public function findLocationsByUserId(?int $userId) : MovieHistoryLocationEntityList
     {
-        $data = $this->dbConnection->fetchAllAssociative(
-            'SELECT *
-            FROM `location` 
-            WHERE user_id = ?
-            ORDER BY name',
-            [$userId],
-        );
+        // For system-wide locations (userId = NULL), use IS NULL query
+        if ($userId === null) {
+            $data = $this->dbConnection->fetchAllAssociative(
+                'SELECT *
+                FROM `location`
+                WHERE user_id IS NULL
+                ORDER BY name',
+            );
+        } else {
+            $data = $this->dbConnection->fetchAllAssociative(
+                'SELECT *
+                FROM `location`
+                WHERE user_id = ?
+                ORDER BY name',
+                [$userId],
+            );
+        }
 
         return MovieHistoryLocationEntityList::createFromArray($data);
     }
