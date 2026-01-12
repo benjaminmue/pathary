@@ -53,7 +53,7 @@ use Twig\TwigFunction;
 
 class Factory
 {
-    private const string DEFAULT_DATABASE_SQLITE = 'storage/movary.sqlite';
+    private const string DEFAULT_DATABASE_SQLITE = 'storage/pathary.sqlite';
 
     private const string DEFAULT_DATABASE_MODE = 'sqlite';
 
