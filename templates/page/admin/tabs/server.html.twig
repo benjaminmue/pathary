@@ -516,7 +516,7 @@
                                     but the application still needs to know <strong>which mail server to connect to</strong>.
                                 </p>
                                 <p class="mb-0 small">
-                                    The server, port, and encryption below will be auto-filled based on your provider selection.
+                                    The server, port, and encryption below are auto-filled based on your provider selection, but can be edited if needed.
                                 </p>
                             </div>
 
@@ -529,8 +529,8 @@
                                     </label>
                                     <input type="text" class="form-control font-monospace" id="oauthSmtpHost"
                                            value="{{ smtpHost ?? (oauthConfig and oauthConfig.provider == 'gmail' ? 'smtp.gmail.com' : 'smtp.office365.com') }}"
-                                           readonly>
-                                    <div class="form-text">Auto-filled based on provider</div>
+                                           placeholder="e.g., smtp.gmail.com or smtp.office365.com">
+                                    <div class="form-text">Auto-filled based on provider (editable)</div>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
@@ -539,19 +539,19 @@
                                     </label>
                                     <input type="number" class="form-control" id="oauthSmtpPort"
                                            value="{{ smtpPort ?? 587 }}"
-                                           readonly>
-                                    <div class="form-text">Default: 587 (TLS)</div>
+                                           placeholder="587">
+                                    <div class="form-text">Default: 587 (TLS) or 465 (SSL)</div>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
                                     <label for="oauthSmtpEncryption" class="form-label">
                                         Encryption <span class="text-danger">*</span>
                                     </label>
-                                    <select class="form-select" id="oauthSmtpEncryption" disabled>
+                                    <select class="form-select" id="oauthSmtpEncryption">
                                         <option value="tls" {{ smtpEncryption == 'tls' or not smtpEncryption ? 'selected' : '' }}>TLS (STARTTLS)</option>
                                         <option value="ssl" {{ smtpEncryption == 'ssl' ? 'selected' : '' }}>SSL</option>
                                     </select>
-                                    <div class="form-text">Default: TLS</div>
+                                    <div class="form-text">TLS for port 587, SSL for port 465</div>
                                 </div>
                             </div>
 
@@ -2336,6 +2336,10 @@
             const smtpPort = parseInt(document.getElementById('oauthSmtpPort').value);
             const smtpEncryption = document.getElementById('oauthSmtpEncryption').value;
 
+            // Include optional From address and Display Name
+            const customFromAddress = document.getElementById('oauthEmailFromAddress').value.trim();
+            const fromDisplayName = document.getElementById('oauthFromDisplayName').value.trim();
+
             const smtpResponse = await fetch('{{ applicationUrl }}/api/admin/server/email', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -2343,7 +2347,8 @@
                     smtpHost: smtpHost,
                     smtpPort: smtpPort,
                     smtpEncryption: smtpEncryption,
-                    smtpFromAddress: fromAddress,
+                    smtpFromAddress: customFromAddress || fromAddress,
+                    smtpFromDisplayName: fromDisplayName,
                     smtpWithAuthentication: true,
                     _csrf_token: getCsrfToken(),
                 }),
