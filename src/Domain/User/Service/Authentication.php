@@ -58,6 +58,27 @@ class Authentication
         ?string $recoveryCode = null,
         ?string $trustedDeviceToken = null,
     ) : UserEntity {
+        $user = $this->findUserByEmailAndVerifyPassword($email, $password);
+        $totpUri = $this->userApi->findTotpUri($user->getId());
+
+        if ($totpUri === null) {
+            // No 2FA configured, login successful
+            $this->logSecurityEvent($user->getId(), SecurityAuditService::EVENT_LOGIN_SUCCESS);
+            return $user;
+        }
+
+        // 2FA is enabled - check for trusted device first
+        if ($this->isTrustedDevice($trustedDeviceToken, $user->getId())) {
+            $this->logSecurityEvent($user->getId(), SecurityAuditService::EVENT_LOGIN_SUCCESS, ['trusted_device' => true]);
+            return $user;
+        }
+
+        // Verify 2FA or recovery code
+        return $this->verifyTwoFactorAuthentication($user, $userTotpCode, $recoveryCode);
+    }
+
+    private function findUserByEmailAndVerifyPassword(string $email, string $password) : UserEntity
+    {
         $user = $this->repository->findUserByEmail($email);
 
         if ($user === null) {
@@ -67,91 +88,61 @@ class Authentication
         }
 
         if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
-            $this->securityAuditService->log(
-                $user->getId(),
-                SecurityAuditService::EVENT_LOGIN_FAILED_PASSWORD,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-            );
+            $this->logSecurityEvent($user->getId(), SecurityAuditService::EVENT_LOGIN_FAILED_PASSWORD);
             throw InvalidPassword::create();
         }
 
-        $totpUri = $this->userApi->findTotpUri($user->getId());
-        if ($totpUri === null) {
-            // No 2FA configured, login successful
-            $this->securityAuditService->log(
-                $user->getId(),
-                SecurityAuditService::EVENT_LOGIN_SUCCESS,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-            );
-            return $user;
+        return $user;
+    }
+
+    private function isTrustedDevice(?string $trustedDeviceToken, int $userId) : bool
+    {
+        if ($trustedDeviceToken === null) {
+            return false;
         }
 
-        // 2FA is enabled - check for trusted device first
-        if ($trustedDeviceToken !== null) {
-            $trustedDevice = $this->trustedDeviceService->verifyTrustedDevice($trustedDeviceToken, $user->getId());
-            if ($trustedDevice !== null) {
-                // Trusted device is valid, skip 2FA
-                $this->securityAuditService->log(
-                    $user->getId(),
-                    SecurityAuditService::EVENT_LOGIN_SUCCESS,
-                    $_SERVER['REMOTE_ADDR'] ?? null,
-                    $_SERVER['HTTP_USER_AGENT'] ?? null,
-                    ['trusted_device' => true]
-                );
-                return $user;
-            }
-        }
+        $trustedDevice = $this->trustedDeviceService->verifyTrustedDevice($trustedDeviceToken, $userId);
+        return $trustedDevice !== null;
+    }
 
-        // No trusted device or invalid - require 2FA or recovery code
+    private function verifyTwoFactorAuthentication(UserEntity $user, ?int $userTotpCode, ?string $recoveryCode) : UserEntity
+    {
         if ($userTotpCode === null && $recoveryCode === null) {
             throw MissingTotpCode::create();
         }
 
         // Try recovery code first if provided
-        if ($recoveryCode !== null && $this->recoveryCodeService->verifyRecoveryCode($user->getId(), $recoveryCode) === true) {
-            $this->securityAuditService->log(
-                $user->getId(),
-                SecurityAuditService::EVENT_RECOVERY_CODE_USED,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-            );
-            return $user;
-        }
-
         if ($recoveryCode !== null) {
-            $this->securityAuditService->log(
-                $user->getId(),
-                SecurityAuditService::EVENT_LOGIN_FAILED_RECOVERY_CODE,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-            );
+            if ($this->recoveryCodeService->verifyRecoveryCode($user->getId(), $recoveryCode) === true) {
+                $this->logSecurityEvent($user->getId(), SecurityAuditService::EVENT_RECOVERY_CODE_USED);
+                return $user;
+            }
+            $this->logSecurityEvent($user->getId(), SecurityAuditService::EVENT_LOGIN_FAILED_RECOVERY_CODE);
         }
 
         // Try TOTP code
-        if ($userTotpCode !== null && $this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpCode) === false) {
-            $this->securityAuditService->log(
-                $user->getId(),
-                SecurityAuditService::EVENT_LOGIN_FAILED_TOTP,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-            );
-            throw InvalidTotpCode::create();
-        }
-
         if ($userTotpCode !== null) {
-            $this->securityAuditService->log(
-                $user->getId(),
-                SecurityAuditService::EVENT_LOGIN_SUCCESS,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-            );
+            if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpCode) === false) {
+                $this->logSecurityEvent($user->getId(), SecurityAuditService::EVENT_LOGIN_FAILED_TOTP);
+                throw InvalidTotpCode::create();
+            }
+            $this->logSecurityEvent($user->getId(), SecurityAuditService::EVENT_LOGIN_SUCCESS);
             return $user;
         }
 
         // Neither recovery code nor TOTP was valid
         throw InvalidTotpCode::create();
+    }
+
+    private function logSecurityEvent(int $userId, string $eventType, ?array $metadata = null) : void
+    {
+        $this->securityAuditService->log(
+            $userId,
+            $eventType,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            $metadata
+        );
     }
 
     public function getCurrentUser() : UserEntity
@@ -316,7 +307,8 @@ class Authentication
         try {
             $userId = $this->getCurrentUserId();
         } catch (RuntimeException) {
-            // User not logged in, ignore
+            // User not logged in - $userId remains null for security audit logging
+            $userId = null;
         }
 
         $token = (string)filter_input(INPUT_COOKIE, 'id');

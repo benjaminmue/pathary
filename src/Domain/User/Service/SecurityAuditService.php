@@ -52,6 +52,46 @@ class SecurityAuditService
     public const EVENT_OAUTH_ENCRYPTION_KEY_GENERATED = 'oauth_encryption_key_generated';
     public const EVENT_OAUTH_CALLBACK_FAILED = 'oauth_callback_failed';
 
+    // Event type to label mapping (reduces cyclomatic complexity)
+    private const EVENT_TYPE_LABELS = [
+        self::EVENT_TOTP_ENABLED => '2FA Enabled',
+        self::EVENT_TOTP_DISABLED => '2FA Disabled',
+        self::EVENT_PASSWORD_CHANGED => 'Password Changed',
+        self::EVENT_RECOVERY_CODES_GENERATED => 'Recovery Codes Generated',
+        self::EVENT_RECOVERY_CODE_USED => 'Recovery Code Used',
+        self::EVENT_TRUSTED_DEVICE_ADDED => 'Trusted Device Added',
+        self::EVENT_TRUSTED_DEVICE_REMOVED => 'Trusted Device Removed',
+        self::EVENT_ALL_TRUSTED_DEVICES_REMOVED => 'All Trusted Devices Removed',
+        self::EVENT_LOGIN_SUCCESS => 'Login Success',
+        self::EVENT_LOGIN_FAILED_PASSWORD => 'Login Failed (Password)',
+        self::EVENT_LOGIN_FAILED_TOTP => 'Login Failed (2FA)',
+        self::EVENT_LOGIN_FAILED_RECOVERY_CODE => 'Login Failed (Recovery Code)',
+        self::EVENT_LOGOUT => 'Logout',
+        self::EVENT_USER_CREATED => 'User Created',
+        self::EVENT_USER_UPDATED => 'User Updated',
+        self::EVENT_USER_DELETED => 'User Deleted',
+        self::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN => 'Password Changed by Admin',
+        self::EVENT_USER_WELCOME_EMAIL_SENT => 'Welcome Email Sent',
+        self::EVENT_USER_WELCOME_EMAIL_FAILED => 'Welcome Email Failed',
+        self::EVENT_OAUTH_TOKEN_WARN_45 => 'OAuth Token Warning (45 Days)',
+        self::EVENT_OAUTH_TOKEN_WARN_30 => 'OAuth Token Warning (30 Days)',
+        self::EVENT_OAUTH_TOKEN_WARN_15 => 'OAuth Token Warning (15 Days)',
+        self::EVENT_OAUTH_TOKEN_WARN_DAILY => 'OAuth Token Warning (Daily Alert)',
+        self::EVENT_OAUTH_TOKEN_EXPIRED => 'OAuth Token Expired',
+        self::EVENT_OAUTH_TOKEN_REFRESH_FAILED => 'OAuth Token Refresh Failed',
+        self::EVENT_OAUTH_TOKEN_REFRESH_RECOVERED => 'OAuth Token Refresh Recovered',
+        self::EVENT_OAUTH_BANNER_ACKNOWLEDGED => 'OAuth Banner Acknowledged',
+        self::EVENT_OAUTH_BANNER_SHOWN => 'OAuth Banner Shown',
+        self::EVENT_OAUTH_CONFIG_CREATED => 'OAuth Config Created',
+        self::EVENT_OAUTH_CONFIG_UPDATED => 'OAuth Config Updated',
+        self::EVENT_OAUTH_CONFIG_DELETED => 'OAuth Config Deleted',
+        self::EVENT_OAUTH_CONNECTED => 'OAuth Connected',
+        self::EVENT_OAUTH_DISCONNECTED => 'OAuth Disconnected',
+        self::EVENT_OAUTH_AUTH_MODE_CHANGED => 'Email Auth Mode Changed',
+        self::EVENT_OAUTH_ENCRYPTION_KEY_GENERATED => 'OAuth Encryption Key Generated',
+        self::EVENT_OAUTH_CALLBACK_FAILED => 'OAuth Callback Failed',
+    ];
+
     public function __construct(
         private readonly SecurityAuditRepository $securityAuditRepository,
     ) {
@@ -106,44 +146,6 @@ class SecurityAuditService
 
     public function getEventTypeLabel(string $eventType) : string
     {
-        return match ($eventType) {
-            self::EVENT_TOTP_ENABLED => '2FA Enabled',
-            self::EVENT_TOTP_DISABLED => '2FA Disabled',
-            self::EVENT_PASSWORD_CHANGED => 'Password Changed',
-            self::EVENT_RECOVERY_CODES_GENERATED => 'Recovery Codes Generated',
-            self::EVENT_RECOVERY_CODE_USED => 'Recovery Code Used',
-            self::EVENT_TRUSTED_DEVICE_ADDED => 'Trusted Device Added',
-            self::EVENT_TRUSTED_DEVICE_REMOVED => 'Trusted Device Removed',
-            self::EVENT_ALL_TRUSTED_DEVICES_REMOVED => 'All Trusted Devices Removed',
-            self::EVENT_LOGIN_SUCCESS => 'Login Success',
-            self::EVENT_LOGIN_FAILED_PASSWORD => 'Login Failed (Password)',
-            self::EVENT_LOGIN_FAILED_TOTP => 'Login Failed (2FA)',
-            self::EVENT_LOGIN_FAILED_RECOVERY_CODE => 'Login Failed (Recovery Code)',
-            self::EVENT_LOGOUT => 'Logout',
-            self::EVENT_USER_CREATED => 'User Created',
-            self::EVENT_USER_UPDATED => 'User Updated',
-            self::EVENT_USER_DELETED => 'User Deleted',
-            self::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN => 'Password Changed by Admin',
-            self::EVENT_USER_WELCOME_EMAIL_SENT => 'Welcome Email Sent',
-            self::EVENT_USER_WELCOME_EMAIL_FAILED => 'Welcome Email Failed',
-            self::EVENT_OAUTH_TOKEN_WARN_45 => 'OAuth Token Warning (45 Days)',
-            self::EVENT_OAUTH_TOKEN_WARN_30 => 'OAuth Token Warning (30 Days)',
-            self::EVENT_OAUTH_TOKEN_WARN_15 => 'OAuth Token Warning (15 Days)',
-            self::EVENT_OAUTH_TOKEN_WARN_DAILY => 'OAuth Token Warning (Daily Alert)',
-            self::EVENT_OAUTH_TOKEN_EXPIRED => 'OAuth Token Expired',
-            self::EVENT_OAUTH_TOKEN_REFRESH_FAILED => 'OAuth Token Refresh Failed',
-            self::EVENT_OAUTH_TOKEN_REFRESH_RECOVERED => 'OAuth Token Refresh Recovered',
-            self::EVENT_OAUTH_BANNER_ACKNOWLEDGED => 'OAuth Banner Acknowledged',
-            self::EVENT_OAUTH_BANNER_SHOWN => 'OAuth Banner Shown',
-            self::EVENT_OAUTH_CONFIG_CREATED => 'OAuth Config Created',
-            self::EVENT_OAUTH_CONFIG_UPDATED => 'OAuth Config Updated',
-            self::EVENT_OAUTH_CONFIG_DELETED => 'OAuth Config Deleted',
-            self::EVENT_OAUTH_CONNECTED => 'OAuth Connected',
-            self::EVENT_OAUTH_DISCONNECTED => 'OAuth Disconnected',
-            self::EVENT_OAUTH_AUTH_MODE_CHANGED => 'Email Auth Mode Changed',
-            self::EVENT_OAUTH_ENCRYPTION_KEY_GENERATED => 'OAuth Encryption Key Generated',
-            self::EVENT_OAUTH_CALLBACK_FAILED => 'OAuth Callback Failed',
-            default => $eventType,
-        };
+        return self::EVENT_TYPE_LABELS[$eventType] ?? $eventType;
     }
 }
