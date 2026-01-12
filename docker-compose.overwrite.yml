@@ -1,7 +1,7 @@
 services:
   app:
     volumes:
-      - movary-storage:/app/storage
+      - pathary-storage:/app/storage
 
 volumes:
-  movary-storage:
+  pathary-storage:
