@@ -1265,6 +1265,52 @@ class MovieRepository
         ], ['id' => $id]);
     }
 
+    public function updateOmdbRatings(int $id, ?\Movary\ValueObject\OmdbRatings $omdbRatings) : void
+    {
+        $this->dbConnection->update('movie', [
+            'imdb_rating_average' => $omdbRatings?->getImdbRating(),
+            'imdb_rating_vote_count' => $omdbRatings?->getImdbVotes(),
+            'rt_rating_average' => $omdbRatings?->getRottenTomatoesRating(),
+            'rt_rating_vote_count' => $omdbRatings?->getRottenTomatoesRating() !== null ? 1 : null,
+            'updated_at_omdb' => (string)DateTime::create(),
+            'updated_at' => (string)DateTime::create(),
+        ], ['id' => $id]);
+    }
+
+    public function fetchMovieIdsForOmdbSync(
+        ?int $maxAgeInHours = null,
+        ?int $limit = null,
+        ?array $filterMovieIds = null,
+        bool $onlyNeverSynced = false,
+    ) : array {
+        $limitQuery = '';
+        if ($limit !== null) {
+            $limitQuery = "LIMIT $limit";
+        }
+
+        $filterMovieIdsQuery = '';
+        if ($filterMovieIds !== null) {
+            $filterMovieIdsQuery = ' AND movie.id IN (' . implode(',', $filterMovieIds) . ')';
+        }
+
+        $syncedFilter = '';
+        if ($onlyNeverSynced === false) {
+            $syncedFilter = match ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+                true => 'OR updated_at_omdb <= datetime("now","-' . (int)$maxAgeInHours . ' hours")',
+                false => 'OR updated_at_omdb <= DATE_SUB(NOW(), INTERVAL ' . (int)$maxAgeInHours . ' HOUR)',
+            };
+        }
+
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT movie.id
+            FROM `movie`
+            WHERE movie.imdb_id IS NOT NULL AND (updated_at_omdb IS NULL $syncedFilter) $filterMovieIdsQuery
+            ORDER BY updated_at_omdb ASC $limitQuery
+            SQL,
+        );
+    }
+
     public function updateLetterboxdId(int $id, string $letterboxdId) : void
     {
         $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId, 'updated_at' => (string)DateTime::create()], ['id' => $id]);

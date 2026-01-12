@@ -445,6 +445,8 @@ class MovieApi
             'tmdbUrl' => (string)$this->tmdbUrlGenerator->generateMovieUrl($entity->getTmdbId()),
             'tmdbRatingAverage' => $entity->getTmdbVoteAverage(),
             'tmdbRatingVoteCount' => $this->voteCountFormatter->formatVoteCount($entity->getTmdbVoteCount()),
+            'rtRatingAverage' => $entity->getRtRatingAverage(),
+            'rtRatingVoteCount' => $entity->getRtRatingVoteCount(),
             'originalLanguage' => $originalLanguageCode === null ? null : $this->tmdbApi->getLanguageByCode($originalLanguageCode),
         ];
     }

@@ -22,7 +22,10 @@ $application->add($container->get(Movary\Command\UserUpdate::class));
 $application->add($container->get(Movary\Command\UserList::class));
 $application->add($container->get(Movary\Command\PlexWatchlistImport::class));
 $application->add($container->get(Movary\Command\ProcessJobs::class));
-$application->add($container->get(Movary\Command\ImdbSync::class));
+// DEPRECATED: IMDb ratings are now provided via OMDb API (omdb:sync command)
+// $application->add($container->get(Movary\Command\ImdbSync::class));
+$application->add($container->get(Movary\Command\OmdbSync::class));
+$application->add($container->get(Movary\Command\ScheduledSync::class));
 $application->add($container->get(Movary\Command\JellyfinCacheDelete::class));
 $application->add($container->get(Movary\Command\JellyfinCacheRefresh::class));
 $application->add($container->get(Movary\Command\JellyfinExport::class));

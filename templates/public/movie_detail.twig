@@ -92,6 +92,108 @@
         line-height: 1.7;
     }
 
+    /* External Ratings Section */
+    .external-ratings-section {
+        background: var(--bs-tertiary-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .external-ratings-section h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .external-ratings-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    /* Single column layout when OMDb is not configured */
+    .external-ratings-grid-single {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .external-rating-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1rem;
+        background: var(--bs-body-bg);
+        border-radius: 8px;
+        border: 1px solid var(--bs-border-color);
+    }
+
+    .external-rating-logo {
+        height: 2.5rem;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .external-rating-logo img.rating-logo {
+        max-height: 2rem;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+    }
+
+    .external-rating-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--bs-secondary-color);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .external-rating-score {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--pathe-yellow);
+        line-height: 1;
+    }
+
+    .external-rating-max {
+        font-size: 1rem;
+        color: var(--bs-secondary-color);
+        margin-bottom: 0.25rem;
+    }
+
+    .external-rating-votes {
+        font-size: 0.75rem;
+        color: var(--bs-tertiary-color);
+    }
+
+    .external-rating-na {
+        font-size: 1.5rem;
+        color: var(--bs-secondary-color);
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+
+    .external-rating-note {
+        font-size: 0.7rem;
+        color: var(--bs-tertiary-color);
+        margin-top: 0.25rem;
+        font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+        .external-ratings-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+
     /* Global Rating Section */
     .global-rating-section {
         background: var(--bs-tertiary-bg);
@@ -466,6 +568,66 @@
             <p>{{ movie.overview }}</p>
         </section>
     {% endif %}
+
+    {# External Ratings Section #}
+    <section class="external-ratings-section">
+        <h2>External Ratings</h2>
+        <div class="external-ratings-grid{% if not isOmdbEnabled %} external-ratings-grid-single{% endif %}">
+            {# TMDB Rating #}
+            <div class="external-rating-item">
+                <div class="external-rating-logo">
+                    <img src="{{ applicationUrl }}/images/tmdb-logo.svg" alt="TMDB" class="rating-logo">
+                </div>
+                <div class="external-rating-label">TMDB</div>
+                {% if movie.tmdbRatingAverage and movie.tmdbRatingAverage > 0 %}
+                    <div>
+                        <span class="external-rating-score" style="display: inline;">{{ movie.tmdbRatingAverage|number_format(1) }}</span><span class="external-rating-max" style="display: inline;">/10</span>
+                    </div>
+                {% else %}
+                    <div class="external-rating-na">N/A</div>
+                {% endif %}
+            </div>
+
+            {% if isOmdbEnabled %}
+            {# IMDb Rating #}
+            <div class="external-rating-item">
+                <div class="external-rating-logo">
+                    <img src="{{ applicationUrl }}/images/imdb-logo.svg" alt="IMDb" class="rating-logo">
+                </div>
+                <div class="external-rating-label">IMDb</div>
+                {% if movie.imdbRatingAverage and movie.imdbRatingAverage > 0 %}
+                    <div>
+                        <span class="external-rating-score" style="display: inline;">{{ movie.imdbRatingAverage|number_format(1) }}</span><span class="external-rating-max" style="display: inline;">/10</span>
+                    </div>
+                {% else %}
+                    <div class="external-rating-na">N/A</div>
+                {% endif %}
+            </div>
+
+            {# Rotten Tomatoes Rating #}
+            <div class="external-rating-item">
+                <div class="external-rating-logo">
+                    <img src="{{ applicationUrl }}/images/rt-logo.svg" alt="Rotten Tomatoes" class="rating-logo">
+                </div>
+                <div class="external-rating-label">Rotten Tomatoes</div>
+                {% if movie.rtRatingAverage and movie.rtRatingAverage > 0 %}
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        {% if movie.rtRatingAverage >= 60 %}
+                            <img src="{{ applicationUrl }}/images/rt-fresh-icon.svg" alt="Fresh" style="width: 1.5rem; height: 1.5rem;">
+                        {% else %}
+                            <img src="{{ applicationUrl }}/images/rt-rotten-icon.svg" alt="Rotten" style="width: 1.5rem; height: 1.5rem;">
+                        {% endif %}
+                        <div>
+                            <span class="external-rating-score" style="display: inline;">{{ movie.rtRatingAverage }}</span><span class="external-rating-max" style="display: inline;">%</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="external-rating-na">N/A</div>
+                {% endif %}
+            </div>
+            {% endif %}{# End isOmdbEnabled #}
+        </div>
+    </section>
 
     <section class="global-rating-section">
         <h2>Community Rating</h2>

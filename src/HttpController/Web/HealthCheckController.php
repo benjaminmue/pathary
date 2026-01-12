@@ -44,8 +44,8 @@ class HealthCheckController
             $cachedData = [
                 'database' => $this->createUnknownStatus('Database', true),
                 'tmdb' => $this->createUnknownStatus('TMDB API', $this->isTmdbEnabled()),
+                'omdb' => $this->createUnknownStatus('OMDb API', $this->isOmdbEnabled()),
                 'oauth' => $this->createUnknownStatus('Email OAuth', $this->isOAuthEnabled()),
-                'integration1' => $this->createUnknownStatus('Integration 1', false),
                 'integration2' => $this->createUnknownStatus('Integration 2', false),
                 'overall' => ['status' => 'unknown'],
             ];
@@ -79,16 +79,17 @@ class HealthCheckController
         // Run health checks
         $dbHealth = $this->checkDatabaseHealth();
         $tmdbHealth = $this->checkTmdbHealth();
+        $omdbHealth = $this->checkOmdbHealth();
         $oauthHealth = $this->checkOAuthHealth();
 
         // Determine overall status
-        $overallStatus = $this->determineOverallStatus($dbHealth['status'], $tmdbHealth['status'], $oauthHealth['status']);
+        $overallStatus = $this->determineOverallStatus($dbHealth['status'], $tmdbHealth['status'], $omdbHealth['status'], $oauthHealth['status']);
 
         $results = [
             'database' => $dbHealth,
             'tmdb' => $tmdbHealth,
+            'omdb' => $omdbHealth,
             'oauth' => $oauthHealth,
-            'integration1' => $this->createUnknownStatus('Integration 1', false),
             'integration2' => $this->createUnknownStatus('Integration 2', false),
             'overall' => ['status' => $overallStatus],
         ];
@@ -138,6 +139,25 @@ class HealthCheckController
         return Response::create(
             StatusCode::createOk(),
             Json::encode(['tmdb' => $tmdbHealth]),
+            [Header::createContentTypeJson()],
+        );
+    }
+
+    /**
+     * POST /admin/health/omdb - Run OMDb health check only
+     */
+    public function runOmdbCheck(Request $request) : Response
+    {
+        $omdbHealth = $this->checkOmdbHealth();
+
+        // Update cache with this result
+        $cachedData = $this->getCachedHealth() ?? [];
+        $cachedData['omdb'] = $omdbHealth;
+        $this->cacheHealth($cachedData);
+
+        return Response::create(
+            StatusCode::createOk(),
+            Json::encode(['omdb' => $omdbHealth]),
             [Header::createContentTypeJson()],
         );
     }
@@ -215,6 +235,15 @@ class HealthCheckController
     private function isTmdbEnabled() : bool
     {
         $apiKey = $this->serverSettings->getTmdbApiKey();
+        return $apiKey !== null && $apiKey !== '';
+    }
+
+    /**
+     * Check if OMDb is enabled (API key configured)
+     */
+    private function isOmdbEnabled() : bool
+    {
+        $apiKey = $this->serverSettings->getOmdbApiKey();
         return $apiKey !== null && $apiKey !== '';
     }
 
@@ -321,6 +350,131 @@ class HealthCheckController
                 'enabled' => true,
                 'status' => 'down',
                 'message' => 'TMDB unreachable',
+                'latency_ms' => $latencyMs,
+                'checked_at' => date('Y-m-d H:i:s'),
+            ];
+        }
+    }
+
+    /**
+     * Check OMDb API connectivity and authentication
+     */
+    private function checkOmdbHealth() : array
+    {
+        $apiKey = $this->serverSettings->getOmdbApiKey();
+
+        // Check if API key is configured
+        if ($apiKey === null || $apiKey === '') {
+            return [
+                'enabled' => false,
+                'status' => 'down',
+                'message' => 'OMDb key not configured',
+                'latency_ms' => 0,
+                'checked_at' => date('Y-m-d H:i:s'),
+            ];
+        }
+
+        $startTime = microtime(true);
+
+        try {
+            // Test with The Shawshank Redemption (tt0111161) - a well-known stable test movie
+            $url = 'https://www.omdbapi.com/?apikey=' . urlencode($apiKey) . '&i=tt0111161';
+            $request = new \GuzzleHttp\Psr7\Request('GET', $url);
+
+            $response = $this->httpClient->sendRequest($request);
+            $latencyMs = (int)round((microtime(true) - $startTime) * 1000);
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode === 200) {
+                // Parse response to verify API key is valid
+                $body = (string)$response->getBody();
+                $data = Json::decode($body);
+
+                if (isset($data['Response']) && $data['Response'] === 'False') {
+                    // API returned an error (e.g., invalid API key)
+                    $errorMessage = $data['Error'] ?? 'Unknown error';
+
+                    if (str_contains($errorMessage, 'Invalid API key')) {
+                        return [
+                            'enabled' => true,
+                            'status' => 'down',
+                            'message' => 'OMDb auth failed',
+                            'latency_ms' => $latencyMs,
+                            'checked_at' => date('Y-m-d H:i:s'),
+                        ];
+                    }
+
+                    if (str_contains($errorMessage, 'limit reached')) {
+                        return [
+                            'enabled' => true,
+                            'status' => 'degraded',
+                            'message' => 'OMDb rate limited',
+                            'latency_ms' => $latencyMs,
+                            'checked_at' => date('Y-m-d H:i:s'),
+                        ];
+                    }
+
+                    return [
+                        'enabled' => true,
+                        'status' => 'degraded',
+                        'message' => 'OMDb error',
+                        'latency_ms' => $latencyMs,
+                        'checked_at' => date('Y-m-d H:i:s'),
+                    ];
+                }
+
+                // Successful response with movie data
+                return [
+                    'enabled' => true,
+                    'status' => 'healthy',
+                    'message' => 'OMDb reachable',
+                    'latency_ms' => $latencyMs,
+                    'checked_at' => date('Y-m-d H:i:s'),
+                ];
+            }
+
+            if ($statusCode === 401 || $statusCode === 403) {
+                return [
+                    'enabled' => true,
+                    'status' => 'down',
+                    'message' => 'OMDb auth failed',
+                    'latency_ms' => $latencyMs,
+                    'checked_at' => date('Y-m-d H:i:s'),
+                ];
+            }
+
+            // 5xx or other errors
+            return [
+                'enabled' => true,
+                'status' => 'degraded',
+                'message' => 'OMDb error',
+                'latency_ms' => $latencyMs,
+                'checked_at' => date('Y-m-d H:i:s'),
+            ];
+
+        } catch (\Exception $e) {
+            $latencyMs = (int)round((microtime(true) - $startTime) * 1000);
+
+            $this->logger->warning('OMDb health check failed', [
+                'error' => $e->getMessage(),
+                // Do not log the API key
+            ]);
+
+            // Check if it's a timeout
+            if (str_contains($e->getMessage(), 'timeout') || str_contains($e->getMessage(), 'timed out')) {
+                return [
+                    'enabled' => true,
+                    'status' => 'down',
+                    'message' => 'OMDb timeout',
+                    'latency_ms' => $latencyMs,
+                    'checked_at' => date('Y-m-d H:i:s'),
+                ];
+            }
+
+            return [
+                'enabled' => true,
+                'status' => 'down',
+                'message' => 'OMDb unreachable',
                 'latency_ms' => $latencyMs,
                 'checked_at' => date('Y-m-d H:i:s'),
             ];
@@ -515,7 +669,7 @@ class HealthCheckController
     /**
      * Determine overall system status from individual checks
      */
-    private function determineOverallStatus(string $dbStatus, string $tmdbStatus, string $oauthStatus = 'unknown') : string
+    private function determineOverallStatus(string $dbStatus, string $tmdbStatus, string $omdbStatus = 'unknown', string $oauthStatus = 'unknown') : string
     {
         // If database is down, overall is down (critical)
         if ($dbStatus === 'down') {
@@ -523,17 +677,17 @@ class HealthCheckController
         }
 
         // If any service is degraded, overall is degraded
-        if ($dbStatus === 'degraded' || $tmdbStatus === 'degraded' || $oauthStatus === 'degraded') {
+        if ($dbStatus === 'degraded' || $tmdbStatus === 'degraded' || $omdbStatus === 'degraded' || $oauthStatus === 'degraded') {
             return 'degraded';
         }
 
-        // If TMDB or OAuth is down but DB is healthy, overall is degraded (not critical)
-        if ($tmdbStatus === 'down' || $oauthStatus === 'down') {
+        // If TMDB, OMDb, or OAuth is down but DB is healthy, overall is degraded (not critical)
+        if ($tmdbStatus === 'down' || $omdbStatus === 'down' || $oauthStatus === 'down') {
             return 'degraded';
         }
 
         // All healthy
-        if ($dbStatus === 'healthy' && $tmdbStatus === 'healthy' && $oauthStatus === 'healthy') {
+        if ($dbStatus === 'healthy' && $tmdbStatus === 'healthy' && $omdbStatus === 'healthy' && $oauthStatus === 'healthy') {
             return 'healthy';
         }
 

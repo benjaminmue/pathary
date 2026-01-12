@@ -8,6 +8,8 @@ use GuzzleHttp;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Movary\Api\Omdb\OmdbApi;
+use Movary\Api\Omdb\OmdbClient;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
@@ -33,6 +35,7 @@ use Movary\Service\ImageCacheService;
 use Movary\Service\ImageUrlService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
+use Movary\Service\Omdb\OmdbMovieRatingSync;
 use Movary\Service\ServerSettings;
 use Movary\Service\SlugifyService;
 use Movary\Util\File;
@@ -268,6 +271,32 @@ class Factory
         return new Tmdb\TmdbClient(
             $container->get(ClientInterface::class),
             $container->get(ServerSettings::class),
+        );
+    }
+
+    public static function createOmdbClient(ContainerInterface $container) : OmdbClient
+    {
+        return new OmdbClient(
+            $container->get(ClientInterface::class),
+            $container->get(ServerSettings::class),
+        );
+    }
+
+    public static function createOmdbApi(ContainerInterface $container) : OmdbApi
+    {
+        return new OmdbApi(
+            $container->get(OmdbClient::class),
+            $container->get(LoggerInterface::class),
+        );
+    }
+
+    public static function createOmdbMovieRatingSync(ContainerInterface $container) : OmdbMovieRatingSync
+    {
+        return new OmdbMovieRatingSync(
+            $container->get(OmdbApi::class),
+            $container->get(MovieApi::class),
+            $container->get(\Movary\Domain\Movie\MovieRepository::class),
+            $container->get(LoggerInterface::class),
         );
     }
 

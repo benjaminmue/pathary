@@ -18,6 +18,11 @@ class JobQueueApi
         return $this->repository->addJob(JobType::createImdbSync(), $jobStatus);
     }
 
+    public function addOmdbSyncJob(JobStatus $jobStatus) : int
+    {
+        return $this->repository->addJob(JobType::createOmdbSync(), $jobStatus);
+    }
+
     public function addJellyfinExportMoviesJob(int $userId, array $movieIds = [], ?JobStatus $jobStatus = null) : int
     {
         return $this->repository->addJob(

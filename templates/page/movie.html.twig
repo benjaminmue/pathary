@@ -107,9 +107,7 @@
             </a>
             {% if displayTmdbRating == true and movie.tmdbRatingAverage is not empty and movie.tmdbRatingAverage != 0.0 %}
                 <p style="margin-bottom: 0;margin-right: .5rem">
-                    {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
-                    <span class="fw-bold">{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}</span><span
-                            class="fw-lighter">/{{ movie.tmdbRatingVoteCount|default('-') }}</span>
+                    <span class="fw-bold">{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}</span>
                 </p>
             {% endif %}
             {% if movie.imdbId is not null %}
@@ -119,11 +117,18 @@
                 </a>
                 {% if displayImdbRating == true and movie.imdbRatingAverage is not empty %}
                     <p style="margin-bottom: 0;margin-right: 0.5rem;text-align: center">
-                        {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
-                        <span class="fw-bold">{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}</span><span
-                                class="fw-lighter">/{{ movie.imdbRatingVoteCount|default('-') }}</span>
+                        <span class="fw-bold">{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}</span>
                     </p>
                 {% endif %}
+            {% endif %}
+            {% if movie.rtRatingAverage is not empty and movie.rtRatingAverage != 0 %}
+                <a style="display: flex; align-items: center;cursor:pointer;margin-right: 0.2rem"
+                   href="https://www.rottentomatoes.com/search?search={{ movie.title|url_encode }}" target="_blank">
+                    <img src="{{ applicationUrl }}/images/rt-logo.svg" style="width: 2rem" alt="Rotten Tomatoes">
+                </a>
+                <p style="margin-bottom: 0;margin-right: 0.5rem;text-align: center">
+                    <span class="fw-bold">{{ movie.rtRatingAverage }}</span><span class="fw-lighter">%</span>
+                </p>
             {% endif %}
             <a style="display: flex; align-items: center;cursor:pointer;margin-right: 0.3rem;text-align: center"
                href="https://letterboxd.com/tmdb/{{ movie.tmdbId }}" target="_blank">

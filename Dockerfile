@@ -82,6 +82,7 @@ RUN set -eux; \
         libpng-dev \
         libcurl4-openssl-dev \
         libonig-dev \
+        cron \
     ; \
     docker-php-ext-configure gd --with-freetype --with-jpeg; \
     docker-php-ext-install -j"$(nproc)" \
@@ -152,6 +153,11 @@ RUN mkdir -p /app/storage/logs /app/storage/app/public /app/storage/profile-imag
     && chown -R www-data:www-data /app \
     && chmod -R 755 /app \
     && chmod -R 775 /app/storage
+
+# Copy cron configuration
+COPY docker/cron/pathary-sync /etc/cron.d/pathary-sync
+RUN chmod 0644 /etc/cron.d/pathary-sync && \
+    crontab /etc/cron.d/pathary-sync
 
 # Copy entrypoint script
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh

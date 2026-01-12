@@ -28,14 +28,52 @@
                             <span class="spinner-border spinner-border-sm me-1" role="status"></span>
                             Loading status...
                         </div>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="testTmdbConnection()">
+                                <i class="bi bi-lightning me-1"></i>Test TMDB Connection
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="removeTmdbKeyBtn" onclick="removeTmdbKey()" style="display: none;">
+                                <i class="bi bi-trash me-1"></i>Remove Key
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="mb-3">
+                        <label for="omdbApiKey" class="form-label">
+                            OMDb API Key
+                            <i class="bi bi-info-circle text-muted" title="Optional: For IMDb and Rotten Tomatoes ratings" data-bs-toggle="tooltip"></i>
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control font-monospace" id="omdbApiKey"
+                                   placeholder="Enter OMDb API key (8 characters)">
+                            <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('omdbApiKey')">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-text" id="omdbKeyStatus">
+                            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                            Loading status...
+                        </div>
+                        <div class="mt-2 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="testOmdbConnection()">
+                                <i class="bi bi-lightning me-1"></i>Test OMDb Connection
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="removeOmdbKeyBtn" onclick="removeOmdbKey()" style="display: none;">
+                                <i class="bi bi-trash me-1"></i>Remove Key
+                            </button>
+                        </div>
+                        <div class="form-text text-muted small">
+                            <i class="bi bi-info-circle"></i> Get your free API key at
+                            <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener">omdbapi.com/apikey.aspx</a>
+                            (1,000 requests/day free tier)
+                        </div>
                     </div>
 
                     <div class="mb-3">
                         <button type="button" class="btn btn-primary" id="saveApiSettingsBtn" onclick="saveApiSettings()">
                             <i class="bi bi-save me-1"></i>Save API Settings
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="testTmdbConnection()">
-                            <i class="bi bi-lightning me-1"></i>Test TMDB Connection
                         </button>
                         <div id="saveHelperText" class="form-text mt-2" style="display: none;">
                             <i class="bi bi-info-circle"></i> <span id="saveHelperMessage"></span>
@@ -824,24 +862,24 @@
                         </div>
                     </div>
 
-                    <!-- Integration 1 Box (Placeholder) -->
+                    <!-- OMDb Box -->
                     <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 health-box health-box-disabled" id="health-box-integration1">
+                        <div class="card h-100 health-box" id="health-box-omdb">
                             <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3 text-muted">Integration 1</h6>
+                                <h6 class="card-title mb-3">OMDb API</h6>
                                 <div class="health-icon mb-3">
-                                    <i class="bi bi-puzzle text-muted" style="font-size: 3rem;" id="health-icon-integration1"></i>
+                                    <i class="bi bi-film text-secondary" style="font-size: 3rem;" id="health-icon-omdb"></i>
                                 </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-integration1">Disabled</span>
-                                <p class="small text-muted mb-2" id="health-message-integration1">Not enabled</p>
-                                <p class="small text-muted mb-3" id="health-meta-integration1">
-                                    <span id="health-latency-integration1">-</span> • <span id="health-checked-integration1">-</span>
+                                <span class="badge bg-secondary mb-2" id="health-badge-omdb">Unknown</span>
+                                <p class="small text-muted mb-2" id="health-message-omdb">Not checked yet</p>
+                                <p class="small text-muted mb-3" id="health-meta-omdb">
+                                    <span id="health-latency-omdb">-</span> • <span id="health-checked-omdb">-</span>
                                 </p>
                                 <div class="mt-auto">
-                                    <button class="btn btn-sm btn-outline-secondary me-1" id="health-retest-integration1" disabled>
+                                    <button class="btn btn-sm btn-outline-primary me-1" id="health-retest-omdb" onclick="retestOmdb()">
                                         <i class="bi bi-arrow-clockwise"></i> Retest
                                     </button>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('integration1')">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('omdb')">
                                         <i class="bi bi-gear"></i> Settings
                                     </button>
                                 </div>
@@ -999,15 +1037,24 @@
 </style>
 
 <script>
-    // Load TMDB status on page load
+    // Load TMDB and OMDb status on page load
     document.addEventListener('DOMContentLoaded', async () => {
         await loadTmdbStatus();
+        await loadOmdbStatus();
 
         // Track input changes for dirty state
         const tmdbInput = document.getElementById('tmdbApiKey');
         if (tmdbInput) {
             tmdbInput.addEventListener('input', () => {
                 tmdbDirty = true;
+                updateSaveButtonState();
+            });
+        }
+
+        const omdbInput = document.getElementById('omdbApiKey');
+        if (omdbInput) {
+            omdbInput.addEventListener('input', () => {
+                omdbDirty = true;
                 updateSaveButtonState();
             });
         }
@@ -1026,7 +1073,7 @@
             }
 
             const data = await response.json();
-            updateTmdbStatus(data.configured, data.updated_at);
+            updateTmdbStatus(data.configured, data.updated_at, data.is_environment);
         } catch (error) {
             document.getElementById('tmdbKeyStatus').innerHTML =
                 '<i class="bi bi-exclamation-circle text-warning"></i> Failed to load status';
@@ -1037,14 +1084,29 @@
     let tmdbConfigured = false;
     let tmdbDirty = false;
 
-    function updateTmdbStatus(configured, updatedAt) {
+    // Track OMDb configuration state
+    let omdbConfigured = false;
+    let omdbDirty = false;
+
+    function updateTmdbStatus(configured, updatedAt, isEnvironment = false) {
         const statusEl = document.getElementById('tmdbKeyStatus');
+        const inputEl = document.getElementById('tmdbApiKey');
+        const removeBtn = document.getElementById('removeTmdbKeyBtn');
+
         tmdbConfigured = configured;
         tmdbDirty = false; // Reset dirty state when status is updated
 
+        // Disable input and hide remove button if key is from environment
+        if (inputEl) {
+            inputEl.disabled = isEnvironment;
+            if (isEnvironment) {
+                inputEl.placeholder = 'Configured via environment file (read-only)';
+            }
+        }
+
         if (configured) {
             const timestamp = updatedAt ? new Date(updatedAt.replace(' ', 'T')).toLocaleString() : 'Unknown';
-            statusEl.innerHTML = `
+            let statusHtml = `
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <span class="badge bg-success">
                         <i class="bi bi-check-circle-fill me-1"></i>Key Configured
@@ -1053,6 +1115,21 @@
                     <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener" class="small">Get API key</a>
                 </div>
             `;
+
+            if (isEnvironment) {
+                statusHtml += `
+                    <div class="alert alert-info py-1 px-2 mt-2 mb-0 small">
+                        <i class="bi bi-info-circle me-1"></i>Key is configured via environment file and cannot be modified or removed here.
+                    </div>
+                `;
+            }
+
+            statusEl.innerHTML = statusHtml;
+
+            // Show remove button only if not from environment
+            if (removeBtn) {
+                removeBtn.style.display = isEnvironment ? 'none' : 'inline-block';
+            }
         } else {
             statusEl.innerHTML = `
                 <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -1062,6 +1139,11 @@
                     <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener" class="small">Get API key</a>
                 </div>
             `;
+
+            // Hide remove button when not configured
+            if (removeBtn) {
+                removeBtn.style.display = 'none';
+            }
         }
 
         updateSaveButtonState();
@@ -1074,19 +1156,30 @@
 
         if (!saveBtn) return;
 
-        if (tmdbConfigured && !tmdbDirty) {
-            // Configured and no changes
+        const bothConfigured = tmdbConfigured && omdbConfigured;
+        const anyDirty = tmdbDirty || omdbDirty;
+        const noneConfigured = !tmdbConfigured && !omdbConfigured;
+
+        if (bothConfigured && !anyDirty) {
+            // Both configured and no changes
             saveBtn.className = 'btn btn-success';
             saveBtn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Saved';
             saveBtn.disabled = true;
             helperText.style.display = 'block';
-            helperMessage.textContent = 'No changes to save. Enter a new API key to update.';
-        } else if (tmdbDirty) {
+            helperMessage.textContent = 'No changes to save. Enter new API keys to update.';
+        } else if (anyDirty) {
             // User has made changes
             saveBtn.className = 'btn btn-primary';
             saveBtn.innerHTML = '<i class="bi bi-save me-1"></i>Save API Settings';
             saveBtn.disabled = false;
             helperText.style.display = 'none';
+        } else if (!noneConfigured && !anyDirty) {
+            // At least one configured, no changes
+            saveBtn.className = 'btn btn-success';
+            saveBtn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Saved';
+            saveBtn.disabled = true;
+            helperText.style.display = 'block';
+            helperMessage.textContent = 'No changes to save. Enter new API keys to update.';
         } else {
             // Not configured
             saveBtn.className = 'btn btn-primary';
@@ -1113,49 +1206,95 @@
 
     async function saveApiSettings() {
         const tmdbApiKey = document.getElementById('tmdbApiKey').value.trim();
+        const omdbApiKey = document.getElementById('omdbApiKey').value.trim();
 
-        if (tmdbApiKey === '') {
-            showToast('Please enter a TMDB API key', 'warning');
-            return;
-        }
+        let savedAny = false;
 
-        // Validate format (32 hexadecimal characters)
-        if (!/^[a-f0-9]{32}$/i.test(tmdbApiKey)) {
-            showToast('Invalid API key format. Expected 32 hexadecimal characters.', 'danger');
-            return;
-        }
-
-        try {
-            const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-                },
-                body: JSON.stringify({
-                    apiKey: tmdbApiKey,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                showToast(data.error || 'Failed to save API key', 'danger');
+        // Save TMDB if dirty
+        if (tmdbDirty && tmdbApiKey !== '') {
+            // Validate format (32 hexadecimal characters)
+            if (!/^[a-f0-9]{32}$/i.test(tmdbApiKey)) {
+                showToast('Invalid TMDB API key format. Expected 32 hexadecimal characters.', 'danger');
                 return;
             }
 
-            showToast(data.message || 'API key saved successfully', 'success');
+            try {
+                const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                    },
+                    body: JSON.stringify({
+                        apiKey: tmdbApiKey,
+                    }),
+                });
 
-            // Clear input and update status
-            document.getElementById('tmdbApiKey').value = '';
-            document.getElementById('tmdbApiKey').type = 'password';
-            updateTmdbStatus(true, data.updated_at);
+                const data = await response.json();
 
-            // Reset dirty state and update button
-            tmdbDirty = false;
+                if (!response.ok) {
+                    showToast(data.error || 'Failed to save TMDB API key', 'danger');
+                    return;
+                }
+
+                // Clear input and update status
+                document.getElementById('tmdbApiKey').value = '';
+                document.getElementById('tmdbApiKey').type = 'password';
+                updateTmdbStatus(true, data.updated_at);
+                tmdbDirty = false;
+                savedAny = true;
+            } catch (error) {
+                showToast('Error saving TMDB API key: ' + error.message, 'danger');
+                return;
+            }
+        }
+
+        // Save OMDb if dirty
+        if (omdbDirty && omdbApiKey !== '') {
+            // Validate format (8 characters)
+            if (!/^[a-zA-Z0-9]{8}$/i.test(omdbApiKey)) {
+                showToast('Invalid OMDb API key format. Expected 8 alphanumeric characters.', 'danger');
+                return;
+            }
+
+            try {
+                const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                    },
+                    body: JSON.stringify({
+                        apiKey: omdbApiKey,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showToast(data.error || 'Failed to save OMDb API key', 'danger');
+                    return;
+                }
+
+                // Clear input and update status
+                document.getElementById('omdbApiKey').value = '';
+                document.getElementById('omdbApiKey').type = 'password';
+                updateOmdbStatus(true, data.updated_at);
+                omdbDirty = false;
+                savedAny = true;
+            } catch (error) {
+                showToast('Error saving OMDb API key: ' + error.message, 'danger');
+                return;
+            }
+        }
+
+        if (savedAny) {
+            showToast('API settings saved successfully', 'success');
             updateSaveButtonState();
-        } catch (error) {
-            showToast('Error saving API key: ' + error.message, 'danger');
+            // Reload health status to update OMDb box visibility
+            await loadHealthStatus();
+        } else {
+            showToast('No changes to save', 'info');
         }
     }
 
@@ -1176,12 +1315,198 @@
             const data = await response.json();
 
             if (data.success) {
-                showToast(`Connection successful! (${data.latency_ms}ms)`, 'success');
+                showToast(`TMDB connection successful! (${data.latency_ms}ms)`, 'success');
             } else {
-                showToast(data.message || 'Connection test failed', 'danger');
+                showToast(data.message || 'TMDB connection test failed', 'danger');
             }
         } catch (error) {
-            showToast('Error testing connection: ' + error.message, 'danger');
+            showToast('Error testing TMDB connection: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    async function loadOmdbStatus() {
+        try {
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to load OMDb status');
+            }
+
+            const data = await response.json();
+            updateOmdbStatus(data.configured, data.updated_at, data.is_environment);
+        } catch (error) {
+            document.getElementById('omdbKeyStatus').innerHTML =
+                '<i class="bi bi-exclamation-circle text-warning"></i> Failed to load status';
+        }
+    }
+
+    function updateOmdbStatus(configured, updatedAt, isEnvironment = false) {
+        const statusEl = document.getElementById('omdbKeyStatus');
+        const inputEl = document.getElementById('omdbApiKey');
+        const removeBtn = document.getElementById('removeOmdbKeyBtn');
+
+        omdbConfigured = configured;
+        omdbDirty = false;
+
+        // Disable input and hide remove button if key is from environment
+        if (inputEl) {
+            inputEl.disabled = isEnvironment;
+            if (isEnvironment) {
+                inputEl.placeholder = 'Configured via environment file (read-only)';
+            }
+        }
+
+        if (configured) {
+            const timestamp = updatedAt ? new Date(updatedAt.replace(' ', 'T')).toLocaleString() : 'Unknown';
+            let statusHtml = `
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle-fill me-1"></i>Key Configured
+                    </span>
+                    <span class="text-muted small">Last updated: ${timestamp}</span>
+                    <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener" class="small">Get API key</a>
+                </div>
+            `;
+
+            if (isEnvironment) {
+                statusHtml += `
+                    <div class="alert alert-info py-1 px-2 mt-2 mb-0 small">
+                        <i class="bi bi-info-circle me-1"></i>Key is configured via environment file and cannot be modified or removed here.
+                    </div>
+                `;
+            }
+
+            statusEl.innerHTML = statusHtml;
+
+            // Show remove button only if not from environment
+            if (removeBtn) {
+                removeBtn.style.display = isEnvironment ? 'none' : 'inline-block';
+            }
+        } else {
+            statusEl.innerHTML = `
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge bg-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Not Configured
+                    </span>
+                    <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener" class="small">Get API key</a>
+                </div>
+            `;
+
+            // Hide remove button when not configured
+            if (removeBtn) {
+                removeBtn.style.display = 'none';
+            }
+        }
+
+        updateSaveButtonState();
+    }
+
+    async function testOmdbConnection() {
+        const button = event.target.closest('button');
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Testing...';
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb/test', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                },
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast(`OMDb connection successful! (${data.latency_ms}ms)`, 'success');
+            } else {
+                showToast(data.message || 'OMDb connection test failed', 'danger');
+            }
+        } catch (error) {
+            showToast('Error testing OMDb connection: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    async function removeTmdbKey() {
+        if (!confirm('Are you sure you want to remove the TMDB API key? This will affect movie metadata functionality.')) {
+            return;
+        }
+
+        const button = document.getElementById('removeTmdbKeyBtn');
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Removing...';
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                },
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast('TMDB API key removed successfully', 'success');
+                // Clear the input field and reload status
+                document.getElementById('tmdbApiKey').value = '';
+                await loadTmdbStatus();
+                // Reload health status to update TMDB box
+                await loadHealthStatus();
+            } else {
+                showToast(data.error || 'Failed to remove TMDB API key', 'danger');
+            }
+        } catch (error) {
+            showToast('Error removing TMDB API key: ' + error.message, 'danger');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+
+    async function removeOmdbKey() {
+        if (!confirm('Are you sure you want to remove the OMDb API key? This will disable IMDb and Rotten Tomatoes ratings.')) {
+            return;
+        }
+
+        const button = document.getElementById('removeOmdbKeyBtn');
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Removing...';
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                },
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast('OMDb API key removed successfully', 'success');
+                // Clear the input field and reload status
+                document.getElementById('omdbApiKey').value = '';
+                await loadOmdbStatus();
+                // Reload health status to hide OMDb box
+                await loadHealthStatus();
+            } else {
+                showToast(data.error || 'Failed to remove OMDb API key', 'danger');
+            }
+        } catch (error) {
+            showToast('Error removing OMDb API key: ' + error.message, 'danger');
         } finally {
             button.disabled = false;
             button.innerHTML = originalHtml;
@@ -1678,6 +2003,52 @@
         }
     }
 
+    async function retestOmdb() {
+        const button = document.getElementById('health-retest-omdb');
+        const originalHtml = button?.innerHTML;
+
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        }
+
+        try {
+            const response = await fetch('{{ applicationUrl }}/admin/health/omdb', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    _csrf_token: getCsrfToken(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.omdb) {
+                updateServiceStatus('omdb', data.omdb);
+                // Show/hide OMDb box based on enabled status
+                const omdbBox = document.getElementById('health-box-omdb');
+                if (omdbBox) {
+                    if (data.omdb.enabled === false) {
+                        omdbBox.style.display = 'none';
+                    } else {
+                        omdbBox.style.display = '';
+                    }
+                }
+                updateLastRunTime();
+                showToast('OMDb check completed', 'success');
+            }
+        } catch (error) {
+            showToast('Error checking OMDb: ' + error.message, 'danger');
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            }
+        }
+    }
+
     function navigateToSettings(module) {
         switch (module) {
             case 'database':
@@ -1689,6 +2060,13 @@
                 const tmdbSection = document.querySelector('.card-header:has(.bi-key)');
                 if (tmdbSection) {
                     tmdbSection.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                break;
+            case 'omdb':
+                // Scroll to OMDb API settings section (same as TMDB, they're in the same card)
+                const omdbSection = document.querySelector('.card-header:has(.bi-key)');
+                if (omdbSection) {
+                    omdbSection.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
                 break;
             case 'email':
@@ -1722,6 +2100,18 @@
         }
         if (data.tmdb) {
             updateServiceStatus('tmdb', data.tmdb);
+        }
+        if (data.omdb) {
+            updateServiceStatus('omdb', data.omdb);
+            // Hide OMDb health box if not enabled (no API key configured)
+            const omdbBox = document.getElementById('health-box-omdb');
+            if (omdbBox) {
+                if (data.omdb.enabled === false) {
+                    omdbBox.style.display = 'none';
+                } else {
+                    omdbBox.style.display = '';
+                }
+            }
         }
         if (data.oauth) {
             updateServiceStatus('oauth', data.oauth);

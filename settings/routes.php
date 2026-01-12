@@ -65,6 +65,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/admin/health/run', [Web\HealthCheckController::class, 'runHealthCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/admin/health/db', [Web\HealthCheckController::class, 'runDatabaseCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/admin/health/tmdb', [Web\HealthCheckController::class, 'runTmdbCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/admin/health/omdb', [Web\HealthCheckController::class, 'runOmdbCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/admin/health/oauth', [Web\HealthCheckController::class, 'runOAuthCheck'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
 
     ###########
@@ -381,9 +382,39 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
 
     // Admin Settings API (admin-only)
-    $routes->add('GET', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'getTmdbStatus'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
-    $routes->add('POST', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'saveTmdbApiKey'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
-    $routes->add('POST', '/admin/settings/tmdb/test', [Api\AdminSettingsController::class, 'testTmdbConnection'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
+    $routes->add('GET', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'getTmdbStatus'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'saveTmdbApiKey'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/admin/settings/tmdb/test', [Api\AdminSettingsController::class, 'testTmdbConnection'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('DELETE', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'deleteTmdbApiKey'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+
+    $routes->add('GET', '/admin/settings/omdb', [Api\AdminSettingsController::class, 'getOmdbStatus'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/admin/settings/omdb', [Api\AdminSettingsController::class, 'saveOmdbApiKey'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/admin/settings/omdb/test', [Api\AdminSettingsController::class, 'testOmdbConnection'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('DELETE', '/admin/settings/omdb', [Api\AdminSettingsController::class, 'deleteOmdbApiKey'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
 
     // Admin Events API (admin-only)
     $routes->add('GET', '/admin/events', [Api\AdminEventsController::class, 'getEvents'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);

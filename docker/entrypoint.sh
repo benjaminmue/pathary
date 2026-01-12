@@ -157,6 +157,18 @@ setup_symlinks() {
 }
 
 # -----------------------------------------------------------------------------
+# Start cron daemon for scheduled syncs
+# -----------------------------------------------------------------------------
+start_cron() {
+    echo "[CRON] Starting cron daemon for scheduled syncs..."
+
+    # Start cron in the background
+    cron
+
+    echo "[CRON] Cron daemon started (daily sync at 2 AM)"
+}
+
+# -----------------------------------------------------------------------------
 # Main execution
 # -----------------------------------------------------------------------------
 main() {
@@ -165,6 +177,7 @@ main() {
     wait_for_mysql
     run_migrations
     setup_symlinks
+    start_cron
 
     echo "=========================================="
     echo "Pathary is ready!"

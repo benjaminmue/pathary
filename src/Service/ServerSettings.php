@@ -48,6 +48,8 @@ class ServerSettings
 
     private const string TMDB_API_KEY = 'TMDB_API_KEY';
 
+    private const string OMDB_API_KEY = 'OMDB_API_KEY';
+
     public function __construct(
         private readonly Config $config,
         private readonly Connection $dbConnection,
@@ -209,6 +211,11 @@ class ServerSettings
         return $this->isSetInEnvironment(self::TMDB_API_KEY);
     }
 
+    public function isOmdbApiKeySetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::OMDB_API_KEY);
+    }
+
     public function requireApplicationUrl() : string
     {
         $value = $this->getByKey(self::APPLICATION_URL, true);
@@ -351,6 +358,79 @@ class ServerSettings
         return $key !== null && $key !== '';
     }
 
+    public function getOmdbApiKey() : ?string
+    {
+        return (string)$this->getByKey(self::OMDB_API_KEY);
+    }
+
+    public function getOmdbApiKeyMetadata() : ?array
+    {
+        $dbKey = $this->convertEnvironmentKeyToDatabaseKey(self::OMDB_API_KEY);
+
+        $result = $this->dbConnection->fetchAssociative(
+            'SELECT updated_at, updated_by_user_id FROM `server_setting_metadata` WHERE `key` = ?',
+            [$dbKey]
+        );
+
+        return $result !== false ? $result : null;
+    }
+
+    public function isOmdbApiKeyConfigured() : bool
+    {
+        $key = $this->getOmdbApiKey();
+        return $key !== null && $key !== '';
+    }
+
+    public function setOmdbApiKey(string $omdbApiKey) : void
+    {
+        $this->updateValue(self::OMDB_API_KEY, $omdbApiKey);
+    }
+
+    public function saveOmdbApiKeyWithMetadata(string $omdbApiKey, ?int $userId = null) : void
+    {
+        // Save the key using existing method
+        $this->setOmdbApiKey($omdbApiKey);
+
+        // Update metadata
+        $dbKey = $this->convertEnvironmentKeyToDatabaseKey(self::OMDB_API_KEY);
+        $now = date('Y-m-d H:i:s');
+
+        // Delete existing metadata
+        $this->dbConnection->prepare('DELETE FROM `server_setting_metadata` WHERE `key` = ?')
+            ->executeStatement([$dbKey]);
+
+        // Insert new metadata
+        $this->dbConnection->prepare(
+            'INSERT INTO `server_setting_metadata` (`key`, `updated_at`, `updated_by_user_id`) VALUES (?, ?, ?)'
+        )->executeStatement([$dbKey, $now, $userId]);
+    }
+
+    public function deleteTmdbApiKey() : void
+    {
+        $dbKey = $this->convertEnvironmentKeyToDatabaseKey(self::TMDB_API_KEY);
+
+        // Delete the key from server_setting
+        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')
+            ->executeStatement([$dbKey]);
+
+        // Delete metadata
+        $this->dbConnection->prepare('DELETE FROM `server_setting_metadata` WHERE `key` = ?')
+            ->executeStatement([$dbKey]);
+    }
+
+    public function deleteOmdbApiKey() : void
+    {
+        $dbKey = $this->convertEnvironmentKeyToDatabaseKey(self::OMDB_API_KEY);
+
+        // Delete the key from server_setting
+        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')
+            ->executeStatement([$dbKey]);
+
+        // Delete metadata
+        $this->dbConnection->prepare('DELETE FROM `server_setting_metadata` WHERE `key` = ?')
+            ->executeStatement([$dbKey]);
+    }
+
     private function convertEnvironmentKeyToDatabaseKey(string $environmentKey) : string
     {
         return lcfirst(str_replace('_', '', ucwords(strtolower($environmentKey), '_')));
@@ -370,6 +450,11 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString($key);
+
+            // If environment value is empty, check database instead
+            if ($value === '' || $value === null) {
+                $value = $this->fetchValueFromDatabase($key);
+            }
         } catch (ConfigNotSetException $e) {
             $value = $this->fetchValueFromDatabase($key);
 
@@ -384,12 +469,12 @@ class ServerSettings
     private function isSetInEnvironment(string $key) : bool
     {
         try {
-            $this->config->getAsString($key);
+            $value = $this->config->getAsString($key);
+            // Treat empty strings as not set
+            return $value !== null && $value !== '';
         } catch (ConfigNotSetException) {
             return false;
         }
-
-        return true;
     }
 
     private function sanitizeDisplayName(string $name) : string

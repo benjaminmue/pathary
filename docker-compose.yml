@@ -16,7 +16,7 @@ services:
       XDEBUG_MODE: "${XDEBUG_MODE:-off}"
       XDEBUG_HOST: "${XDEBUG_HOST:-host.docker.internal}"
       XDEBUG_PORT: "${XDEBUG_PORT:-9003}"
-      TMDB_API_KEY: "${TMDB_API_KEY:-XXXXX}"
+      TMDB_API_KEY: "${TMDB_API_KEY}"
       TMDB_ENABLE_IMAGE_CACHING: "${TMDB_ENABLE_IMAGE_CACHING:-0}"
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "pathary-mysql"

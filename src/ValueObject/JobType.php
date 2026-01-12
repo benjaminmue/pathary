@@ -15,6 +15,8 @@ class JobType implements JsonSerializable
 
     private const string TYPE_IMDB_SYNC = 'imdb_sync';
 
+    private const string TYPE_OMDB_SYNC = 'omdb_sync';
+
     private const string TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_import_history';
 
     private const string TYPE_JELLYFIN_EXPORT_HISTORY = 'jellyfin_export_history';
@@ -44,6 +46,7 @@ class JobType implements JsonSerializable
                 self::TYPE_TRAKT_IMPORT_HISTORY,
                 self::TYPE_TRAKT_IMPORT_RATINGS,
                 self::TYPE_IMDB_SYNC,
+                self::TYPE_OMDB_SYNC,
                 self::TYPE_PLEX_IMPORT_WATCHLIST,
                 self::TYPE_JELLYFIN_EXPORT_HISTORY,
                 self::TYPE_JELLYFIN_IMPORT_HISTORY,
@@ -62,6 +65,11 @@ class JobType implements JsonSerializable
     public static function createImdbSync() : self
     {
         return new self(self::TYPE_IMDB_SYNC);
+    }
+
+    public static function createOmdbSync() : self
+    {
+        return new self(self::TYPE_OMDB_SYNC);
     }
 
     public static function createJellyfinExportMovies() : self

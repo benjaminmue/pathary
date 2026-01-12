@@ -24,8 +24,11 @@ class MovieEntity
         private readonly ?string $tmdbPosterPath,
         private readonly ?float $imdbRatingAverage,
         private readonly ?int $imdbRatingVoteCount,
+        private readonly ?int $rtRatingAverage,
+        private readonly ?int $rtRatingVoteCount,
         private readonly ?DateTime $updatedAtTmdb,
         private readonly ?DateTime $updatedAtImdb,
+        private readonly ?DateTime $updatedAtOmdb,
     ) {
     }
 
@@ -48,8 +51,11 @@ class MovieEntity
             $data['tmdb_poster_path'],
             $data['imdb_rating_average'] === null ? null : (float)$data['imdb_rating_average'],
             $data['imdb_rating_vote_count'] === null ? null : (int)$data['imdb_rating_vote_count'],
+            $data['rt_rating_average'] === null ? null : (int)$data['rt_rating_average'],
+            $data['rt_rating_vote_count'] === null ? null : (int)$data['rt_rating_vote_count'],
             $data['updated_at_tmdb'] === null ? null : DateTime::createFromString($data['updated_at_tmdb']),
             $data['updated_at_imdb'] === null ? null : DateTime::createFromString($data['updated_at_imdb']),
+            $data['updated_at_omdb'] === null ? null : DateTime::createFromString($data['updated_at_omdb']),
         );
     }
 
@@ -141,5 +147,20 @@ class MovieEntity
     public function getUpdatedAtTmdb() : ?DateTime
     {
         return $this->updatedAtTmdb;
+    }
+
+    public function getRtRatingAverage() : ?int
+    {
+        return $this->rtRatingAverage;
+    }
+
+    public function getRtRatingVoteCount() : ?int
+    {
+        return $this->rtRatingVoteCount;
+    }
+
+    public function getUpdatedAtOmdb() : ?DateTime
+    {
+        return $this->updatedAtOmdb;
     }
 }
