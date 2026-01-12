@@ -34,6 +34,7 @@ tmp/*
 
 # Database dumps and backups
 *.sql
+!db/schema_exports/*.sql
 *.dump
 *.backup
 *.bak
