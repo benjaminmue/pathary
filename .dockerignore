@@ -16,11 +16,9 @@
 .DS_Store
 
 # Development and testing
-tests/
-settings/phpcs.xml
-settings/phpstan.neon
-settings/psalm.xml
-settings/phpunit.xml
+# Note: Keep test config files for CI to work properly
+# tests/ - Keep in image for CI
+# settings/*.xml - Keep in image for CI (phpcs, phpstan, psalm, phpunit)
 phpunit.xml
 .phpunit.result.cache
 coverage/
