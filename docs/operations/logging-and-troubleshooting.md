@@ -405,7 +405,7 @@ docker exec pathary find /app/storage/logs -name "*.log" -mtime +7 -delete
 
 ## Related Pages
 
-- [Deployment](../deployment.md) - Production setup
-- [Getting Started](../getting-started.md) - Initial configuration
+- [Production Deployment](../deployment.md) - Production setup
+- [Quickstart Guide](../quickstart.md) - Initial configuration
 - [Database](../architecture/database.md) - Database troubleshooting
 - [Migrations](../migrations.md) - Migration issues

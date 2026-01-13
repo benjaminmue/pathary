@@ -42,7 +42,7 @@ Built for friend groups who love movies, Pathary lets you:
 
     Self-hosted on your infrastructure. No tracking, no ads, no corporate overlords.
 
--   :rocket: **[Easy Setup](getting-started.md)**
+-   :rocket: **[Easy Setup](quickstart.md)**
 
     ---
 
@@ -169,11 +169,11 @@ Enforced password policy with real-time validation. Security that doesn't compro
 
 <div class="grid cards" markdown>
 
--   :material-rocket-launch: **[Getting Started](getting-started.md)**
+-   :material-rocket-launch: **[Quickstart Guide](quickstart.md)**
 
     ---
 
-    Installation guide and initial setup
+    5-minute setup guide to get Pathary running
 
 -   :material-security: **[Security](security/authentication-and-sessions.md)**
 

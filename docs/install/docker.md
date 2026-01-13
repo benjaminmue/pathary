@@ -1,96 +1,167 @@
-## Introduction
+# Docker Installation Reference
 
-It is recommended to host Pathary with the [official Docker image](https://github.com/benjaminmue/pathary/pkgs/container/pathary) from GitHub Container Registry.
+This page provides detailed information about installing Pathary using the official Docker image. For a quick 5-minute setup, see the [Quickstart Guide](../quickstart.md).
 
-!!! warning
+## Official Docker Image
 
-    After the **initial installation** and every update containing database changes the database migrations must be executed:
+Pathary is distributed as an official Docker image via GitHub Container Registry:
 
-    `php bin/console.php database:migration:migrate`
+```bash
+docker pull ghcr.io/benjaminmue/pathary:latest
+```
+
+**Image Registry**: [GitHub Container Registry](https://github.com/benjaminmue/pathary/pkgs/container/pathary)
+
+## Image Tags
+
+| Tag | Description | Recommended For |
+|-----|-------------|-----------------|
+| `latest` | Latest stable release | Production use (recommended) |
+| `main` | Latest build from main branch | Testing new features |
+| `vX.Y.Z` | Specific version (e.g., `v1.2.3`) | Version pinning in production |
+| `sha-XXXXXXX` | Specific commit build | Advanced users, debugging |
+
+**Example using specific version:**
+```bash
+docker pull ghcr.io/benjaminmue/pathary:v1.0.0
+```
+
+## Database Migrations
+
+!!! warning "Database Migrations Required"
+    After **initial installation** and every update containing database changes, database migrations must be executed:
+
+    ```bash
+    php bin/console.php database:migration:migrate
+    ```
 
     Missing database migrations can cause critical errors!
 
-!!! info
+!!! info "Automatic Migrations"
+    The Docker image automatically runs missing database migrations on startup. To disable this behavior, set:
 
-    The docker images automatically runs the missing database migrations on start up.
-    To stop this behavior set the environment variable `DATABASE_DISABLE_AUTO_MIGRATION=1`
+    ```bash
+    DATABASE_DISABLE_AUTO_MIGRATION=1
+    ```
 
-## Image tags
+## Storage Directory
 
-- `latest` Default image. Latest stable version and **recommended** for the average user
-- `main` Latest build from main branch
-- `vX.Y.Z` There is a tag for every individual version
-- `sha-XXXXXXX` Specific commit builds
+The `/app/storage` directory stores all persistent data:
 
-## Storage permissions
+- Application logs
+- Cached images (if TMDB caching enabled)
+- SQLite database (if using SQLite mode)
+- Uploaded files
 
-The `/app/storage` directory is used to store all created files (e.g. logs and images).
-It should be persisted outside the container and Pathary needs read/write access to it.
+**Requirements:**
+- Must be persisted outside the container
+- Requires read/write access
+- Should use Docker volumes (recommended) or bind mounts
 
-The easiest way to do this are managed docker volumes (used in the examples below).
+!!! warning "Bind Mount Permissions"
+    If using bind mounts instead of Docker volumes, ensure:
 
-!!! info
+    1. The directory exists before starting the container
+    2. Correct permissions/ownership are set
+    3. Match container UID/GID (default: 3000:3000)
 
-    If you bind a local mount, make sure the directory exists before you start the container
-    and that it has the necessary permissions/ownership.
+## Docker Secrets Support
 
-## Docker secrets
+All environment variables support Docker secrets by appending `_FILE` suffix:
 
-Docker secrets can be used for all environment variables, just append `_FILE` to the environment variable name.
-Secrets are used as a fallback for not existing environment variables.
-Make sure to not set the environment variable without the `_FILE` suffix if you want to use a secret.
+```yaml
+environment:
+  TMDB_API_KEY_FILE: /run/secrets/tmdb_key
+  DATABASE_MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+```
 
-For more info on Docker secrets, read the [official Docker documentation](https://docs.docker.com/engine/swarm/secrets/).
+**How it works:**
+- Secrets are used as fallback when environment variable is not set
+- Do NOT set both `VARIABLE` and `VARIABLE_FILE` (file takes precedence)
+- See [official Docker secrets documentation](https://docs.docker.com/engine/swarm/secrets/)
 
-## Examples
+## Installation Examples
 
-All examples include the environment variable `TMDB_API_KEY` (get a key [here](https://www.themoviedb.org/settings/api)).
-It is not strictly required to be set here but recommend.
-Many features of the application will not work correctly without it.
+### Basic Docker Run (SQLite)
 
-### With SQLite
+Simplest setup for quick testing or small deployments:
 
-This is the easiest setup and especially recommend for beginners
+```bash
+docker volume create pathary-storage
 
-```shell
-$ docker volume create pathary-storage
-$ docker run --rm -d \
+docker run -d \
   --name pathary \
   -p 80:80 \
-  -e TMDB_API_KEY="<tmdb_key>" \
+  -e TMDB_API_KEY="your_api_key_here" \
   -e DATABASE_MODE="sqlite" \
   -v pathary-storage:/app/storage \
   ghcr.io/benjaminmue/pathary:latest
 ```
 
-### With MySQL
+Access at: `http://localhost/`
 
-```shell
-$ docker volume create pathary-storage
-$ docker run --rm -d \
+### Basic Docker Run (MySQL)
+
+For production use with external MySQL:
+
+```bash
+docker volume create pathary-storage
+
+docker run -d \
   --name pathary \
   -p 80:80 \
-  -e TMDB_API_KEY="<tmdb_key>" \
+  -e TMDB_API_KEY="your_api_key_here" \
   -e DATABASE_MODE="mysql" \
-  -e DATABASE_MYSQL_HOST="<host>" \
-  -e DATABASE_MYSQL_NAME="<db_name>" \
-  -e DATABASE_MYSQL_USER="<db_user>" \
-  -e DATABASE_MYSQL_PASSWORD="<db_password>" \
+  -e DATABASE_MYSQL_HOST="mysql.example.com" \
+  -e DATABASE_MYSQL_NAME="pathary" \
+  -e DATABASE_MYSQL_USER="pathary_user" \
+  -e DATABASE_MYSQL_PASSWORD="secure_password" \
   -v pathary-storage:/app/storage \
   ghcr.io/benjaminmue/pathary:latest
 ```
 
-### docker-compose.yml with MySQL
+### Docker Compose (SQLite)
+
+Simple single-container setup:
 
 ```yaml
+version: '3.8'
+
 services:
   pathary:
     image: ghcr.io/benjaminmue/pathary:latest
     container_name: pathary
+    restart: unless-stopped
     ports:
       - "80:80"
     environment:
-      TMDB_API_KEY: "<tmdb_key>"
+      TMDB_API_KEY: "your_api_key_here"
+      APPLICATION_URL: "http://localhost"
+      DATABASE_MODE: "sqlite"
+    volumes:
+      - pathary-storage:/app/storage
+
+volumes:
+  pathary-storage:
+```
+
+### Docker Compose (MySQL)
+
+Multi-container setup with MySQL:
+
+```yaml
+version: '3.8'
+
+services:
+  pathary:
+    image: ghcr.io/benjaminmue/pathary:latest
+    container_name: pathary
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      TMDB_API_KEY: "your_api_key_here"
+      APPLICATION_URL: "http://localhost"
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "mysql"
       DATABASE_MYSQL_NAME: "pathary"
@@ -98,33 +169,43 @@ services:
       DATABASE_MYSQL_PASSWORD: "pathary_password"
     volumes:
       - pathary-storage:/app/storage
+    depends_on:
+      - mysql
 
   mysql:
     image: mysql:8.0
+    container_name: pathary-mysql
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: "pathary"
       MYSQL_USER: "pathary_user"
       MYSQL_PASSWORD: "pathary_password"
-      MYSQL_ROOT_PASSWORD: "<mysql_root_password>"
+      MYSQL_ROOT_PASSWORD: "mysql_root_password"
     volumes:
       - pathary-db:/var/lib/mysql
 
 volumes:
-  pathary-db:
   pathary-storage:
+  pathary-db:
 ```
 
-### docker-compose.yml with MySQL and secrets
+### Docker Compose (MySQL with Secrets)
+
+Production setup using Docker secrets for sensitive data:
 
 ```yaml
+version: '3.8'
+
 services:
   pathary:
     image: ghcr.io/benjaminmue/pathary:latest
     container_name: pathary
+    restart: unless-stopped
     ports:
       - "80:80"
     environment:
       TMDB_API_KEY_FILE: /run/secrets/tmdb_key
+      APPLICATION_URL: "https://pathary.example.com"
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "mysql"
       DATABASE_MYSQL_NAME: "pathary"
@@ -135,9 +216,13 @@ services:
     secrets:
       - tmdb_key
       - mysql_password
+    depends_on:
+      - mysql
 
   mysql:
     image: mysql:8.0
+    container_name: pathary-mysql
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: "pathary"
       MYSQL_USER: "pathary_user"
@@ -151,13 +236,176 @@ services:
 
 secrets:
   mysql_root_password:
-    file: /path/to/docker/secret/mysql_root_password
+    file: ./secrets/mysql_root_password.txt
   mysql_password:
-    file: /path/to/docker/secret/mysql_password
+    file: ./secrets/mysql_password.txt
   tmdb_key:
-    file: /path/to/docker/secret/tmdb_key
+    file: ./secrets/tmdb_key.txt
 
 volumes:
-  pathary-db:
   pathary-storage:
+  pathary-db:
 ```
+
+**Secret files format** (plain text, no newline):
+```bash
+# Create secrets directory
+mkdir -p secrets
+
+# Create secret files (replace with actual values)
+echo -n "your_tmdb_api_key" > secrets/tmdb_key.txt
+echo -n "pathary_db_password" > secrets/mysql_password.txt
+echo -n "mysql_root_password" > secrets/mysql_root_password.txt
+
+# Secure the secrets
+chmod 600 secrets/*.txt
+```
+
+## Advanced Configuration
+
+### Custom Port Mapping
+
+To run on a different port (e.g., 8080):
+
+```yaml
+services:
+  pathary:
+    ports:
+      - "8080:80"  # Host port 8080 → Container port 80
+    environment:
+      APPLICATION_URL: "http://localhost:8080"
+```
+
+!!! warning "Update APPLICATION_URL"
+    Always update `APPLICATION_URL` to match your port configuration, or redirects will fail.
+
+### Custom User/Group ID
+
+To match file ownership with your host system:
+
+```yaml
+services:
+  pathary:
+    environment:
+      USER_ID: 1000
+      GROUP_ID: 1000
+```
+
+Default is `3000:3000`. Useful when using bind mounts.
+
+### Bind Mount Instead of Volume
+
+```yaml
+services:
+  pathary:
+    volumes:
+      - ./pathary-storage:/app/storage  # Bind mount to local directory
+```
+
+!!! warning "Permissions Required"
+    Ensure the local directory exists and is writable:
+
+    ```bash
+    mkdir -p pathary-storage
+    chown -R 3000:3000 pathary-storage  # Match container UID/GID
+    chmod -R 755 pathary-storage
+    ```
+
+### Health Checks
+
+Add health check to your compose file:
+
+```yaml
+services:
+  pathary:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+```
+
+## After Installation
+
+Once the container is running:
+
+1. **Access the setup wizard**: Navigate to `http://localhost/` (or your configured URL)
+2. **Complete first-time setup**: Follow the [First-Time Setup Guide](../first-time-setup.md)
+3. **Configure settings**: See [Configuration Reference](../configuration.md)
+
+## Updating Pathary
+
+### Pull Latest Image
+
+```bash
+docker pull ghcr.io/benjaminmue/pathary:latest
+```
+
+### Using Docker Compose
+
+```bash
+# Pull new image
+docker compose pull pathary
+
+# Recreate container with new image
+docker compose up -d pathary
+```
+
+!!! info "Migrations Run Automatically"
+    Database migrations run automatically on container startup (unless disabled).
+
+### Manual Migration
+
+If auto-migration is disabled:
+
+```bash
+docker compose exec pathary php bin/console.php database:migration:migrate
+```
+
+## Troubleshooting
+
+### Container Won't Start
+
+Check logs:
+```bash
+docker logs pathary
+# or with docker compose:
+docker compose logs pathary
+```
+
+Common issues:
+- Missing required environment variables
+- Port already in use
+- Storage volume permission errors
+
+### Database Connection Errors
+
+For MySQL:
+```bash
+# Verify MySQL is running
+docker compose ps mysql
+
+# Check MySQL logs
+docker compose logs mysql
+
+# Test connection from app container
+docker compose exec pathary php bin/console.php database:migration:status
+```
+
+### Storage Permission Errors
+
+```bash
+# Fix permissions inside container
+docker compose exec pathary chmod -R 777 /app/storage
+
+# Or match host UID/GID
+docker compose exec pathary chown -R 3000:3000 /app/storage
+```
+
+## Next Steps
+
+- **[First-Time Setup](../first-time-setup.md)** - Complete the /init wizard
+- **[Configuration](../configuration.md)** - Environment variables reference
+- **[Production Deployment](../deployment.md)** - Reverse proxy, HTTPS, and production setup
+- **[Manual Installation](manual.md)** - Install without Docker

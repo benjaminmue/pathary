@@ -89,13 +89,13 @@ extra_css:
 
 nav:
   - Home: 'index.md'
-  - Getting Started: 'getting-started.md'
-  - Installation:
-      - Docker (recommended): install/docker.md
-      - Manual: install/manual.md
+  - Quickstart Guide: 'quickstart.md'
+  - Installation Reference:
+      - Docker Installation: install/docker.md
+      - Manual Installation: install/manual.md
   - First-Time Setup: 'first-time-setup.md'
   - Configuration: 'configuration.md'
-  - Deployment: 'deployment.md'
+  - Production Deployment: 'deployment.md'
 
   - Features:
       - Movies and TMDB: features/movies-and-tmdb.md
