@@ -18,10 +18,16 @@ RUN apk add --no-cache \
     php84-mbstring \
     php84-sqlite3 \
     php84-simplexml \
-    php84-pecl-imagick
+    php84-pecl-imagick \
+    dcron
 
 # Create standard binary for php
 RUN cp /usr/bin/php84 /usr/bin/php
+
+# Copy and configure cron for scheduled syncs
+COPY ./docker/cron/pathary-sync /etc/cron.d/pathary-sync
+RUN chmod 0644 /etc/cron.d/pathary-sync \
+    && crontab -u application /etc/cron.d/pathary-sync
 
 # Create entrypoint script (for automatic database migrations)
 COPY ./build/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh

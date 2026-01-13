@@ -29,4 +29,8 @@ fi
 echo "INFO: Generating symbolic link for storage"
 /usr/bin/php /app/bin/console.php storage:link
 
+echo "INFO: Starting cron daemon for scheduled syncs..."
+crond -b -L /var/log/cron.log
+echo "INFO: Cron daemon started (daily sync at 2:15 AM)"
+
 exec "$@"
