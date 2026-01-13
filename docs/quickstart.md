@@ -109,7 +109,7 @@ docker compose restart pathary
 docker compose exec mysql mysql -u <database_user> -p<database_password> <database_name>
 ```
 
-!!! tip "MySQL Password Flag"
+!!! tip "MySQL Password Syntax"
     Note: `-p<database_password>` has NO space between `-p` and the password. This is required MySQL syntax.
 
 ### Access the Application Container

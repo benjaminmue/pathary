@@ -5,8 +5,7 @@ There are two main ways how to set your server configuration:
 - Environment variables
 - Web UI (Settings -> Server), this config is stored in the database
 
-!!! Info
-
+!!! info "Priority"
     Environment variables have the highest priority and overwrite everything else as long as they are set.
 
 ## Environment variables

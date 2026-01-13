@@ -202,7 +202,7 @@ mysql -u <database_user> -p -e "DROP DATABASE IF EXISTS <database_name>; CREATE 
 php vendor/bin/phinx migrate -c ./settings/phinx.php
 ```
 
-!!! note "MySQL Password Syntax"
+!!! tip "MySQL Password Syntax"
     Note the `-p` flag syntax:
 
     - `-p<database_password>` - No space between `-p` and password (required for Docker exec)
