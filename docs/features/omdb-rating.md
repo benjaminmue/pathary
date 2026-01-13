@@ -42,7 +42,7 @@ Pathary uses the [OMDb API](https://www.omdbapi.com/) to fetch both **IMDb** and
 Add to your `.env` or `.env.local` file:
 
 ```bash
-OMDB_API_KEY=your_api_key_here
+OMDB_API_KEY=<omdb_api_key>
 ```
 
 !!! Warning

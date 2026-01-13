@@ -199,7 +199,7 @@ docker ps | grep mysql
 docker exec pathary env | grep DATABASE
 
 # Test MySQL connection
-docker exec pathary-mysql mysql -u pathary -p -e "SELECT 1"
+docker exec pathary-mysql mysql -u <database_user> -p -e "SELECT 1"
 ```
 
 ### 2. Migration Failed
@@ -310,7 +310,7 @@ docker exec -it pathary php -a
 
 ```bash
 # MySQL
-docker exec pathary-mysql mysql -u pathary -p pathary -e "SELECT COUNT(*) FROM movie"
+docker exec pathary-mysql mysql -u <database_user> -p <database_name> -e "SELECT COUNT(*) FROM movie"
 
 # SQLite
 docker exec pathary sqlite3 /app/storage/movary.sqlite "SELECT COUNT(*) FROM movie"

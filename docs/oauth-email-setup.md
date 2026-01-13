@@ -39,7 +39,7 @@ Example Nginx configuration:
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name pathary.example.com;
+    server_name <your_domain>;
 
     ssl_certificate /path/to/cert.pem;
     ssl_certificate_key /path/to/key.pem;
@@ -60,7 +60,7 @@ Set the `APPLICATION_URL` environment variable to match your public URL:
 
 ```bash
 # .env or .env.local
-APPLICATION_URL=https://pathary.example.com
+APPLICATION_URL=https://<your_domain>
 ```
 
 For local development:
@@ -114,7 +114,7 @@ Or generate via Pathary UI: Admin → Server Management → Email Settings → O
 - **App name**: `Pathary`
 - **User support email**: Your email address
 - **App logo**: (Optional) Upload Pathary logo
-- **Application home page**: Your Pathary URL (e.g., `https://pathary.example.com`)
+- **Application home page**: Your Pathary URL (e.g., `https://<your_domain>`)
 - **Authorized domains**: Your domain (e.g., `example.com`)
 - **Developer contact information**: Your email address
 
@@ -136,7 +136,7 @@ Or generate via Pathary UI: Admin → Server Management → Email Settings → O
 5. Under **Authorized redirect URIs**, click **Add URI**
 6. Enter your OAuth callback URL:
    - Format: `{APPLICATION_URL}/admin/server/email/oauth/callback`
-   - Example production: `https://pathary.example.com/admin/server/email/oauth/callback`
+   - Example production: `https://<your_domain>/admin/server/email/oauth/callback`
    - Example local: `http://localhost/admin/server/email/oauth/callback`
 
 7. Click **Create**
@@ -191,7 +191,7 @@ Or generate via Pathary UI: Admin → Server Management → Email Settings → O
   - **Personal accounts** - Include personal Microsoft accounts
 - **Redirect URI**:
   - Platform: **Web**
-  - URI: Your OAuth callback URL (e.g., `https://pathary.example.com/admin/server/email/oauth/callback`)
+  - URI: Your OAuth callback URL (e.g., `https://<your_domain>/admin/server/email/oauth/callback`)
 
 5. Click **Register**
 
@@ -264,7 +264,7 @@ Microsoft 365 requires SMTP AUTH to be enabled at both tenant and mailbox levels
 Connect to Exchange Online PowerShell:
 ```powershell
 Install-Module -Name ExchangeOnlineManagement
-Connect-ExchangeOnline -UserPrincipalName admin@yourdomain.com
+Connect-ExchangeOnline -UserPrincipalName <admin_email>
 ```
 
 Check if SMTP AUTH is enabled:
@@ -281,12 +281,12 @@ Set-OrganizationConfig -SmtpClientAuthenticationDisabled $false
 
 Check specific mailbox:
 ```powershell
-Get-CASMailbox -Identity mail@yourdomain.com | Select-Object SmtpClientAuthenticationDisabled
+Get-CASMailbox -Identity <email_address> | Select-Object SmtpClientAuthenticationDisabled
 ```
 
 If disabled, enable it:
 ```powershell
-Set-CASMailbox -Identity mail@yourdomain.com -SmtpClientAuthenticationDisabled $false
+Set-CASMailbox -Identity <email_address> -SmtpClientAuthenticationDisabled $false
 ```
 
 #### Create Authentication Policy (Alternative)
@@ -298,7 +298,7 @@ If you want to enable SMTP AUTH only for specific mailboxes:
 New-AuthenticationPolicy -Name "Allow SMTP AUTH" -AllowBasicAuthSmtp
 
 # Assign to mailbox
-Set-User -Identity mail@yourdomain.com -AuthenticationPolicy "Allow SMTP AUTH"
+Set-User -Identity <email_address> -AuthenticationPolicy "Allow SMTP AUTH"
 ```
 
 ### Step 5: (Optional) Register Service Principal
@@ -314,7 +314,7 @@ $objectId = "bdb51601-5178-4fb3-b4ad-f1e79fef5016"  # Object ID
 New-ServicePrincipal -AppId $appId -ServiceId $objectId
 
 # Grant SendAs permission
-Add-RecipientPermission -Identity 'mail@yourdomain.com' -Trustee $objectId -AccessRights SendAs
+Add-RecipientPermission -Identity '<email_address>' -Trustee $objectId -AccessRights SendAs
 ```
 
 ### Step 6: Configure in Pathary
@@ -324,8 +324,8 @@ Add-RecipientPermission -Identity 'mail@yourdomain.com' -Trustee $objectId -Acce
 3. **Client ID**: Paste the Application (client) ID from Azure
 4. **Client Secret**: Paste the secret Value from step 2
 5. **Tenant ID**: Paste the Directory (tenant) ID from Azure
-6. **Authentication Mailbox**: Enter your Microsoft 365 email (e.g., `mail@yourdomain.com`)
-7. **Email From Address**: (Optional) Different from address (e.g., `noreply@yourdomain.com`)
+6. **Authentication Mailbox**: Enter your Microsoft 365 email (e.g., `<email_address>`)
+7. **Email From Address**: (Optional) Different from address (e.g., `<from_email_address>`)
 8. Click **Save OAuth Settings**
 
 ### Step 7: Authorize Microsoft Account
@@ -384,7 +384,7 @@ Add-RecipientPermission -Identity 'mail@yourdomain.com' -Trustee $objectId -Acce
 **Authentication Mailbox:**
 - The email account used for OAuth authorization
 - Gmail: Your Gmail address (e.g., `you@gmail.com`)
-- Microsoft: Your Microsoft 365 address (e.g., `mail@yourdomain.com`)
+- Microsoft: Your Microsoft 365 address (e.g., `<email_address>`)
 
 **Email From Address** (Optional):
 - Different email shown as sender
@@ -558,10 +558,10 @@ Get-OrganizationConfig | Select-Object SmtpClientAuthenticationDisabled
 Set-OrganizationConfig -SmtpClientAuthenticationDisabled $false
 
 # Check mailbox level
-Get-CASMailbox -Identity mail@yourdomain.com | Select-Object SmtpClientAuthenticationDisabled
+Get-CASMailbox -Identity <email_address> | Select-Object SmtpClientAuthenticationDisabled
 
 # Enable if needed
-Set-CASMailbox -Identity mail@yourdomain.com -SmtpClientAuthenticationDisabled $false
+Set-CASMailbox -Identity <email_address> -SmtpClientAuthenticationDisabled $false
 ```
 
 **Cause 4: Service principal not registered**
@@ -578,7 +578,7 @@ $objectId = "YOUR-APPLICATION-OBJECT-ID"
 New-ServicePrincipal -AppId $appId -ServiceId $objectId
 
 # Grant SendAs permission
-Add-RecipientPermission -Identity 'mail@yourdomain.com' -Trustee $objectId -AccessRights SendAs
+Add-RecipientPermission -Identity '<email_address>' -Trustee $objectId -AccessRights SendAs
 ```
 
 #### Error: "AADSTS50011: redirect uri mismatch"

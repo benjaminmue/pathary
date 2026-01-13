@@ -27,7 +27,7 @@ Create a `.env.local` file with your TMDB API key:
 
 ```bash
 cat > .env.local << 'EOF'
-TMDB_API_KEY=your_actual_api_key_here
+TMDB_API_KEY=<tmdb_api_key>
 HTTP_PORT=80
 APPLICATION_URL=http://localhost
 EOF
@@ -106,8 +106,11 @@ docker compose restart pathary
 ### Access the Database (MySQL)
 
 ```bash
-docker compose exec mysql mysql -u pathary -ppathary pathary
+docker compose exec mysql mysql -u <database_user> -p<database_password> <database_name>
 ```
+
+!!! tip "MySQL Password Flag"
+    Note: `-p<database_password>` has NO space between `-p` and the password. This is required MySQL syntax.
 
 ### Access the Application Container
 
@@ -142,7 +145,7 @@ If port 80 is already in use on your machine, change the port mapping:
 This warning appears if the API key isn't found. Ensure:
 
 1. `.env.local` exists in the `pathary/` directory
-2. The file contains `TMDB_API_KEY=your_actual_key`
+2. The file contains `TMDB_API_KEY=<tmdb_api_key>`
 3. You're using `--env-file .env.local` in the docker compose command
 
 ### Database Migration Errors

@@ -15,7 +15,7 @@ Pathary uses TMDB as its primary source for movie metadata:
 A TMDB API key is required. Get one at: https://www.themoviedb.org/settings/api
 
 ```env
-TMDB_API_KEY=your_api_key_here
+TMDB_API_KEY=<tmdb_api_key>
 ```
 
 ## Movie Entity

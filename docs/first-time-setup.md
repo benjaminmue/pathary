@@ -17,7 +17,7 @@ On first installation, Pathary requires you to complete a one-time setup wizard 
 Before starting the setup wizard, ensure:
 
 1. Pathary is installed and running (via Docker or manual installation)
-2. The application is accessible at your configured URL (e.g., `http://localhost` or `https://pathary.yourdomain.com`)
+2. The application is accessible at your configured URL (e.g., `http://localhost` or `https://<your_domain>`)
 3. The database is properly configured and migrations have been applied
 
 ## Accessing the Setup Wizard
@@ -194,13 +194,19 @@ On your first login, you may be asked to:
 
 ```bash
 # Using Docker
-docker compose exec mysql mysql -u pathary -ppathary -e "DROP DATABASE IF EXISTS pathary; CREATE DATABASE pathary;"
+docker compose exec mysql mysql -u <database_user> -p<database_password> -e "DROP DATABASE IF EXISTS <database_name>; CREATE DATABASE <database_name>;"
 docker compose exec app php vendor/bin/phinx migrate -c ./settings/phinx.php
 
 # Manual installation
-mysql -u pathary -p -e "DROP DATABASE IF EXISTS pathary; CREATE DATABASE pathary;"
+mysql -u <database_user> -p -e "DROP DATABASE IF EXISTS <database_name>; CREATE DATABASE <database_name>;"
 php vendor/bin/phinx migrate -c ./settings/phinx.php
 ```
+
+!!! note "MySQL Password Syntax"
+    Note the `-p` flag syntax:
+
+    - `-p<database_password>` - No space between `-p` and password (required for Docker exec)
+    - `-p` alone - Prompts for password interactively (safer for manual use, no password in shell history)
 
 **Warning**: This permanently deletes all data. Only use on a fresh installation.
 
@@ -311,9 +317,9 @@ docker compose exec app php bin/console.php user:delete USER_ID
 
 # Create new user
 docker compose exec app php bin/console.php user:create \
-  "your-email@example.com" \
-  "YourNewPassword123!" \
-  "yourusername" \
+  "<email_address>" \
+  "<password>" \
+  "<username>" \
   true
 ```
 
@@ -325,11 +331,11 @@ docker compose exec app php bin/console.php user:create \
 
 ```bash
 # Using Docker
-docker compose exec mysql mysql -u pathary -ppathary -e "DROP DATABASE IF EXISTS pathary; CREATE DATABASE pathary;"
+docker compose exec mysql mysql -u <database_user> -p<database_password> -e "DROP DATABASE IF EXISTS <database_name>; CREATE DATABASE <database_name>;"
 docker compose exec app php vendor/bin/phinx migrate -c ./settings/phinx.php
 
 # Manual installation
-mysql -u pathary -p -e "DROP DATABASE IF EXISTS pathary; CREATE DATABASE pathary;"
+mysql -u <database_user> -p -e "DROP DATABASE IF EXISTS <database_name>; CREATE DATABASE <database_name>;"
 php vendor/bin/phinx migrate -c ./settings/phinx.php
 ```
 

@@ -67,7 +67,7 @@ Example config:
 [program:movary]
 command=/usr/local/bin/php /app/bin/console.php jobs:process
 numprocs=1
-user=movary
+user=<system_user>
 autostart=true
 autorestart=true
 startsecs=1

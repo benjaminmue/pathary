@@ -92,7 +92,7 @@ docker volume create pathary-storage
 docker run -d \
   --name pathary \
   -p 80:80 \
-  -e TMDB_API_KEY="your_api_key_here" \
+  -e TMDB_API_KEY="<tmdb_api_key>" \
   -e DATABASE_MODE="sqlite" \
   -v pathary-storage:/app/storage \
   ghcr.io/benjaminmue/pathary:latest
@@ -110,12 +110,12 @@ docker volume create pathary-storage
 docker run -d \
   --name pathary \
   -p 80:80 \
-  -e TMDB_API_KEY="your_api_key_here" \
+  -e TMDB_API_KEY="<tmdb_api_key>" \
   -e DATABASE_MODE="mysql" \
   -e DATABASE_MYSQL_HOST="mysql.example.com" \
-  -e DATABASE_MYSQL_NAME="pathary" \
-  -e DATABASE_MYSQL_USER="pathary_user" \
-  -e DATABASE_MYSQL_PASSWORD="secure_password" \
+  -e DATABASE_MYSQL_NAME="<database_name>" \
+  -e DATABASE_MYSQL_USER="<database_user>" \
+  -e DATABASE_MYSQL_PASSWORD="<database_password>" \
   -v pathary-storage:/app/storage \
   ghcr.io/benjaminmue/pathary:latest
 ```
@@ -135,7 +135,7 @@ services:
     ports:
       - "80:80"
     environment:
-      TMDB_API_KEY: "your_api_key_here"
+      TMDB_API_KEY: "<tmdb_api_key>"
       APPLICATION_URL: "http://localhost"
       DATABASE_MODE: "sqlite"
     volumes:
@@ -160,13 +160,13 @@ services:
     ports:
       - "80:80"
     environment:
-      TMDB_API_KEY: "your_api_key_here"
+      TMDB_API_KEY: "<tmdb_api_key>"
       APPLICATION_URL: "http://localhost"
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "mysql"
-      DATABASE_MYSQL_NAME: "pathary"
-      DATABASE_MYSQL_USER: "pathary_user"
-      DATABASE_MYSQL_PASSWORD: "pathary_password"
+      DATABASE_MYSQL_NAME: "<database_name>"
+      DATABASE_MYSQL_USER: "<database_user>"
+      DATABASE_MYSQL_PASSWORD: "<database_password>"
     volumes:
       - pathary-storage:/app/storage
     depends_on:
@@ -177,10 +177,10 @@ services:
     container_name: pathary-mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: "pathary"
-      MYSQL_USER: "pathary_user"
-      MYSQL_PASSWORD: "pathary_password"
-      MYSQL_ROOT_PASSWORD: "mysql_root_password"
+      MYSQL_DATABASE: "<database_name>"
+      MYSQL_USER: "<database_user>"
+      MYSQL_PASSWORD: "<database_password>"
+      MYSQL_ROOT_PASSWORD: "<mysql_root_password>"
     volumes:
       - pathary-db:/var/lib/mysql
 
@@ -208,7 +208,7 @@ services:
       APPLICATION_URL: "https://pathary.example.com"
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "mysql"
-      DATABASE_MYSQL_NAME: "pathary"
+      DATABASE_MYSQL_NAME: "<database_name>"
       DATABASE_MYSQL_USER: "pathary_user"
       DATABASE_MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
     volumes:
@@ -224,7 +224,7 @@ services:
     container_name: pathary-mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: "pathary"
+      MYSQL_DATABASE: "<database_name>"
       MYSQL_USER: "pathary_user"
       MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
@@ -253,9 +253,9 @@ volumes:
 mkdir -p secrets
 
 # Create secret files (replace with actual values)
-echo -n "your_tmdb_api_key" > secrets/tmdb_key.txt
-echo -n "pathary_db_password" > secrets/mysql_password.txt
-echo -n "mysql_root_password" > secrets/mysql_root_password.txt
+echo -n "<tmdb_api_key>" > secrets/tmdb_key.txt
+echo -n "<database_password>" > secrets/mysql_password.txt
+echo -n "<mysql_root_password>" > secrets/mysql_root_password.txt
 
 # Secure the secrets
 chmod 600 secrets/*.txt
