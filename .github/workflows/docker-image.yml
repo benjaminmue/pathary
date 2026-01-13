@@ -6,6 +6,23 @@ on:
       - main
     tags:
       - 'v*'
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'mkdocs.yml'
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/tests.yml'
+      - '.github/workflows/claude.yml'
+      - '.github/workflows/claude-code-review.yml'
+      - '.github/workflows/update-issue-roadmap.yml'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/CODEOWNERS'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CLAUDE.md'
+      - 'ROADMAP.md'
+      - 'OPEN_ISSUES.md'
+      - 'security_audit_report.txt'
   workflow_dispatch:
 
 env:
