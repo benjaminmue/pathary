@@ -19,7 +19,12 @@ class UserApi
     ) {
     }
 
-    public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : void
+    public function countAdminUsers() : int
+    {
+        return $this->repository->countAdminUsers();
+    }
+
+    public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : UserEntity
     {
         $this->userValidator->ensureEmailIsValid($email);
         $this->userValidator->ensureEmailIsUnique($email);
@@ -27,7 +32,9 @@ class UserApi
         $this->userValidator->ensureNameFormatIsValid($name);
         $this->userValidator->ensureNameIsUnique($name);
 
-        $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name, $isAdmin);
+        $userId = $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name, $isAdmin);
+
+        return $this->repository->findUserById($userId);
     }
 
     public function deleteApiToken(int $userId) : void
@@ -73,6 +80,14 @@ class UserApi
     public function deleteUser(int $userId) : void
     {
         $this->repository->deleteUser($userId);
+    }
+
+    public function deleteAllUsers() : void
+    {
+        $userIds = $this->repository->fetchAllUserIds();
+        foreach ($userIds as $userId) {
+            $this->repository->deleteUser((int)$userId);
+        }
     }
 
     public function fetchAll() : array

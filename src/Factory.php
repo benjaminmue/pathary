@@ -22,7 +22,6 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
-use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
 use Movary\JobQueue\JobQueueApi;

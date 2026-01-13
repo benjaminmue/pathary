@@ -20,7 +20,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ###############
     # Public Home #
     ###############
-    $routes->add('GET', '/', [Web\PublicHomeController::class, 'index']);
+    $routes->add('GET', '/', [Web\PublicHomeController::class, 'index'], [Web\Middleware\RedirectToInitIfNeeded::class]);
     $routes->add('GET', '/movie/{id:[0-9]+}', [Web\PublicMovieController::class, 'detail']);
     $routes->add('POST', '/movie/{id:[0-9]+}/rate', [Web\RateMovieController::class, 'rate'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/movie/{id:[0-9]+}/rate/delete', [Web\RateMovieController::class, 'deleteRating'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
@@ -95,18 +95,14 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/tmdb/movie/{tmdbId:[0-9]+}/add', [Web\TmdbMovieController::class, 'add'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
 
     $routes->add('GET', '/landing', [Web\LandingPageController::class, 'render'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
-    $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
-    $routes->add('POST', '/create-user', [Web\CreateUserController::class, 'createUser'], [
-        Web\Middleware\UserIsUnauthenticated::class,
-        Web\Middleware\ServerHasUsers::class,
-        Web\Middleware\ServerHasRegistrationEnabled::class,
-        Web\Middleware\CsrfProtection::class,
-    ]);
-    $routes->add('GET', '/create-user', [Web\CreateUserController::class, 'renderPage'], [
-        Web\Middleware\UserIsUnauthenticated::class,
-        Web\Middleware\ServerHasUsers::class,
-        Web\Middleware\ServerHasRegistrationEnabled::class
-    ]);
+
+    ###########################
+    # Setup Wizard (First-Time Installation) #
+    ###########################
+    $routes->add('GET', '/init', [Web\InitController::class, 'renderWizard'], [Web\Middleware\SetupNotCompleted::class]);
+    $routes->add('POST', '/init/create-admin', [Web\InitController::class, 'createAdmin'], [Web\Middleware\SetupNotCompleted::class]);
+
+    $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\RedirectToInitIfNeeded::class, Web\Middleware\UserIsUnauthenticated::class]);
     $routes->add('GET', '/setup-password', [Web\SetPasswordController::class, 'renderPage'], [Web\Middleware\UserIsUnauthenticated::class]);
     $routes->add('POST', '/setup-password', [Web\SetPasswordController::class, 'setPassword'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimited::class]);
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);

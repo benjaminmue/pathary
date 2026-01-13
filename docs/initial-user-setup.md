@@ -1,8 +1,17 @@
 # Initial User Setup
 
-How to create the first user account for a fresh Pathary installation.
+!!! warning "Deprecated Documentation"
+    This page is **deprecated** as of 2026-01-13. The web-based `/init` setup wizard is now implemented and is the recommended method for first-time setup.
 
-> **Note:** A web-based `/init` setup wizard is planned for first-time installation. See [GitHub Issue #45](https://github.com/benjaminmue/pathary/issues/45). Currently, use the CLI method below for initial user creation.
+    **Please see the [First-Time Setup Guide](first-time-setup.md) for current documentation.**
+
+    This page is kept for reference only. CLI methods are still available for emergency access.
+
+---
+
+How to create the first user account for a fresh Pathary installation using CLI methods.
+
+> **Note:** The web-based `/init` setup wizard is now the primary method for initial user creation. See [First-Time Setup Guide](first-time-setup.md). The CLI methods below are provided for emergency access or automated deployments only.
 
 ## Prerequisites
 

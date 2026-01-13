@@ -11,7 +11,6 @@ use Movary\Domain\User\Repository\TrustedDeviceRepository;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
-use Movary\HttpController\Web\CreateUserController;
 use Movary\Util\SessionWrapper;
 use Movary\Util\TrustedDeviceCookie;
 use Movary\ValueObject\DateTime;
@@ -20,6 +19,8 @@ use RuntimeException;
 
 class Authentication
 {
+    public const string PATHARY_WEB_CLIENT = 'Pathary Web';
+
     private const string AUTHENTICATION_COOKIE_NAME = 'id';
 
     private const int MAX_EXPIRATION_AGE_IN_DAYS = 3650; // 10 years for persistent login
@@ -276,7 +277,7 @@ class Authentication
 
         $userAndToken = ['user' => $user, 'token' => $token];
 
-        if ($deviceName === CreateUserController::PATHARY_WEB_CLIENT) {
+        if ($deviceName === self::PATHARY_WEB_CLIENT) {
             $this->setAuthenticationCookieAndNewSession($user->getId(), $token, $authTokenExpirationDate);
 
             // Create trusted device if requested and 2FA is enabled

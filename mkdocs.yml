@@ -93,7 +93,7 @@ nav:
   - Installation:
       - Docker (recommended): install/docker.md
       - Manual: install/manual.md
-  - Initial User Setup: 'initial-user-setup.md'
+  - First-Time Setup: 'first-time-setup.md'
   - Configuration: 'configuration.md'
   - Deployment: 'deployment.md'
 

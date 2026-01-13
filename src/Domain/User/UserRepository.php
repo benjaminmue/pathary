@@ -44,7 +44,14 @@ class UserRepository
         );
     }
 
-    public function createUser(string $email, string $passwordHash, string $name, bool $isAdmin) : void
+    public function countAdminUsers() : int
+    {
+        return (int)$this->dbConnection->fetchOne(
+            'SELECT COUNT(*) FROM `user` WHERE `is_admin` = 1'
+        );
+    }
+
+    public function createUser(string $email, string $passwordHash, string $name, bool $isAdmin) : int
     {
         $this->dbConnection->insert(
             'user',
@@ -56,6 +63,8 @@ class UserRepository
                 'created_at' => (string)DateTime::create(),
             ],
         );
+
+        return (int)$this->dbConnection->lastInsertId();
     }
 
     public function deleteApiToken(int $userId) : void
@@ -101,6 +110,11 @@ class UserRepository
     public function fetchAll() : array
     {
         return $this->dbConnection->fetchAllAssociative('SELECT id, name, email, is_admin as isAdmin FROM `user` ORDER BY id');
+    }
+
+    public function fetchAllUserIds() : array
+    {
+        return $this->dbConnection->fetchFirstColumn('SELECT id FROM `user` ORDER BY id');
     }
 
     public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array

@@ -10,7 +10,7 @@ use Movary\ValueObject\RelativeUrl;
 
 class ServerHasNoUsers implements MiddlewareInterface
 {
-    private const string CREATE_USER_URL_PATH = '/create-user';
+    private const string INIT_URL_PATH = '/init';
 
     public function __construct(
         private readonly UserApi $userApi,
@@ -27,7 +27,7 @@ class ServerHasNoUsers implements MiddlewareInterface
 
         return Response::createSeeOther(
             $this->urlService->createApplicationUrl(
-                RelativeUrl::create(self::CREATE_USER_URL_PATH),
+                RelativeUrl::create(self::INIT_URL_PATH),
             ),
         );
     }

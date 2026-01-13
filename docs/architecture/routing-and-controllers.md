@@ -16,7 +16,7 @@ Routes are defined in `settings/routes.php` using FastRoute with a RouteList pat
 | GET | `/movie/{id}` | `PublicMovieController::detail` | Movie detail page |
 | GET | `/login` | `AuthenticationController::renderLoginPage` | Login form |
 | GET | `/landing` | `LandingPageController::render` | First-run setup |
-| GET | `/create-user` | `CreateUserController::renderPage` | Registration form |
+| GET | `/init` | `InitController::renderWizard` | Setup wizard for first admin |
 | GET | `/docs/api` | `OpenApiController::renderPage` | API documentation |
 | GET | `/profile-images/{filename}` | `ProfileController::serveImage` | Serve profile images |
 

@@ -84,12 +84,6 @@
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">
                     Sign in
                 </button>
-
-                {% if registrationEnabled == true %}
-                    <div class="text-center">
-                        <a href="{{ applicationUrl }}/create-user">Create new user</a>
-                    </div>
-                {% endif %}
             </div>
 
             <div id="totpForm" class="d-none">
