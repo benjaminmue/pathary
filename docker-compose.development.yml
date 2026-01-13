@@ -6,6 +6,7 @@ services:
       target: development
       args:
         - USER_ID=${USER_ID:-1000}
+    user: "0:0"  # Run as root to allow supervisord to manage processes as different users
     extra_hosts:
       host.docker.internal: host-gateway
     volumes:

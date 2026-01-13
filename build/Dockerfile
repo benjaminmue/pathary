@@ -19,15 +19,11 @@ RUN apk add --no-cache \
     php84-sqlite3 \
     php84-simplexml \
     php84-pecl-imagick \
-    dcron
+    dcron \
+    tzdata
 
 # Create standard binary for php
 RUN cp /usr/bin/php84 /usr/bin/php
-
-# Copy and configure cron for scheduled syncs
-COPY ./docker/cron/pathary-sync /etc/cron.d/pathary-sync
-RUN chmod 0644 /etc/cron.d/pathary-sync \
-    && crontab -u application /etc/cron.d/pathary-sync
 
 # Create entrypoint script (for automatic database migrations)
 COPY ./build/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -40,20 +36,27 @@ RUN chmod +x /usr/local/bin/stop_supervisor_on_process_failure.sh
 # Create configuration and appllication files
 COPY ./build/config/conf.d /etc/nginx/conf.d
 COPY ./build/config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY ./build/config/php-fpm.d/zz-docker.conf /etc/php84/php-fpm.d/zz-docker.conf
 COPY ./ /app
 
 # Create non root user
 RUN addgroup -g $USER_ID -S application && adduser -u $USER_ID -S application -G application
 RUN chown -R application:application /app /run /var/lib/nginx /var/log/nginx
 
+# Configure cron for scheduled syncs (must be done as root, after user exists)
+COPY ./docker/cron/pathary-sync /etc/cron.d/pathary-sync
+RUN chmod 0644 /etc/cron.d/pathary-sync \
+    && crontab -u application /etc/cron.d/pathary-sync
+
 # Add composer
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
-# Switch to non root (improve security)
-USER application
-
 # Set app directory as working directory
 WORKDIR /app
+
+# Stay as root for supervisord (which manages processes as different users)
+# Supervisord will run crond as root and application processes as 'application' user
+USER root
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
