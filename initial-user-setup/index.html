@@ -13,10 +13,6 @@
         <link rel="canonical" href="https://docs.pathary.tv/initial-user-setup/">
       
       
-        <link rel="prev" href="../install/manual/">
-      
-      
-        <link rel="next" href="../configuration/">
       
       
         
@@ -285,17 +281,15 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="./" class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../first-time-setup/" class="md-tabs__link">
         
   
   
     
   
-  Initial User Setup
+  First-Time Setup
 
       </a>
     </li>
@@ -703,44 +697,17 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Initial User Setup
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../first-time-setup/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Initial User Setup
+    First-Time Setup
   
 
     
@@ -749,242 +716,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prerequisites
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#method-1-cli-command-recommended" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 1: CLI Command (Recommended)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Method 1: CLI Command (Recommended)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#docker" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Docker
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#local-docker-compose" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Local / Docker Compose
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#command-arguments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Command Arguments
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#example-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example Output
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#error-messages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Error Messages
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#method-2-direct-database-insert-last-resort" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 2: Direct Database Insert (Last Resort)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Method 2: Direct Database Insert (Last Resort)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#generate-password-hash" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Generate Password Hash
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#insert-user" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Insert User
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#required-columns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Required Columns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Troubleshooting">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cannot-create-first-user-via-web-interface" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cannot create first user via web interface
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#database-connection-errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Database connection errors
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#could-not-create-user-with-no-details" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        "Could not create user" with no details
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cookiesession-issues-after-login" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cookie/session issues after login
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#verification-checklist" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verification Checklist
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#user-management-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        User Management Commands
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2663,9 +2394,16 @@
 
 
 <h1 id="initial-user-setup">Initial User Setup<a class="headerlink" href="#initial-user-setup" title="Permanent link">&para;</a></h1>
-<p>How to create the first user account for a fresh Pathary installation.</p>
+<div class="admonition warning">
+<p class="admonition-title">Deprecated Documentation</p>
+<p>This page is <strong>deprecated</strong> as of 2026-01-13. The web-based <code>/init</code> setup wizard is now implemented and is the recommended method for first-time setup.</p>
+<p><strong>Please see the <a href="../first-time-setup/">First-Time Setup Guide</a> for current documentation.</strong></p>
+<p>This page is kept for reference only. CLI methods are still available for emergency access.</p>
+</div>
+<hr />
+<p>How to create the first user account for a fresh Pathary installation using CLI methods.</p>
 <blockquote>
-<p><strong>Note:</strong> A web-based <code>/init</code> setup wizard is planned for first-time installation. See <a href="https://github.com/benjaminmue/pathary/issues/45">GitHub Issue #45</a>. Currently, use the CLI method below for initial user creation.</p>
+<p><strong>Note:</strong> The web-based <code>/init</code> setup wizard is now the primary method for initial user creation. See <a href="../first-time-setup/">First-Time Setup Guide</a>. The CLI methods below are provided for emergency access or automated deployments only.</p>
 </blockquote>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <ul>
@@ -2896,44 +2634,6 @@
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../install/manual/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Manual">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                Manual
-              </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="../configuration/" class="md-footer__link md-footer__link--next" aria-label="Next: Configuration">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                Configuration
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">
