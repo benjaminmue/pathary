@@ -296,26 +296,30 @@ For detailed configuration guides, see:
 
 ## Emergency Access
 
-If you lose both your authenticator device and recovery codes, you'll be locked out of your account. To regain access:
+### Locked Out (Lost 2FA Device + Recovery Codes)
 
-### Option 1: CLI Emergency Admin (Recommended)
+If you lose both your authenticator device and recovery codes, you have two options:
 
-Use the emergency admin CLI command to create a temporary admin account:
+#### Option 1: Use CLI to Delete and Recreate User
 
 ```bash
-# Using Docker
-docker compose exec app php bin/console.php user:emergency-admin
+# List users to find the ID
+docker compose exec app php bin/console.php user:list
 
-# Manual installation
-php bin/console.php user:emergency-admin
+# Delete your locked user (replace USER_ID)
+docker compose exec app php bin/console.php user:delete USER_ID
+
+# Create new user
+docker compose exec app php bin/console.php user:create \
+  "your-email@example.com" \
+  "YourNewPassword123!" \
+  "yourusername" \
+  true
 ```
 
-This creates a temporary admin account with credentials displayed on screen. Use it to:
-1. Log in to Pathary
-2. Reset 2FA for your original account (or delete and recreate it)
-3. Delete the emergency admin account
+**Note**: This preserves all movies and ratings data, but you'll need to set up 2FA again via the web interface.
 
-### Option 2: Database Reset (Last Resort)
+#### Option 2: Database Reset (Last Resort)
 
 **Warning**: This deletes ALL data including movies, ratings, and users.
 
@@ -330,6 +334,26 @@ php vendor/bin/phinx migrate -c ./settings/phinx.php
 ```
 
 After reset, access `/init` to run the setup wizard again.
+
+### Emergency Admin Creation (Any Situation)
+
+If you need to create an emergency admin account (locked out, death of admin, fired employee, etc.), use the emergency admin command:
+
+```bash
+# Using Docker
+docker compose exec app php bin/console.php user:create-emergency-admin
+
+# Manual installation
+php bin/console.php user:create-emergency-admin
+```
+
+The command will interactively guide you through:
+1. Confirming the emergency (if admins already exist)
+2. Creating a new admin account
+3. Setting up 2FA with QR code
+4. Generating recovery codes
+
+**Security Note**: If admin users already exist, the command will warn you and require explicit confirmation before proceeding. This prevents accidental creation of unnecessary admin accounts while still allowing true emergencies.
 
 ---
 

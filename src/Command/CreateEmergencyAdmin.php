@@ -42,18 +42,31 @@ class CreateEmergencyAdmin extends Command
         $output->writeln('<error>======================================</error>');
         $output->writeln('');
         $output->writeln('<comment>This command creates an admin account with mandatory 2FA.</comment>');
-        $output->writeln('<comment>Use only when all admin accounts are locked out.</comment>');
+        $output->writeln('<comment>Use only in emergency situations (lockout, death, fired employee, etc.).</comment>');
         $output->writeln('');
 
-        // Check if admin users already exist
+        // Check if admin users already exist and warn
         $adminCount = $this->userApi->countAdminUsers();
         if ($adminCount > 0) {
-            $output->writeln('<error>Admin users already exist in the system.</error>');
-            $output->writeln('<info>Please use the web interface to create additional users.</info>');
-            return Command::FAILURE;
+            $output->writeln('<comment>Warning: ' . $adminCount . ' admin user(s) already exist in the system.</comment>');
+            $output->writeln('<comment>This command should only be used in true emergencies.</comment>');
+            $output->writeln('');
+
+            $confirmQuestion = new ConfirmationQuestion(
+                '<question>Do you want to proceed with creating an emergency admin? (yes/no):</question> ',
+                false
+            );
+
+            $helper = $this->getHelper('question');
+            $confirmed = $helper->ask($input, $output, $confirmQuestion);
+            if (!$confirmed) {
+                $output->writeln('<info>Aborted. Use the web interface to create users normally.</info>');
+                return Command::SUCCESS;
+            }
+            $output->writeln('');
         }
 
-        $output->writeln('<info>No admin users found. Proceeding with emergency admin creation...</info>');
+        $output->writeln('<info>Proceeding with emergency admin creation...</info>');
         $output->writeln('');
 
         // Collect user information

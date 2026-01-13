@@ -15,6 +15,7 @@ $application->add($container->get(Movary\Command\DatabaseMigrationStatus::class)
 $application->add($container->get(Movary\Command\DatabaseMigrationMigrate::class));
 $application->add($container->get(Movary\Command\DatabaseMigrationRollback::class));
 $application->add($container->get(Movary\Command\UserCreate::class));
+$application->add($container->get(Movary\Command\CreateEmergencyAdmin::class));
 $application->add($container->get(Movary\Command\UserDelete::class));
 $application->add($container->get(Movary\Command\UserHistoryExport::class));
 $application->add($container->get(Movary\Command\UserRatingExport::class));
