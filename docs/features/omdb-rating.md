@@ -10,8 +10,7 @@ Pathary uses the [OMDb API](https://www.omdbapi.com/) to fetch both **IMDb** and
 - Rotten Tomatoes Critics Score (0-100% scale)
 - Fresh/Rotten tomato icon display
 
-!!! Info
-
+!!! info "API Limits"
     OMDb API is free for up to 1,000 requests per day. For higher limits, consider a paid tier.
     Pathary automatically respects rate limits with a 250ms delay between requests.
 
@@ -45,8 +44,7 @@ Add to your `.env` or `.env.local` file:
 OMDB_API_KEY=<omdb_api_key>
 ```
 
-!!! Warning
-
+!!! warning "Security"
     Never commit API keys to version control. Always use `.env.local` for local development.
 
 ## Syncing Ratings
@@ -91,8 +89,7 @@ php bin/console.php omdb:sync --never-synced
 
 ## Scheduling Automatic Syncs
 
-!!! Tip "Use Scheduled Sync"
-
+!!! tip "Use Scheduled Sync"
     For automatic daily syncs of both TMDB and OMDb, use the [Scheduled Sync](scheduled-sync.md) feature.
     It automatically syncs movies 7+ days old (max 1000/day) for both TMDB metadata and OMDb ratings.
 
@@ -208,7 +205,7 @@ If you hit the daily limit:
 
 ## Migration from IMDb Scraper
 
-!!! Info "Deprecated Feature"
+!!! info "Deprecated Feature"
 
     The old `imdb:sync` command (web scraping) has been removed in favor of OMDb API.
     OMDb provides more reliable access to IMDb ratings plus Rotten Tomatoes ratings.

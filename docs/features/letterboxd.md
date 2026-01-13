@@ -9,8 +9,7 @@ You will receive a ZIP archive containing multiple CSV files.
 The `diary.csv` contains your watch dates and the and the `ratings.csv` your ratings.
 Visit the Pathary settings page `/settings/integrations/letterboxd` to import these files to Pathary.
 
-!!! Info
-
+!!! info "Import Notes"
     - Ratings are only imported for movies already existing in Pathary (**import the diary.csv first**).
     - The import only adds watch dates or ratings missing in Pathary and it will not overwrite existing data.
     - Importing hundreds or thousands of movies for the first time can take a few minutes.

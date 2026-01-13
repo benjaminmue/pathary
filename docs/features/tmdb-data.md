@@ -4,8 +4,7 @@ The primary source for information about movies, persons etc. is [TMDB](https://
 Make sure you have set a valid TMDB api key, e.g. via environment variable (`TMDB_API_KEY`) or in the admin server settings UI.
 
 
-!!! tip
-
+!!! tip "Regular Sync Recommended"
     Execute the metadata sync and image cache commands regularly, e.g. via cronjobs, to keep your application data up to date.
 
 ## Movie & Person data

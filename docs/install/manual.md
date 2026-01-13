@@ -42,8 +42,7 @@ php bin/console.php storage:link
 php bin/console.php database:migration:migrate
 ```
 
-!!! Info
-
+!!! info "Storage Permissions"
     Make sure that the permissions on the `storage` directory are correct and set to writable for the php (fpm) user
 
 ### Web server

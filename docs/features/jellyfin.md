@@ -7,8 +7,7 @@
 
 Automatically add new [Jellyin](https://jellyfin.org/) movie plays to Pathary.
 
-!!! Info
-
+!!! info "Plugin Required"
     Requires the [webhook plugin](https://github.com/jellyfin/jellyfin-plugin-webhook) to be installed and active in Jellyfin.
 
 ### Instruction
@@ -19,8 +18,7 @@ Automatically add new [Jellyin](https://jellyfin.org/) movie plays to Pathary.
     - User Filter => Choose your user
     - Item Type => "Movies" + "Send All Properties (ignores template)"
 
-!!! tip
-
+!!! tip "Webhook Security"
     Keep your webhook url private to prevent abuse.
 
 ## Authentication
@@ -28,8 +26,7 @@ Automatically add new [Jellyin](https://jellyfin.org/) movie plays to Pathary.
 Some features require access to protected personal Jellyfin data.
 You can authenticate Pathary against Jellyfin on the Jellyfin integration settings page (`/settings/integrations/jellyfin`).
 
-!!! Info
-
+!!! info "Configuration Required"
     Requires the server configuration [JELLYFIN_DEVICE_ID](/configuration/#third-party-integrations) to be set.
 
 During the authentication process a Jellyfin access token is generated and stored in Pathary.
@@ -48,8 +45,7 @@ General notes:
 
 You can keep your Jellyfin libraries automatically up to date with your latest Pathary watch history changes.
 
-!!! Info
-
+!!! info "Authentication Required"
     Jellyfin [authentication](#authentication) is required.  
 
 If the automatic sync is enabled (e.g. on `/settings/integrations/jellyfin`) new watch dates added to Pathary are automatically pushed as plays to Jellyfin.
@@ -61,8 +57,7 @@ If a movie has its last watch date removed in Pathary it is set to unwatched in 
 
 You can export your Pathary watch dates as plays to Jellyfin.
 
-!!! Info
-
+!!! info "Authentication Required"
     Jellyfin [authentication](#authentication) is required.  
 
 Pathary will compare its movie watch dates against the Jellyfin movie plays.
@@ -81,8 +76,7 @@ php bin/console.php jellyfin:export <userId>
 
 You can import your Jellyfin plays as Pathary watch dates.
 
-!!! Info
-
+!!! info "Authentication Required"
     Jellyfin [authentication](#authentication) is required.  
 
 Pathary will compare the Jellyfin movie plays against its movie watch dates.

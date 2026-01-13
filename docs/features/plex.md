@@ -7,8 +7,7 @@
 
 Automatically add new [Plex](https://www.plex.tv/) movie plays and ratings to Pathary.
 
-!!! Info
-
+!!! info "Plex Pass Required"
     To use the required webhooks feature in Plex an active [Plex Pass](https://www.plex.tv/plex-pass/) subscription is neceessary.
 
 ### Instruction
@@ -17,8 +16,7 @@ Automatically add new [Plex](https://www.plex.tv/) movie plays and ratings to Pa
 
 You can select what you want to scrobble (movie plays and/or ratings) via the "Scrobble Options" checkboxes on the settings page.
 
-!!! tip
-
+!!! tip "Webhook Security"
     Keep your webhook url private to prevent abuse.
 
 ## Authentication
@@ -26,16 +24,14 @@ You can select what you want to scrobble (movie plays and/or ratings) via the "S
 Some features require access to protected personal Plex data.
 You can authenticate Pathary against Plex on the Plex integration settings page (`/settings/integrations/plex`).
 
-!!! Info
-
+!!! info "Configuration Required"
     Requires the server configuration [PLEX_IDENTIFIER](/configuration/#third-party-integrations) to be set.
 
 During the authentication process a Plex access token is generated and stored in Pathary. 
 This token will be used in all further Plex API requests.
 When an authentication is removed from Pathary, the token will be deleted only in Pathary.
 
-!!! Info
-
+!!! info "Token Removal"
     Removing the authentication only deletes the token stored in Pathary itself. The token still exists in Plex.
     To invalidate the access token in Plex, go to your Plex settings at: Account -> Authorized devices -> Click on the red cross for the entry "Pathary"
 
@@ -46,8 +42,7 @@ When an authentication is removed from Pathary, the token will be deleted only i
 Import missing movies from your Plex Watchlist to your Pathary Watchlist.
 Missing movies imported to the Pathary Watchlist are put at the beginning of the list in the same order as they are in Plex.
 
-!!! Info
-
+!!! info "Authentication Required"
     Plex [authentication](#authentication) is required.
 
 ### Instruction
@@ -62,6 +57,5 @@ You can directly trigger an import via CLI
 php bin/console.php plex:watchlist:import --userId=<id>
 ```
 
-!!! tip
-
+!!! tip "Automatic Updates"
     You could create a cronjob to regularly import your watchlist to keep up to date automatically. 

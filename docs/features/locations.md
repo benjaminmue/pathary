@@ -7,9 +7,8 @@ A location can be marked as a cinema.
 
 When a users visibility is not set to private, others can see if a location is set for a play but not which exact location.
 
-!!! Info
+!!! info "Optional Feature"
+    This feature is optional and can be disabled.
 
-    This feature is optional and can be disabled. 
-    
     Disabling keeps the current data, but hides all locations UI elements.
 

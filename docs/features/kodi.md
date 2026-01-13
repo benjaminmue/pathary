@@ -8,8 +8,7 @@
 Automatically add new [Kodi](https://kodi.tv/) movie plays to Pathary.
 
 
-!!! Info
-
+!!! info "TMDB ID Required"
     Only Kodi movies with tmdb ids can be logged to Pathary.
 
 ### Instruction

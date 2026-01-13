@@ -26,12 +26,10 @@ The import will only add data missing in Pathary on default, it will not overwri
 
 The import can be triggered via the user settings page at `/settings/integrations/trakt` or via cli.
 
-!!! Info
-
+!!! info "Import Time"
     Importing hundreds or thousands of movies for the first time can take a few minutes.
 
-!!! Warning
-
+!!! warning "Public Accounts Only"
     Currently Pathary only supports import from public Trakt accounts. Make sure your account is not set to private during the import.
 
 ### CLI Command
