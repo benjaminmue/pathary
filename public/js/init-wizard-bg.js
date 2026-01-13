@@ -1,6 +1,6 @@
 /**
- * Falling Snowflake Background Animation
- * Creates a snowfall effect with blurred snowflake emojis
+ * Falling Popcorn Background Animation
+ * Creates a snowfall-like effect with blurred popcorn emojis
  */
 (function() {
     'use strict';
@@ -10,6 +10,7 @@
 
     if (prefersReducedMotion) {
         // Don't create animated particles for users who prefer reduced motion
+        // CSS handles static fallback via ::before and ::after
         return;
     }
 
@@ -26,7 +27,7 @@
         maxFallDuration: 28,
         minSwayDuration: 3,
         maxSwayDuration: 8,
-        emoji: '❄️'
+        emoji: '🍿'
     };
 
     /**
@@ -48,17 +49,17 @@
      */
     function createContainer() {
         const container = document.createElement('div');
-        container.className = 'snowflake-bg';
+        container.className = 'popcorn-bg';
         container.setAttribute('aria-hidden', 'true');
         return container;
     }
 
     /**
-     * Create a single snowflake particle
+     * Create a single popcorn particle
      */
     function createParticle(index, total) {
         const particle = document.createElement('span');
-        particle.className = 'snowflake';
+        particle.className = 'popcorn';
         particle.textContent = CONFIG.emoji;
 
         // Distribute particles evenly across the viewport width
@@ -89,7 +90,7 @@
     }
 
     /**
-     * Initialize the snowflake background
+     * Initialize the popcorn background
      */
     function init() {
         const container = createContainer();

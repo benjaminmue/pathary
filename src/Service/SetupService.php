@@ -26,8 +26,9 @@ class SetupService
     public function markSetupCompleted() : void
     {
         $this->dbConnection->executeStatement(
-            'UPDATE server_setting SET value = ? WHERE `key` = ?',
-            ['true', self::SETUP_COMPLETED_KEY],
+            'INSERT INTO server_setting (`key`, `value`) VALUES (?, ?)
+             ON DUPLICATE KEY UPDATE `value` = ?',
+            [self::SETUP_COMPLETED_KEY, 'true', 'true'],
         );
     }
 
