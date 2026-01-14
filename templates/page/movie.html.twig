@@ -10,11 +10,13 @@
 
 {% block stylesheets %}
     <link href="{{ applicationUrl }}/css/movie.css" rel="stylesheet">
+    <link href="{{ applicationUrl }}/css/lightbox.css" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
     <script src="{{ applicationUrl }}/js/movie.js"></script>
     <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
+    <script src="{{ applicationUrl }}/js/lightbox.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -47,7 +49,12 @@
 
         <div style="display: flex;">
             <div style="text-align: center">
-                <img src="{{ movie.posterPath }}" style="width: 13rem;align-self: start;">
+                <img id="moviePoster"
+                     src="{{ movie.posterPath }}"
+                     alt="{{ movie.title }}"
+                     class="poster-clickable"
+                     style="width: 13rem;align-self: start;"
+                     onclick="openPosterLightbox('{{ movie.posterPath|e('js') }}', '{{ movie.title|e('js') }}')">
             </div>
 
             <div style="padding-left: 1rem">
@@ -326,6 +333,12 @@
                 {% for movieProductionCountry in movieProductionCountries %}{{ movieProductionCountry }}{% if not loop.last %}, {% endif %}
                 {% endfor %}
             </p>
+        </div>
+
+        {# Poster Lightbox #}
+        <div id="posterLightbox" class="lightbox-overlay" style="display: none;">
+            <button class="lightbox-close" aria-label="Close">&times;</button>
+            <img id="posterLightboxImage" src="" alt="Movie Poster" class="lightbox-image">
         </div>
     </main>
 {% endblock %}
