@@ -73,12 +73,12 @@ APPLICATION_URL=http://localhost
 Generate a strong encryption key for storing OAuth secrets:
 
 ```bash
-openssl rand -hex 32
+openssl rand -base64 32
 ```
 
 Set as environment variable:
 ```bash
-ENCRYPTION_KEY=your_generated_64_character_hex_string
+ENCRYPTION_KEY=your_generated_base64_key_here
 ```
 
 Or generate via Pathary UI: Admin → Server Management → Email Settings → OAuth tab → "Generate Encryption Key"
@@ -666,11 +666,11 @@ Option 1 - Generate via UI:
 
 Option 2 - Set environment variable:
 ```bash
-# Generate key
-openssl rand -hex 32
+# Generate key (base64 format)
+openssl rand -base64 32
 
 # Add to .env or .env.local
-ENCRYPTION_KEY=your_generated_64_character_hex_string
+ENCRYPTION_KEY=your_generated_base64_key_here
 
 # Restart container
 docker compose restart app

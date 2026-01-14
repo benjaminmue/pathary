@@ -72,7 +72,7 @@ Required when email support is wanted
 
 | NAME | DEFAULT VALUE | INFO | Web UI |
 |:-----|:-------------:|:-----|:------:|
-| `ENCRYPTION_KEY` | - | AES-256 key for OAuth secrets (generate: `openssl rand -hex 32`) | no |
+| `ENCRYPTION_KEY` | - | AES-256 key for OAuth secrets (generate: `openssl rand -base64 32`) | no |
 
 OAuth configuration is managed via Admin → Server Management → Email Settings → OAuth tab.
 See [OAuth Email Setup](oauth-email-setup.md) for detailed instructions.

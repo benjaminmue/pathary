@@ -198,7 +198,7 @@ To enable Gmail or Microsoft 365 authentication for outgoing emails:
 
 1. Configure OAuth provider (Azure AD or Google Cloud Console)
 2. Add redirect URI: `{APPLICATION_URL}/admin/server/email/oauth/callback`
-3. Generate `ENCRYPTION_KEY`: `openssl rand -hex 32`
+3. Generate `ENCRYPTION_KEY`: `openssl rand -base64 32`
 4. Configure in Admin panel → Server Management → Email Settings → OAuth tab
 
 See [Wiki: OAuth Email Setup](https://docs.pathary.tv/oauth-email-setup/) for detailed instructions.
