@@ -248,16 +248,23 @@
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 0.75rem;
+        gap: 1rem;
     }
 
     .rating-user-name {
         font-weight: 600;
         font-size: 1rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+        flex: 1;
     }
 
     .rating-user-popcorn {
         display: flex;
         align-items: center;
+        flex-shrink: 0;
     }
 
     .rating-unrated {

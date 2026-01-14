@@ -117,6 +117,89 @@
         color: var(--bs-secondary-color);
     }
 
+    /* Dual Range Slider Styles */
+    .dual-range-slider {
+        position: relative;
+        width: 100%;
+        padding: 1rem 0;
+    }
+
+    .dual-range-slider-track {
+        position: absolute;
+        width: 100%;
+        height: 4px;
+        background: var(--bs-border-color);
+        border-radius: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .dual-range-slider-range {
+        position: absolute;
+        height: 4px;
+        background: var(--pathe-yellow);
+        border-radius: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .dual-range-slider input[type="range"] {
+        position: absolute;
+        width: 100%;
+        height: 4px;
+        background: transparent;
+        pointer-events: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .dual-range-slider input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: var(--pathe-yellow);
+        border: 3px solid var(--bs-body-bg);
+        border-radius: 50%;
+        cursor: pointer;
+        pointer-events: auto;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .dual-range-slider input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: var(--pathe-yellow);
+        border: 3px solid var(--bs-body-bg);
+        border-radius: 50%;
+        cursor: pointer;
+        pointer-events: auto;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .dual-range-slider input[type="range"]::-webkit-slider-thumb:hover {
+        background: #e0a808;
+    }
+
+    .dual-range-slider input[type="range"]::-moz-range-thumb:hover {
+        background: #e0a808;
+    }
+
+    .dual-range-values {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--bs-body-color);
+    }
+
+    .dual-range-value {
+        padding: 0.25rem 0.5rem;
+        background: var(--bs-tertiary-bg);
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
     .filter-actions {
         display: flex;
         gap: 0.5rem;
@@ -353,7 +436,7 @@
         </div>
     </header>
 
-    {% if currentGenre or currentRatingMin or currentRatingMax or currentYearMin or currentYearMax %}
+    {% if currentGenre or currentRatingMin or currentRatingMax or currentYearMin or currentYearMax or currentTmdbMin or currentTmdbMax or currentImdbMin or currentImdbMax or currentRtMin or currentRtMax %}
         <div class="active-filters">
             {% if currentGenre %}
                 <span class="active-filter-badge">
@@ -370,6 +453,21 @@
                     <i class="bi bi-calendar"></i> Year: {{ currentYearMin ?? yearRange.min }} - {{ currentYearMax ?? yearRange.max }}
                 </span>
             {% endif %}
+            {% if currentTmdbMin or currentTmdbMax %}
+                <span class="active-filter-badge">
+                    TMDB: {{ currentTmdbMin ?? 0 }} - {{ currentTmdbMax ?? 10 }}
+                </span>
+            {% endif %}
+            {% if currentImdbMin or currentImdbMax %}
+                <span class="active-filter-badge">
+                    IMDB: {{ currentImdbMin ?? 0 }} - {{ currentImdbMax ?? 10 }}
+                </span>
+            {% endif %}
+            {% if currentRtMin or currentRtMax %}
+                <span class="active-filter-badge">
+                    RT: {{ currentRtMin ?? 0 }}% - {{ currentRtMax ?? 100 }}%
+                </span>
+            {% endif %}
         </div>
     {% endif %}
 
@@ -379,7 +477,7 @@
             <div class="filters-card">
                 <h2 class="filters-title">
                     Filters
-                    {% if currentGenre or currentRatingMin or currentRatingMax or currentYearMin or currentYearMax %}
+                    {% if currentGenre or currentRatingMin or currentRatingMax or currentYearMin or currentYearMax or currentTmdbMin or currentTmdbMax or currentImdbMin or currentImdbMax or currentRtMin or currentRtMax %}
                         <a href="{{ applicationUrl }}/movies?sort={{ currentSort }}&order={{ currentOrder }}" class="btn btn-sm btn-clear-filters">Clear</a>
                     {% endif %}
                 </h2>
@@ -400,11 +498,18 @@
 
                     <div class="filter-group">
                         <label class="filter-label">Global Rating (avg)</label>
-                        <div class="filter-range">
-                            <input type="number" name="rating_min" class="filter-input" placeholder="Min" min="1" max="7" value="{{ currentRatingMin }}">
-                            <span class="filter-range-separator">-</span>
-                            <input type="number" name="rating_max" class="filter-input" placeholder="Max" min="1" max="7" value="{{ currentRatingMax }}">
+                        <div class="dual-range-slider">
+                            <div class="dual-range-slider-track"></div>
+                            <div class="dual-range-slider-range" id="rating-range"></div>
+                            <input type="range" min="1" max="7" step="1" value="{{ currentRatingMin ?? 1 }}" id="rating-min" data-input="rating_min">
+                            <input type="range" min="1" max="7" step="1" value="{{ currentRatingMax ?? 7 }}" id="rating-max" data-input="rating_max">
                         </div>
+                        <div class="dual-range-values">
+                            <span class="dual-range-value">🍿 <span id="rating-min-value">{{ currentRatingMin ?? 1 }}</span></span>
+                            <span class="dual-range-value">🍿 <span id="rating-max-value">{{ currentRatingMax ?? 7 }}</span></span>
+                        </div>
+                        <input type="hidden" name="rating_min" id="rating_min" value="{{ currentRatingMin }}">
+                        <input type="hidden" name="rating_max" id="rating_max" value="{{ currentRatingMax }}">
                         <p class="filter-info">Filters by rounded average (1-7 popcorn scale)</p>
                     </div>
 
@@ -416,6 +521,59 @@
                             <input type="number" name="year_max" class="filter-input" placeholder="{{ yearRange.max ?? 'Max' }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMax }}">
                         </div>
                     </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">TMDB Rating</label>
+                        <div class="dual-range-slider">
+                            <div class="dual-range-slider-track"></div>
+                            <div class="dual-range-slider-range" id="tmdb-range"></div>
+                            <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMin ?? 0 }}" id="tmdb-min" data-input="tmdb_min">
+                            <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMax ?? 10 }}" id="tmdb-max" data-input="tmdb_max">
+                        </div>
+                        <div class="dual-range-values">
+                            <span class="dual-range-value"><span id="tmdb-min-value">{{ currentTmdbMin ?? 0 }}</span></span>
+                            <span class="dual-range-value"><span id="tmdb-max-value">{{ currentTmdbMax ?? 10 }}</span></span>
+                        </div>
+                        <input type="hidden" name="tmdb_min" id="tmdb_min" value="{{ currentTmdbMin }}">
+                        <input type="hidden" name="tmdb_max" id="tmdb_max" value="{{ currentTmdbMax }}">
+                        <p class="filter-info">Scale: 0-10</p>
+                    </div>
+
+                    {% if omdbConfigured %}
+                        <div class="filter-group">
+                            <label class="filter-label">IMDB Rating</label>
+                            <div class="dual-range-slider">
+                                <div class="dual-range-slider-track"></div>
+                                <div class="dual-range-slider-range" id="imdb-range"></div>
+                                <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMin ?? 0 }}" id="imdb-min" data-input="imdb_min">
+                                <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMax ?? 10 }}" id="imdb-max" data-input="imdb_max">
+                            </div>
+                            <div class="dual-range-values">
+                                <span class="dual-range-value"><span id="imdb-min-value">{{ currentImdbMin ?? 0 }}</span></span>
+                                <span class="dual-range-value"><span id="imdb-max-value">{{ currentImdbMax ?? 10 }}</span></span>
+                            </div>
+                            <input type="hidden" name="imdb_min" id="imdb_min" value="{{ currentImdbMin }}">
+                            <input type="hidden" name="imdb_max" id="imdb_max" value="{{ currentImdbMax }}">
+                            <p class="filter-info">Scale: 0-10</p>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="filter-label">Rotten Tomatoes</label>
+                            <div class="dual-range-slider">
+                                <div class="dual-range-slider-track"></div>
+                                <div class="dual-range-slider-range" id="rt-range"></div>
+                                <input type="range" min="0" max="100" step="5" value="{{ currentRtMin ?? 0 }}" id="rt-min" data-input="rt_min">
+                                <input type="range" min="0" max="100" step="5" value="{{ currentRtMax ?? 100 }}" id="rt-max" data-input="rt_max">
+                            </div>
+                            <div class="dual-range-values">
+                                <span class="dual-range-value"><span id="rt-min-value">{{ currentRtMin ?? 0 }}</span>%</span>
+                                <span class="dual-range-value"><span id="rt-max-value">{{ currentRtMax ?? 100 }}</span>%</span>
+                            </div>
+                            <input type="hidden" name="rt_min" id="rt_min" value="{{ currentRtMin }}">
+                            <input type="hidden" name="rt_max" id="rt_max" value="{{ currentRtMax }}">
+                            <p class="filter-info">Scale: 0-100</p>
+                        </div>
+                    {% endif %}
 
                     <div class="filter-actions">
                         <button type="submit" class="btn btn-apply-filters">Apply Filters</button>
@@ -487,11 +645,18 @@
 
             <div class="filter-group">
                 <label class="filter-label">Global Rating (avg)</label>
-                <div class="filter-range">
-                    <input type="number" name="rating_min" class="filter-input" placeholder="Min" min="1" max="7" value="{{ currentRatingMin }}">
-                    <span class="filter-range-separator">-</span>
-                    <input type="number" name="rating_max" class="filter-input" placeholder="Max" min="1" max="7" value="{{ currentRatingMax }}">
+                <div class="dual-range-slider">
+                    <div class="dual-range-slider-track"></div>
+                    <div class="dual-range-slider-range" id="rating-range-mobile"></div>
+                    <input type="range" min="1" max="7" step="1" value="{{ currentRatingMin ?? 1 }}" id="rating-min-mobile" data-input="rating_min_mobile">
+                    <input type="range" min="1" max="7" step="1" value="{{ currentRatingMax ?? 7 }}" id="rating-max-mobile" data-input="rating_max_mobile">
                 </div>
+                <div class="dual-range-values">
+                    <span class="dual-range-value">🍿 <span id="rating-min-value-mobile">{{ currentRatingMin ?? 1 }}</span></span>
+                    <span class="dual-range-value">🍿 <span id="rating-max-value-mobile">{{ currentRatingMax ?? 7 }}</span></span>
+                </div>
+                <input type="hidden" name="rating_min" id="rating_min_mobile" value="{{ currentRatingMin }}">
+                <input type="hidden" name="rating_max" id="rating_max_mobile" value="{{ currentRatingMax }}">
                 <p class="filter-info">Filters by rounded average (1-7 popcorn scale)</p>
             </div>
 
@@ -503,6 +668,59 @@
                     <input type="number" name="year_max" class="filter-input" placeholder="{{ yearRange.max ?? 'Max' }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMax }}">
                 </div>
             </div>
+
+            <div class="filter-group">
+                <label class="filter-label">TMDB Rating</label>
+                <div class="dual-range-slider">
+                    <div class="dual-range-slider-track"></div>
+                    <div class="dual-range-slider-range" id="tmdb-range-mobile"></div>
+                    <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMin ?? 0 }}" id="tmdb-min-mobile" data-input="tmdb_min_mobile">
+                    <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMax ?? 10 }}" id="tmdb-max-mobile" data-input="tmdb_max_mobile">
+                </div>
+                <div class="dual-range-values">
+                    <span class="dual-range-value"><span id="tmdb-min-value-mobile">{{ currentTmdbMin ?? 0 }}</span></span>
+                    <span class="dual-range-value"><span id="tmdb-max-value-mobile">{{ currentTmdbMax ?? 10 }}</span></span>
+                </div>
+                <input type="hidden" name="tmdb_min" id="tmdb_min_mobile" value="{{ currentTmdbMin }}">
+                <input type="hidden" name="tmdb_max" id="tmdb_max_mobile" value="{{ currentTmdbMax }}">
+                <p class="filter-info">Scale: 0-10</p>
+            </div>
+
+            {% if omdbConfigured %}
+                <div class="filter-group">
+                    <label class="filter-label">IMDB Rating</label>
+                    <div class="dual-range-slider">
+                        <div class="dual-range-slider-track"></div>
+                        <div class="dual-range-slider-range" id="imdb-range-mobile"></div>
+                        <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMin ?? 0 }}" id="imdb-min-mobile" data-input="imdb_min_mobile">
+                        <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMax ?? 10 }}" id="imdb-max-mobile" data-input="imdb_max_mobile">
+                    </div>
+                    <div class="dual-range-values">
+                        <span class="dual-range-value"><span id="imdb-min-value-mobile">{{ currentImdbMin ?? 0 }}</span></span>
+                        <span class="dual-range-value"><span id="imdb-max-value-mobile">{{ currentImdbMax ?? 10 }}</span></span>
+                    </div>
+                    <input type="hidden" name="imdb_min" id="imdb_min_mobile" value="{{ currentImdbMin }}">
+                    <input type="hidden" name="imdb_max" id="imdb_max_mobile" value="{{ currentImdbMax }}">
+                    <p class="filter-info">Scale: 0-10</p>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Rotten Tomatoes</label>
+                    <div class="dual-range-slider">
+                        <div class="dual-range-slider-track"></div>
+                        <div class="dual-range-slider-range" id="rt-range-mobile"></div>
+                        <input type="range" min="0" max="100" step="5" value="{{ currentRtMin ?? 0 }}" id="rt-min-mobile" data-input="rt_min_mobile">
+                        <input type="range" min="0" max="100" step="5" value="{{ currentRtMax ?? 100 }}" id="rt-max-mobile" data-input="rt_max_mobile">
+                    </div>
+                    <div class="dual-range-values">
+                        <span class="dual-range-value"><span id="rt-min-value-mobile">{{ currentRtMin ?? 0 }}</span>%</span>
+                        <span class="dual-range-value"><span id="rt-max-value-mobile">{{ currentRtMax ?? 100 }}</span>%</span>
+                    </div>
+                    <input type="hidden" name="rt_min" id="rt_min_mobile" value="{{ currentRtMin }}">
+                    <input type="hidden" name="rt_max" id="rt_max_mobile" value="{{ currentRtMax }}">
+                    <p class="filter-info">Scale: 0-100</p>
+                </div>
+            {% endif %}
 
             <div class="filter-actions">
                 <button type="submit" class="btn btn-apply-filters">Apply Filters</button>
@@ -522,5 +740,72 @@ function updateSort(value) {
     url.searchParams.set('order', order);
     window.location.href = url.toString();
 }
+
+// Dual Range Slider functionality
+function initDualRangeSlider(minId, maxId, rangeId, minValueId, maxValueId, inputName) {
+    const minSlider = document.getElementById(minId);
+    const maxSlider = document.getElementById(maxId);
+    const rangeBar = document.getElementById(rangeId);
+    const minValueDisplay = document.getElementById(minValueId);
+    const maxValueDisplay = document.getElementById(maxValueId);
+    const minInput = document.getElementById(inputName + '_min') || document.getElementById(minSlider.dataset.input);
+    const maxInput = document.getElementById(inputName + '_max') || document.getElementById(maxSlider.dataset.input);
+
+    if (!minSlider || !maxSlider || !rangeBar) return;
+
+    function updateRange() {
+        const min = parseFloat(minSlider.value);
+        const max = parseFloat(maxSlider.value);
+        const minVal = parseFloat(minSlider.min);
+        const maxVal = parseFloat(minSlider.max);
+
+        // Prevent handles from crossing
+        if (min > max) {
+            if (event.target === minSlider) {
+                minSlider.value = max;
+            } else {
+                maxSlider.value = min;
+            }
+        }
+
+        const currentMin = parseFloat(minSlider.value);
+        const currentMax = parseFloat(maxSlider.value);
+
+        // Update range bar position and width
+        const percentMin = ((currentMin - minVal) / (maxVal - minVal)) * 100;
+        const percentMax = ((currentMax - minVal) / (maxVal - minVal)) * 100;
+        rangeBar.style.left = percentMin + '%';
+        rangeBar.style.width = (percentMax - percentMin) + '%';
+
+        // Update displayed values
+        if (minValueDisplay) minValueDisplay.textContent = currentMin;
+        if (maxValueDisplay) maxValueDisplay.textContent = currentMax;
+
+        // Update hidden inputs
+        if (minInput) minInput.value = currentMin;
+        if (maxInput) maxInput.value = currentMax;
+    }
+
+    minSlider.addEventListener('input', updateRange);
+    maxSlider.addEventListener('input', updateRange);
+
+    // Initialize on page load
+    updateRange();
+}
+
+// Initialize all dual range sliders on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Desktop filters
+    initDualRangeSlider('rating-min', 'rating-max', 'rating-range', 'rating-min-value', 'rating-max-value', 'rating');
+    initDualRangeSlider('tmdb-min', 'tmdb-max', 'tmdb-range', 'tmdb-min-value', 'tmdb-max-value', 'tmdb');
+    initDualRangeSlider('imdb-min', 'imdb-max', 'imdb-range', 'imdb-min-value', 'imdb-max-value', 'imdb');
+    initDualRangeSlider('rt-min', 'rt-max', 'rt-range', 'rt-min-value', 'rt-max-value', 'rt');
+
+    // Mobile filters
+    initDualRangeSlider('rating-min-mobile', 'rating-max-mobile', 'rating-range-mobile', 'rating-min-value-mobile', 'rating-max-value-mobile', 'rating');
+    initDualRangeSlider('tmdb-min-mobile', 'tmdb-max-mobile', 'tmdb-range-mobile', 'tmdb-min-value-mobile', 'tmdb-max-value-mobile', 'tmdb');
+    initDualRangeSlider('imdb-min-mobile', 'imdb-max-mobile', 'imdb-range-mobile', 'imdb-min-value-mobile', 'imdb-max-value-mobile', 'imdb');
+    initDualRangeSlider('rt-min-mobile', 'rt-max-mobile', 'rt-range-mobile', 'rt-min-value-mobile', 'rt-max-value-mobile', 'rt');
+});
 </script>
 {% endblock %}

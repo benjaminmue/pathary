@@ -56,6 +56,9 @@ logs/
 /storage/logs/*
 !/storage/logs/.gitkeep
 
+# Demo data (local development only - never commit)
+/demo/
+
 # macOS
 .DS_Store
 site/

@@ -143,6 +143,12 @@ class GroupMovieService
      * @param ?string $genre Genre name filter
      * @param ?int $yearMin Minimum release year
      * @param ?int $yearMax Maximum release year
+     * @param ?float $tmdbMin Minimum TMDB rating (0-10)
+     * @param ?float $tmdbMax Maximum TMDB rating (0-10)
+     * @param ?float $imdbMin Minimum IMDB rating (0-10)
+     * @param ?float $imdbMax Maximum IMDB rating (0-10)
+     * @param ?int $rtMin Minimum Rotten Tomatoes rating (0-100)
+     * @param ?int $rtMax Maximum Rotten Tomatoes rating (0-100)
      * @return array
      */
     public function getAllMovies(
@@ -154,6 +160,12 @@ class GroupMovieService
         ?string $genre = null,
         ?int $yearMin = null,
         ?int $yearMax = null,
+        ?float $tmdbMin = null,
+        ?float $tmdbMax = null,
+        ?float $imdbMin = null,
+        ?float $imdbMax = null,
+        ?int $rtMin = null,
+        ?int $rtMax = null,
     ) : array {
         $params = [];
         $whereConditions = [];
@@ -182,6 +194,36 @@ class GroupMovieService
                 $whereConditions[] = 'YEAR(m.release_date) <= ?';
             }
             $params[] = $yearMax;
+        }
+
+        // TMDB rating filter
+        if ($tmdbMin !== null) {
+            $whereConditions[] = '(m.tmdb_vote_average IS NULL OR m.tmdb_vote_average >= ?)';
+            $params[] = $tmdbMin;
+        }
+        if ($tmdbMax !== null) {
+            $whereConditions[] = '(m.tmdb_vote_average IS NULL OR m.tmdb_vote_average <= ?)';
+            $params[] = $tmdbMax;
+        }
+
+        // IMDB rating filter
+        if ($imdbMin !== null) {
+            $whereConditions[] = '(m.imdb_rating_average IS NULL OR m.imdb_rating_average >= ?)';
+            $params[] = $imdbMin;
+        }
+        if ($imdbMax !== null) {
+            $whereConditions[] = '(m.imdb_rating_average IS NULL OR m.imdb_rating_average <= ?)';
+            $params[] = $imdbMax;
+        }
+
+        // Rotten Tomatoes rating filter
+        if ($rtMin !== null) {
+            $whereConditions[] = '(m.rt_rating_average IS NULL OR m.rt_rating_average >= ?)';
+            $params[] = $rtMin;
+        }
+        if ($rtMax !== null) {
+            $whereConditions[] = '(m.rt_rating_average IS NULL OR m.rt_rating_average <= ?)';
+            $params[] = $rtMax;
         }
 
         // Rating filter (on avg_popcorn, applied via HAVING)
@@ -301,6 +343,193 @@ class GroupMovieService
         return [
             'min' => $result['min_year'] !== null ? (int)$result['min_year'] : null,
             'max' => $result['max_year'] !== null ? (int)$result['max_year'] : null,
+        ];
+    }
+
+    /**
+     * Get total count of unique movies in the library.
+     */
+    public function getTotalMoviesCount() : int
+    {
+        return (int)$this->dbConnection->fetchOne(
+            <<<SQL
+            SELECT COUNT(DISTINCT m.id)
+            FROM movie m
+            JOIN movie_user_watch_dates muwd ON muwd.movie_id = m.id
+            WHERE muwd.watched_at IS NOT NULL
+            SQL,
+        );
+    }
+
+    /**
+     * Get total count of all ratings across all movies.
+     */
+    public function getTotalRatingsCount() : int
+    {
+        return (int)$this->dbConnection->fetchOne(
+            <<<SQL
+            SELECT COUNT(*)
+            FROM movie_user_rating
+            WHERE rating_popcorn IS NOT NULL
+            SQL,
+        );
+    }
+
+    /**
+     * Get highest rated movies (by average popcorn rating).
+     *
+     * @return array<int, array{
+     *     movie_id: int,
+     *     title: string,
+     *     release_date: ?string,
+     *     tmdb_poster_path: ?string,
+     *     poster_path: ?string,
+     *     avg_popcorn: float,
+     *     rating_count: int
+     * }>
+     */
+    public function getHighestRatedMovies(int $limit = 3) : array
+    {
+        $movies = $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT
+                m.id AS movie_id,
+                m.title,
+                m.release_date,
+                m.tmdb_poster_path,
+                m.poster_path,
+                AVG(mur.rating_popcorn) AS avg_popcorn,
+                COUNT(mur.rating_popcorn) AS rating_count
+            FROM movie m
+            JOIN movie_user_rating mur ON mur.movie_id = m.id
+            WHERE mur.rating_popcorn IS NOT NULL
+            GROUP BY m.id
+            HAVING rating_count >= 1
+            ORDER BY avg_popcorn DESC, rating_count DESC, LOWER(m.title) ASC
+            LIMIT ?
+            SQL,
+            [$limit],
+            [ParameterType::INTEGER],
+        );
+
+        return $this->imageUrlService->replacePosterPathWithImageSrcUrl($movies);
+    }
+
+    /**
+     * Get lowest rated movies (by average popcorn rating).
+     *
+     * @return array<int, array{
+     *     movie_id: int,
+     *     title: string,
+     *     release_date: ?string,
+     *     tmdb_poster_path: ?string,
+     *     poster_path: ?string,
+     *     avg_popcorn: float,
+     *     rating_count: int
+     * }>
+     */
+    public function getLowestRatedMovies(int $limit = 3) : array
+    {
+        $movies = $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT
+                m.id AS movie_id,
+                m.title,
+                m.release_date,
+                m.tmdb_poster_path,
+                m.poster_path,
+                AVG(mur.rating_popcorn) AS avg_popcorn,
+                COUNT(mur.rating_popcorn) AS rating_count
+            FROM movie m
+            JOIN movie_user_rating mur ON mur.movie_id = m.id
+            WHERE mur.rating_popcorn IS NOT NULL
+            GROUP BY m.id
+            HAVING rating_count >= 1
+            ORDER BY avg_popcorn ASC, rating_count DESC, LOWER(m.title) ASC
+            LIMIT ?
+            SQL,
+            [$limit],
+            [ParameterType::INTEGER],
+        );
+
+        return $this->imageUrlService->replacePosterPathWithImageSrcUrl($movies);
+    }
+
+    /**
+     * Get random comments from users.
+     *
+     * @return array<int, array{
+     *     user_name: string,
+     *     movie_title: string,
+     *     movie_id: int,
+     *     comment: string,
+     *     rating_popcorn: int
+     * }>
+     */
+    public function getRandomComments(int $limit = 5) : array
+    {
+        $randomFunction = $this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform
+            ? 'RANDOM()'
+            : 'RAND()';
+
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT
+                u.name AS user_name,
+                m.title AS movie_title,
+                m.id AS movie_id,
+                mur.comment,
+                mur.rating_popcorn
+            FROM movie_user_rating mur
+            JOIN user u ON u.id = mur.user_id
+            JOIN movie m ON m.id = mur.movie_id
+            WHERE mur.comment IS NOT NULL AND mur.comment != ''
+            ORDER BY $randomFunction
+            LIMIT ?
+            SQL,
+            [$limit],
+            [ParameterType::INTEGER],
+        );
+    }
+
+    /**
+     * Get global statistics for the entire library.
+     *
+     * @return array{
+     *     total_movies: int,
+     *     total_ratings: int,
+     *     avg_rating: ?float,
+     *     highest_rated: array,
+     *     lowest_rated: array,
+     *     random_comments: array
+     * }
+     */
+    public function getGlobalStats() : array
+    {
+        $totalMovies = $this->getTotalMoviesCount();
+        $totalRatings = $this->getTotalRatingsCount();
+
+        $avgRating = null;
+        if ($totalRatings > 0) {
+            $result = $this->dbConnection->fetchOne(
+                <<<SQL
+                SELECT AVG(rating_popcorn)
+                FROM movie_user_rating
+                WHERE rating_popcorn IS NOT NULL
+                SQL,
+            );
+            if ($result !== false && $result !== null) {
+                $avgRating = round((float)$result, 1);
+            }
+        }
+
+        return [
+            'total_movies' => $totalMovies,
+            'total_ratings' => $totalRatings,
+            'avg_rating' => $avgRating,
+            'highest_rated' => $this->getHighestRatedMovies(3),
+            'lowest_rated' => $this->getLowestRatedMovies(3),
+            'random_comments' => $this->getRandomComments(6),
         ];
     }
 

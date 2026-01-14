@@ -56,18 +56,13 @@
                             <span class="spinner-border spinner-border-sm me-1" role="status"></span>
                             Loading status...
                         </div>
-                        <div class="mt-2 mb-2">
+                        <div class="mt-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="testOmdbConnection()">
                                 <i class="bi bi-lightning me-1"></i>Test OMDb Connection
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-danger" id="removeOmdbKeyBtn" onclick="removeOmdbKey()" style="display: none;">
                                 <i class="bi bi-trash me-1"></i>Remove Key
                             </button>
-                        </div>
-                        <div class="form-text text-muted small">
-                            <i class="bi bi-info-circle"></i> Get your free API key at
-                            <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener">omdbapi.com/apikey.aspx</a>
-                            (1,000 requests/day free tier)
                         </div>
                     </div>
 
@@ -926,17 +921,26 @@
 </div>
 
 <style>
-    /* TMDB Status Badge Styling */
-    #tmdbKeyStatus .badge {
-        font-size: 0.875rem;
-        padding: 0.35em 0.65em;
+    /* Status badge styling */
+    #tmdbKeyStatus .badge,
+    #omdbKeyStatus .badge {
+        line-height: 1.2;
     }
 
+    /* Status badge gap spacing */
     #tmdbKeyStatus .gap-2 > * {
         margin-right: 0.5rem;
     }
 
     #tmdbKeyStatus .gap-2 > *:last-child {
+        margin-right: 0;
+    }
+
+    #omdbKeyStatus .gap-2 > * {
+        margin-right: 0.5rem;
+    }
+
+    #omdbKeyStatus .gap-2 > *:last-child {
         margin-right: 0;
     }
 
@@ -1108,7 +1112,7 @@
             const timestamp = updatedAt ? new Date(updatedAt.replace(' ', 'T')).toLocaleString() : 'Unknown';
             let statusHtml = `
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge bg-success">
+                    <span class="badge bg-success fs-6">
                         <i class="bi bi-check-circle-fill me-1"></i>Key Configured
                     </span>
                     <span class="text-muted small">Last updated: ${timestamp}</span>
@@ -1367,7 +1371,7 @@
             const timestamp = updatedAt ? new Date(updatedAt.replace(' ', 'T')).toLocaleString() : 'Unknown';
             let statusHtml = `
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge bg-success">
+                    <span class="badge bg-success fs-6">
                         <i class="bi bi-check-circle-fill me-1"></i>Key Configured
                     </span>
                     <span class="text-muted small">Last updated: ${timestamp}</span>

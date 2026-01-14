@@ -238,6 +238,322 @@
         color: var(--bs-secondary-color);
         margin-bottom: 0;
     }
+
+    /* Stats Section */
+    .stats-section {
+        margin-top: 4rem;
+        padding-top: 3rem;
+        border-top: 2px solid var(--pathe-yellow);
+    }
+
+    .stats-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .stats-header h2 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-header p {
+        color: var(--bs-secondary-color);
+    }
+
+    .stats-overview {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        text-align: center;
+        padding: 1.5rem;
+        background: var(--bs-tertiary-bg);
+        border-radius: 12px;
+        border: 2px solid transparent;
+        transition: border-color 0.2s ease;
+        min-width: 150px;
+    }
+
+    .stat-card:hover {
+        border-color: var(--pathe-yellow);
+    }
+
+    .stat-card .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--pathe-yellow);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card .stat-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--bs-secondary-color);
+    }
+
+    .stat-card .popcorn-icon {
+        font-size: 1.25rem;
+        margin-left: 0.25rem;
+    }
+
+    .rated-movies-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .rated-movies-card {
+        background: var(--bs-tertiary-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 2px solid transparent;
+        transition: border-color 0.2s ease;
+    }
+
+    .rated-movies-card:hover {
+        border-color: var(--accent-purple);
+    }
+
+    .rated-movies-card h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .rated-movies-card h3 .icon {
+        font-size: 1.5rem;
+        color: var(--pathe-yellow);
+        display: inline-block;
+        font-style: normal;
+        font-weight: normal !important;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        vertical-align: -.125em;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .rated-movies-card h3 .icon::before {
+        font-family: bootstrap-icons !important;
+    }
+
+    .rated-movie-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        background: var(--bs-body-bg);
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .rated-movie-item:hover {
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .rated-movie-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .rated-movie-poster {
+        width: 50px;
+        height: 75px;
+        border-radius: 4px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .rated-movie-poster-placeholder {
+        width: 50px;
+        height: 75px;
+        border-radius: 4px;
+        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #888;
+        font-size: 0.6rem;
+        text-align: center;
+        padding: 0.25rem;
+        flex-shrink: 0;
+    }
+
+    .rated-movie-info {
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    .rated-movie-title {
+        font-weight: 500;
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .rated-movie-meta {
+        font-size: 0.8rem;
+        color: var(--bs-secondary-color);
+    }
+
+    .rated-movie-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        flex-shrink: 0;
+    }
+
+    .rated-movie-rating .popcorn-emoji {
+        font-size: 1.25rem;
+    }
+
+    .rated-movie-rating .rating-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--pathe-yellow);
+    }
+
+    .rated-movie-rating .rating-scale {
+        font-size: 0.8rem;
+        color: var(--bs-secondary-color);
+    }
+
+    .no-stats {
+        text-align: center;
+        padding: 2rem;
+        color: var(--bs-secondary-color);
+    }
+
+    /* Random Comments Section */
+    .random-comments-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    @media (max-width: 992px) {
+        .random-comments-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .comment-card {
+        background: var(--bs-tertiary-bg);
+        border-radius: 12px;
+        padding: 1.25rem;
+        border: 2px solid transparent;
+        transition: border-color 0.2s ease, transform 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .comment-card:hover {
+        border-color: var(--pathe-yellow);
+        transform: translateY(-2px);
+    }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .comment-user {
+        font-weight: 600;
+        color: var(--pathe-yellow);
+        font-size: 0.95rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .comment-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        flex-shrink: 0;
+    }
+
+    .comment-rating .popcorn-emoji {
+        font-size: 1rem;
+    }
+
+    .comment-rating .rating-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--pathe-yellow);
+    }
+
+    .comment-rating .rating-scale {
+        font-size: 0.75rem;
+        color: var(--bs-secondary-color);
+    }
+
+    .comment-text {
+        font-style: italic;
+        line-height: 1.5;
+        color: var(--bs-body-color);
+        flex-grow: 1;
+    }
+
+    .comment-movie {
+        font-size: 0.85rem;
+        color: var(--bs-secondary-color);
+        text-decoration: none;
+        transition: color 0.2s ease;
+        margin-top: auto;
+    }
+
+    .comment-movie:hover {
+        color: var(--accent-purple);
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .stats-overview {
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            min-width: 120px;
+            padding: 1rem;
+        }
+
+        .stat-card .stat-number {
+            font-size: 2rem;
+        }
+
+        .rated-movies-section {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .random-comments-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -323,6 +639,148 @@
                 Get Started
             </a>
         </div>
+    {% endif %}
+
+    {# Stats Section #}
+    {% if globalStats.total_movies > 0 %}
+    <section class="stats-section">
+        <div class="stats-header">
+            <h2>Library Statistics</h2>
+            <p>Insights from our community's movie collection</p>
+        </div>
+
+        {# Overview Stats #}
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-number">{{ globalStats.total_movies }}</div>
+                <div class="stat-label">Total Movies</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ globalStats.total_ratings }}</div>
+                <div class="stat-label">Total Ratings</div>
+            </div>
+            {% if globalStats.avg_rating %}
+            <div class="stat-card">
+                <div class="stat-number">
+                    {{ globalStats.avg_rating }}
+                    <span class="popcorn-icon">🍿</span>
+                </div>
+                <div class="stat-label">Average Rating</div>
+            </div>
+            {% endif %}
+        </div>
+
+        {# Highest and Lowest Rated Movies #}
+        {% if globalStats.highest_rated|length > 0 or globalStats.lowest_rated|length > 0 %}
+        <div class="rated-movies-section">
+            {# Highest Rated #}
+            {% if globalStats.highest_rated|length > 0 %}
+            <div class="rated-movies-card">
+                <h3>
+                    <i class="bi bi-hand-thumbs-up icon"></i>
+                    <span>Highest Rated</span>
+                </h3>
+                {% for movie in globalStats.highest_rated %}
+                <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="rated-movie-item">
+                    {% if movie.poster_path %}
+                        <img
+                            src="{{ movie.poster_path }}"
+                            alt="{{ movie.title }}"
+                            class="rated-movie-poster"
+                            loading="lazy"
+                        >
+                    {% else %}
+                        <div class="rated-movie-poster-placeholder">
+                            {{ movie.title|slice(0, 20) }}
+                        </div>
+                    {% endif %}
+                    <div class="rated-movie-info">
+                        <div class="rated-movie-title" title="{{ movie.title }}">
+                            {{ movie.title }}
+                        </div>
+                        <div class="rated-movie-meta">
+                            {{ movie.rating_count }} rating{{ movie.rating_count != 1 ? 's' : '' }}
+                        </div>
+                    </div>
+                    <div class="rated-movie-rating">
+                        <span class="popcorn-emoji" aria-hidden="true">🍿</span>
+                        <span class="rating-value">{{ movie.avg_popcorn|number_format(1) }}</span>
+                        <span class="rating-scale">/ 7</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# Lowest Rated #}
+            {% if globalStats.lowest_rated|length > 0 %}
+            <div class="rated-movies-card">
+                <h3>
+                    <i class="bi bi-hand-thumbs-down icon"></i>
+                    <span>Lowest Rated</span>
+                </h3>
+                {% for movie in globalStats.lowest_rated %}
+                <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="rated-movie-item">
+                    {% if movie.poster_path %}
+                        <img
+                            src="{{ movie.poster_path }}"
+                            alt="{{ movie.title }}"
+                            class="rated-movie-poster"
+                            loading="lazy"
+                        >
+                    {% else %}
+                        <div class="rated-movie-poster-placeholder">
+                            {{ movie.title|slice(0, 20) }}
+                        </div>
+                    {% endif %}
+                    <div class="rated-movie-info">
+                        <div class="rated-movie-title" title="{{ movie.title }}">
+                            {{ movie.title }}
+                        </div>
+                        <div class="rated-movie-meta">
+                            {{ movie.rating_count }} rating{{ movie.rating_count != 1 ? 's' : '' }}
+                        </div>
+                    </div>
+                    <div class="rated-movie-rating">
+                        <span class="popcorn-emoji" aria-hidden="true">🍿</span>
+                        <span class="rating-value">{{ movie.avg_popcorn|number_format(1) }}</span>
+                        <span class="rating-scale">/ 7</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {# Random Comments #}
+        {% if globalStats.random_comments|length > 0 %}
+        <div style="margin-top: 3rem;">
+            <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; text-align: center;">
+                <i class="bi bi-chat-quote" style="font-size: 1.5rem; color: var(--pathe-yellow); margin-right: 0.5rem;"></i>
+                <span>Random Comments</span>
+            </h3>
+            <div class="random-comments-grid">
+                {% for comment in globalStats.random_comments %}
+                <div class="comment-card">
+                    <div class="comment-header">
+                        <div class="comment-user">{{ comment.user_name }}</div>
+                        <div class="comment-rating">
+                            <span class="popcorn-emoji" aria-hidden="true">🍿</span>
+                            <span class="rating-value">{{ comment.rating_popcorn }}</span>
+                            <span class="rating-scale">/ 7</span>
+                        </div>
+                    </div>
+                    <div class="comment-text">"{{ comment.comment }}"</div>
+                    <a href="{{ applicationUrl }}/movie/{{ comment.movie_id }}" class="comment-movie">
+                        — {{ comment.movie_title }}
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </section>
     {% endif %}
 </div>
 {% endblock %}

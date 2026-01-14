@@ -28,10 +28,13 @@ class PublicHomeController
             ];
         }
 
+        $globalStats = $this->groupMovieService->getGlobalStats();
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('public/home.twig', [
                 'movies' => $moviesWithStats,
+                'globalStats' => $globalStats,
             ]),
         );
     }

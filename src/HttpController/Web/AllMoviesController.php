@@ -15,6 +15,7 @@ class AllMoviesController
         private readonly Environment $twig,
         private readonly GroupMovieService $groupMovieService,
         private readonly Authentication $authenticationService,
+        private readonly \Movary\Service\ServerSettings $serverSettings,
     ) {
     }
 
@@ -54,6 +55,24 @@ class AllMoviesController
         $yearMax = isset($params['year_max']) && $params['year_max'] !== ''
             ? (int)$params['year_max']
             : null;
+        $tmdbMin = isset($params['tmdb_min']) && $params['tmdb_min'] !== ''
+            ? (float)$params['tmdb_min']
+            : null;
+        $tmdbMax = isset($params['tmdb_max']) && $params['tmdb_max'] !== ''
+            ? (float)$params['tmdb_max']
+            : null;
+        $imdbMin = isset($params['imdb_min']) && $params['imdb_min'] !== ''
+            ? (float)$params['imdb_min']
+            : null;
+        $imdbMax = isset($params['imdb_max']) && $params['imdb_max'] !== ''
+            ? (float)$params['imdb_max']
+            : null;
+        $rtMin = isset($params['rt_min']) && $params['rt_min'] !== ''
+            ? (int)$params['rt_min']
+            : null;
+        $rtMax = isset($params['rt_max']) && $params['rt_max'] !== ''
+            ? (int)$params['rt_max']
+            : null;
 
         // Fetch movies with filters
         $movies = $this->groupMovieService->getAllMovies(
@@ -65,6 +84,12 @@ class AllMoviesController
             $genre,
             $yearMin,
             $yearMax,
+            $tmdbMin,
+            $tmdbMax,
+            $imdbMin,
+            $imdbMax,
+            $rtMin,
+            $rtMax,
         );
 
         // Fetch filter options
@@ -84,6 +109,13 @@ class AllMoviesController
                 'currentGenre' => $genre,
                 'currentYearMin' => $yearMin,
                 'currentYearMax' => $yearMax,
+                'currentTmdbMin' => $tmdbMin,
+                'currentTmdbMax' => $tmdbMax,
+                'currentImdbMin' => $imdbMin,
+                'currentImdbMax' => $imdbMax,
+                'currentRtMin' => $rtMin,
+                'currentRtMax' => $rtMax,
+                'omdbConfigured' => $this->serverSettings->isOmdbApiKeyConfigured(),
                 'totalMovies' => count($movies),
             ]),
         );
