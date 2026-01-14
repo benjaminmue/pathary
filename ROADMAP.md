@@ -25,7 +25,6 @@ This roadmap outlines planned features, implementation ideas, and strategic dire
 
 *Features that need design/planning before implementation*
 
-- [ ] **Movie Poster Lightbox**: Click movie poster to show full-size overlay with close button (X) and click-outside-to-close
 - [ ] **Enhanced Admin Movies Page** (`/admin/movies`):
   - Refresh movie posters
   - Edit movie metadata
@@ -129,6 +128,9 @@ This roadmap outlines planned features, implementation ideas, and strategic dire
 ---
 
 ## Completed Milestones
+
+### January 14, 2026
+- ✅ Movie poster lightbox (click poster for full-size overlay with close button)
 
 ### v0.5.0-beta.1 (January 3, 2026)
 - ✅ OAuth email authentication (Gmail, Microsoft 365)
