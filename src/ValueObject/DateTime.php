@@ -28,7 +28,9 @@ class DateTime implements JsonSerializable
 
     public static function createFromString(string $dateTimeString) : self
     {
-        return new self(new \DateTime($dateTimeString, new DateTimeZone(self::DEFAULT_TIME_ZONE)));
+        // Use system timezone from TZ environment variable (falls back to DEFAULT_TIME_ZONE if not set)
+        $timezone = getenv('TZ') ?: self::DEFAULT_TIME_ZONE;
+        return new self(new \DateTime($dateTimeString, new DateTimeZone($timezone)));
     }
 
     public static function createFromStringAndTimeZone(string $dateTimeString, string $timeZone) : self

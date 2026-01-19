@@ -1,6 +1,6 @@
 # Pathary Scheduled Sync
-# Runs daily at 2 AM to sync TMDB metadata and OMDb ratings
+# Runs daily at 2:00 AM to sync TMDB metadata and OMDb ratings
 # Only syncs movies not updated in 7+ days (max 1000 per day)
 
-# Run scheduled sync daily at 2:15 AM (temporarily for testing)
-15 2 * * * application cd /app && /usr/bin/php bin/console.php sync:scheduled >> storage/logs/scheduled-sync.log 2>&1
+# Run scheduled sync daily at 2:00 AM via wrapper script
+0 2 * * * /bin/bash /app/build/scripts/run-scheduled-sync.sh

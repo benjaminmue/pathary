@@ -19,6 +19,7 @@ services:
       XDEBUG_PORT: "${XDEBUG_PORT:-9003}"
       TMDB_API_KEY: "${TMDB_API_KEY:-}"
       TMDB_ENABLE_IMAGE_CACHING: "${TMDB_ENABLE_IMAGE_CACHING:-0}"
+      OMDB_API_KEY: "${OMDB_API_KEY:-}"
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "pathary-mysql"
       DATABASE_MYSQL_PORT: "3306"

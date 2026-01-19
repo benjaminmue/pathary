@@ -43,10 +43,14 @@ COPY ./ /app
 RUN addgroup -g $USER_ID -S application && adduser -u $USER_ID -S application -G application
 RUN chown -R application:application /app /run /var/lib/nginx /var/log/nginx
 
+# Create scheduled sync wrapper script (for cron environment variable handling)
+# Must be after main COPY to avoid being overwritten
+COPY ./build/scripts/run-scheduled-sync.sh /app/build/scripts/run-scheduled-sync.sh
+RUN chmod +x /app/build/scripts/run-scheduled-sync.sh
+
 # Configure cron for scheduled syncs (must be done as root, after user exists)
-COPY ./docker/cron/pathary-sync /etc/cron.d/pathary-sync
-RUN chmod 0644 /etc/cron.d/pathary-sync \
-    && crontab -u application /etc/cron.d/pathary-sync
+# Install as user crontab only (not /etc/cron.d/) to avoid duplicate execution
+RUN crontab -u application /app/docker/cron/pathary-sync
 
 # Add composer
 COPY --from=composer /usr/bin/composer /usr/bin/composer
