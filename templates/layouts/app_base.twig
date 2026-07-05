@@ -11,8 +11,7 @@
     <script>
         (function() {
             const saved = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = saved || (prefersDark ? 'dark' : 'light');
+            const theme = saved || 'dark'; // dark is the default; light only if the user toggled it
             document.documentElement.setAttribute('data-bs-theme', theme);
         })();
     </script>

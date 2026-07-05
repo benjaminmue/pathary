@@ -35,6 +35,7 @@ class PublicHomeController
             $this->twig->render('public/home.twig', [
                 'movies' => $moviesWithStats,
                 'globalStats' => $globalStats,
+                'showFooter' => false,
             ]),
         );
     }

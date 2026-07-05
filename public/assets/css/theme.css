@@ -1,13 +1,63 @@
+/* ==========================================================================
+   Pathary design system (aligned to the "Showcase" landing)
+   Neutral cool greys, Geist typography, gold accent. Applied app-wide via the
+   Bootstrap CSS variables so every component (cards, buttons, forms, tables,
+   modals, navbar) follows the same language. Dark theme = the showcase palette.
+   ========================================================================== */
+
 :root {
-    --pathe-dark: #231F20;
+    /* Brand: --pathe-dark is now NEUTRAL cool (was warm #231F20 → read brown). */
+    --pathe-dark: #101216;
     --pathe-yellow: #FBBC09;
     --accent-purple: #6F2DBD;
+
+    /* Geist everywhere (woff2 @font-face ships in global.css). */
+    --bs-body-font-family: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    /* Gold is the single accent — align Bootstrap's warning to the exact tone. */
+    --bs-warning: #FBBC09;
+    --bs-warning-rgb: 251, 188, 9;
 }
 
+body {
+    font-family: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: -0.006em;
+}
+code, kbd, pre, samp, .font-monospace {
+    font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* Dark theme → neutral cool showcase palette (drives all Bootstrap surfaces). */
 [data-bs-theme="dark"] {
-    --pathe-dark: #231F20;
+    --pathe-dark: #101216;
     --pathe-yellow: #FBBC09;
     --accent-purple: #6F2DBD;
+
+    --bs-body-bg: #15171B;
+    --bs-body-bg-rgb: 21, 23, 27;
+    --bs-body-color: #E7E9EC;
+    --bs-body-color-rgb: 231, 233, 236;
+    --bs-emphasis-color: #F2F3F5;
+    --bs-emphasis-color-rgb: 242, 243, 245;
+    --bs-heading-color: #F2F3F5;
+
+    --bs-secondary-bg: #1C1F24;
+    --bs-secondary-bg-rgb: 28, 31, 36;
+    --bs-tertiary-bg: #22262C;
+    --bs-tertiary-bg-rgb: 34, 38, 44;
+
+    --bs-secondary-color: rgba(231, 233, 236, 0.66);
+    --bs-tertiary-color: rgba(231, 233, 236, 0.5);
+
+    --bs-border-color: #2A2E35;
+    --bs-border-color-translucent: rgba(255, 255, 255, 0.08);
+
+    --bs-link-color: #FBBC09;
+    --bs-link-color-rgb: 251, 188, 9;
+    --bs-link-hover-color: #FFD05C;
+    --bs-link-hover-color-rgb: 255, 208, 92;
+
+    --bs-emphasis-color: #F2F3F5;
 }
 
 /* ==========================================================================

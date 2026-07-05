@@ -1,786 +1,178 @@
 {% extends 'layouts/public_base.twig' %}
 
-{% block title %}Home{% endblock %}
-
-{% block stylesheets %}
-<style>
-    /* Movie grid - centered with consistent card widths */
-    .movie-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1.5rem;
-        padding: 1rem 0;
-    }
-
-    .movie-card-link {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-        width: 160px;
-        flex-shrink: 0;
-    }
-
-    .movie-card {
-        position: relative;
-        border-radius: 8px;
-        overflow: hidden;
-        background: var(--bs-body-bg);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .movie-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    }
-
-    .movie-poster-wrapper {
-        position: relative;
-        aspect-ratio: 2/3;
-        overflow: hidden;
-    }
-
-    .movie-poster {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .movie-poster-placeholder {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
-        color: #888;
-        font-size: 0.75rem;
-        text-align: center;
-        padding: 1rem;
-    }
-
-    /* Desktop hover overlay */
-    .movie-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
-        padding: 2rem 0.75rem 0.75rem;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-    }
-
-    .movie-card:hover .movie-overlay {
-        opacity: 1;
-    }
-
-    .movie-stats {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #fff;
-    }
-
-    .popcorn-display {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-    }
-
-    .popcorn-emoji {
-        font-size: 1.25rem;
-        line-height: 1;
-    }
-
-    .popcorn-value {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--pathe-yellow);
-    }
-
-    .stats-text {
-        font-size: 0.7rem;
-        color: rgba(255, 255, 255, 0.8);
-        line-height: 1.2;
-    }
-
-    .movie-title {
-        font-size: 0.85rem;
-        font-weight: 500;
-        padding: 0.5rem 0.75rem;
-        color: var(--bs-body-color);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /* Mobile stats (shown below poster) */
-    .mobile-stats {
-        display: none;
-        padding: 0.5rem 0.75rem;
-        background: var(--bs-tertiary-bg);
-        border-top: 1px solid var(--bs-border-color);
-    }
-
-    .mobile-stats .stats-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 0.75rem;
-    }
-
-    .mobile-stats .popcorn-display {
-        color: var(--pathe-yellow);
-    }
-
-    .mobile-stats .popcorn-emoji {
-        font-size: 1rem;
-    }
-
-    .mobile-stats .popcorn-value {
-        font-size: 1rem;
-    }
-
-    .mobile-stats .rating-count {
-        color: var(--bs-secondary-color);
-    }
-
-    /* Mobile toggle button */
-    .mobile-toggle {
-        display: none;
-        position: absolute;
-        bottom: 0.5rem;
-        right: 0.5rem;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: rgba(0, 0, 0, 0.6);
-        border: none;
-        color: #fff;
-        font-size: 0.75rem;
-        cursor: pointer;
-        z-index: 10;
-    }
-
-    .mobile-toggle:focus {
-        outline: 2px solid var(--accent-purple);
-        outline-offset: 2px;
-    }
-
-    /* Responsive: hide desktop overlay on mobile, show mobile stats */
-    @media (max-width: 768px) {
-        .movie-overlay {
-            display: none;
-        }
-
-        .mobile-stats {
-            display: block;
-        }
-
-        .movie-card-link {
-            width: 140px;
-        }
-
-        .movie-grid {
-            gap: 1rem;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .movie-card-link {
-            width: calc(50% - 0.5rem);
-        }
-
-        .movie-grid {
-            gap: 1rem;
-        }
-    }
-
-    /* Alternative: tap-to-toggle overlay on mobile */
-    @media (hover: none) and (pointer: coarse) {
-        .movie-overlay {
-            display: none;
-        }
-
-        .mobile-stats {
-            display: block;
-        }
-
-        .mobile-toggle {
-            display: none; /* Using always-visible stats instead of toggle */
-        }
-    }
-
-    .no-movies {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: var(--bs-secondary-color);
-    }
-
-    .no-movies h2 {
-        margin-bottom: 1rem;
-    }
-
-    .hero-section {
-        padding: 2rem 0;
-        text-align: center;
-    }
-
-    .hero-section h1 {
-        font-size: 2rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .hero-section p {
-        color: var(--bs-secondary-color);
-        margin-bottom: 0;
-    }
-
-    /* Stats Section */
-    .stats-section {
-        margin-top: 4rem;
-        padding-top: 3rem;
-        border-top: 2px solid var(--pathe-yellow);
-    }
-
-    .stats-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .stats-header h2 {
-        font-size: 1.75rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .stats-header p {
-        color: var(--bs-secondary-color);
-    }
-
-    .stats-overview {
-        display: flex;
-        justify-content: center;
-        gap: 3rem;
-        margin-bottom: 3rem;
-        flex-wrap: wrap;
-    }
-
-    .stat-card {
-        text-align: center;
-        padding: 1.5rem;
-        background: var(--bs-tertiary-bg);
-        border-radius: 12px;
-        border: 2px solid transparent;
-        transition: border-color 0.2s ease;
-        min-width: 150px;
-    }
-
-    .stat-card:hover {
-        border-color: var(--pathe-yellow);
-    }
-
-    .stat-card .stat-number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--pathe-yellow);
-        line-height: 1;
-        margin-bottom: 0.5rem;
-    }
-
-    .stat-card .stat-label {
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--bs-secondary-color);
-    }
-
-    .stat-card .popcorn-icon {
-        font-size: 1.25rem;
-        margin-left: 0.25rem;
-    }
-
-    .rated-movies-section {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        margin-top: 2rem;
-    }
-
-    .rated-movies-card {
-        background: var(--bs-tertiary-bg);
-        border-radius: 12px;
-        padding: 1.5rem;
-        border: 2px solid transparent;
-        transition: border-color 0.2s ease;
-    }
-
-    .rated-movies-card:hover {
-        border-color: var(--accent-purple);
-    }
-
-    .rated-movies-card h3 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .rated-movies-card h3 .icon {
-        font-size: 1.5rem;
-        color: var(--pathe-yellow);
-        display: inline-block;
-        font-style: normal;
-        font-weight: normal !important;
-        font-variant: normal;
-        text-transform: none;
-        line-height: 1;
-        vertical-align: -.125em;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
-
-    .rated-movies-card h3 .icon::before {
-        font-family: bootstrap-icons !important;
-    }
-
-    .rated-movie-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 0.75rem;
-        background: var(--bs-body-bg);
-        border-radius: 8px;
-        margin-bottom: 0.75rem;
-        text-decoration: none;
-        color: inherit;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .rated-movie-item:hover {
-        transform: translateX(4px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .rated-movie-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .rated-movie-poster {
-        width: 50px;
-        height: 75px;
-        border-radius: 4px;
-        object-fit: cover;
-        flex-shrink: 0;
-    }
-
-    .rated-movie-poster-placeholder {
-        width: 50px;
-        height: 75px;
-        border-radius: 4px;
-        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #888;
-        font-size: 0.6rem;
-        text-align: center;
-        padding: 0.25rem;
-        flex-shrink: 0;
-    }
-
-    .rated-movie-info {
-        flex-grow: 1;
-        min-width: 0;
-    }
-
-    .rated-movie-title {
-        font-weight: 500;
-        font-size: 0.95rem;
-        margin-bottom: 0.25rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .rated-movie-meta {
-        font-size: 0.8rem;
-        color: var(--bs-secondary-color);
-    }
-
-    .rated-movie-rating {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        flex-shrink: 0;
-    }
-
-    .rated-movie-rating .popcorn-emoji {
-        font-size: 1.25rem;
-    }
-
-    .rated-movie-rating .rating-value {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--pathe-yellow);
-    }
-
-    .rated-movie-rating .rating-scale {
-        font-size: 0.8rem;
-        color: var(--bs-secondary-color);
-    }
-
-    .no-stats {
-        text-align: center;
-        padding: 2rem;
-        color: var(--bs-secondary-color);
-    }
-
-    /* Random Comments Section */
-    .random-comments-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
-    }
-
-    @media (max-width: 992px) {
-        .random-comments-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    .comment-card {
-        background: var(--bs-tertiary-bg);
-        border-radius: 12px;
-        padding: 1.25rem;
-        border: 2px solid transparent;
-        transition: border-color 0.2s ease, transform 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .comment-card:hover {
-        border-color: var(--pathe-yellow);
-        transform: translateY(-2px);
-    }
-
-    .comment-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .comment-user {
-        font-weight: 600;
-        color: var(--pathe-yellow);
-        font-size: 0.95rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        min-width: 0;
-        flex: 1;
-    }
-
-    .comment-rating {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        flex-shrink: 0;
-    }
-
-    .comment-rating .popcorn-emoji {
-        font-size: 1rem;
-    }
-
-    .comment-rating .rating-value {
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--pathe-yellow);
-    }
-
-    .comment-rating .rating-scale {
-        font-size: 0.75rem;
-        color: var(--bs-secondary-color);
-    }
-
-    .comment-text {
-        font-style: italic;
-        line-height: 1.5;
-        color: var(--bs-body-color);
-        flex-grow: 1;
-    }
-
-    .comment-movie {
-        font-size: 0.85rem;
-        color: var(--bs-secondary-color);
-        text-decoration: none;
-        transition: color 0.2s ease;
-        margin-top: auto;
-    }
-
-    .comment-movie:hover {
-        color: var(--accent-purple);
-        text-decoration: underline;
-    }
-
-    @media (max-width: 768px) {
-        .stats-overview {
-            gap: 1.5rem;
-        }
-
-        .stat-card {
-            min-width: 120px;
-            padding: 1rem;
-        }
-
-        .stat-card .stat-number {
-            font-size: 2rem;
-        }
-
-        .rated-movies-section {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        .random-comments-grid {
-            grid-template-columns: 1fr !important;
-            gap: 1rem;
-        }
-    }
-</style>
-{% endblock %}
+{% block title %}Startseite{% endblock %}
 
 {% block body %}
-<div class="container">
-    <section class="hero-section">
-        <h1>Recently Added</h1>
-        <p>Movies our community has been watching</p>
+<div class="showcase-home">
+
+    {# 2. Hero #}
+    <section class="sc-hero">
+        <div class="sc-hero__kicker">Ein privater Kinoklub</div>
+        <h1 class="sc-hero__title">Filmabend,<br>in Popcorn bewertet.</h1>
+        <p class="sc-hero__sub">Jeder Film, den wir zusammen schauen - bewertet 1-7 auf der einzigen Skala, die zählt.</p>
+        <div class="sc-pop" role="img" aria-label="5 von 7 Popcorn">
+            {% for i in 1..7 %}<span class="k{{ i > 5 ? ' off' }}" aria-hidden="true">🍿</span>{% endfor %}
+        </div>
+        {% if loggedIn %}
+        <div class="sc-hero__actions">
+            <a href="{{ applicationUrl }}/movies" class="sc-btn sc-btn--ghost">Bibliothek durchstöbern</a>
+        </div>
+        {% endif %}
     </section>
 
+    {# 3. Poster-Carousel - 20 neueste, nur Poster, einmal dupliziert für nahtlose Schleife #}
     {% if movies|length > 0 %}
-        <div class="movie-grid">
-            {% for item in movies %}
+    <div class="sc-carousel">
+        <div class="sc-carousel__track">
+            {% for pass in 1..2 %}
+                {% for item in movies %}
+                    {% set movie = item.movie %}
+                    <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="sc-carousel__item"{{ pass == 2 ? ' aria-hidden="true" tabindex="-1"' }}>
+                        {% if movie.poster_path %}
+                            <img src="{{ movie.poster_path }}" alt="{{ pass == 1 ? movie.title : '' }}" loading="lazy">
+                        {% endif %}
+                    </a>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# 4. Statistik-Band #}
+    {% if globalStats.total_movies > 0 %}
+    <div class="sc-statsband">
+        <div class="sc-statsband__inner">
+            <div class="sc-stat">
+                <div class="sc-stat__value">{{ globalStats.total_movies }}</div>
+                <div class="sc-stat__label">Geschaute Filme</div>
+            </div>
+            <div class="sc-stat">
+                <div class="sc-stat__value">{{ globalStats.total_ratings }}</div>
+                <div class="sc-stat__label">Popcorn-Urteile</div>
+            </div>
+            {% if globalStats.avg_rating %}
+            <div class="sc-stat">
+                <div class="sc-stat__value">{{ globalStats.avg_rating }} <span>🍿</span></div>
+                <div class="sc-stat__label">Durchschnitt</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="sc-main">
+
+        {# 5. Was wir zuletzt geschaut haben - 12 neueste #}
+        {% if movies|length > 0 %}
+        <div class="sc-heading">
+            <h2>Was wir zuletzt geschaut haben</h2>
+            <p>Frisch vom Projektor</p>
+        </div>
+        <div class="sc-wall">
+            {% for item in movies|slice(0, 12) %}
                 {% set movie = item.movie %}
                 {% set stats = item.stats %}
-                {% set avgRounded = stats.avg_popcorn ? stats.avg_popcorn|round(0, 'floor') : 0 %}
-
-                <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="movie-card-link">
-                <article class="movie-card">
-                    <div class="movie-poster-wrapper">
+                <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="sc-film">
+                    <div class="sc-film__poster">
                         {% if movie.poster_path %}
-                            <img
-                                src="{{ movie.poster_path }}"
-                                alt="{{ movie.title }}"
-                                class="movie-poster"
-                                loading="lazy"
-                            >
+                            <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" loading="lazy">
                         {% else %}
-                            <div class="movie-poster-placeholder">
-                                {{ movie.title }}
-                            </div>
+                            <div class="sc-film__placeholder">{{ movie.title }}</div>
                         {% endif %}
-
-                        <!-- Desktop hover overlay -->
-                        <div class="movie-overlay">
+                    </div>
+                    <div class="sc-film__cap">
+                        <div class="sc-film__title" title="{{ movie.title }}">{{ movie.title }}</div>
+                        <div class="sc-film__meta">
+                            <span class="sc-film__year">{{ movie.release_date ? movie.release_date|slice(0, 4) }}</span>
                             {% if stats.rating_count > 0 %}
-                                <div class="movie-stats">
-                                    <div class="popcorn-display">
-                                        <span class="popcorn-emoji" aria-hidden="true">🍿</span>
-                                        <span class="popcorn-value">{{ avgRounded }}</span>
-                                    </div>
-                                    <div class="stats-text">
-                                        avg: {{ stats.avg_popcorn|number_format(1) }} / 7<br>
-                                        {{ stats.rating_count }} rating{{ stats.rating_count != 1 ? 's' : '' }}
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="stats-text">No ratings yet</div>
+                                <span class="sc-film__rating">🍿 {{ stats.avg_popcorn|number_format(1) }}</span>
                             {% endif %}
                         </div>
                     </div>
-
-                    <div class="movie-title" title="{{ movie.title }}">
-                        {{ movie.title }}
-                    </div>
-
-                    <!-- Mobile stats (always visible on mobile) -->
-                    <div class="mobile-stats">
-                        {% if stats.rating_count > 0 %}
-                            <div class="stats-row">
-                                <div class="popcorn-display">
-                                    <span class="popcorn-emoji" aria-hidden="true">🍿</span>
-                                    <span class="popcorn-value">{{ avgRounded }}</span>
-                                    <span style="color: var(--bs-secondary-color); margin-left: 0.25rem;">/ 7</span>
-                                </div>
-                                <span class="rating-count">{{ stats.rating_count }} rating{{ stats.rating_count != 1 ? 's' : '' }}</span>
-                            </div>
-                        {% else %}
-                            <div class="stats-row">
-                                <span class="rating-count">No ratings yet</span>
-                            </div>
-                        {% endif %}
-                    </div>
-                </article>
                 </a>
             {% endfor %}
         </div>
-    {% else %}
-        <div class="no-movies">
-            <h2>No movies yet</h2>
-            <p>Be the first to add a movie to the collection!</p>
-            <a href="{{ applicationUrl }}/search" class="btn btn-warning mt-3" style="background-color: var(--pathe-yellow); border-color: var(--pathe-yellow); color: var(--pathe-dark);">
-                Get Started
-            </a>
-        </div>
-    {% endif %}
-
-    {# Stats Section #}
-    {% if globalStats.total_movies > 0 %}
-    <section class="stats-section">
-        <div class="stats-header">
-            <h2>Library Statistics</h2>
-            <p>Insights from our community's movie collection</p>
-        </div>
-
-        {# Overview Stats #}
-        <div class="stats-overview">
-            <div class="stat-card">
-                <div class="stat-number">{{ globalStats.total_movies }}</div>
-                <div class="stat-label">Total Movies</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ globalStats.total_ratings }}</div>
-                <div class="stat-label">Total Ratings</div>
-            </div>
-            {% if globalStats.avg_rating %}
-            <div class="stat-card">
-                <div class="stat-number">
-                    {{ globalStats.avg_rating }}
-                    <span class="popcorn-icon">🍿</span>
-                </div>
-                <div class="stat-label">Average Rating</div>
-            </div>
-            {% endif %}
-        </div>
-
-        {# Highest and Lowest Rated Movies #}
-        {% if globalStats.highest_rated|length > 0 or globalStats.lowest_rated|length > 0 %}
-        <div class="rated-movies-section">
-            {# Highest Rated #}
-            {% if globalStats.highest_rated|length > 0 %}
-            <div class="rated-movies-card">
-                <h3>
-                    <i class="bi bi-hand-thumbs-up icon"></i>
-                    <span>Highest Rated</span>
-                </h3>
-                {% for movie in globalStats.highest_rated %}
-                <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="rated-movie-item">
-                    {% if movie.poster_path %}
-                        <img
-                            src="{{ movie.poster_path }}"
-                            alt="{{ movie.title }}"
-                            class="rated-movie-poster"
-                            loading="lazy"
-                        >
-                    {% else %}
-                        <div class="rated-movie-poster-placeholder">
-                            {{ movie.title|slice(0, 20) }}
-                        </div>
-                    {% endif %}
-                    <div class="rated-movie-info">
-                        <div class="rated-movie-title" title="{{ movie.title }}">
-                            {{ movie.title }}
-                        </div>
-                        <div class="rated-movie-meta">
-                            {{ movie.rating_count }} rating{{ movie.rating_count != 1 ? 's' : '' }}
-                        </div>
-                    </div>
-                    <div class="rated-movie-rating">
-                        <span class="popcorn-emoji" aria-hidden="true">🍿</span>
-                        <span class="rating-value">{{ movie.avg_popcorn|number_format(1) }}</span>
-                        <span class="rating-scale">/ 7</span>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            {# Lowest Rated #}
-            {% if globalStats.lowest_rated|length > 0 %}
-            <div class="rated-movies-card">
-                <h3>
-                    <i class="bi bi-hand-thumbs-down icon"></i>
-                    <span>Lowest Rated</span>
-                </h3>
-                {% for movie in globalStats.lowest_rated %}
-                <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="rated-movie-item">
-                    {% if movie.poster_path %}
-                        <img
-                            src="{{ movie.poster_path }}"
-                            alt="{{ movie.title }}"
-                            class="rated-movie-poster"
-                            loading="lazy"
-                        >
-                    {% else %}
-                        <div class="rated-movie-poster-placeholder">
-                            {{ movie.title|slice(0, 20) }}
-                        </div>
-                    {% endif %}
-                    <div class="rated-movie-info">
-                        <div class="rated-movie-title" title="{{ movie.title }}">
-                            {{ movie.title }}
-                        </div>
-                        <div class="rated-movie-meta">
-                            {{ movie.rating_count }} rating{{ movie.rating_count != 1 ? 's' : '' }}
-                        </div>
-                    </div>
-                    <div class="rated-movie-rating">
-                        <span class="popcorn-emoji" aria-hidden="true">🍿</span>
-                        <span class="rating-value">{{ movie.avg_popcorn|number_format(1) }}</span>
-                        <span class="rating-scale">/ 7</span>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
         {% endif %}
 
-        {# Random Comments #}
+        {# 6. Direkt aus dem Gruppenchat #}
         {% if globalStats.random_comments|length > 0 %}
-        <div style="margin-top: 3rem;">
-            <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; text-align: center;">
-                <i class="bi bi-chat-quote" style="font-size: 1.5rem; color: var(--pathe-yellow); margin-right: 0.5rem;"></i>
-                <span>Random Comments</span>
-            </h3>
-            <div class="random-comments-grid">
+        <div class="sc-section">
+            <div class="sc-heading">
+                <h2>Direkt aus dem Gruppenchat</h2>
+                <p>Keine PR-Zitate. Echte Urteile.</p>
+            </div>
+            <div class="sc-comments">
                 {% for comment in globalStats.random_comments %}
-                <div class="comment-card">
-                    <div class="comment-header">
-                        <div class="comment-user">{{ comment.user_name }}</div>
-                        <div class="comment-rating">
-                            <span class="popcorn-emoji" aria-hidden="true">🍿</span>
-                            <span class="rating-value">{{ comment.rating_popcorn }}</span>
-                            <span class="rating-scale">/ 7</span>
+                    <div class="sc-cmt">
+                        <div class="sc-cmt__top">
+                            <span class="sc-cmt__user">{{ comment.user_name }}</span>
+                            <span class="sc-cmt__score">🍿 {{ comment.rating_popcorn }} <small>/ 7</small></span>
                         </div>
+                        <div class="sc-cmt__quote">“{{ comment.comment }}”</div>
+                        <a href="{{ applicationUrl }}/movie/{{ comment.movie_id }}" class="sc-cmt__film">- {{ comment.movie_title }}</a>
                     </div>
-                    <div class="comment-text">"{{ comment.comment }}"</div>
-                    <a href="{{ applicationUrl }}/movie/{{ comment.movie_id }}" class="comment-movie">
-                        — {{ comment.movie_title }}
-                    </a>
-                </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
-    </section>
-    {% endif %}
+
+        {# 7. Ruhmeshalle - und Schandhalle #}
+        {% if globalStats.highest_rated|length > 0 or globalStats.lowest_rated|length > 0 %}
+        <div class="sc-section">
+            <div class="sc-heading">
+                <h2>Ruhmeshalle - und Schandhalle</h2>
+            </div>
+            <div class="sc-panels">
+                <div class="sc-panel">
+                    <div class="sc-panel__title">👍 Am besten bewertet</div>
+                    {% for movie in globalStats.highest_rated %}
+                        <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="sc-rank">
+                            <span class="sc-rank__thumb">
+                                {% if movie.poster_path %}<img src="{{ movie.poster_path }}" alt="{{ movie.title }}" loading="lazy">{% endif %}
+                            </span>
+                            <span class="sc-rank__body">
+                                <span class="sc-rank__title" title="{{ movie.title }}">{{ movie.title }}</span>
+                                <span class="sc-rank__sub">{{ movie.rating_count }} Bewertung{{ movie.rating_count != 1 ? 'en' }}</span>
+                            </span>
+                            <span class="sc-rank__score">🍿 {{ movie.avg_popcorn|number_format(1) }} <small>/ 7</small></span>
+                        </a>
+                    {% endfor %}
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel__title">👎 Am schlechtesten bewertet</div>
+                    {% for movie in globalStats.lowest_rated %}
+                        <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="sc-rank">
+                            <span class="sc-rank__thumb">
+                                {% if movie.poster_path %}<img src="{{ movie.poster_path }}" alt="{{ movie.title }}" loading="lazy">{% endif %}
+                            </span>
+                            <span class="sc-rank__body">
+                                <span class="sc-rank__title" title="{{ movie.title }}">{{ movie.title }}</span>
+                                <span class="sc-rank__sub">{{ movie.rating_count }} Bewertung{{ movie.rating_count != 1 ? 'en' }}</span>
+                            </span>
+                            <span class="sc-rank__score">🍿 {{ movie.avg_popcorn|number_format(1) }} <small>/ 7</small></span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    {# 8. Footer-CTA #}
+    <div class="sc-cta">
+        <div class="sc-cta__title">Nimm Platz. 🍿</div>
+        {% if loggedIn %}
+        <div>
+            <a href="{{ applicationUrl }}/movies" class="sc-btn sc-btn--primary">Bibliothek durchstöbern</a>
+        </div>
+        {% endif %}
+        <div class="sc-cta__links">
+            <a href="https://github.com/benjaminmue/pathary" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://benjaminmue.github.io/pathary/" target="_blank" rel="noopener noreferrer">Wiki</a>
+            <a href="https://github.com/benjaminmue/pathary/issues/new" target="_blank" rel="noopener noreferrer">Fehler melden</a>
+        </div>
+    </div>
+
 </div>
 {% endblock %}
