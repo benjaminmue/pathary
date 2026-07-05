@@ -56,10 +56,12 @@ function initializeSecurityListeners() {
         enable2FABtn.addEventListener('click', enable2FA);
     }
 
-    // Disable 2FA
-    const disable2FABtn = document.getElementById('disable2FABtn');
-    if (disable2FABtn) {
-        disable2FABtn.addEventListener('click', showDisable2FAModal);
+    // "Set up on a new device": re-enrolls the authenticator. Requires the current
+    // password (proof of ownership) before issuing a new secret; the current TOTP
+    // stays valid until the new code is verified, so 2FA is never off in between.
+    const reconfigure2FABtn = document.getElementById('reconfigure2FABtn');
+    if (reconfigure2FABtn) {
+        reconfigure2FABtn.addEventListener('click', reconfigure2FA);
     }
 
     // Regenerate Recovery Codes
@@ -340,13 +342,19 @@ function initializePasswordValidation() {
     });
 }
 
-// Enable 2FA
-async function enable2FA() {
+// Enable 2FA. `password` is sent only when re-enrolling an already-enabled account
+// ("set up on a new device"); the server requires+verifies it in that case.
+async function enable2FA(password = null) {
     try {
+        const body = {_csrf_token: getCsrfToken()};
+        if (password !== null) {
+            body.password = password;
+        }
+
         const response = await fetch(APPLICATION_URL + '/profile/security/totp/enable', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({_csrf_token: getCsrfToken()})
+            body: JSON.stringify(body)
         });
 
         const data = await response.json();
@@ -359,6 +367,55 @@ async function enable2FA() {
     } catch (error) {
         showAlert('Failed to enable 2FA.', 'danger');
     }
+}
+
+// Re-enroll on a new device: confirm the current password, then run the setup flow.
+function reconfigure2FA() {
+    const modalHtml = `
+        <div class="modal fade" id="reconfigure2FAModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Set up on a new device</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="reconfigure2FAAlert"></div>
+                        <p class="text-body-secondary small">Confirm your password to set up a new authenticator. Your current 2FA stays active until you finish.</p>
+                        <div class="mb-3">
+                            <label for="reconfigurePassword" class="form-label">Current password</label>
+                            <input type="password" class="form-control" id="reconfigurePassword" autocomplete="current-password" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="submitReconfigure2FA()">Continue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = new bootstrap.Modal(document.getElementById('reconfigure2FAModal'));
+    modal.show();
+
+    document.getElementById('reconfigure2FAModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+    });
+}
+
+function submitReconfigure2FA() {
+    const password = document.getElementById('reconfigurePassword').value;
+    const alertDiv = document.getElementById('reconfigure2FAAlert');
+
+    if (!password) {
+        alertDiv.innerHTML = '<div class="alert alert-danger">Please enter your password.</div>';
+        return;
+    }
+
+    bootstrap.Modal.getInstance(document.getElementById('reconfigure2FAModal')).hide();
+    enable2FA(password);
 }
 
 function show2FASetupModal(totpUri, secret) {
@@ -963,74 +1020,6 @@ function showCopyFeedback(feedbackDiv, type, message) {
             }, 150);
         }
     }, 3000);
-}
-
-// Disable 2FA
-function showDisable2FAModal() {
-    const modalHtml = `
-        <div class="modal fade" id="disable2FAModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title">Disable Two-Factor Authentication</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="disable2FAAlert"></div>
-                        <div class="alert alert-warning">
-                            <strong>Warning:</strong> Disabling 2FA will also remove all recovery codes and trusted devices.
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirmPassword" class="form-label">Enter your password to confirm:</label>
-                            <input type="password" class="form-control" id="confirmPassword" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" onclick="submitDisable2FA()">Disable 2FA</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    const modal = new bootstrap.Modal(document.getElementById('disable2FAModal'));
-    modal.show();
-
-    document.getElementById('disable2FAModal').addEventListener('hidden.bs.modal', function() {
-        this.remove();
-    });
-}
-
-async function submitDisable2FA() {
-    const password = document.getElementById('confirmPassword').value;
-    const alertDiv = document.getElementById('disable2FAAlert');
-
-    try {
-        const response = await fetch(APPLICATION_URL + '/profile/security/totp/disable', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({password, _csrf_token: getCsrfToken()})
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            // Remove focus from button before closing modal
-            if (document.activeElement) {
-                document.activeElement.blur();
-            }
-
-            bootstrap.Modal.getInstance(document.getElementById('disable2FAModal')).hide();
-            showAlert('2FA has been disabled.', 'success');
-            loadSecurityTab();
-        } else {
-            alertDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
-        }
-    } catch (error) {
-        alertDiv.innerHTML = '<div class="alert alert-danger">Failed to disable 2FA.</div>';
-    }
 }
 
 // Regenerate Recovery Codes
