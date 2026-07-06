@@ -1225,6 +1225,10 @@ class MovieRepository
         ?string $tmdbPosterPath,
         ?string $tmdbBackdropPath,
         ?string $imdbId,
+        ?int $budget = null,
+        ?int $revenue = null,
+        ?string $status = null,
+        ?string $originalTitle = null,
     ) : MovieEntity {
         $this->dbConnection->update(
             'movie',
@@ -1240,12 +1244,40 @@ class MovieRepository
                 'tmdb_backdrop_path' => $tmdbBackdropPath,
                 'updated_at_tmdb' => (string)DateTime::create(),
                 'imdb_id' => $imdbId,
+                'budget' => $budget,
+                'revenue' => $revenue,
+                'status' => $status,
+                'original_title' => $originalTitle,
                 'updated_at' => (string)DateTime::create(),
             ],
             ['id' => $id],
         );
 
         return $this->fetchById($id);
+    }
+
+    public function findTmdbFactsByMovieId(int $movieId) : array
+    {
+        $data = $this->dbConnection->fetchAssociative(
+            'SELECT budget, revenue, status, original_title FROM `movie` WHERE id = ?',
+            [$movieId],
+        );
+
+        return $data === false ? [] : $data;
+    }
+
+    public function findProductionCompaniesByMovieId(int $movieId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT c.id, c.name, c.origin_country
+            FROM movie_production_company mpc
+            JOIN company c ON mpc.company_id = c.id
+            WHERE mpc.movie_id = ?
+            ORDER BY mpc.position
+            SQL,
+            [$movieId],
+        );
     }
 
     public function updateImdbRating(int $id, ?ImdbRating $imdbRating) : void

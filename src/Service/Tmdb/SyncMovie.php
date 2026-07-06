@@ -78,6 +78,10 @@ class SyncMovie
                     tmdbPosterPath: $tmdbMovie->getPosterPath(),
                     tmdbBackdropPath: $tmdbMovie->getBackdropPath(),
                     imdbId: $movie->getImdbId(),
+                    budget: $tmdbMovie->getBudget(),
+                    revenue: $tmdbMovie->getRevenue(),
+                    status: $tmdbMovie->getStatus(),
+                    originalTitle: $tmdbMovie->getOriginalTitle(),
                 );
 
                 if ($originalTmdbPosterPath !== $movie->getTmdbPosterPath()) {

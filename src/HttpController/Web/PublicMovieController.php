@@ -38,6 +38,12 @@ class PublicMovieController
         $stats = $this->groupMovieService->getMovieGroupStats($movieId);
         $individualRatings = $this->groupMovieService->getMovieIndividualRatings($movieId);
 
+        $cast = $this->movieApi->findCastByMovieId($movieId);
+        $directors = $this->movieApi->findDirectorsByMovieId($movieId);
+        $productionCountries = $this->movieApi->findProductionCountriesByMovieId($movieId);
+        $productionCompanies = $this->movieApi->findProductionCompaniesByMovieId($movieId);
+        $tmdbFacts = $this->movieApi->findTmdbFactsByMovieId($movieId);
+
         $displayPopcorn = $stats['avg_popcorn'] !== null
             ? (int)round($stats['avg_popcorn'])
             : 0;
@@ -63,6 +69,11 @@ class PublicMovieController
                 'individualRatings' => $individualRatings,
                 'userRating' => $userRating,
                 'isOmdbEnabled' => $isOmdbEnabled,
+                'cast' => $cast,
+                'directors' => $directors,
+                'productionCountries' => $productionCountries,
+                'productionCompanies' => $productionCompanies,
+                'tmdbFacts' => $tmdbFacts,
             ]),
         );
     }

@@ -609,6 +609,10 @@ class MovieApi
         ?string $tmdbPosterPath,
         ?string $tmdbBackdropPath,
         ?string $imdbId,
+        ?int $budget = null,
+        ?int $revenue = null,
+        ?string $status = null,
+        ?string $originalTitle = null,
     ) : MovieEntity {
         return $this->repository->updateDetails(
             $movieId,
@@ -622,7 +626,21 @@ class MovieApi
             $tmdbPosterPath,
             $tmdbBackdropPath,
             $imdbId,
+            $budget,
+            $revenue,
+            $status,
+            $originalTitle,
         );
+    }
+
+    public function findTmdbFactsByMovieId(int $movieId) : array
+    {
+        return $this->movieRepository->findTmdbFactsByMovieId($movieId);
+    }
+
+    public function findProductionCompaniesByMovieId(int $movieId) : array
+    {
+        return $this->movieRepository->findProductionCompaniesByMovieId($movieId);
     }
 
     public function updateGenres(int $movieId, GenreEntityList $genres) : void
