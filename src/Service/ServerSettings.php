@@ -53,6 +53,7 @@ class ServerSettings
     public function __construct(
         private readonly Config $config,
         private readonly Connection $dbConnection,
+        private readonly SmtpPasswordCipher $smtpPasswordCipher,
     ) {
     }
 
@@ -118,7 +119,12 @@ class ServerSettings
 
     public function getSmtpPassword() : ?string
     {
-        return $this->getByKey(self::SMTP_PASSWORD);
+        $storedValue = $this->getByKey(self::SMTP_PASSWORD);
+        if ($storedValue === null) {
+            return null;
+        }
+
+        return $this->smtpPasswordCipher->decryptFromStorage($storedValue);
     }
 
     public function getSmtpPort() : ?int
@@ -294,7 +300,7 @@ class ServerSettings
 
     public function setSmtpPassword(string $smtpPassword) : void
     {
-        $this->updateValue(self::SMTP_PASSWORD, $smtpPassword);
+        $this->updateValue(self::SMTP_PASSWORD, $this->smtpPasswordCipher->encryptForStorage($smtpPassword));
     }
 
     public function setSmtpPort(int $smtpPort) : void
