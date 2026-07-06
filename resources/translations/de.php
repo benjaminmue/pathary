@@ -703,6 +703,7 @@ return [
     'profile.logout' => 'Abmelden',
     'profile.name_hint' => 'Nur Buchstaben und Zahlen, 2-24 Zeichen.',
     'profile.photo' => 'Profilfoto',
+    'profile.profile_card_subtitle' => 'Deine öffentliche Identität im Filmclub',
     'profile.remove' => 'Entfernen',
     'profile.save_changes' => 'Änderungen speichern',
     'profile.sign_out' => 'Abmelden',

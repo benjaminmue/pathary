@@ -4,326 +4,452 @@
 
 {% block stylesheets %}
 <style>
-    .profile-header {
-        margin-bottom: 2rem;
+    /* ===== Profile design system tokens (--pds-*), scoped to .pds-root =====
+       Default block = dark (app default). Light overrides below via [data-bs-theme].
+       Shared verbatim with the security-tab fragment which nests inside .pds-root. */
+    .pds-root {
+        --pds-gold: #FBBC09;
+        --pds-bg: #15171B;
+        --pds-surface: #1C1F24;
+        --pds-surface-2: #22262C;
+        --pds-border: #2A2E35;
+        --pds-hair: rgba(255, 255, 255, .06);
+        --pds-text: #F2F3F5;
+        --pds-muted: #A9B0BA;
+        --pds-dim: #7A828C;
+        --pds-nav: #101216;
+        --pds-danger: #E5654B;
+        --pds-success: #4FB477;
+        --pds-r: 14px;
+        --pds-r-sm: 8px;
+        --pds-s-sm: 8px;
+        --pds-s-md: 16px;
+        --pds-s-lg: 24px;
+        --pds-font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --pds-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
-    /* Bootstrap Tabs Styling */
-    .nav-tabs {
-        border-bottom: 2px solid var(--bs-border-color);
-        margin-bottom: 2rem;
+    [data-bs-theme="light"] .pds-root {
+        --pds-bg: #FFFFFF;
+        --pds-surface: #FBFBFC;
+        --pds-surface-2: #F5F6F8;
+        --pds-border: #E3E6EA;
+        --pds-hair: #EEF0F3;
+        --pds-text: #15171B;
+        --pds-muted: #5B636E;
+        --pds-dim: #8A9099;
+        --pds-nav: #101216;
+        --pds-danger: #C0392B;
+        --pds-success: #198754;
     }
 
-    .nav-tabs .nav-link {
-        color: var(--bs-secondary-color);
+    .pds-root {
+        color: var(--pds-text);
+        font-family: var(--pds-font);
+    }
+
+    .pds-wrap {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 8px 24px 40px;
+        box-sizing: border-box;
+    }
+
+    /* Identity header */
+    .pds-identity {
+        display: flex;
+        align-items: center;
+        gap: var(--pds-s-md);
+        margin-bottom: 36px;
+    }
+
+    .pds-avatar-lg,
+    .pds-avatar-lg img {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .pds-avatar-lg {
+        background: var(--pds-surface);
+        border: 3px solid var(--pds-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        font-weight: 700;
+        color: var(--pds-gold);
+        overflow: hidden;
+    }
+
+    .pds-avatar-lg img {
+        object-fit: cover;
+    }
+
+    .pds-name {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .pds-identity-sub {
+        font-size: 14px;
+        color: var(--pds-muted);
+        margin-top: 4px;
+    }
+
+    /* Tabs (Bootstrap-driven; only restyled) */
+    .pds-tabs {
+        display: flex;
+        gap: var(--pds-s-lg);
+        border-bottom: 1px solid var(--pds-border);
+        margin-bottom: 28px;
+        padding: 0;
+        list-style: none;
+    }
+
+    .pds-tabs .nav-item {
+        margin-bottom: -1px;
+    }
+
+    .pds-tabs .nav-link {
+        background: transparent;
         border: none;
         border-bottom: 2px solid transparent;
-        padding: 1rem 0.75rem;
+        color: var(--pds-muted);
         font-weight: 500;
-        transition: all 0.2s;
+        font-size: 15px;
+        padding: 10px 2px 12px;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        cursor: pointer;
+        transition: color .15s, border-color .15s;
     }
 
-    /* Hide filled icons by default, show on active */
-    .nav-tabs .nav-link .icon-filled {
+    .pds-tabs .nav-link .icon-filled {
         display: none;
     }
 
-    .nav-tabs .nav-link.active .icon-filled {
+    .pds-tabs .nav-link.active .icon-filled {
         display: inline-block;
     }
 
-    .nav-tabs .nav-link.active .icon-outline {
+    .pds-tabs .nav-link.active .icon-outline {
         display: none;
     }
 
-    .nav-tabs .nav-link:hover {
-        color: var(--pathe-yellow);
-        border-bottom-color: var(--pathe-yellow);
+    .pds-tabs .nav-link:hover {
+        color: var(--pds-text);
     }
 
-    .nav-tabs .nav-link.active {
-        color: var(--pathe-yellow);
-        background: transparent;
-        border-bottom-color: var(--pathe-yellow);
+    .pds-tabs .nav-link.active {
+        color: var(--pds-text);
+        font-weight: 600;
+        border-bottom-color: var(--pds-gold);
     }
 
-    .profile-card {
-        background: var(--bs-tertiary-bg);
-        border-radius: 12px;
-        padding: 2rem;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    /* Keep the header and tabs aligned with the centered card. */
-    .profile-header,
-    #profileTabs {
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .profile-image-section {
+    /* Card primitives */
+    .pds-stack {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        margin-bottom: 2rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid var(--bs-border-color);
+        gap: var(--pds-s-lg);
     }
 
-    .profile-image-section h3 {
-        font-size: 1.2rem;
+    .pds-card {
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r);
+        overflow: hidden;
+    }
+
+    .pds-card-head {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--pds-hair);
+    }
+
+    .pds-card-title {
+        font-size: 15px;
         font-weight: 600;
-        margin-bottom: 1.5rem;
+    }
+
+    .pds-card-sub {
+        font-size: 13px;
+        color: var(--pds-muted);
+        margin-top: 2px;
+    }
+
+    .pds-card-body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: var(--pds-s-lg);
+    }
+
+    .pds-card-foot {
+        padding: 16px 24px;
+        border-top: 1px solid var(--pds-hair);
+        display: flex;
+        justify-content: flex-end;
+        background: var(--pds-surface-2);
+    }
+
+    /* Single-row card (language, sign out) */
+    .pds-row-card {
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r);
+        padding: 20px 24px;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        justify-content: space-between;
+        gap: var(--pds-s-lg);
     }
 
-    .profile-image-section h3 i {
-        font-size: 1.1rem;
+    .pds-row-label {
+        font-size: 15px;
+        font-weight: 600;
     }
 
-    .profile-image-container {
-        position: relative;
-        width: 150px;
-        height: 150px;
-        margin-bottom: 1rem;
+    .pds-row-sub {
+        font-size: 13px;
+        color: var(--pds-muted);
+        margin-top: 2px;
     }
 
-    .profile-image {
-        width: 150px;
-        height: 150px;
+    /* Photo row */
+    .pds-photo-row {
+        display: flex;
+        align-items: center;
+        gap: var(--pds-s-lg);
+    }
+
+    .pds-avatar,
+    .pds-avatar img {
+        width: 88px;
+        height: 88px;
         border-radius: 50%;
-        object-fit: cover;
-        border: 4px solid var(--pathe-yellow);
+        flex-shrink: 0;
     }
 
-    .profile-image-placeholder {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
+    .pds-avatar {
+        background: var(--pds-surface-2);
+        border: 3px solid var(--pds-gold);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--pathe-yellow);
-        font-size: 3rem;
+        font-size: 36px;
         font-weight: 700;
-        border: 4px solid var(--pathe-yellow);
+        color: var(--pds-gold);
+        overflow: hidden;
     }
 
-    .profile-image-actions {
+    .pds-avatar img {
+        object-fit: cover;
+    }
+
+    .pds-photo-actions {
         display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-direction: column;
+        gap: var(--pds-s-sm);
+        align-items: flex-start;
     }
 
-    .btn-upload {
+    .pds-photo-buttons {
+        display: flex;
+        gap: var(--pds-s-sm);
+        flex-wrap: wrap;
+    }
+
+    /* Fields */
+    .pds-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--pds-s-lg);
+    }
+
+    .pds-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .pds-field-label {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .pds-input {
+        width: 100%;
+        font-size: 14px;
+        color: var(--pds-text);
+        background: var(--pds-bg);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        padding: 10px 12px;
+        outline: none;
+        font-family: inherit;
+        box-sizing: border-box;
+        transition: border-color .15s, box-shadow .15s;
+    }
+
+    .pds-input:focus {
+        border-color: var(--pds-gold);
+        box-shadow: 0 0 0 3px rgba(251, 188, 9, .15);
+    }
+
+    .pds-field-hint {
+        font-size: 12px;
+        color: var(--pds-dim);
+    }
+
+    /* Buttons */
+    .pds-btn {
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: var(--pds-r-sm);
+        padding: 8px 16px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        line-height: 1.2;
+        transition: background .15s, border-color .15s, color .15s;
+        white-space: nowrap;
+    }
+
+    .pds-btn-primary {
+        background: var(--pds-gold);
+        color: #12140F;
+    }
+
+    .pds-btn-primary:hover {
+        background: #e0a808;
+    }
+
+    .pds-btn-ghost {
+        background: transparent;
+        border-color: var(--pds-border);
+        color: var(--pds-muted);
+    }
+
+    .pds-btn-ghost:hover {
+        border-color: var(--pds-dim);
+        color: var(--pds-text);
+    }
+
+    .pds-btn-danger {
+        background: transparent;
+        border-color: var(--pds-danger);
+        color: var(--pds-danger);
+    }
+
+    .pds-btn-danger:hover {
+        background: rgba(192, 57, 43, .08);
+    }
+
+    /* Upload button wraps a hidden file input */
+    .pds-upload {
         position: relative;
         overflow: hidden;
-        background: var(--pathe-yellow);
-        border-color: var(--pathe-yellow);
-        color: var(--pathe-dark);
-        font-weight: 600;
     }
 
-    .btn-upload:hover {
-        background: #e0a808;
-        border-color: #e0a808;
-        color: var(--pathe-dark);
-    }
-
-    .btn-upload input[type="file"] {
+    .pds-upload input[type="file"] {
         position: absolute;
-        top: 0;
-        left: 0;
+        inset: 0;
         width: 100%;
         height: 100%;
         opacity: 0;
         cursor: pointer;
     }
 
-    .btn-remove-image {
-        background: transparent;
-        border: 1px solid var(--bs-border-color);
-        color: var(--bs-secondary-color);
-    }
-
-    .btn-remove-image:hover {
-        background: rgba(220, 53, 69, 0.1);
-        border-color: #dc3545;
-        color: #dc3545;
-    }
-
-    .image-requirements {
-        font-size: 0.8rem;
-        color: var(--bs-secondary-color);
-        text-align: center;
-        margin-top: 0.5rem;
-    }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
+    /* Language segmented control (reuses partials/language_switcher.twig markup) */
+    .pds-seg .btn-group {
         display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        overflow: hidden;
+        flex-shrink: 0;
     }
 
-    .form-group label i {
-        font-size: 0.95rem;
-    }
-
-    .form-group input {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid var(--bs-border-color);
-        border-radius: 8px;
-        background: var(--bs-body-bg);
-        color: var(--bs-body-color);
-        font-size: 1rem;
-    }
-
-    .form-group input:focus {
-        outline: none;
-        border-color: var(--accent-purple);
-        box-shadow: 0 0 0 3px rgba(111, 45, 189, 0.1);
-    }
-
-    .form-group .form-hint {
-        font-size: 0.8rem;
-        color: var(--bs-secondary-color);
-        margin-top: 0.25rem;
-    }
-
-    .form-actions {
-        display: flex;
-        gap: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid var(--bs-border-color);
-    }
-
-    .btn-save {
-        background: var(--pathe-yellow);
-        border-color: var(--pathe-yellow);
-        color: var(--pathe-dark);
+    .pds-seg .btn-group .btn {
+        border: none;
+        border-radius: 0;
+        background: var(--pds-surface-2);
+        color: var(--pds-muted);
+        font-size: 13px;
         font-weight: 600;
-        padding: 0.75rem 2rem;
+        padding: 7px 16px;
+        box-shadow: none;
     }
 
-    .btn-save:hover {
-        background: #e0a808;
-        border-color: #e0a808;
-        color: var(--pathe-dark);
+    .pds-seg .btn-group .btn.active {
+        background: var(--pds-gold);
+        color: #12140F;
     }
 
-    .alert {
-        padding: 1rem;
-        border-radius: 8px;
-        margin-bottom: 1.5rem;
+    /* Alerts */
+    .pds-alert {
+        padding: 12px 16px;
+        border-radius: var(--pds-r-sm);
+        margin-bottom: var(--pds-s-lg);
+        font-size: 14px;
+        border: 1px solid transparent;
     }
 
-    .alert-success {
-        background: rgba(25, 135, 84, 0.1);
-        border: 1px solid rgba(25, 135, 84, 0.3);
-        color: #198754;
+    .pds-alert-success {
+        background: rgba(79, 180, 119, .12);
+        border-color: rgba(79, 180, 119, .35);
+        color: var(--pds-success);
     }
 
-    .alert-danger {
-        background: rgba(220, 53, 69, 0.1);
-        border: 1px solid rgba(220, 53, 69, 0.3);
-        color: #dc3545;
+    .pds-alert-danger {
+        background: rgba(229, 101, 75, .12);
+        border-color: rgba(229, 101, 75, .35);
+        color: var(--pds-danger);
     }
 
-    .logout-section,
-    .language-section {
-        margin-top: 2rem;
-        padding-top: 2rem;
-        border-top: 1px solid var(--bs-border-color);
-    }
-
-    .logout-section h3,
-    .language-section h3 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .logout-section h3 i,
-    .language-section h3 i {
-        font-size: 1rem;
-    }
-
-    .logout-section p,
-    .language-section p {
-        color: var(--bs-secondary-color);
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
-    }
-
-    .language-section .language-toggle {
-        margin-bottom: 0.75rem;
-    }
-
-    .btn-logout {
-        background: transparent;
-        border: 1px solid #dc3545;
-        color: #dc3545;
-        font-weight: 600;
-        padding: 0.5rem 1.5rem;
-    }
-
-    .btn-logout:hover {
-        background: #dc3545;
-        color: #fff;
-    }
-
-    @media (max-width: 576px) {
-        .profile-card {
-            padding: 1.5rem;
+    @media (max-width: 640px) {
+        .pds-wrap {
+            padding: 8px 16px 40px;
         }
 
-        .profile-image-container {
-            width: 120px;
-            height: 120px;
+        .pds-grid-2 {
+            grid-template-columns: 1fr;
         }
 
-        .profile-image,
-        .profile-image-placeholder {
-            width: 120px;
-            height: 120px;
-        }
-
-        .profile-image-placeholder {
-            font-size: 2.5rem;
+        .pds-photo-row {
+            flex-direction: column;
+            align-items: flex-start;
         }
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <!-- Page Header -->
-    <div class="profile-header mb-4">
-        <h1 class="h3"><i class="bi bi-person-circle me-2"></i>{{ t('profile.title') }}</h1>
-        <p class="text-muted">{{ t('profile.subtitle') }}</p>
+<div class="pds-root">
+  <div class="pds-wrap">
+    <!-- Identity header -->
+    <div class="pds-identity">
+        <div class="pds-avatar-lg">
+            {% if profileImage %}
+                <img src="{{ applicationUrl }}/profile-images/{{ profileImage }}" alt="{{ userName }}">
+            {% else %}
+                {{ userName|first|upper }}
+            {% endif %}
+        </div>
+        <div class="pds-identity-meta">
+            <h1 class="pds-name">{{ userName }}</h1>
+            <div class="pds-identity-sub">{{ userEmail }}</div>
+        </div>
     </div>
 
-    <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+    <!-- Tabs -->
+    <ul class="nav pds-tabs" id="profileTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
                 <i class="bi bi-person icon-outline" aria-hidden="true"></i>
@@ -343,81 +469,93 @@
     <div class="tab-content" id="profileTabsContent">
         <!-- Profile Tab -->
         <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-            <div class="profile-card">
+            <div class="pds-stack">
                 {% if success %}
-                    <div class="alert alert-success">
+                    <div class="pds-alert pds-alert-success">
                         <i class="bi bi-check-circle"></i> {{ success }}
                     </div>
                 {% endif %}
 
                 {% if error %}
-                    <div class="alert alert-danger">
+                    <div class="pds-alert pds-alert-danger">
                         <i class="bi bi-exclamation-circle"></i> {{ error }}
                     </div>
                 {% endif %}
 
-                <form action="{{ applicationUrl }}/profile" method="post" enctype="multipart/form-data" id="profileForm">
-                    <div class="profile-image-section">
-                        <h3><i class="bi bi-person-circle"></i> {{ t('profile.photo') }}</h3>
-                        <div class="profile-image-container">
-                            {% if profileImage %}
-                                <img src="{{ applicationUrl }}/profile-images/{{ profileImage }}" alt="{{ userName }}" class="profile-image" id="profileImagePreview">
-                            {% else %}
-                                <div class="profile-image-placeholder" id="profileImagePlaceholder">
-                                    {{ userName|first|upper }}
+                <!-- Profile card -->
+                <form action="{{ applicationUrl }}/profile" method="post" enctype="multipart/form-data" id="profileForm" class="pds-card">
+                    <div class="pds-card-head">
+                        <div class="pds-card-title">{{ t('profile.tab_profile') }}</div>
+                        <div class="pds-card-sub">{{ t('profile.profile_card_subtitle') }}</div>
+                    </div>
+                    <div class="pds-card-body">
+                        <div class="pds-photo-row">
+                            <div class="pds-avatar">
+                                {% if profileImage %}
+                                    <img src="{{ applicationUrl }}/profile-images/{{ profileImage }}" alt="{{ userName }}" id="profileImagePreview">
+                                {% else %}
+                                    <span id="profileImagePlaceholder">{{ userName|first|upper }}</span>
+                                    <img src="" alt="" id="profileImagePreview" style="display: none;">
+                                {% endif %}
+                            </div>
+                            <div class="pds-photo-actions">
+                                <div class="pds-photo-buttons">
+                                    <label class="pds-btn pds-btn-primary pds-upload">
+                                        <i class="bi bi-camera"></i> {{ t('profile.upload_photo') }}
+                                        <input type="file" name="profile_image" accept="image/jpeg,image/png,image/gif,image/webp" id="profileImageInput">
+                                    </label>
+                                    {% if profileImage %}
+                                        <button type="button" class="pds-btn pds-btn-ghost" id="removeImageBtn">
+                                            <i class="bi bi-trash"></i> {{ t('profile.remove') }}
+                                        </button>
+                                    {% endif %}
                                 </div>
-                                <img src="" alt="" class="profile-image" id="profileImagePreview" style="display: none;">
-                            {% endif %}
+                                <div class="pds-field-hint">{{ t('profile.image_requirements') }}</div>
+                            </div>
                         </div>
 
-                        <div class="profile-image-actions">
-                            <label class="btn btn-upload">
-                                <i class="bi bi-camera"></i> {{ t('profile.upload_photo') }}
-                                <input type="file" name="profile_image" accept="image/jpeg,image/png,image/gif,image/webp" id="profileImageInput">
+                        <div class="pds-grid-2">
+                            <label class="pds-field" for="name">
+                                <span class="pds-field-label">{{ t('profile.display_name') }}</span>
+                                <input class="pds-input" type="text" id="name" name="name" value="{{ userName }}" required pattern="[a-zA-Z0-9]+" minlength="2" maxlength="24">
+                                <span class="pds-field-hint">{{ t('profile.name_hint') }}</span>
                             </label>
-                            {% if profileImage %}
-                                <button type="button" class="btn btn-remove-image" id="removeImageBtn">
-                                    <i class="bi bi-trash"></i> {{ t('profile.remove') }}
-                                </button>
-                            {% endif %}
+                            <label class="pds-field" for="email">
+                                <span class="pds-field-label">{{ t('profile.email') }}</span>
+                                <input class="pds-input" type="email" id="email" name="email" value="{{ userEmail }}">
+                                <span class="pds-field-hint">{{ t('profile.email_hint') }}</span>
+                            </label>
                         </div>
-                        <p class="image-requirements">{{ t('profile.image_requirements') }}</p>
-                        <input type="hidden" name="remove_image" id="removeImageFlag" value="0">
                     </div>
 
-                    <div class="form-group">
-                        <label for="name"><i class="bi bi-person-badge"></i> {{ t('profile.display_name') }}</label>
-                        <input type="text" id="name" name="name" value="{{ userName }}" required pattern="[a-zA-Z0-9]+" minlength="2" maxlength="24">
-                        <p class="form-hint">{{ t('profile.name_hint') }}</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email"><i class="bi bi-envelope"></i> {{ t('profile.email') }}</label>
-                        <input type="email" id="email" name="email" value="{{ userEmail }}">
-                        <p class="form-hint">{{ t('profile.email_hint') }}</p>
-                    </div>
-
+                    <input type="hidden" name="remove_image" id="removeImageFlag" value="0">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-save">
+                    <div class="pds-card-foot">
+                        <button type="submit" class="pds-btn pds-btn-primary">
                             <i class="bi bi-check-lg"></i> {{ t('profile.save_changes') }}
                         </button>
                     </div>
                 </form>
 
-                <div class="language-section">
-                    <h3><i class="bi bi-translate"></i> {{ t('profile.language') }}</h3>
-                    <div class="language-toggle">
+                <!-- Language card -->
+                <div class="pds-row-card">
+                    <div>
+                        <div class="pds-row-label">{{ t('profile.language') }}</div>
+                        <div class="pds-row-sub">{{ t('profile.language_hint') }}</div>
+                    </div>
+                    <div class="pds-seg">
                         {% include 'partials/language_switcher.twig' %}
                     </div>
-                    <p>{{ t('profile.language_hint') }}</p>
                 </div>
 
-                <div class="logout-section">
-                    <h3><i class="bi bi-box-arrow-right"></i> {{ t('profile.sign_out') }}</h3>
-                    <p>{{ t('profile.sign_out_hint') }}</p>
-                    <button type="button" class="btn btn-logout" onclick="logoutAndRedirect()">
+                <!-- Sign out card -->
+                <div class="pds-row-card">
+                    <div>
+                        <div class="pds-row-label">{{ t('profile.sign_out') }}</div>
+                        <div class="pds-row-sub">{{ t('profile.sign_out_hint') }}</div>
+                    </div>
+                    <button type="button" class="pds-btn pds-btn-danger" onclick="logoutAndRedirect()">
                         <i class="bi bi-box-arrow-right"></i> {{ t('profile.logout') }}
                     </button>
                 </div>
@@ -430,11 +568,12 @@
                 {% if securityTabContent is defined %}
                     {{ securityTabContent|raw }}
                 {% else %}
-                    <p class="text-center"><i class="bi bi-hourglass-split"></i> {{ t('profile.loading_security') }}</p>
+                    <p class="text-center pds-card-sub"><i class="bi bi-hourglass-split"></i> {{ t('profile.loading_security') }}</p>
                 {% endif %}
             </div>
         </div>
     </div>
+  </div>
 </div>
 {% endblock %}
 
