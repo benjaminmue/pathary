@@ -697,6 +697,8 @@ return [
     'profile.email' => 'E-Mail-Adresse',
     'profile.email_hint' => 'Wird für Kontowiederherstellung und Benachrichtigungen verwendet.',
     'profile.image_requirements' => 'JPEG, PNG, GIF oder WebP. Max. 5 MB.',
+    'profile.language' => 'Sprache',
+    'profile.language_hint' => 'Bestimmt die Sprache der Oberfläche und wird in deinem Profil gespeichert.',
     'profile.loading_security' => 'Sicherheitseinstellungen werden geladen...',
     'profile.logout' => 'Abmelden',
     'profile.name_hint' => 'Nur Buchstaben und Zahlen, 2-24 Zeichen.',
