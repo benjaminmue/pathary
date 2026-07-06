@@ -6,17 +6,20 @@ use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 
 class AuthenticationController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
+        private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
     ) {
     }
 
@@ -88,13 +91,32 @@ class AuthenticationController
             );
         }
 
+        $user = $userAndAuthToken['user'];
+
+        // Two-factor authentication is mandatory. The API cannot run the TOTP
+        // enrollment flow (that needs the web QR setup), so a user who has not
+        // set up 2FA yet must not receive an API token. Revoke the token that
+        // was just created and point them at the web setup. (Users who already
+        // have 2FA were verified by login() above.)
+        if ($this->twoFactorAuthenticationApi->findTotpUri($user->getId()) === null) {
+            $this->authenticationService->deleteToken($userAndAuthToken['token']);
+
+            return Response::createJson(
+                Json::encode([
+                    'error' => 'TwoFactorSetupRequired',
+                    'message' => 'Two-factor authentication is mandatory. Log in via the web interface to set it up before using the API.',
+                ]),
+                StatusCode::createForbidden(),
+            );
+        }
+
         return Response::createJson(
             Json::encode([
                 'authToken' => $userAndAuthToken['token'],
                 'user' => [
-                    'id' => $userAndAuthToken['user']->getId(),
-                    'name' => $userAndAuthToken['user']->getName(),
-                    'isAdmin' => $userAndAuthToken['user']->isAdmin(),
+                    'id' => $user->getId(),
+                    'name' => $user->getName(),
+                    'isAdmin' => $user->isAdmin(),
                 ]
             ]),
         );
