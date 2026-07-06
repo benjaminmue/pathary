@@ -214,6 +214,20 @@
         color: #c3c9d1;
     }
 
+    .pds-rating-help {
+        display: inline-flex;
+        align-items: center;
+        color: var(--pds-dim);
+        font-size: 15px;
+        line-height: 1;
+        text-decoration: none;
+        transition: color .15s ease;
+    }
+
+    .pds-rating-help:hover {
+        color: var(--pds-gold);
+    }
+
     .pds-ext-row {
         display: flex;
         flex-wrap: wrap;
@@ -764,6 +778,9 @@
                                 {{ t('movie.no_ratings_yet') }}
                             {% endif %}
                         </span>
+                        <a href="{{ applicationUrl }}/faq#popcorn" class="pds-rating-help" title="{{ t('faq.popcorn_question') }}" aria-label="{{ t('faq.popcorn_question') }}">
+                            <i class="bi bi-question-circle"></i>
+                        </a>
                     </div>
 
                     {% set hasTmdb = movie.tmdbRatingAverage and movie.tmdbRatingAverage > 0 %}
