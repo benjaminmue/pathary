@@ -379,7 +379,7 @@
 
     .movie-grid {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: var(--pds-s-md);
     }
 
@@ -387,6 +387,7 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+        min-width: 0;
         text-decoration: none;
         color: inherit;
         transition: transform 0.15s ease;
@@ -550,7 +551,7 @@
     /* Responsive */
     @media (max-width: 1199px) {
         .movie-grid {
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
         }
     }
 
@@ -572,7 +573,7 @@
         }
 
         .movie-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
     }
 
@@ -592,7 +593,7 @@
         }
 
         .movie-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 
