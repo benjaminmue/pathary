@@ -36,25 +36,25 @@
             </div>
 
             <div style="padding-left: 1rem">
-                <h6 style="margin-bottom: 0.1rem">Known for</h6>
+                <h6 style="margin-bottom: 0.1rem">{{ t('person.known_for') }}</h6>
                 <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.knownForDepartment }}</p>
 
-                <h6 style="margin-bottom: 0.1rem">Gender</h6>
+                <h6 style="margin-bottom: 0.1rem">{{ t('person.gender') }}</h6>
                 <p class="fw-light"
-                   style="margin-bottom: 0.4rem">{{ person.gender == '0' ? '-' }}{{ person.gender == '1' ? 'Female' }}{{ person.gender == '2' ? 'Male' }}{{ person.gender == '3' ? 'Non-Binary' }}</p>
+                   style="margin-bottom: 0.4rem">{{ person.gender == '0' ? '-' }}{{ person.gender == '1' ? t('person.gender_female') }}{{ person.gender == '2' ? t('person.gender_male') }}{{ person.gender == '3' ? t('person.gender_non_binary') }}</p>
 
                 {% if person.birthDate is not null %}
-                    <h6 style="margin-bottom: 0.1rem">Birth date</h6>
+                    <h6 style="margin-bottom: 0.1rem">{{ t('person.birth_date') }}</h6>
                     <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.birthDate }} {% if person.deathDate is null %}({{ person.age }}){% endif %}</p>
                 {% endif %}
 
                 {% if person.deathDate is not null %}
-                    <h6 style="margin-bottom: 0.1rem">Day of Death</h6>
+                    <h6 style="margin-bottom: 0.1rem">{{ t('person.day_of_death') }}</h6>
                     <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.deathDate }} ({{ person.age }})</p>
                 {% endif %}
 
                 {% if person.placeOfBirth is not null %}
-                    <h6 style="margin-bottom: 0.1rem">Place of Birth</h6>
+                    <h6 style="margin-bottom: 0.1rem">{{ t('person.place_of_birth') }}</h6>
                     <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.placeOfBirth }}</p>
                 {% endif %}
             </div>
@@ -79,7 +79,7 @@
                             class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             data-bs-toggle="modal"
                             data-bs-target="#moreModal">
-                        More
+                        {{ t('person.more') }}
                     </button>
                 </div>
             </div>
@@ -87,16 +87,16 @@
             {{ include('component/modal-person-more-options.html.twig') }}
         {% endif %}
 
-        <h6 style="margin-bottom: 0.1rem; margin-top: 1rem; font-weight: bold;">Biography</h6>
+        <h6 style="margin-bottom: 0.1rem; margin-top: 1rem; font-weight: bold;">{{ t('person.biography') }}</h6>
         {% if person.biography is not null %}
             <p id="biographyParagraph" style="margin-bottom: 1rem">{{ person.biography|nl2br }}</p>
             <div class="text-primary d-none" style="cursor: pointer; top: 0;" id="expandContainer">
                 <span style="padding: 0;float: right;" onclick="toggleBiography()"><i class="bi bi-chevron-down"></i></span>
-                <span style="float: right; margin-right: 0.5em;" onclick="toggleBiography()">Read more&#8230;</span>
+                <span style="float: right; margin-right: 0.5em;" onclick="toggleBiography()">{{ t('person.read_more') }}&#8230;</span>
                 <br>
             </div>
         {% else %}
-            <p id="biographyParagraph">No biography available.</p>
+            <p id="biographyParagraph">{{ t('person.no_biography') }}</p>
         {% endif %}
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -105,7 +105,7 @@
                         id="home-tab"
                         data-bs-toggle="tab" data-bs-target="#acting"
                         type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">
-                    Acting {% if moviesAsActor is not empty %}({{ moviesAsActor|length }}){% endif %}
+                    {{ t('person.tab_acting') }} {% if moviesAsActor is not empty %}({{ moviesAsActor|length }}){% endif %}
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -113,7 +113,7 @@
                         id="profile-tab"
                         data-bs-toggle="tab" data-bs-target="#director" type="button"
                         role="tab" aria-controls="profile-tab-pane" aria-selected="false">
-                    Director {% if moviesAsDirector is not empty %}({{ moviesAsDirector|length }}){% endif %}
+                    {{ t('person.tab_director') }} {% if moviesAsDirector is not empty %}({{ moviesAsDirector|length }}){% endif %}
                 </button>
             </li>
         </ul>
@@ -142,7 +142,7 @@
                     </div>
                 {% endif %}
                 {% if moviesFromWatchlistAsActor is not empty %}
-                    <h6>From your watch list</h6>
+                    <h6>{{ t('person.from_watchlist') }}</h6>
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                         {% for movieAsActor in moviesFromWatchlistAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
@@ -186,7 +186,7 @@
                 </div>
 
                 {% if moviesFromWatchlistAsDirector is not empty %}
-                  <h6>From your watch list</h6>
+                  <h6>{{ t('person.from_watchlist') }}</h6>
                   <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                       {% for movieAsDirector in moviesFromWatchlistAsDirector %}
                           <div class="col position-relative" style="padding-bottom: 1rem">

@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ routeUsername }}'s most watched directors
+    {{ routeUsername }}{{ t('person.title_directors_suffix') }}
 {% endblock %}
 
 {% block scripts %}
@@ -18,7 +18,7 @@
             {{ include('component/modal-advanced-search-person.html.twig') }}
 
             <div class="input-group mb-3">
-                <input type="text" class="form-control" name="s" placeholder="Search directors" value="{{ (searchTerm is null) ? '' : searchTerm }}" style="border-right-color: #aab0b3" id="searchTermInput">
+                <input type="text" class="form-control" name="s" placeholder="{{ t('person.search_directors_placeholder') }}" value="{{ (searchTerm is null) ? '' : searchTerm }}" style="border-right-color: #aab0b3" id="searchTermInput">
                 <button class="btn btn-primary" type="button" onclick="search()" id="directSearchButton">
                     <i class="bi bi-search"></i>
                 </button>
@@ -75,7 +75,7 @@
                     </li>
                 {% endif %}
                 <li class="page-item active">
-                    <p class="page-link">{{ paginationElements.currentPage }} of {{ paginationElements.maxPage }}</p>
+                    <p class="page-link">{{ paginationElements.currentPage }} {{ t('person.pagination_of') }} {{ paginationElements.maxPage }}</p>
                 </li>
                 {% if paginationElements.next is null %}
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&rsaquo;</span></p></li>

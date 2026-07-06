@@ -197,7 +197,7 @@
 <div class="container">
     <a href="{{ applicationUrl }}/search" class="back-link">
         <i class="bi bi-arrow-left"></i>
-        Back to search
+        {{ t('search.back_to_search') }}
     </a>
 
     <div class="movie-hero">
@@ -227,7 +227,7 @@
                 {% if runtime %}
                     <span class="movie-meta-item">
                         <i class="bi bi-clock"></i>
-                        {{ runtime }} min
+                        {{ runtime }} {{ t('search.minutes') }}
                     </span>
                 {% endif %}
             </div>
@@ -235,13 +235,13 @@
             {% if voteAverage %}
                 <div class="tmdb-rating">
                     <span class="tmdb-rating-value">{{ voteAverage|number_format(1) }}</span>
-                    <span class="tmdb-rating-label">TMDB rating{% if voteCount %} ({{ voteCount|number_format }} votes){% endif %}</span>
+                    <span class="tmdb-rating-label">{{ t('search.tmdb_rating') }}{% if voteCount %} ({{ voteCount|number_format }} {{ t('search.votes') }}){% endif %}</span>
                 </div>
             {% endif %}
 
             {% if overview %}
                 <div class="movie-overview">
-                    <h3>Overview</h3>
+                    <h3>{{ t('search.overview') }}</h3>
                     <p>{{ overview }}</p>
                 </div>
             {% endif %}
@@ -249,12 +249,12 @@
             {% if existingMovieId %}
                 <div class="existing-notice">
                     <i class="bi bi-check-circle-fill"></i>
-                    This movie is already in your library
+                    {{ t('search.already_in_library') }}
                 </div>
                 <div class="action-buttons">
                     <a href="{{ applicationUrl }}/movie/{{ existingMovieId }}" class="btn btn-view-existing">
                         <i class="bi bi-film"></i>
-                        View in library
+                        {{ t('search.view_in_library') }}
                     </a>
                 </div>
             {% else %}
@@ -263,7 +263,7 @@
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-add-library">
                             <i class="bi bi-plus-circle"></i>
-                            Add to library
+                            {{ t('search.add_to_library') }}
                         </button>
                     </form>
                 </div>

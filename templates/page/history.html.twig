@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ routeUsername }}'s watch history
+    {{ routeUsername }}{{ t('history.title_suffix') }}
 {% endblock %}
 
 {% block scripts %}
@@ -17,8 +17,8 @@
 
             <form action="{{ applicationUrl }}/old/users/{{ routeUsername }}/history" method="GET">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="s" placeholder="Search history" value="{{ (searchTerm is null) ? '' : searchTerm }}">
-                    <button class="btn btn-primary" type="submit">Search</button>
+                    <input type="text" class="form-control" name="s" placeholder="{{ t('history.search_placeholder') }}" value="{{ (searchTerm is null) ? '' : searchTerm }}">
+                    <button class="btn btn-primary" type="submit">{{ t('history.search') }}</button>
                 </div>
             </form>
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
@@ -58,7 +58,7 @@
                     </li>
                 {% endif %}
                 <li class="page-item active">
-                    <p class="page-link">{{ paginationElements.currentPage }} of {{ paginationElements.maxPage }}</p>
+                    <p class="page-link">{{ paginationElements.currentPage }} {{ t('history.pagination_of') }} {{ paginationElements.maxPage }}</p>
                 </li>
                 {% if paginationElements.next is null %}
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&rsaquo;</span></p></li>

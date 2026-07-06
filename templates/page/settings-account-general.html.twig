@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - General Account
+    {{ t('settings_account.title_general') }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -20,51 +20,51 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
-                <h5>General account settings</h5>
+                <h5>{{ t('settings_account.general_heading') }}</h5>
 
                 <div class="mb-3">
-                    <label for="nameInput" class="form-label"><b>Username</b> <span class="text-danger">*</span></label>
+                    <label for="nameInput" class="form-label"><b>{{ t('settings_account.username') }}</b> <span class="text-danger">*</span></label>
                     <input type="text"
                            class="form-control"
-                           placeholder="Username"
+                           placeholder="{{ t('settings_account.username') }}"
                            value="{{ username }}"
-                           title="Only letters and numbers allowed"
+                           title="{{ t('settings_account.username_title') }}"
                            required
                            id="nameInput"
                            aria-describedby="usernameHelp"
                            style="text-align: center;">
-                    <div id="usernameHelp" class="form-text">Must consist of only letters and numbers</div>
+                    <div id="usernameHelp" class="form-text">{{ t('settings_account.username_help') }}</div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="dateFormatInput" class="form-label"><b>Date format</b></label>
+                    <label for="dateFormatInput" class="form-label"><b>{{ t('settings_account.date_format') }}</b></label>
                     <select class="form-select" style="text-align: center;padding-right:0;" required id="dateFormatInput" aria-describedby="emailHelp">
                         {% for dateFormatOffset, dateFormat in dateFormats %}
                             <option {% if dateFormatSelected == dateFormatOffset %}selected{% endif %} value="{{ dateFormatOffset }}">{{ dateFormat.javascript }}</option>
                         {% endfor %}
                     </select>
-                    <div id="emailHelp" class="form-text">Format used when displaying dates</div>
+                    <div id="emailHelp" class="form-text">{{ t('settings_account.date_format_help') }}</div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="privacyInput" class="form-label"><b>Privacy</b></label>
+                    <label for="privacyInput" class="form-label"><b>{{ t('settings_account.privacy') }}</b></label>
                     <select class="form-select" name="privacyLevel" style="text-align: center;padding-right:0;" id="privacyInput" aria-describedby="privacyHelp" required>
-                        <option value="0" {% if privacyLevel == 0 %}selected{% endif %}>Not visible</option>
-                        <option value="1" {% if privacyLevel == 1 %}selected{% endif %}>Visible to users</option>
-                        <option value="2" {% if privacyLevel == 2 %}selected{% endif %}>Visible to everyone</option>
+                        <option value="0" {% if privacyLevel == 0 %}selected{% endif %}>{{ t('settings_account.privacy_not_visible') }}</option>
+                        <option value="1" {% if privacyLevel == 1 %}selected{% endif %}>{{ t('settings_account.privacy_visible_users') }}</option>
+                        <option value="2" {% if privacyLevel == 2 %}selected{% endif %}>{{ t('settings_account.privacy_visible_everyone') }}</option>
                     </select>
-                    <div id="privacyHelp" class="form-text">Who can see your history and ratings</div>
+                    <div id="privacyHelp" class="form-text">{{ t('settings_account.privacy_help') }}</div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="countryInput" class="form-label"><b>Country</b></label>
+                    <label for="countryInput" class="form-label"><b>{{ t('settings_account.country') }}</b></label>
                     <select class="form-select" name="country" style="text-align: center;padding-right:0;" id="countryInput" aria-describedby="countryHelp" required>
                         <option value=""></option>
                         {% for ISO31661, name in countries %}
                             <option value="{{ ISO31661 }}" {% if ISO31661 == userCountry %}selected{% endif %}>{{ name }}</option>
                         {% endfor %}
                     </select>
-                    <div id="privacyHelp" class="form-text">Used as default for "Where to Watch"</div>
+                    <div id="privacyHelp" class="form-text">{{ t('settings_account.country_help') }}</div>
                 </div>
 
                 <div style="padding-bottom: 1rem;padding-top: 0.5rem">
@@ -74,7 +74,7 @@
                            id="enableAutomaticWatchlistRemovalInput"
                            {% if enableAutomaticWatchlistRemoval == true %}checked{% endif %}
                            style="margin-right: 0.2rem">
-                    <label class="form-check-label" for="scrobbleWatchesCheckbox">Enable automatic removals from watchlist</label>
+                    <label class="form-check-label" for="scrobbleWatchesCheckbox">{{ t('settings_account.auto_watchlist_removal') }}</label>
                 </div>
 
                 <div style="padding-bottom: 1rem;">
@@ -84,7 +84,7 @@
                            id="displayCharacterNamesInput"
                            {% if displayCharacterNamesInput == true %}checked{% endif %}
                            style="margin-right: 0.2rem">
-                    <label class="form-check-label" for="displayCharacterNamesInput">Display cast character names on movie pages</label>
+                    <label class="form-check-label" for="displayCharacterNamesInput">{{ t('settings_account.display_character_names') }}</label>
                 </div>
 
                 <div style="padding-bottom: 1rem;">
@@ -94,7 +94,7 @@
                            id="displayTmdbRatingsInput"
                            {% if displayTmdbRatingsInput == true %}checked{% endif %}
                            style="margin-right: 0.2rem">
-                    <label class="form-check-label" for="displayTmdbRatingsInput">Display TMDB ratings on movie pages</label>
+                    <label class="form-check-label" for="displayTmdbRatingsInput">{{ t('settings_account.display_tmdb_ratings') }}</label>
                 </div>
 
                 <div style="padding-bottom: 1rem;">
@@ -104,18 +104,18 @@
                            id="displayImdbRatingsInput"
                            {% if displayImdbRatingsInput == true %}checked{% endif %}
                            style="margin-right: 0.2rem">
-                    <label class="form-check-label" for="displayImdbRatingsInput">Display IMDb ratings on movie pages</label>
+                    <label class="form-check-label" for="displayImdbRatingsInput">{{ t('settings_account.display_imdb_ratings') }}</label>
                 </div>
 
                 <div id="alertGeneralAccountDiv"></div>
 
-                <button type="submit" class="btn btn-primary" id="generalAccountUpdateButton">Submit</button>
+                <button type="submit" class="btn btn-primary" id="generalAccountUpdateButton">{{ t('settings.submit') }}</button>
 
                 <hr>
 
-                <h5>Api token</h5>
+                <h5>{{ t('settings_account.api_token') }}</h5>
 
-                <p>Used for authentication against the Pathary API.</p>
+                <p>{{ t('settings_account.api_token_desc') }}</p>
 
                 <div class="mb-3">
                     <input type="text"
@@ -133,9 +133,9 @@
                         class="btn btn-danger "
                         onclick="deleteApiToken()"
                         {% if apiToken == '' %}disabled{% endif %}>
-                    Delete token
+                    {{ t('settings_account.delete_token') }}
                 </button>
-                <button type="button" class="btn btn-primary" onclick="regenerateApiToken()">Regenerate token</button>
+                <button type="button" class="btn btn-primary" onclick="regenerateApiToken()">{{ t('settings_account.regenerate_token') }}</button>
 
             </div>
         </div>
