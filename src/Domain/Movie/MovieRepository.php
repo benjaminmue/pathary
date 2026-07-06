@@ -1110,7 +1110,7 @@ class MovieRepository
     {
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.id, m.title, m.release_date, m.tmdb_poster_path, m.poster_path, m.overview
+            SELECT m.id, m.tmdb_id, m.title, m.release_date, m.tmdb_poster_path, m.poster_path, m.overview
             FROM movie m
             WHERE m.title LIKE ?
             ORDER BY m.title ASC
