@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html id="html" data-bs-theme="{{ theme }}">
 <head>
+    <!-- Theme initialization (runs before page render to prevent flash) -->
+    <script>
+        (function() {
+            const saved = localStorage.getItem('theme');
+            const theme = saved || 'dark'; // dark is the default; light only if the user toggled it
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">

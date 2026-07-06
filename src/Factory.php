@@ -355,7 +355,7 @@ class Factory
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
         $twig->addGlobal('requestUrlPath', $currentRequest->getPath());
         $twig->addGlobal('canonicalPath', preg_replace('/-?' . $routenameSlugSuffix . '$/', '', $currentRequest->getPath()));
-        $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
+        $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'dark');
 
         // slugify filter for "nice looking" URLs
         //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
