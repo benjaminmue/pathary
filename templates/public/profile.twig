@@ -51,7 +51,7 @@
     .pds-wrap {
         max-width: 860px;
         margin: 0 auto;
-        padding: 8px 24px 40px;
+        padding: 32px 24px 40px;
         box-sizing: border-box;
     }
 
@@ -568,7 +568,7 @@
                 {% if securityTabContent is defined %}
                     {{ securityTabContent|raw }}
                 {% else %}
-                    <p class="text-center pds-card-sub"><i class="bi bi-hourglass-split"></i> {{ t('profile.loading_security') }}</p>
+                    <p class="text-center pds-card-sub" data-loading-placeholder><i class="bi bi-hourglass-split"></i> {{ t('profile.loading_security') }}</p>
                 {% endif %}
             </div>
         </div>
@@ -674,7 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
             history.pushState({tab: 'security'}, '', '{{ applicationUrl }}/profile/security');
 
             const content = document.getElementById('securityTabContent');
-            if (content && content.innerHTML.includes('Loading security settings')) {
+            if (content && content.querySelector('[data-loading-placeholder]')) {
                 loadSecurityTab();
             }
         });
@@ -707,7 +707,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // If content is pre-rendered (not "Loading..."), initialize listeners immediately
         const content = document.getElementById('securityTabContent');
-        if (content && !content.innerHTML.includes('Loading security settings')) {
+        if (content && !content.querySelector('[data-loading-placeholder]')) {
             if (typeof initializeSecurityListeners === 'function') {
                 initializeSecurityListeners();
             }

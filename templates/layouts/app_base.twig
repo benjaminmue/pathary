@@ -21,10 +21,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- Global CSS -->
-    <link rel="stylesheet" href="{{ applicationUrl }}/css/global.css">
+    <link rel="stylesheet" href="{{ applicationUrl }}/css/global.css?v={{ assetVersion }}">
 
     <!-- Custom Theme CSS -->
-    <link rel="stylesheet" href="{{ applicationUrl }}/assets/css/theme.css">
+    <link rel="stylesheet" href="{{ applicationUrl }}/assets/css/theme.css?v={{ assetVersion }}">
 
     {% block stylesheets %}{% endblock %}
 </head>
@@ -57,10 +57,10 @@
     <script src="{{ applicationUrl }}/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom Components JS -->
-    <script src="{{ applicationUrl }}/assets/js/popcorn.js"></script>
+    <script src="{{ applicationUrl }}/assets/js/popcorn.js?v={{ assetVersion }}"></script>
 
     <!-- Theme Toggle JS -->
-    <script src="{{ applicationUrl }}/assets/js/theme.js"></script>
+    <script src="{{ applicationUrl }}/assets/js/theme.js?v={{ assetVersion }}"></script>
 
     <!-- Background Health Check (Admin Only) -->
     {% if currentUser is defined and currentUser is not null and currentUser.isAdmin() %}
