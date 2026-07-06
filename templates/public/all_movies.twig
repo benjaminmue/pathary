@@ -4,107 +4,234 @@
 
 {% block stylesheets %}
 <style>
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        padding: 1.5rem 0;
-        border-bottom: 1px solid var(--bs-border-color);
-        margin-bottom: 1.5rem;
+    /* ===== Design system tokens (--pds-*), scoped to .pds-root =====
+       Default block = dark (app default). Light overrides below via [data-bs-theme].
+       Same token values/structure as the profile redesign. */
+    .pds-root {
+        --pds-gold: #FBBC09;
+        --pds-bg: #15171B;
+        --pds-surface: #1C1F24;
+        --pds-surface-2: #22262C;
+        --pds-border: #2A2E35;
+        --pds-hair: rgba(255, 255, 255, .06);
+        --pds-text: #F2F3F5;
+        --pds-muted: #A9B0BA;
+        --pds-dim: #7A828C;
+        --pds-nav: #101216;
+        --pds-danger: #E5654B;
+        --pds-success: #4FB477;
+        --pds-r: 14px;
+        --pds-r-sm: 8px;
+        --pds-s-sm: 8px;
+        --pds-s-md: 16px;
+        --pds-s-lg: 24px;
+        --pds-s-xl: 32px;
+        --pds-font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --pds-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
-    .page-title {
-        font-size: 1.75rem;
+    [data-bs-theme="light"] .pds-root {
+        --pds-bg: #FFFFFF;
+        --pds-surface: #FBFBFC;
+        --pds-surface-2: #F5F6F8;
+        --pds-border: #E3E6EA;
+        --pds-hair: #EEF0F3;
+        --pds-text: #15171B;
+        --pds-muted: #5B636E;
+        --pds-dim: #8A9099;
+        --pds-nav: #101216;
+        --pds-danger: #C0392B;
+        --pds-success: #198754;
+    }
+
+    .pds-root {
+        color: var(--pds-text);
+        font-family: var(--pds-font);
+    }
+
+    .am-main {
+        width: 100%;
+        max-width: 1560px;
+        margin: 0 auto;
+        padding: 40px 32px 64px;
+        box-sizing: border-box;
+    }
+
+    /* Page header */
+    .am-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: var(--pds-s-lg);
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+    }
+
+    .am-title {
+        margin: 0;
+        font-size: 30px;
         font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--pds-text);
+    }
+
+    .am-subtitle {
+        font-size: 14px;
+        color: var(--pds-muted);
+        margin: 4px 0 0;
+    }
+
+    .am-subtitle .mono {
+        font-family: var(--pds-font-mono);
+        color: var(--pds-text);
+    }
+
+    .am-controls {
+        display: flex;
+        gap: var(--pds-s-sm);
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .am-sort-label {
+        font-size: 13px;
+        color: var(--pds-muted);
         margin: 0;
     }
 
-    .page-subtitle {
-        color: var(--bs-secondary-color);
-        font-size: 0.9rem;
-        margin-top: 0.25rem;
-    }
-
-    .controls {
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-    }
-
     .sort-select {
-        min-width: 160px;
+        font-size: 14px;
+        color: var(--pds-text);
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        padding: 9px 12px;
+        outline: none;
+        cursor: pointer;
+        min-width: 200px;
+    }
+
+    .sort-select:focus {
+        border-color: var(--pds-gold);
     }
 
     .btn-filter-toggle {
         display: none;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--pds-text);
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        padding: 8px 12px;
+        cursor: pointer;
     }
 
-    /* Desktop filters sidebar */
-    .content-wrapper {
+    /* Two-column layout */
+    .am-layout {
         display: grid;
-        grid-template-columns: 260px 1fr;
-        gap: 2rem;
+        grid-template-columns: 264px 1fr;
+        gap: var(--pds-s-xl);
+        align-items: start;
     }
 
     .filters-sidebar {
         position: sticky;
-        top: 1rem;
+        top: 24px;
         height: fit-content;
     }
 
     .filters-card {
-        background: var(--bs-tertiary-bg);
-        border-radius: 12px;
-        padding: 1.25rem;
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
     }
 
     .filters-title {
-        font-size: 1rem;
+        margin: 0;
+        font-size: 15px;
         font-weight: 600;
-        margin-bottom: 1rem;
+        color: var(--pds-text);
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
-    .filter-group {
-        margin-bottom: 1.25rem;
+    .btn-clear-filters {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--pds-muted);
+        background: transparent;
+        border: 0;
+        padding: 0;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color 0.15s ease;
     }
 
-    .filter-group:last-child {
-        margin-bottom: 0;
+    .btn-clear-filters:hover {
+        color: var(--pds-gold);
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin: 0;
+    }
+
+    .filter-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--pds-s-sm);
     }
 
     .filter-label {
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        color: var(--bs-body-color);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--pds-text);
+        margin: 0;
+    }
+
+    .filter-scale {
+        font-family: var(--pds-font-mono);
+        font-size: 11px;
+        color: var(--pds-dim);
+        white-space: nowrap;
     }
 
     .filter-select,
     .filter-input {
         width: 100%;
-        padding: 0.5rem 0.75rem;
-        border: 1px solid var(--bs-border-color);
-        border-radius: 6px;
-        background: var(--bs-body-bg);
-        color: var(--bs-body-color);
-        font-size: 0.9rem;
+        box-sizing: border-box;
+        font-size: 13px;
+        color: var(--pds-text);
+        background: var(--pds-bg);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        padding: 8px 10px;
+    }
+
+    .filter-input {
+        font-family: var(--pds-font-mono);
     }
 
     .filter-select:focus,
     .filter-input:focus {
         outline: none;
-        border-color: var(--accent-purple);
-        box-shadow: 0 0 0 3px rgba(111, 45, 189, 0.1);
+        border-color: var(--pds-gold);
     }
 
     .filter-range {
         display: flex;
-        gap: 0.5rem;
+        gap: var(--pds-s-sm);
         align-items: center;
     }
 
@@ -114,21 +241,21 @@
     }
 
     .filter-range-separator {
-        color: var(--bs-secondary-color);
+        color: var(--pds-dim);
     }
 
-    /* Dual Range Slider Styles */
+    /* Dual range slider */
     .dual-range-slider {
         position: relative;
         width: 100%;
-        padding: 1rem 0;
+        padding: 0.75rem 0;
     }
 
     .dual-range-slider-track {
         position: absolute;
         width: 100%;
         height: 4px;
-        background: var(--bs-border-color);
+        background: var(--pds-border);
         border-radius: 2px;
         top: 50%;
         transform: translateY(-50%);
@@ -137,7 +264,7 @@
     .dual-range-slider-range {
         position: absolute;
         height: 4px;
-        background: var(--pathe-yellow);
+        background: var(--pds-gold);
         border-radius: 2px;
         top: 50%;
         transform: translateY(-50%);
@@ -156,25 +283,25 @@
     .dual-range-slider input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 20px;
-        height: 20px;
-        background: var(--pathe-yellow);
-        border: 3px solid var(--bs-body-bg);
+        width: 18px;
+        height: 18px;
+        background: var(--pds-gold);
+        border: 3px solid var(--pds-surface);
         border-radius: 50%;
         cursor: pointer;
         pointer-events: auto;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
     }
 
     .dual-range-slider input[type="range"]::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
-        background: var(--pathe-yellow);
-        border: 3px solid var(--bs-body-bg);
+        width: 18px;
+        height: 18px;
+        background: var(--pds-gold);
+        border: 3px solid var(--pds-surface);
         border-radius: 50%;
         cursor: pointer;
         pointer-events: auto;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
     }
 
     .dual-range-slider input[type="range"]::-webkit-slider-thumb:hover {
@@ -188,111 +315,125 @@
     .dual-range-values {
         display: flex;
         justify-content: space-between;
-        margin-top: 0.5rem;
-        font-size: 0.85rem;
-        color: var(--bs-body-color);
+        font-size: 12px;
+        color: var(--pds-muted);
     }
 
     .dual-range-value {
-        padding: 0.25rem 0.5rem;
-        background: var(--bs-tertiary-bg);
-        border-radius: 4px;
+        font-family: var(--pds-font-mono);
+        padding: 2px 8px;
+        background: var(--pds-surface-2);
+        border-radius: var(--pds-r-sm);
         font-weight: 500;
     }
 
-    .filter-actions {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid var(--bs-border-color);
+    .filter-info {
+        font-size: 11px;
+        color: var(--pds-dim);
+        margin: 2px 0 0;
     }
 
     .btn-apply-filters {
-        flex: 1;
-        background: var(--pathe-yellow);
-        border-color: var(--pathe-yellow);
-        color: var(--pathe-dark);
+        width: 100%;
+        height: 36px;
+        font-size: 14px;
         font-weight: 600;
+        color: #12140F;
+        background: var(--pds-gold);
+        border: 1px solid var(--pds-gold);
+        border-radius: var(--pds-r-sm);
+        cursor: pointer;
+        transition: background 0.15s ease;
     }
 
     .btn-apply-filters:hover {
         background: #e0a808;
-        border-color: #e0a808;
-        color: var(--pathe-dark);
     }
 
-    .btn-clear-filters {
-        background: transparent;
-        border: 1px solid var(--bs-border-color);
-        color: var(--bs-secondary-color);
-    }
-
-    .btn-clear-filters:hover {
-        background: var(--bs-tertiary-bg);
-        color: var(--bs-body-color);
-    }
-
-    /* Rating filter info text */
-    .filter-info {
-        font-size: 0.75rem;
-        color: var(--bs-secondary-color);
-        margin-top: 0.25rem;
-    }
-
-    /* Movie grid - centered with consistent card widths */
-    .movie-grid {
+    /* Active filter badges */
+    .active-filters {
         display: flex;
         flex-wrap: wrap;
-        justify-content: center;
-        gap: 1.5rem;
+        gap: var(--pds-s-sm);
+        margin-bottom: var(--pds-s-md);
+    }
+
+    .active-filter-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--pds-surface-2);
+        border: 1px solid var(--pds-border);
+        color: var(--pds-muted);
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+    }
+
+    /* Results column */
+    .am-results {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+    }
+
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: var(--pds-s-md);
     }
 
     .movie-card {
-        width: 160px;
-        flex-shrink: 0;
-        background: var(--bs-body-bg);
-        border: 1px solid var(--bs-border-color);
-        border-radius: 8px;
-        overflow: hidden;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
         text-decoration: none;
         color: inherit;
-        display: block;
+        transition: transform 0.15s ease;
     }
 
     .movie-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     }
 
-    .movie-poster {
-        width: 100%;
-        aspect-ratio: 2/3;
-        object-fit: cover;
-    }
-
+    .movie-poster,
     .movie-poster-placeholder {
         width: 100%;
         aspect-ratio: 2/3;
+        border-radius: var(--pds-r-sm);
+        border: 1px solid var(--pds-border);
+        object-fit: cover;
+        display: block;
+    }
+
+    .movie-card:hover .movie-poster,
+    .movie-card:hover .movie-poster-placeholder {
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .movie-poster-placeholder {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
-        color: #888;
-        font-size: 0.75rem;
+        background: linear-gradient(135deg, var(--pds-surface-2) 0%, var(--pds-surface) 100%);
+        color: var(--pds-dim);
+        font-size: 12px;
         text-align: center;
         padding: 1rem;
+        box-sizing: border-box;
     }
 
     .movie-info {
-        padding: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
     }
 
     .movie-title {
-        font-size: 0.9rem;
-        font-weight: 500;
-        margin-bottom: 0.25rem;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--pds-text);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -302,60 +443,124 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 0.5rem;
+        gap: var(--pds-s-sm);
     }
 
     .movie-year {
-        font-size: 0.8rem;
-        color: var(--bs-secondary-color);
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+        color: var(--pds-muted);
     }
 
     .movie-rating {
         display: flex;
         align-items: center;
-        gap: 0.25rem;
-        font-size: 0.8rem;
-        color: var(--pathe-yellow);
+        gap: 4px;
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+        color: var(--pds-gold);
     }
 
     .movie-rating .popcorn-emoji {
-        font-size: 0.9rem;
+        font-size: 13px;
         line-height: 1;
     }
 
     .no-movies {
+        grid-column: 1 / -1;
         text-align: center;
         padding: 3rem 2rem;
-        color: var(--bs-secondary-color);
-        width: 100%;
+        color: var(--pds-muted);
     }
 
-    .active-filters {
+    .no-movies h3 {
+        color: var(--pds-text);
+    }
+
+    /* Pagination */
+    .am-pagination {
         display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .active-filter-badge {
-        display: inline-flex;
         align-items: center;
-        gap: 0.375rem;
-        background: rgba(111, 45, 189, 0.1);
-        border: 1px solid rgba(111, 45, 189, 0.3);
-        color: var(--accent-purple);
-        padding: 0.25rem 0.75rem;
-        border-radius: 1rem;
-        font-size: 0.8rem;
+        justify-content: center;
+        gap: var(--pds-s-sm);
+        flex-wrap: wrap;
+        padding-top: 4px;
     }
 
-    /* Mobile responsive */
+    .am-page-btn {
+        font-size: 13px;
+        font-weight: 600;
+        height: 36px;
+        padding: 0 14px;
+        border-radius: var(--pds-r-sm);
+        border: 1px solid var(--pds-border);
+        background: var(--pds-surface);
+        color: var(--pds-text);
+        cursor: pointer;
+    }
+
+    .am-page-btn:disabled {
+        opacity: 0.5;
+        cursor: default;
+        color: var(--pds-dim);
+    }
+
+    .am-page-btn:not(:disabled):hover {
+        border-color: var(--pds-dim);
+    }
+
+    .am-page-num {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 6px;
+        border-radius: var(--pds-r-sm);
+        border: 1px solid var(--pds-border);
+        background: var(--pds-surface);
+        color: var(--pds-muted);
+        font-family: var(--pds-font-mono);
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .am-page-num:hover {
+        border-color: var(--pds-dim);
+        color: var(--pds-text);
+    }
+
+    .am-page-num.active {
+        background: var(--pds-gold);
+        color: #12140F;
+        border-color: var(--pds-gold);
+        font-weight: 700;
+    }
+
+    .am-ellipsis {
+        font-family: var(--pds-font-mono);
+        color: var(--pds-dim);
+        padding: 0 4px;
+    }
+
+    .am-page-status {
+        text-align: center;
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+        color: var(--pds-dim);
+        margin-top: -16px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1199px) {
+        .movie-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
     @media (max-width: 991px) {
-        .btn-filter-toggle {
-            display: inline-flex;
+        .am-main {
+            padding: 24px 16px 48px;
         }
 
-        .content-wrapper {
+        .am-layout {
             grid-template-columns: 1fr;
         }
 
@@ -363,382 +568,425 @@
             display: none;
         }
 
-        .movie-card {
-            width: 140px;
+        .btn-filter-toggle {
+            display: inline-flex;
         }
 
         .movie-grid {
-            gap: 1rem;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
     }
 
-    @media (max-width: 576px) {
-        .page-header {
+    @media (max-width: 575px) {
+        .am-header {
             flex-direction: column;
             align-items: flex-start;
         }
 
-        .controls {
+        .am-controls {
             width: 100%;
-            flex-wrap: wrap;
         }
 
         .sort-select {
             flex: 1;
-            min-width: 120px;
-        }
-
-        .movie-card {
-            width: calc(50% - 0.375rem);
+            min-width: 0;
         }
 
         .movie-grid {
-            gap: 0.75rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 
     /* Offcanvas filters styling */
+    .offcanvas-filters {
+        background: var(--pds-surface);
+        color: var(--pds-text);
+    }
+
     .offcanvas-filters .offcanvas-header {
-        border-bottom: 1px solid var(--bs-border-color);
+        border-bottom: 1px solid var(--pds-border);
     }
 
     .offcanvas-filters .offcanvas-body {
-        padding: 1.25rem;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .offcanvas-filters .filter-actions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--pds-s-sm);
+    }
+
+    .offcanvas-filters .btn-clear-filters {
+        text-align: center;
+        padding: 8px;
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <header class="page-header">
-        <div>
-            <h1 class="page-title">{{ t('movies.title') }}</h1>
-            <p class="page-subtitle">{{ totalMovies }} {{ t('movies.in_library') }}</p>
-        </div>
-
-        <div class="controls">
-            <button class="btn btn-outline-secondary btn-filter-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas">
-                <i class="bi bi-funnel"></i> {{ t('movies.filters') }}
-            </button>
-
-            <select class="form-select sort-select" id="sortSelect" onchange="updateSort(this.value)">
-                <option value="added-desc" {{ currentSort == 'added' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_recently_added') }}</option>
-                <option value="added-asc" {{ currentSort == 'added' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_oldest_added') }}</option>
-                <option value="title-asc" {{ currentSort == 'title' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_title_az') }}</option>
-                <option value="title-desc" {{ currentSort == 'title' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_title_za') }}</option>
-                <option value="release_date-desc" {{ currentSort == 'release_date' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_newest_release') }}</option>
-                <option value="release_date-asc" {{ currentSort == 'release_date' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_oldest_release') }}</option>
-                <option value="global_rating-desc" {{ currentSort == 'global_rating' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_highest_rated') }}</option>
-                <option value="global_rating-asc" {{ currentSort == 'global_rating' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_lowest_rated') }}</option>
-                <option value="own_rating-desc" {{ currentSort == 'own_rating' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_my_rating_high') }}</option>
-                <option value="own_rating-asc" {{ currentSort == 'own_rating' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_my_rating_low') }}</option>
-            </select>
-        </div>
-    </header>
-
-    {% if currentGenre or currentRatingMin or currentRatingMax or currentYearMin or currentYearMax or currentTmdbMin or currentTmdbMax or currentImdbMin or currentImdbMax or currentRtMin or currentRtMax %}
-        <div class="active-filters">
-            {% if currentGenre %}
-                <span class="active-filter-badge">
-                    <i class="bi bi-tag"></i> {{ currentGenre }}
-                </span>
-            {% endif %}
-            {% if currentRatingMin or currentRatingMax %}
-                <span class="active-filter-badge">
-                    🍿 {{ t('movies.badge_rating') }} {{ currentRatingMin ?? 1 }} - {{ currentRatingMax ?? 7 }}
-                </span>
-            {% endif %}
-            {% if currentYearMin or currentYearMax %}
-                <span class="active-filter-badge">
-                    <i class="bi bi-calendar"></i> {{ t('movies.badge_year') }} {{ currentYearMin ?? yearRange.min }} - {{ currentYearMax ?? yearRange.max }}
-                </span>
-            {% endif %}
-            {% if currentTmdbMin or currentTmdbMax %}
-                <span class="active-filter-badge">
-                    TMDB: {{ currentTmdbMin ?? 0 }} - {{ currentTmdbMax ?? 10 }}
-                </span>
-            {% endif %}
-            {% if currentImdbMin or currentImdbMax %}
-                <span class="active-filter-badge">
-                    IMDB: {{ currentImdbMin ?? 0 }} - {{ currentImdbMax ?? 10 }}
-                </span>
-            {% endif %}
-            {% if currentRtMin or currentRtMax %}
-                <span class="active-filter-badge">
-                    RT: {{ currentRtMin ?? 0 }}% - {{ currentRtMax ?? 100 }}%
-                </span>
-            {% endif %}
-        </div>
-    {% endif %}
-
-    <div class="content-wrapper">
-        <!-- Desktop Filters Sidebar -->
-        <aside class="filters-sidebar">
-            <div class="filters-card">
-                <h2 class="filters-title">
-                    {{ t('movies.filters') }}
-                    {% if currentGenre or currentRatingMin or currentRatingMax or currentYearMin or currentYearMax or currentTmdbMin or currentTmdbMax or currentImdbMin or currentImdbMax or currentRtMin or currentRtMax %}
-                        <a href="{{ applicationUrl }}/movies?sort={{ currentSort }}&order={{ currentOrder }}" class="btn btn-sm btn-clear-filters">{{ t('movies.clear') }}</a>
-                    {% endif %}
-                </h2>
-
-                <form id="filtersForm" action="{{ applicationUrl }}/movies" method="get">
-                    <input type="hidden" name="sort" value="{{ currentSort }}">
-                    <input type="hidden" name="order" value="{{ currentOrder }}">
-
-                    <div class="filter-group">
-                        <label class="filter-label">{{ t('movies.genre') }}</label>
-                        <select name="genre" class="filter-select">
-                            <option value="">{{ t('movies.all_genres') }}</option>
-                            {% for g in genres %}
-                                <option value="{{ g }}" {{ currentGenre == g ? 'selected' : '' }}>{{ g }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">{{ t('movies.global_rating') }}</label>
-                        <div class="dual-range-slider">
-                            <div class="dual-range-slider-track"></div>
-                            <div class="dual-range-slider-range" id="rating-range"></div>
-                            <input type="range" min="1" max="7" step="1" value="{{ currentRatingMin ?? 1 }}" id="rating-min" data-input="rating_min">
-                            <input type="range" min="1" max="7" step="1" value="{{ currentRatingMax ?? 7 }}" id="rating-max" data-input="rating_max">
-                        </div>
-                        <div class="dual-range-values">
-                            <span class="dual-range-value">🍿 <span id="rating-min-value">{{ currentRatingMin ?? 1 }}</span></span>
-                            <span class="dual-range-value">🍿 <span id="rating-max-value">{{ currentRatingMax ?? 7 }}</span></span>
-                        </div>
-                        <input type="hidden" name="rating_min" id="rating_min" value="{{ currentRatingMin }}">
-                        <input type="hidden" name="rating_max" id="rating_max" value="{{ currentRatingMax }}">
-                        <p class="filter-info">{{ t('movies.rating_info') }}</p>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">{{ t('movies.release_year') }}</label>
-                        <div class="filter-range">
-                            <input type="number" name="year_min" class="filter-input" placeholder="{{ yearRange.min ?? t('movies.min') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMin }}">
-                            <span class="filter-range-separator">-</span>
-                            <input type="number" name="year_max" class="filter-input" placeholder="{{ yearRange.max ?? t('movies.max') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMax }}">
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">{{ t('movies.tmdb_rating') }}</label>
-                        <div class="dual-range-slider">
-                            <div class="dual-range-slider-track"></div>
-                            <div class="dual-range-slider-range" id="tmdb-range"></div>
-                            <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMin ?? 0 }}" id="tmdb-min" data-input="tmdb_min">
-                            <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMax ?? 10 }}" id="tmdb-max" data-input="tmdb_max">
-                        </div>
-                        <div class="dual-range-values">
-                            <span class="dual-range-value"><span id="tmdb-min-value">{{ currentTmdbMin ?? 0 }}</span></span>
-                            <span class="dual-range-value"><span id="tmdb-max-value">{{ currentTmdbMax ?? 10 }}</span></span>
-                        </div>
-                        <input type="hidden" name="tmdb_min" id="tmdb_min" value="{{ currentTmdbMin }}">
-                        <input type="hidden" name="tmdb_max" id="tmdb_max" value="{{ currentTmdbMax }}">
-                        <p class="filter-info">{{ t('movies.scale_0_10') }}</p>
-                    </div>
-
-                    {% if omdbConfigured %}
-                        <div class="filter-group">
-                            <label class="filter-label">{{ t('movies.imdb_rating') }}</label>
-                            <div class="dual-range-slider">
-                                <div class="dual-range-slider-track"></div>
-                                <div class="dual-range-slider-range" id="imdb-range"></div>
-                                <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMin ?? 0 }}" id="imdb-min" data-input="imdb_min">
-                                <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMax ?? 10 }}" id="imdb-max" data-input="imdb_max">
-                            </div>
-                            <div class="dual-range-values">
-                                <span class="dual-range-value"><span id="imdb-min-value">{{ currentImdbMin ?? 0 }}</span></span>
-                                <span class="dual-range-value"><span id="imdb-max-value">{{ currentImdbMax ?? 10 }}</span></span>
-                            </div>
-                            <input type="hidden" name="imdb_min" id="imdb_min" value="{{ currentImdbMin }}">
-                            <input type="hidden" name="imdb_max" id="imdb_max" value="{{ currentImdbMax }}">
-                            <p class="filter-info">{{ t('movies.scale_0_10') }}</p>
-                        </div>
-
-                        <div class="filter-group">
-                            <label class="filter-label">Rotten Tomatoes</label>
-                            <div class="dual-range-slider">
-                                <div class="dual-range-slider-track"></div>
-                                <div class="dual-range-slider-range" id="rt-range"></div>
-                                <input type="range" min="0" max="100" step="5" value="{{ currentRtMin ?? 0 }}" id="rt-min" data-input="rt_min">
-                                <input type="range" min="0" max="100" step="5" value="{{ currentRtMax ?? 100 }}" id="rt-max" data-input="rt_max">
-                            </div>
-                            <div class="dual-range-values">
-                                <span class="dual-range-value"><span id="rt-min-value">{{ currentRtMin ?? 0 }}</span>%</span>
-                                <span class="dual-range-value"><span id="rt-max-value">{{ currentRtMax ?? 100 }}</span>%</span>
-                            </div>
-                            <input type="hidden" name="rt_min" id="rt_min" value="{{ currentRtMin }}">
-                            <input type="hidden" name="rt_max" id="rt_max" value="{{ currentRtMax }}">
-                            <p class="filter-info">{{ t('movies.scale_0_100') }}</p>
-                        </div>
-                    {% endif %}
-
-                    <div class="filter-actions">
-                        <button type="submit" class="btn btn-apply-filters">{{ t('movies.apply_filters') }}</button>
-                    </div>
-                </form>
+<div class="pds-root">
+    <main class="am-main">
+        <header class="am-header">
+            <div>
+                <h1 class="am-title">{{ t('movies.title') }}</h1>
+                <p class="am-subtitle" id="resultRange">
+                    {{ t('movies.range_of', {shown: (totalMovies > 0 ? '1-' ~ min(30, totalMovies) : '0'), total: totalMovies}) }}
+                </p>
             </div>
-        </aside>
 
-        <!-- Movie Grid -->
-        <main>
-            <div class="movie-grid">
-                {% if movies|length > 0 %}
-                    {% for movie in movies %}
-                        <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="movie-card">
-                            {% if movie.poster_path %}
-                                <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
-                            {% else %}
-                                <div class="movie-poster-placeholder">{{ movie.title }}</div>
-                            {% endif %}
-                            <div class="movie-info">
-                                <div class="movie-title" title="{{ movie.title }}">{{ movie.title }}</div>
-                                <div class="movie-meta-row">
-                                    {% if movie.release_date %}
-                                        <span class="movie-year">{{ movie.release_date|date('Y') }}</span>
-                                    {% else %}
-                                        <span class="movie-year">-</span>
-                                    {% endif %}
-                                    {% if movie.avg_popcorn %}
-                                        <span class="movie-rating">
-                                            <span class="popcorn-emoji" aria-hidden="true">🍿</span>
-                                            {{ movie.avg_popcorn|number_format(1) }}
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </a>
-                    {% endfor %}
-                {% else %}
-                    <div class="no-movies">
-                        <h3>{{ t('movies.no_movies_found') }}</h3>
-                        <p>{{ t('movies.no_movies_hint') }}</p>
-                    </div>
-                {% endif %}
-            </div>
-        </main>
-    </div>
-</div>
+            <div class="am-controls">
+                <button class="btn-filter-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas">
+                    <i class="bi bi-funnel"></i> {{ t('movies.filters') }}
+                </button>
 
-<!-- Mobile Filters Offcanvas -->
-<div class="offcanvas offcanvas-end offcanvas-filters" tabindex="-1" id="filtersOffcanvas" aria-labelledby="filtersOffcanvasLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="filtersOffcanvasLabel">{{ t('movies.filters') }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="{{ t('movies.close') }}"></button>
-    </div>
-    <div class="offcanvas-body">
-        <form id="filtersFormMobile" action="{{ applicationUrl }}/movies" method="get">
-            <input type="hidden" name="sort" value="{{ currentSort }}">
-            <input type="hidden" name="order" value="{{ currentOrder }}">
-
-            <div class="filter-group">
-                <label class="filter-label">{{ t('movies.genre') }}</label>
-                <select name="genre" class="filter-select">
-                    <option value="">{{ t('movies.all_genres') }}</option>
-                    {% for g in genres %}
-                        <option value="{{ g }}" {{ currentGenre == g ? 'selected' : '' }}>{{ g }}</option>
-                    {% endfor %}
+                <label class="am-sort-label" for="sortSelect">{{ t('movies.sort_label') }}</label>
+                <select class="sort-select" id="sortSelect" onchange="updateSort(this.value)">
+                    <option value="added-desc" {{ currentSort == 'added' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_recently_added') }}</option>
+                    <option value="added-asc" {{ currentSort == 'added' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_oldest_added') }}</option>
+                    <option value="title-asc" {{ currentSort == 'title' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_title_az') }}</option>
+                    <option value="title-desc" {{ currentSort == 'title' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_title_za') }}</option>
+                    <option value="release_date-desc" {{ currentSort == 'release_date' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_newest_release') }}</option>
+                    <option value="release_date-asc" {{ currentSort == 'release_date' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_oldest_release') }}</option>
+                    <option value="global_rating-desc" {{ currentSort == 'global_rating' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_highest_rated') }}</option>
+                    <option value="global_rating-asc" {{ currentSort == 'global_rating' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_lowest_rated') }}</option>
+                    <option value="own_rating-desc" {{ currentSort == 'own_rating' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_my_rating_high') }}</option>
+                    <option value="own_rating-asc" {{ currentSort == 'own_rating' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_my_rating_low') }}</option>
                 </select>
             </div>
+        </header>
 
-            <div class="filter-group">
-                <label class="filter-label">{{ t('movies.global_rating') }}</label>
-                <div class="dual-range-slider">
-                    <div class="dual-range-slider-track"></div>
-                    <div class="dual-range-slider-range" id="rating-range-mobile"></div>
-                    <input type="range" min="1" max="7" step="1" value="{{ currentRatingMin ?? 1 }}" id="rating-min-mobile" data-input="rating_min_mobile">
-                    <input type="range" min="1" max="7" step="1" value="{{ currentRatingMax ?? 7 }}" id="rating-max-mobile" data-input="rating_max_mobile">
-                </div>
-                <div class="dual-range-values">
-                    <span class="dual-range-value">🍿 <span id="rating-min-value-mobile">{{ currentRatingMin ?? 1 }}</span></span>
-                    <span class="dual-range-value">🍿 <span id="rating-max-value-mobile">{{ currentRatingMax ?? 7 }}</span></span>
-                </div>
-                <input type="hidden" name="rating_min" id="rating_min_mobile" value="{{ currentRatingMin }}">
-                <input type="hidden" name="rating_max" id="rating_max_mobile" value="{{ currentRatingMax }}">
-                <p class="filter-info">{{ t('movies.rating_info') }}</p>
+        {% if currentGenre or currentRatingMin or currentRatingMax or currentYearMin or currentYearMax or currentTmdbMin or currentTmdbMax or currentImdbMin or currentImdbMax or currentRtMin or currentRtMax %}
+            <div class="active-filters">
+                {% if currentGenre %}
+                    <span class="active-filter-badge">
+                        <i class="bi bi-tag"></i> {{ currentGenre }}
+                    </span>
+                {% endif %}
+                {% if currentRatingMin or currentRatingMax %}
+                    <span class="active-filter-badge">
+                        🍿 {{ t('movies.badge_rating') }} {{ currentRatingMin ?? 1 }} - {{ currentRatingMax ?? 7 }}
+                    </span>
+                {% endif %}
+                {% if currentYearMin or currentYearMax %}
+                    <span class="active-filter-badge">
+                        <i class="bi bi-calendar"></i> {{ t('movies.badge_year') }} {{ currentYearMin ?? yearRange.min }} - {{ currentYearMax ?? yearRange.max }}
+                    </span>
+                {% endif %}
+                {% if currentTmdbMin or currentTmdbMax %}
+                    <span class="active-filter-badge">
+                        TMDB: {{ currentTmdbMin ?? 0 }} - {{ currentTmdbMax ?? 10 }}
+                    </span>
+                {% endif %}
+                {% if currentImdbMin or currentImdbMax %}
+                    <span class="active-filter-badge">
+                        IMDB: {{ currentImdbMin ?? 0 }} - {{ currentImdbMax ?? 10 }}
+                    </span>
+                {% endif %}
+                {% if currentRtMin or currentRtMax %}
+                    <span class="active-filter-badge">
+                        RT: {{ currentRtMin ?? 0 }}% - {{ currentRtMax ?? 100 }}%
+                    </span>
+                {% endif %}
             </div>
+        {% endif %}
 
-            <div class="filter-group">
-                <label class="filter-label">{{ t('movies.release_year') }}</label>
-                <div class="filter-range">
-                    <input type="number" name="year_min" class="filter-input" placeholder="{{ yearRange.min ?? t('movies.min') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMin }}">
-                    <span class="filter-range-separator">-</span>
-                    <input type="number" name="year_max" class="filter-input" placeholder="{{ yearRange.max ?? t('movies.max') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMax }}">
+        <div class="am-layout">
+            <!-- Desktop Filters Sidebar -->
+            <aside class="filters-sidebar">
+                <div class="filters-card">
+                    <h2 class="filters-title">
+                        {{ t('movies.filters') }}
+                        {% if currentGenre or currentRatingMin or currentRatingMax or currentYearMin or currentYearMax or currentTmdbMin or currentTmdbMax or currentImdbMin or currentImdbMax or currentRtMin or currentRtMax %}
+                            <a href="{{ applicationUrl }}/movies?sort={{ currentSort }}&order={{ currentOrder }}" class="btn-clear-filters">{{ t('movies.clear') }}</a>
+                        {% endif %}
+                    </h2>
+
+                    <form id="filtersForm" action="{{ applicationUrl }}/movies" method="get">
+                        <input type="hidden" name="sort" value="{{ currentSort }}">
+                        <input type="hidden" name="order" value="{{ currentOrder }}">
+
+                        <div class="filter-group">
+                            <label class="filter-label">{{ t('movies.genre') }}</label>
+                            <select name="genre" class="filter-select">
+                                <option value="">{{ t('movies.all_genres') }}</option>
+                                {% for g in genres %}
+                                    <option value="{{ g }}" {{ currentGenre == g ? 'selected' : '' }}>{{ g }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="filter-label">{{ t('movies.release_year') }}</label>
+                            <div class="filter-range">
+                                <input type="number" name="year_min" class="filter-input" placeholder="{{ yearRange.min ?? t('movies.min') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMin }}">
+                                <span class="filter-range-separator">-</span>
+                                <input type="number" name="year_max" class="filter-input" placeholder="{{ yearRange.max ?? t('movies.max') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMax }}">
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <div class="filter-head">
+                                <label class="filter-label">{{ t('movies.global_rating') }}</label>
+                                <span class="filter-scale">1-7</span>
+                            </div>
+                            <div class="dual-range-slider">
+                                <div class="dual-range-slider-track"></div>
+                                <div class="dual-range-slider-range" id="rating-range"></div>
+                                <input type="range" min="1" max="7" step="1" value="{{ currentRatingMin ?? 1 }}" id="rating-min" data-input="rating_min">
+                                <input type="range" min="1" max="7" step="1" value="{{ currentRatingMax ?? 7 }}" id="rating-max" data-input="rating_max">
+                            </div>
+                            <div class="dual-range-values">
+                                <span class="dual-range-value">🍿 <span id="rating-min-value">{{ currentRatingMin ?? 1 }}</span></span>
+                                <span class="dual-range-value">🍿 <span id="rating-max-value">{{ currentRatingMax ?? 7 }}</span></span>
+                            </div>
+                            <input type="hidden" name="rating_min" id="rating_min" value="{{ currentRatingMin }}">
+                            <input type="hidden" name="rating_max" id="rating_max" value="{{ currentRatingMax }}">
+                        </div>
+
+                        <div class="filter-group">
+                            <div class="filter-head">
+                                <label class="filter-label">{{ t('movies.tmdb_rating') }}</label>
+                                <span class="filter-scale">0-10</span>
+                            </div>
+                            <div class="dual-range-slider">
+                                <div class="dual-range-slider-track"></div>
+                                <div class="dual-range-slider-range" id="tmdb-range"></div>
+                                <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMin ?? 0 }}" id="tmdb-min" data-input="tmdb_min">
+                                <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMax ?? 10 }}" id="tmdb-max" data-input="tmdb_max">
+                            </div>
+                            <div class="dual-range-values">
+                                <span class="dual-range-value"><span id="tmdb-min-value">{{ currentTmdbMin ?? 0 }}</span></span>
+                                <span class="dual-range-value"><span id="tmdb-max-value">{{ currentTmdbMax ?? 10 }}</span></span>
+                            </div>
+                            <input type="hidden" name="tmdb_min" id="tmdb_min" value="{{ currentTmdbMin }}">
+                            <input type="hidden" name="tmdb_max" id="tmdb_max" value="{{ currentTmdbMax }}">
+                        </div>
+
+                        {% if omdbConfigured %}
+                            <div class="filter-group">
+                                <div class="filter-head">
+                                    <label class="filter-label">{{ t('movies.imdb_rating') }}</label>
+                                    <span class="filter-scale">0-10</span>
+                                </div>
+                                <div class="dual-range-slider">
+                                    <div class="dual-range-slider-track"></div>
+                                    <div class="dual-range-slider-range" id="imdb-range"></div>
+                                    <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMin ?? 0 }}" id="imdb-min" data-input="imdb_min">
+                                    <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMax ?? 10 }}" id="imdb-max" data-input="imdb_max">
+                                </div>
+                                <div class="dual-range-values">
+                                    <span class="dual-range-value"><span id="imdb-min-value">{{ currentImdbMin ?? 0 }}</span></span>
+                                    <span class="dual-range-value"><span id="imdb-max-value">{{ currentImdbMax ?? 10 }}</span></span>
+                                </div>
+                                <input type="hidden" name="imdb_min" id="imdb_min" value="{{ currentImdbMin }}">
+                                <input type="hidden" name="imdb_max" id="imdb_max" value="{{ currentImdbMax }}">
+                            </div>
+
+                            <div class="filter-group">
+                                <div class="filter-head">
+                                    <label class="filter-label">Rotten Tomatoes</label>
+                                    <span class="filter-scale">0-100 %</span>
+                                </div>
+                                <div class="dual-range-slider">
+                                    <div class="dual-range-slider-track"></div>
+                                    <div class="dual-range-slider-range" id="rt-range"></div>
+                                    <input type="range" min="0" max="100" step="5" value="{{ currentRtMin ?? 0 }}" id="rt-min" data-input="rt_min">
+                                    <input type="range" min="0" max="100" step="5" value="{{ currentRtMax ?? 100 }}" id="rt-max" data-input="rt_max">
+                                </div>
+                                <div class="dual-range-values">
+                                    <span class="dual-range-value"><span id="rt-min-value">{{ currentRtMin ?? 0 }}</span>%</span>
+                                    <span class="dual-range-value"><span id="rt-max-value">{{ currentRtMax ?? 100 }}</span>%</span>
+                                </div>
+                                <input type="hidden" name="rt_min" id="rt_min" value="{{ currentRtMin }}">
+                                <input type="hidden" name="rt_max" id="rt_max" value="{{ currentRtMax }}">
+                            </div>
+                        {% endif %}
+
+                        <button type="submit" class="btn-apply-filters">{{ t('movies.apply_filters') }}</button>
+                    </form>
                 </div>
+            </aside>
+
+            <!-- Results -->
+            <div class="am-results">
+                <div class="movie-grid" id="movieGrid">
+                    {% if movies|length > 0 %}
+                        {% for movie in movies %}
+                            <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="movie-card"
+                               data-year="{{ movie.release_date ? movie.release_date|slice(0,4) : '' }}"
+                               data-global="{{ movie.avg_popcorn ?? '' }}"
+                               data-tmdb="{{ movie.tmdb_rating ?? '' }}"
+                               data-imdb="{{ movie.imdb_rating ?? '' }}"
+                               data-rt="{{ movie.rt_rating ?? '' }}"
+                               data-genres="{{ movie.genres ?? '' }}"
+                               data-title="{{ movie.title|lower }}"
+                               data-added="{{ loop.index0 }}"
+                               data-own="{{ movie.own_rating ?? '' }}">
+                                {% if movie.poster_path %}
+                                    <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
+                                {% else %}
+                                    <div class="movie-poster-placeholder">{{ movie.title }}</div>
+                                {% endif %}
+                                <div class="movie-info">
+                                    <div class="movie-title" title="{{ movie.title }}">{{ movie.title }}</div>
+                                    <div class="movie-meta-row">
+                                        {% if movie.release_date %}
+                                            <span class="movie-year">{{ movie.release_date|date('Y') }}</span>
+                                        {% else %}
+                                            <span class="movie-year">-</span>
+                                        {% endif %}
+                                        {% if movie.avg_popcorn %}
+                                            <span class="movie-rating">
+                                                <span class="popcorn-emoji" aria-hidden="true">🍿</span>
+                                                {{ movie.avg_popcorn|number_format(1) }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-movies">
+                            <h3>{{ t('movies.no_movies_found') }}</h3>
+                            <p>{{ t('movies.no_movies_hint') }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <nav class="am-pagination" id="pagination" aria-label="Pagination"></nav>
+                <div class="am-page-status" id="pageStatus"></div>
             </div>
+        </div>
+    </main>
 
-            <div class="filter-group">
-                <label class="filter-label">{{ t('movies.tmdb_rating') }}</label>
-                <div class="dual-range-slider">
-                    <div class="dual-range-slider-track"></div>
-                    <div class="dual-range-slider-range" id="tmdb-range-mobile"></div>
-                    <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMin ?? 0 }}" id="tmdb-min-mobile" data-input="tmdb_min_mobile">
-                    <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMax ?? 10 }}" id="tmdb-max-mobile" data-input="tmdb_max_mobile">
-                </div>
-                <div class="dual-range-values">
-                    <span class="dual-range-value"><span id="tmdb-min-value-mobile">{{ currentTmdbMin ?? 0 }}</span></span>
-                    <span class="dual-range-value"><span id="tmdb-max-value-mobile">{{ currentTmdbMax ?? 10 }}</span></span>
-                </div>
-                <input type="hidden" name="tmdb_min" id="tmdb_min_mobile" value="{{ currentTmdbMin }}">
-                <input type="hidden" name="tmdb_max" id="tmdb_max_mobile" value="{{ currentTmdbMax }}">
-                <p class="filter-info">{{ t('movies.scale_0_10') }}</p>
-            </div>
+    <!-- Mobile Filters Offcanvas -->
+    <div class="offcanvas offcanvas-end offcanvas-filters" tabindex="-1" id="filtersOffcanvas" aria-labelledby="filtersOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="filtersOffcanvasLabel">{{ t('movies.filters') }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="{{ t('movies.close') }}"></button>
+        </div>
+        <div class="offcanvas-body">
+            <form id="filtersFormMobile" action="{{ applicationUrl }}/movies" method="get">
+                <input type="hidden" name="sort" value="{{ currentSort }}">
+                <input type="hidden" name="order" value="{{ currentOrder }}">
 
-            {% if omdbConfigured %}
                 <div class="filter-group">
-                    <label class="filter-label">{{ t('movies.imdb_rating') }}</label>
+                    <label class="filter-label">{{ t('movies.genre') }}</label>
+                    <select name="genre" class="filter-select">
+                        <option value="">{{ t('movies.all_genres') }}</option>
+                        {% for g in genres %}
+                            <option value="{{ g }}" {{ currentGenre == g ? 'selected' : '' }}>{{ g }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">{{ t('movies.release_year') }}</label>
+                    <div class="filter-range">
+                        <input type="number" name="year_min" class="filter-input" placeholder="{{ yearRange.min ?? t('movies.min') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMin }}">
+                        <span class="filter-range-separator">-</span>
+                        <input type="number" name="year_max" class="filter-input" placeholder="{{ yearRange.max ?? t('movies.max') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMax }}">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-head">
+                        <label class="filter-label">{{ t('movies.global_rating') }}</label>
+                        <span class="filter-scale">1-7</span>
+                    </div>
                     <div class="dual-range-slider">
                         <div class="dual-range-slider-track"></div>
-                        <div class="dual-range-slider-range" id="imdb-range-mobile"></div>
-                        <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMin ?? 0 }}" id="imdb-min-mobile" data-input="imdb_min_mobile">
-                        <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMax ?? 10 }}" id="imdb-max-mobile" data-input="imdb_max_mobile">
+                        <div class="dual-range-slider-range" id="rating-range-mobile"></div>
+                        <input type="range" min="1" max="7" step="1" value="{{ currentRatingMin ?? 1 }}" id="rating-min-mobile" data-input="rating_min_mobile">
+                        <input type="range" min="1" max="7" step="1" value="{{ currentRatingMax ?? 7 }}" id="rating-max-mobile" data-input="rating_max_mobile">
                     </div>
                     <div class="dual-range-values">
-                        <span class="dual-range-value"><span id="imdb-min-value-mobile">{{ currentImdbMin ?? 0 }}</span></span>
-                        <span class="dual-range-value"><span id="imdb-max-value-mobile">{{ currentImdbMax ?? 10 }}</span></span>
+                        <span class="dual-range-value">🍿 <span id="rating-min-value-mobile">{{ currentRatingMin ?? 1 }}</span></span>
+                        <span class="dual-range-value">🍿 <span id="rating-max-value-mobile">{{ currentRatingMax ?? 7 }}</span></span>
                     </div>
-                    <input type="hidden" name="imdb_min" id="imdb_min_mobile" value="{{ currentImdbMin }}">
-                    <input type="hidden" name="imdb_max" id="imdb_max_mobile" value="{{ currentImdbMax }}">
-                    <p class="filter-info">{{ t('movies.scale_0_10') }}</p>
+                    <input type="hidden" name="rating_min" id="rating_min_mobile" value="{{ currentRatingMin }}">
+                    <input type="hidden" name="rating_max" id="rating_max_mobile" value="{{ currentRatingMax }}">
                 </div>
 
                 <div class="filter-group">
-                    <label class="filter-label">Rotten Tomatoes</label>
+                    <div class="filter-head">
+                        <label class="filter-label">{{ t('movies.tmdb_rating') }}</label>
+                        <span class="filter-scale">0-10</span>
+                    </div>
                     <div class="dual-range-slider">
                         <div class="dual-range-slider-track"></div>
-                        <div class="dual-range-slider-range" id="rt-range-mobile"></div>
-                        <input type="range" min="0" max="100" step="5" value="{{ currentRtMin ?? 0 }}" id="rt-min-mobile" data-input="rt_min_mobile">
-                        <input type="range" min="0" max="100" step="5" value="{{ currentRtMax ?? 100 }}" id="rt-max-mobile" data-input="rt_max_mobile">
+                        <div class="dual-range-slider-range" id="tmdb-range-mobile"></div>
+                        <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMin ?? 0 }}" id="tmdb-min-mobile" data-input="tmdb_min_mobile">
+                        <input type="range" min="0" max="10" step="0.5" value="{{ currentTmdbMax ?? 10 }}" id="tmdb-max-mobile" data-input="tmdb_max_mobile">
                     </div>
                     <div class="dual-range-values">
-                        <span class="dual-range-value"><span id="rt-min-value-mobile">{{ currentRtMin ?? 0 }}</span>%</span>
-                        <span class="dual-range-value"><span id="rt-max-value-mobile">{{ currentRtMax ?? 100 }}</span>%</span>
+                        <span class="dual-range-value"><span id="tmdb-min-value-mobile">{{ currentTmdbMin ?? 0 }}</span></span>
+                        <span class="dual-range-value"><span id="tmdb-max-value-mobile">{{ currentTmdbMax ?? 10 }}</span></span>
                     </div>
-                    <input type="hidden" name="rt_min" id="rt_min_mobile" value="{{ currentRtMin }}">
-                    <input type="hidden" name="rt_max" id="rt_max_mobile" value="{{ currentRtMax }}">
-                    <p class="filter-info">{{ t('movies.scale_0_100') }}</p>
+                    <input type="hidden" name="tmdb_min" id="tmdb_min_mobile" value="{{ currentTmdbMin }}">
+                    <input type="hidden" name="tmdb_max" id="tmdb_max_mobile" value="{{ currentTmdbMax }}">
                 </div>
-            {% endif %}
 
-            <div class="filter-actions">
-                <button type="submit" class="btn btn-apply-filters">{{ t('movies.apply_filters') }}</button>
-                <a href="{{ applicationUrl }}/movies?sort={{ currentSort }}&order={{ currentOrder }}" class="btn btn-clear-filters">{{ t('movies.clear') }}</a>
-            </div>
-        </form>
+                {% if omdbConfigured %}
+                    <div class="filter-group">
+                        <div class="filter-head">
+                            <label class="filter-label">{{ t('movies.imdb_rating') }}</label>
+                            <span class="filter-scale">0-10</span>
+                        </div>
+                        <div class="dual-range-slider">
+                            <div class="dual-range-slider-track"></div>
+                            <div class="dual-range-slider-range" id="imdb-range-mobile"></div>
+                            <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMin ?? 0 }}" id="imdb-min-mobile" data-input="imdb_min_mobile">
+                            <input type="range" min="0" max="10" step="0.5" value="{{ currentImdbMax ?? 10 }}" id="imdb-max-mobile" data-input="imdb_max_mobile">
+                        </div>
+                        <div class="dual-range-values">
+                            <span class="dual-range-value"><span id="imdb-min-value-mobile">{{ currentImdbMin ?? 0 }}</span></span>
+                            <span class="dual-range-value"><span id="imdb-max-value-mobile">{{ currentImdbMax ?? 10 }}</span></span>
+                        </div>
+                        <input type="hidden" name="imdb_min" id="imdb_min_mobile" value="{{ currentImdbMin }}">
+                        <input type="hidden" name="imdb_max" id="imdb_max_mobile" value="{{ currentImdbMax }}">
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-head">
+                            <label class="filter-label">Rotten Tomatoes</label>
+                            <span class="filter-scale">0-100 %</span>
+                        </div>
+                        <div class="dual-range-slider">
+                            <div class="dual-range-slider-track"></div>
+                            <div class="dual-range-slider-range" id="rt-range-mobile"></div>
+                            <input type="range" min="0" max="100" step="5" value="{{ currentRtMin ?? 0 }}" id="rt-min-mobile" data-input="rt_min_mobile">
+                            <input type="range" min="0" max="100" step="5" value="{{ currentRtMax ?? 100 }}" id="rt-max-mobile" data-input="rt_max_mobile">
+                        </div>
+                        <div class="dual-range-values">
+                            <span class="dual-range-value"><span id="rt-min-value-mobile">{{ currentRtMin ?? 0 }}</span>%</span>
+                            <span class="dual-range-value"><span id="rt-max-value-mobile">{{ currentRtMax ?? 100 }}</span>%</span>
+                        </div>
+                        <input type="hidden" name="rt_min" id="rt_min_mobile" value="{{ currentRtMin }}">
+                        <input type="hidden" name="rt_max" id="rt_max_mobile" value="{{ currentRtMax }}">
+                    </div>
+                {% endif %}
+
+                <div class="filter-actions">
+                    <button type="submit" class="btn-apply-filters">{{ t('movies.apply_filters') }}</button>
+                    <a href="{{ applicationUrl }}/movies?sort={{ currentSort }}&order={{ currentOrder }}" class="btn-clear-filters">{{ t('movies.clear') }}</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-function updateSort(value) {
-    const [sort, order] = value.split('-');
-    const url = new URL(window.location.href);
-    url.searchParams.set('sort', sort);
-    url.searchParams.set('order', order);
-    window.location.href = url.toString();
+// updateSort is wired to the #sortSelect onchange attribute. Live client-side
+// sorting is handled inside the pagination/filter IIFE below via window.__amApply().
+function updateSort() {
+    if (window.__amApply) window.__amApply();
 }
 
 // Dual Range Slider functionality
@@ -807,5 +1055,334 @@ document.addEventListener('DOMContentLoaded', function() {
     initDualRangeSlider('imdb-min-mobile', 'imdb-max-mobile', 'imdb-range-mobile', 'imdb-min-value-mobile', 'imdb-max-value-mobile', 'imdb');
     initDualRangeSlider('rt-min-mobile', 'rt-max-mobile', 'rt-range-mobile', 'rt-min-value-mobile', 'rt-max-value-mobile', 'rt');
 });
+</script>
+
+<script>
+// Live client-side filtering + sorting + pagination over the fully-rendered movie
+// grid (all movies are already in the DOM; there is no server pagination).
+(function () {
+    const PER_PAGE = 30;
+    const grid = document.getElementById('movieGrid');
+    if (!grid) return;
+
+    const allCards = Array.prototype.slice.call(grid.querySelectorAll('.movie-card'));
+    const paginationEl = document.getElementById('pagination');
+    const statusEl = document.getElementById('pageStatus');
+    const rangeEl = document.getElementById('resultRange');
+    const sortSelect = document.getElementById('sortSelect');
+    const forms = [document.getElementById('filtersForm'), document.getElementById('filtersFormMobile')].filter(Boolean);
+
+    // i18n templates (placeholders replaced client-side).
+    const I18N = {
+        rangeOf: {{ t('movies.range_of')|json_encode|raw }},
+        status: {{ t('movies.pagination_status')|json_encode|raw }},
+        prev: {{ t('movies.prev')|json_encode|raw }},
+        next: {{ t('movies.next')|json_encode|raw }},
+        noFound: {{ t('movies.no_movies_found')|json_encode|raw }},
+        noHint: {{ t('movies.no_movies_hint')|json_encode|raw }}
+    };
+
+    let filtered = allCards.slice(); // currently visible (filtered + sorted) cards
+    let current = 1;
+    let pageCount = 1;
+
+    // Reuse the server-rendered empty state if present, otherwise build one lazily.
+    let emptyEl = grid.querySelector('.no-movies');
+    function ensureEmpty() {
+        if (!emptyEl) {
+            emptyEl = document.createElement('div');
+            emptyEl.className = 'no-movies';
+            emptyEl.innerHTML = '<h3>' + I18N.noFound + '</h3><p>' + I18N.noHint + '</p>';
+            grid.appendChild(emptyEl);
+        }
+        return emptyEl;
+    }
+
+    // ---- Filter state ---------------------------------------------------------
+    function byId(id) { return document.getElementById(id); }
+
+    function readGenre() {
+        for (const form of forms) {
+            const sel = form.querySelector('select[name="genre"]');
+            if (sel && sel.value) return sel.value;
+        }
+        return '';
+    }
+
+    function readYear(name) {
+        for (const form of forms) {
+            const inp = form.querySelector('input[name="' + name + '"]');
+            if (inp && inp.value !== '') {
+                const v = parseFloat(inp.value);
+                if (!isNaN(v)) return v;
+            }
+        }
+        return null;
+    }
+
+    // Combine the desktop + mobile slider pair into the most restrictive range.
+    // Untouched sliders sit at their extremes, so they never over-restrict.
+    function readRange(ids) {
+        let min = -Infinity, max = Infinity;
+        ids.forEach(function (id) {
+            const el = byId(id);
+            if (!el) return;
+            const v = parseFloat(el.value);
+            if (isNaN(v)) return;
+            if (id.indexOf('-min') !== -1) min = Math.max(min, v);
+            else max = Math.min(max, v);
+        });
+        return {
+            min: isFinite(min) ? min : null,
+            max: isFinite(max) ? max : null
+        };
+    }
+
+    function readFilters() {
+        return {
+            genre: readGenre(),
+            yearMin: readYear('year_min'),
+            yearMax: readYear('year_max'),
+            global: readRange(['rating-min', 'rating-max', 'rating-min-mobile', 'rating-max-mobile']),
+            tmdb: readRange(['tmdb-min', 'tmdb-max', 'tmdb-min-mobile', 'tmdb-max-mobile']),
+            imdb: readRange(['imdb-min', 'imdb-max', 'imdb-min-mobile', 'imdb-max-mobile']),
+            rt: readRange(['rt-min', 'rt-max', 'rt-min-mobile', 'rt-max-mobile'])
+        };
+    }
+
+    // Empty rating value passes any range (mirrors server "IS NULL OR ..." logic).
+    function rangePass(raw, range) {
+        const v = parseFloat(raw);
+        if (isNaN(v)) return true;
+        if (range.min !== null && v < range.min) return false;
+        if (range.max !== null && v > range.max) return false;
+        return true;
+    }
+
+    function matches(card, f) {
+        const d = card.dataset;
+
+        // Genre: card's comma-list must contain the selected genre.
+        if (f.genre) {
+            const genres = (d.genres || '').split(',').map(function (s) { return s.trim(); });
+            if (genres.indexOf(f.genre) === -1) return false;
+        }
+
+        // Year: only enforced when a bound is set. NULL year is excluded then
+        // (mirrors server YEAR(release_date) comparison dropping NULLs).
+        if (f.yearMin !== null || f.yearMax !== null) {
+            const year = parseFloat(d.year);
+            if (isNaN(year)) return false;
+            if (f.yearMin !== null && year < f.yearMin) return false;
+            if (f.yearMax !== null && year > f.yearMax) return false;
+        }
+
+        // Ratings: empty value always passes (server "IS NULL OR" semantics).
+        if (!rangePass(d.global, f.global)) return false;
+        if (!rangePass(d.tmdb, f.tmdb)) return false;
+        if (!rangePass(d.imdb, f.imdb)) return false;
+        if (!rangePass(d.rt, f.rt)) return false;
+
+        return true;
+    }
+
+    // ---- Sorting --------------------------------------------------------------
+    function addedIndex(card) { return parseFloat(card.dataset.added); }
+
+    function compareCards(a, b) {
+        const value = sortSelect ? sortSelect.value : 'added-desc';
+        const parts = value.split('-');
+        const order = parts.pop();          // 'asc' | 'desc'
+        const field = parts.join('-');      // 'added' | 'title' | 'release_date' | 'global_rating' | 'own_rating'
+
+        // "Recently added" (added-desc) = delivered order; "oldest added" reverses it.
+        if (field === 'added') {
+            const d = addedIndex(a) - addedIndex(b);
+            return order === 'asc' ? -d : d;
+        }
+
+        let va, vb, missingA, missingB;
+        if (field === 'title') {
+            va = a.dataset.title || '';
+            vb = b.dataset.title || '';
+            missingA = va === '';
+            missingB = vb === '';
+        } else {
+            const key = field === 'release_date' ? 'year' : (field === 'global_rating' ? 'global' : 'own');
+            va = parseFloat(a.dataset[key]);
+            vb = parseFloat(b.dataset[key]);
+            missingA = isNaN(va);
+            missingB = isNaN(vb);
+        }
+
+        // Missing values always sink to the end, regardless of direction.
+        if (missingA && missingB) return addedIndex(a) - addedIndex(b);
+        if (missingA) return 1;
+        if (missingB) return -1;
+
+        let r = field === 'title' ? (va < vb ? -1 : (va > vb ? 1 : 0)) : (va - vb);
+        if (order === 'desc') r = -r;
+        if (r === 0) return addedIndex(a) - addedIndex(b);
+        return r;
+    }
+
+    // ---- Pagination rendering -------------------------------------------------
+    function updateHeaderRange() {
+        if (!rangeEl) return;
+        const total = filtered.length;
+        const from = total === 0 ? 0 : (current - 1) * PER_PAGE + 1;
+        const to = Math.min(current * PER_PAGE, total);
+        const shown = total === 0 ? '0' : '<span class="mono">' + from + '-' + to + '</span>';
+        rangeEl.innerHTML = I18N.rangeOf
+            .replace('{shown}', shown)
+            .replace('{total}', '<span class="mono">' + total + '</span>');
+    }
+
+    function buildPageItems() {
+        const items = [];
+        let last = 0;
+        for (let p = 1; p <= pageCount; p++) {
+            if (p === 1 || p === pageCount || (p >= current - 1 && p <= current + 1)) {
+                if (last && p - last > 1) items.push('ellipsis');
+                items.push(p);
+                last = p;
+            }
+        }
+        return items;
+    }
+
+    function renderControls() {
+        if (!paginationEl) return;
+        if (pageCount <= 1) {
+            paginationEl.style.display = 'none';
+            paginationEl.innerHTML = '';
+            return;
+        }
+        paginationEl.style.display = '';
+        paginationEl.innerHTML = '';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'am-page-btn';
+        prevBtn.innerHTML = '&larr; ' + I18N.prev;
+        prevBtn.disabled = current === 1;
+        prevBtn.addEventListener('click', function () { if (current > 1) showPage(current - 1, true); });
+        paginationEl.appendChild(prevBtn);
+
+        buildPageItems().forEach(function (item) {
+            if (item === 'ellipsis') {
+                const span = document.createElement('span');
+                span.className = 'am-ellipsis';
+                span.textContent = '…';
+                paginationEl.appendChild(span);
+                return;
+            }
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'am-page-num' + (item === current ? ' active' : '');
+            btn.textContent = item;
+            if (item === current) btn.setAttribute('aria-current', 'page');
+            btn.addEventListener('click', function () { showPage(item, true); });
+            paginationEl.appendChild(btn);
+        });
+
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'am-page-btn';
+        nextBtn.innerHTML = I18N.next + ' &rarr;';
+        nextBtn.disabled = current === pageCount;
+        nextBtn.addEventListener('click', function () { if (current < pageCount) showPage(current + 1, true); });
+        paginationEl.appendChild(nextBtn);
+    }
+
+    function renderStatus() {
+        if (!statusEl) return;
+        if (pageCount <= 1) {
+            statusEl.style.display = 'none';
+            return;
+        }
+        statusEl.style.display = '';
+        statusEl.textContent = I18N.status
+            .replace('{page}', current)
+            .replace('{total}', pageCount)
+            .replace('{per}', PER_PAGE);
+    }
+
+    function showPage(page, scroll) {
+        current = Math.min(Math.max(1, page), pageCount);
+
+        // Hide everything, then reveal only the current page of the filtered set.
+        allCards.forEach(function (card) { card.style.display = 'none'; });
+        const start = (current - 1) * PER_PAGE;
+        const end = current * PER_PAGE;
+        for (let i = start; i < end && i < filtered.length; i++) {
+            filtered[i].style.display = '';
+        }
+
+        if (filtered.length === 0) {
+            ensureEmpty().style.display = '';
+        } else if (emptyEl) {
+            emptyEl.style.display = 'none';
+        }
+
+        updateHeaderRange();
+        renderControls();
+        renderStatus();
+        if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ---- Apply (filter -> sort -> reorder DOM -> paginate) --------------------
+    function apply() {
+        const f = readFilters();
+        filtered = allCards.filter(function (card) { return matches(card, f); });
+        filtered.sort(compareCards);
+        // Reflect the sorted order in the DOM so the visible page shows correctly.
+        filtered.forEach(function (card) { grid.appendChild(card); });
+        pageCount = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+        showPage(1, false);
+    }
+
+    // Reset all filters to their defaults without a page reload.
+    function resetFilters() {
+        forms.forEach(function (form) {
+            const genre = form.querySelector('select[name="genre"]');
+            if (genre) genre.value = '';
+            form.querySelectorAll('input[name="year_min"], input[name="year_max"]').forEach(function (inp) { inp.value = ''; });
+        });
+        document.querySelectorAll('.dual-range-slider input[type="range"]').forEach(function (inp) {
+            inp.value = inp.id.indexOf('-min') !== -1 ? inp.min : inp.max;
+            inp.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        apply();
+    }
+
+    // ---- Wiring ---------------------------------------------------------------
+    window.__amApply = apply; // used by the inline updateSort() on #sortSelect
+
+    forms.forEach(function (form) {
+        // No reloads: "Filter anwenden" just re-runs the client filter.
+        form.addEventListener('submit', function (e) { e.preventDefault(); apply(); });
+
+        const genre = form.querySelector('select[name="genre"]');
+        if (genre) genre.addEventListener('change', apply);
+        form.querySelectorAll('input[name="year_min"], input[name="year_max"]').forEach(function (inp) {
+            inp.addEventListener('input', apply);
+        });
+    });
+
+    // Every dual-range slider triggers a live re-filter (in addition to its own
+    // track/value updates wired by initDualRangeSlider).
+    document.querySelectorAll('.dual-range-slider input[type="range"]').forEach(function (inp) {
+        inp.addEventListener('input', apply);
+    });
+
+    // Clear/reset links reset the filters in place instead of navigating away.
+    document.querySelectorAll('.btn-clear-filters').forEach(function (link) {
+        link.addEventListener('click', function (e) { e.preventDefault(); resetFilters(); });
+    });
+
+    // Initial render (also normalises the server-rendered header range).
+    apply();
+})();
 </script>
 {% endblock %}
