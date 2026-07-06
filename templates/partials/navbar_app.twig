@@ -22,11 +22,15 @@
 
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                 <li class="nav-item me-2">
-                    <div class="form-check form-switch mb-0" title="{{ t('nav.toggle_dark_mode') }}">
-                        <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle" style="cursor: pointer;">
-                        <label class="form-check-label visually-hidden" for="darkModeToggle">{{ t('nav.dark_mode') }}</label>
-                        <span id="themeIcon" style="font-size: 1.1rem;">🌙</span>
-                    </div>
+                    <label class="theme-toggle" title="{{ t('nav.toggle_dark_mode') }}">
+                        <input class="theme-toggle__input" type="checkbox" role="switch" id="darkModeToggle" aria-label="{{ t('nav.dark_mode') }}">
+                        <span class="theme-toggle__track">
+                            <span class="theme-toggle__knob">
+                                <i class="bi bi-moon-stars-fill theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true"></i>
+                                <i class="bi bi-sun-fill theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true"></i>
+                            </span>
+                        </span>
+                    </label>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ applicationUrl }}/movies">{{ t('nav.all_movies') }}</a>
