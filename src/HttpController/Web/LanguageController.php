@@ -2,6 +2,8 @@
 
 namespace Movary\HttpController\Web;
 
+use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\Service\Translation\Translator;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Request;
@@ -12,6 +14,8 @@ class LanguageController
     public function __construct(
         private readonly SessionWrapper $sessionWrapper,
         private readonly Translator $translator,
+        private readonly Authentication $authenticationService,
+        private readonly UserApi $userApi,
     ) {
     }
 
@@ -20,6 +24,12 @@ class LanguageController
         $locale = (string)($request->getRouteParameters()['locale'] ?? '');
         if ($this->translator->isSupported($locale) === true) {
             $this->sessionWrapper->set('locale', $locale);
+
+            // Persist the choice for logged-in users so it survives new sessions
+            // and follows them across devices.
+            if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
+                $this->userApi->updateLanguage($this->authenticationService->getCurrentUserId(), $locale);
+            }
         }
 
         return Response::createSeeOther($this->resolveRedirectTarget($request));
