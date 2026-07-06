@@ -5,13 +5,14 @@
             <span>{{ applicationName ?? 'Pathary' }}</span>
         </a>
         <div class="d-flex align-items-center gap-3">
-            <div class="form-check form-switch mb-0" title="Toggle dark mode">
+            {% include 'partials/language_switcher.twig' %}
+            <div class="form-check form-switch mb-0" title="{{ t('nav.toggle_dark_mode') }}">
                 <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle" style="cursor: pointer;">
-                <label class="form-check-label visually-hidden" for="darkModeToggle">Dark mode</label>
+                <label class="form-check-label visually-hidden" for="darkModeToggle">{{ t('nav.dark_mode') }}</label>
                 <span id="themeIcon" style="font-size: 1.1rem;">🌙</span>
             </div>
             <a href="{{ applicationUrl }}/login" class="btn btn-warning" style="background-color: var(--pathe-yellow); border-color: var(--pathe-yellow); color: var(--pathe-dark);">
-                Login
+                {{ t('nav.login') }}
             </a>
         </div>
     </div>
