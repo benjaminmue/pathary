@@ -6,7 +6,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#apiSettings" aria-expanded="true">
-                    <i class="bi bi-key me-2"></i>{{ t('admin_server.api_settings') }}
+                    {{ t('admin_server.api_settings') }}
                 </button>
             </h2>
             <div id="apiSettings" class="accordion-collapse collapse show" data-bs-parent="#serverSettingsAccordion">
@@ -17,7 +17,6 @@
                         <div class="pds-key__head">
                             <span class="pds-key__name">
                                 {{ t('admin_server.tmdb_api_key') }}
-                                <i class="bi bi-info-circle" title="{{ t('admin_server.tmdb_key_tooltip') }}" data-bs-toggle="tooltip"></i>
                             </span>
                             <span class="pds-key__status" id="tmdbKeyStatus">
                                 <span class="spinner-border spinner-border-sm me-1" role="status"></span>
@@ -31,10 +30,10 @@
                                 <i class="bi bi-eye"></i>
                             </button>
                             <button type="button" class="pds-btn pds-btn--ghost" onclick="testTmdbConnection()">
-                                <i class="bi bi-lightning me-1"></i>{{ t('admin.server.test_connection') }}
+                                {{ t('admin.server.test_connection') }}
                             </button>
-                            <button type="button" class="pds-btn pds-btn--danger" id="removeTmdbKeyBtn" onclick="removeTmdbKey()" style="display: none;">
-                                <i class="bi bi-trash me-1"></i>{{ t('admin.server.remove') }}
+                            <button type="button" class="pds-btn pds-btn--ghost" id="removeTmdbKeyBtn" onclick="removeTmdbKey()" style="display: none;">
+                                {{ t('admin.server.remove') }}
                             </button>
                         </div>
                     </div>
@@ -44,7 +43,6 @@
                         <div class="pds-key__head">
                             <span class="pds-key__name">
                                 {{ t('admin_server.omdb_api_key') }}
-                                <i class="bi bi-info-circle" title="{{ t('admin_server.omdb_key_tooltip') }}" data-bs-toggle="tooltip"></i>
                             </span>
                             <span class="pds-key__status" id="omdbKeyStatus">
                                 <span class="spinner-border spinner-border-sm me-1" role="status"></span>
@@ -58,17 +56,17 @@
                                 <i class="bi bi-eye"></i>
                             </button>
                             <button type="button" class="pds-btn pds-btn--ghost" onclick="testOmdbConnection()">
-                                <i class="bi bi-lightning me-1"></i>{{ t('admin.server.test_connection') }}
+                                {{ t('admin.server.test_connection') }}
                             </button>
-                            <button type="button" class="pds-btn pds-btn--danger" id="removeOmdbKeyBtn" onclick="removeOmdbKey()" style="display: none;">
-                                <i class="bi bi-trash me-1"></i>{{ t('admin.server.remove') }}
+                            <button type="button" class="pds-btn pds-btn--ghost" id="removeOmdbKeyBtn" onclick="removeOmdbKey()" style="display: none;">
+                                {{ t('admin.server.remove') }}
                             </button>
                         </div>
                     </div>
 
                     <div class="pds-key__save">
                         <button type="button" class="pds-btn pds-btn--primary" id="saveApiSettingsBtn" onclick="saveApiSettings()">
-                            <i class="bi bi-save me-1"></i>{{ t('admin.server.save_keys') }}
+                            {{ t('admin.server.save_keys') }}
                         </button>
                         <div id="saveHelperText" class="form-text mt-2" style="display: none;">
                             <i class="bi bi-info-circle"></i> <span id="saveHelperMessage"></span>
@@ -85,7 +83,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#appSettings" aria-expanded="false">
-                    <i class="bi bi-gear me-2"></i>{{ t('admin_server.application_settings') }}
+                    {{ t('admin_server.application_settings') }}
                 </button>
             </h2>
             <div id="appSettings" class="accordion-collapse collapse" data-bs-parent="#serverSettingsAccordion">
@@ -129,7 +127,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#emailSettings" aria-expanded="false">
-                    <i class="bi bi-envelope me-2"></i>{{ t('admin_server.email_settings') }}
+                    {{ t('admin_server.email_settings') }}
                 </button>
             </h2>
             <div id="emailSettings" class="accordion-collapse collapse" data-bs-parent="#serverSettingsAccordion">
@@ -227,7 +225,7 @@
                                         {{ t('admin_server.password_app_password') }}
                                         {% if smtpPasswordConfigured %}
                                             <span class="badge bg-success ms-2">
-                                                <i class="bi bi-check-circle-fill"></i> {{ t('admin_server.status_configured') }}
+                                                {{ t('admin_server.status_configured') }}
                                             </span>
                                         {% endif %}
                                     </label>
@@ -608,7 +606,7 @@
                                         Client Secret
                                         {% if oauthConfig %}
                                             <span class="badge bg-success ms-2">
-                                                <i class="bi bi-check-circle-fill"></i> {{ t('admin_server.status_configured') }}
+                                                {{ t('admin_server.status_configured') }}
                                             </span>
                                         {% endif %}
                                     </label>
@@ -780,7 +778,7 @@
     <div class="col-md-12 mb-4">
         <div class="pds-admin-card">
             <div class="pds-health-head">
-                <span class="pds-health-head__title"><i class="bi bi-activity me-2"></i>{{ t('admin_server.system_health') }}</span>
+                <span class="pds-health-head__title">{{ t('admin_server.system_health') }}</span>
                 <span class="pds-health-head__note" id="health-last-run">{{ t('admin_server.last_check') }} <span id="health-last-run-time">{{ t('admin_server.never') }}</span></span>
             </div>
             <div class="pds-admin-card__pad">
@@ -1390,6 +1388,7 @@
         text-align: right;
         white-space: nowrap;
     }
+    .pds-server .pds-health-row__checked { display: none; }
     .pds-server .pds-health-row__checked::before {
         content: "·";
         margin: 0 6px;
@@ -1531,14 +1530,10 @@
         if (!statusEl) return;
         if (opts.configured) {
             const updated = pdsFormatDate(opts.updatedAt);
-            let html = `
-                <span class="pds-pill pds-pill--gold">
-                    <i class="bi bi-check-circle-fill"></i>${serverI18n.statusConfigured}
-                </span>`;
+            let html = `<span class="pds-pill pds-pill--gold">${serverI18n.statusConfigured}</span>`;
             if (updated) {
                 html += `<span class="pds-key__meta">${serverI18n.updatedPrefix} ${updated}</span>`;
             }
-            html += `<a href="${opts.getKeyUrl}" target="_blank" rel="noopener">${serverI18n.getApiKey}</a>`;
             if (opts.isEnvironment) {
                 html += `
                     <div class="alert alert-info py-1 px-2 mt-2 mb-0 small" style="flex-basis:100%;">
@@ -1551,9 +1546,7 @@
             }
         } else {
             statusEl.innerHTML = `
-                <span class="pds-pill pds-pill--muted">
-                    <i class="bi bi-x-circle"></i>${serverI18n.statusNotConfigured}
-                </span>
+                <span class="pds-pill pds-pill--muted">${serverI18n.statusNotConfigured}</span>
                 <a href="${opts.getKeyUrl}" target="_blank" rel="noopener">${serverI18n.getApiKey}</a>`;
             if (removeBtn) {
                 removeBtn.style.display = 'none';
@@ -1651,14 +1644,14 @@
         if (!anyDirty && anyConfigured) {
             // At least one key configured, nothing pending → "Gespeichert"
             saveBtn.className = 'pds-btn pds-btn--ghost';
-            saveBtn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>' + serverI18n.saved;
+            saveBtn.innerHTML = serverI18n.saved;
             saveBtn.disabled = true;
             if (helperText) helperText.style.display = 'block';
             if (helperMessage) helperMessage.textContent = serverI18n.noChangesHint;
         } else {
             // Pending changes or nothing configured yet → "Keys speichern"
             saveBtn.className = 'pds-btn pds-btn--primary';
-            saveBtn.innerHTML = '<i class="bi bi-save me-1"></i>' + serverI18n.saveKeys;
+            saveBtn.innerHTML = serverI18n.saveKeys;
             saveBtn.disabled = false;
             if (helperText) helperText.style.display = 'none';
         }
