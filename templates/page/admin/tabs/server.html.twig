@@ -12,63 +12,63 @@
             <div id="apiSettings" class="accordion-collapse collapse show" data-bs-parent="#serverSettingsAccordion">
                 <div class="accordion-body">
                 <form id="apiSettingsForm">
-                    <div class="mb-3">
-                        <label for="tmdbApiKey" class="form-label">
-                            {{ t('admin_server.tmdb_api_key') }}
-                            <i class="bi bi-info-circle text-muted" title="{{ t('admin_server.tmdb_key_tooltip') }}" data-bs-toggle="tooltip"></i>
-                        </label>
-                        <div class="input-group">
-                            <input type="password" class="form-control font-monospace" id="tmdbApiKey"
+                    <!-- TMDB key (compact: head = name + pill + updated, row = input + actions) -->
+                    <div class="pds-key">
+                        <div class="pds-key__head">
+                            <span class="pds-key__name">
+                                {{ t('admin_server.tmdb_api_key') }}
+                                <i class="bi bi-info-circle" title="{{ t('admin_server.tmdb_key_tooltip') }}" data-bs-toggle="tooltip"></i>
+                            </span>
+                            <span class="pds-key__status" id="tmdbKeyStatus">
+                                <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                {{ t('admin_server.loading_status') }}
+                            </span>
+                        </div>
+                        <div class="pds-key__row">
+                            <input type="password" class="pds-input font-monospace pds-key__input" id="tmdbApiKey"
                                    placeholder="{{ t('admin_server.tmdb_key_placeholder') }}">
-                            <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('tmdbApiKey')">
+                            <button type="button" class="pds-btn pds-btn--ghost pds-key__eye" onclick="toggleApiKeyVisibility('tmdbApiKey')" aria-label="{{ t('admin_server.tmdb_api_key') }}">
                                 <i class="bi bi-eye"></i>
                             </button>
-                        </div>
-                        <div class="form-text" id="tmdbKeyStatus">
-                            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                            {{ t('admin_server.loading_status') }}
-                        </div>
-                        <div class="mt-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="testTmdbConnection()">
-                                <i class="bi bi-lightning me-1"></i>{{ t('admin_server.test_tmdb') }}
+                            <button type="button" class="pds-btn pds-btn--ghost" onclick="testTmdbConnection()">
+                                <i class="bi bi-lightning me-1"></i>{{ t('admin.server.test_connection') }}
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger" id="removeTmdbKeyBtn" onclick="removeTmdbKey()" style="display: none;">
-                                <i class="bi bi-trash me-1"></i>{{ t('admin_server.remove_key') }}
+                            <button type="button" class="pds-btn pds-btn--danger" id="removeTmdbKeyBtn" onclick="removeTmdbKey()" style="display: none;">
+                                <i class="bi bi-trash me-1"></i>{{ t('admin.server.remove') }}
                             </button>
                         </div>
                     </div>
 
-                    <hr class="my-4">
-
-                    <div class="mb-3">
-                        <label for="omdbApiKey" class="form-label">
-                            {{ t('admin_server.omdb_api_key') }}
-                            <i class="bi bi-info-circle text-muted" title="{{ t('admin_server.omdb_key_tooltip') }}" data-bs-toggle="tooltip"></i>
-                        </label>
-                        <div class="input-group">
-                            <input type="password" class="form-control font-monospace" id="omdbApiKey"
+                    <!-- OMDb key -->
+                    <div class="pds-key">
+                        <div class="pds-key__head">
+                            <span class="pds-key__name">
+                                {{ t('admin_server.omdb_api_key') }}
+                                <i class="bi bi-info-circle" title="{{ t('admin_server.omdb_key_tooltip') }}" data-bs-toggle="tooltip"></i>
+                            </span>
+                            <span class="pds-key__status" id="omdbKeyStatus">
+                                <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                {{ t('admin_server.loading_status') }}
+                            </span>
+                        </div>
+                        <div class="pds-key__row">
+                            <input type="password" class="pds-input font-monospace pds-key__input" id="omdbApiKey"
                                    placeholder="{{ t('admin_server.omdb_key_placeholder') }}">
-                            <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('omdbApiKey')">
+                            <button type="button" class="pds-btn pds-btn--ghost pds-key__eye" onclick="toggleApiKeyVisibility('omdbApiKey')" aria-label="{{ t('admin_server.omdb_api_key') }}">
                                 <i class="bi bi-eye"></i>
                             </button>
-                        </div>
-                        <div class="form-text" id="omdbKeyStatus">
-                            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                            {{ t('admin_server.loading_status') }}
-                        </div>
-                        <div class="mt-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="testOmdbConnection()">
-                                <i class="bi bi-lightning me-1"></i>{{ t('admin_server.test_omdb') }}
+                            <button type="button" class="pds-btn pds-btn--ghost" onclick="testOmdbConnection()">
+                                <i class="bi bi-lightning me-1"></i>{{ t('admin.server.test_connection') }}
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger" id="removeOmdbKeyBtn" onclick="removeOmdbKey()" style="display: none;">
-                                <i class="bi bi-trash me-1"></i>{{ t('admin_server.remove_key') }}
+                            <button type="button" class="pds-btn pds-btn--danger" id="removeOmdbKeyBtn" onclick="removeOmdbKey()" style="display: none;">
+                                <i class="bi bi-trash me-1"></i>{{ t('admin.server.remove') }}
                             </button>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <button type="button" class="btn btn-primary" id="saveApiSettingsBtn" onclick="saveApiSettings()">
-                            <i class="bi bi-save me-1"></i>{{ t('admin_server.save_api_settings') }}
+                    <div class="pds-key__save">
+                        <button type="button" class="pds-btn pds-btn--primary" id="saveApiSettingsBtn" onclick="saveApiSettings()">
+                            <i class="bi bi-save me-1"></i>{{ t('admin.server.save_keys') }}
                         </button>
                         <div id="saveHelperText" class="form-text mt-2" style="display: none;">
                             <i class="bi bi-info-circle"></i> <span id="saveHelperMessage"></span>
@@ -776,140 +776,90 @@
         </div>
     </div>
 
-    <!-- System Health Card -->
+    <!-- System Health Card — compact single-line rows -->
     <div class="col-md-12 mb-4">
-        <div class="card admin-card">
-            <div class="card-header health-card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-activity me-2"></i>{{ t('admin_server.system_health') }}</span>
-                <small class="text-muted" id="health-last-run">{{ t('admin_server.last_check') }} <span id="health-last-run-time">{{ t('admin_server.never') }}</span></small>
+        <div class="pds-admin-card">
+            <div class="pds-health-head">
+                <span class="pds-health-head__title"><i class="bi bi-activity me-2"></i>{{ t('admin_server.system_health') }}</span>
+                <span class="pds-health-head__note" id="health-last-run">{{ t('admin_server.last_check') }} <span id="health-last-run-time">{{ t('admin_server.never') }}</span></span>
             </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <!-- Database Box -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 health-box" id="health-box-database">
-                            <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3">{{ t('admin_server.health_database') }}</h6>
-                                <div class="health-icon mb-3">
-                                    <i class="bi bi-database text-secondary" style="font-size: 3rem;" id="health-icon-database"></i>
-                                </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-database">{{ t('admin_server.status_unknown') }}</span>
-                                <p class="small text-muted mb-2" id="health-message-database">{{ t('admin_server.not_checked_yet') }}</p>
-                                <p class="small text-muted mb-3" id="health-meta-database">
-                                    <span id="health-latency-database">-</span> • <span id="health-checked-database">-</span>
-                                </p>
-                                <div class="mt-auto">
-                                    <button class="btn btn-sm btn-outline-primary" id="health-retest-database" onclick="retestDatabase()">
-                                        <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+            <div class="pds-admin-card__pad">
+                <div class="pds-health-list">
+                    <!-- Database Row -->
+                    <div class="pds-health-row" id="health-box-database">
+                        <i class="bi bi-database text-secondary health-icon" id="health-icon-database"></i>
+                        <span class="pds-health-row__name">{{ t('admin_server.health_database') }}</span>
+                        <span class="pds-pill pds-pill--muted" id="health-badge-database">{{ t('admin_server.status_unknown') }}</span>
+                        <span class="pds-health-row__detail" id="health-message-database">{{ t('admin_server.not_checked_yet') }}</span>
+                        <span class="pds-health-row__meta" id="health-meta-database"><span id="health-latency-database">-</span><span class="pds-health-row__checked" id="health-checked-database">-</span></span>
+                        <button class="pds-btn pds-btn--ghost pds-btn--xs" id="health-retest-database" onclick="retestDatabase()">
+                            <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
+                        </button>
                     </div>
 
-                    <!-- TMDB Box -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 health-box" id="health-box-tmdb">
-                            <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3">{{ t('admin_server.health_tmdb') }}</h6>
-                                <div class="health-icon mb-3">
-                                    <i class="bi bi-cloud text-secondary" style="font-size: 3rem;" id="health-icon-tmdb"></i>
-                                </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-tmdb">{{ t('admin_server.status_unknown') }}</span>
-                                <p class="small text-muted mb-2" id="health-message-tmdb">{{ t('admin_server.not_checked_yet') }}</p>
-                                <p class="small text-muted mb-3" id="health-meta-tmdb">
-                                    <span id="health-latency-tmdb">-</span> • <span id="health-checked-tmdb">-</span>
-                                </p>
-                                <div class="mt-auto">
-                                    <button class="btn btn-sm btn-outline-primary me-1" id="health-retest-tmdb" onclick="retestTmdb()">
-                                        <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('tmdb')">
-                                        <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- TMDB Row -->
+                    <div class="pds-health-row" id="health-box-tmdb">
+                        <i class="bi bi-cloud text-secondary health-icon" id="health-icon-tmdb"></i>
+                        <span class="pds-health-row__name">{{ t('admin_server.health_tmdb') }}</span>
+                        <span class="pds-pill pds-pill--muted" id="health-badge-tmdb">{{ t('admin_server.status_unknown') }}</span>
+                        <span class="pds-health-row__detail" id="health-message-tmdb">{{ t('admin_server.not_checked_yet') }}</span>
+                        <span class="pds-health-row__meta" id="health-meta-tmdb"><span id="health-latency-tmdb">-</span><span class="pds-health-row__checked" id="health-checked-tmdb">-</span></span>
+                        <button class="pds-btn pds-btn--ghost pds-btn--xs" id="health-retest-tmdb" onclick="retestTmdb()">
+                            <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
+                        </button>
+                        <button class="pds-btn pds-btn--ghost pds-btn--xs" onclick="navigateToSettings('tmdb')">
+                            <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
+                        </button>
                     </div>
 
-                    <!-- Email Box (OAuth or SMTP) -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 health-box" id="health-box-oauth">
-                            <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3" id="health-title-oauth">{{ t('admin_server.health_email') }}</h6>
-                                <div class="health-icon mb-3">
-                                    <i class="bi bi-envelope text-secondary" style="font-size: 3rem;" id="health-icon-oauth"></i>
-                                </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-oauth">{{ t('admin_server.status_unknown') }}</span>
-                                <p class="small text-muted mb-2" id="health-message-oauth">{{ t('admin_server.not_checked_yet') }}</p>
-                                <p class="small text-muted mb-3" id="health-meta-oauth">
-                                    <span id="health-latency-oauth">-</span> • <span id="health-checked-oauth">-</span>
-                                </p>
-                                <div class="mt-auto">
-                                    <button class="btn btn-sm btn-outline-primary me-1" id="health-retest-oauth" onclick="retestOauth()">
-                                        <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('email')">
-                                        <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Email Row (OAuth or SMTP) -->
+                    <div class="pds-health-row" id="health-box-oauth">
+                        <i class="bi bi-envelope text-secondary health-icon" id="health-icon-oauth"></i>
+                        <span class="pds-health-row__name" id="health-title-oauth">{{ t('admin_server.health_email') }}</span>
+                        <span class="pds-pill pds-pill--muted" id="health-badge-oauth">{{ t('admin_server.status_unknown') }}</span>
+                        <span class="pds-health-row__detail" id="health-message-oauth">{{ t('admin_server.not_checked_yet') }}</span>
+                        <span class="pds-health-row__meta" id="health-meta-oauth"><span id="health-latency-oauth">-</span><span class="pds-health-row__checked" id="health-checked-oauth">-</span></span>
+                        <button class="pds-btn pds-btn--ghost pds-btn--xs" id="health-retest-oauth" onclick="retestOauth()">
+                            <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
+                        </button>
+                        <button class="pds-btn pds-btn--ghost pds-btn--xs" onclick="navigateToSettings('email')">
+                            <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
+                        </button>
                     </div>
 
-                    <!-- OMDb Box -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 health-box" id="health-box-omdb">
-                            <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3">{{ t('admin_server.health_omdb') }}</h6>
-                                <div class="health-icon mb-3">
-                                    <i class="bi bi-film text-secondary" style="font-size: 3rem;" id="health-icon-omdb"></i>
-                                </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-omdb">{{ t('admin_server.status_unknown') }}</span>
-                                <p class="small text-muted mb-2" id="health-message-omdb">{{ t('admin_server.not_checked_yet') }}</p>
-                                <p class="small text-muted mb-3" id="health-meta-omdb">
-                                    <span id="health-latency-omdb">-</span> • <span id="health-checked-omdb">-</span>
-                                </p>
-                                <div class="mt-auto">
-                                    <button class="btn btn-sm btn-outline-primary me-1" id="health-retest-omdb" onclick="retestOmdb()">
-                                        <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('omdb')">
-                                        <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- OMDb Row -->
+                    <div class="pds-health-row" id="health-box-omdb">
+                        <i class="bi bi-film text-secondary health-icon" id="health-icon-omdb"></i>
+                        <span class="pds-health-row__name">{{ t('admin_server.health_omdb') }}</span>
+                        <span class="pds-pill pds-pill--muted" id="health-badge-omdb">{{ t('admin_server.status_unknown') }}</span>
+                        <span class="pds-health-row__detail" id="health-message-omdb">{{ t('admin_server.not_checked_yet') }}</span>
+                        <span class="pds-health-row__meta" id="health-meta-omdb"><span id="health-latency-omdb">-</span><span class="pds-health-row__checked" id="health-checked-omdb">-</span></span>
+                        <button class="pds-btn pds-btn--ghost pds-btn--xs" id="health-retest-omdb" onclick="retestOmdb()">
+                            <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
+                        </button>
+                        <button class="pds-btn pds-btn--ghost pds-btn--xs" onclick="navigateToSettings('omdb')">
+                            <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
+                        </button>
                     </div>
 
-                    <!-- Integration 2 Box (Placeholder) -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 health-box health-box-disabled" id="health-box-integration2">
-                            <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3 text-muted">Integration 2</h6>
-                                <div class="health-icon mb-3">
-                                    <i class="bi bi-puzzle text-muted" style="font-size: 3rem;" id="health-icon-integration2"></i>
-                                </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-integration2">{{ t('admin_server.status_disabled') }}</span>
-                                <p class="small text-muted mb-2" id="health-message-integration2">{{ t('admin_server.not_enabled') }}</p>
-                                <p class="small text-muted mb-3" id="health-meta-integration2">
-                                    <span id="health-latency-integration2">-</span> • <span id="health-checked-integration2">-</span>
-                                </p>
-                                <div class="mt-auto">
-                                    <button class="btn btn-sm btn-outline-secondary me-1" id="health-retest-integration2" disabled>
-                                        <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('integration2')">
-                                        <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Integration 2 Row (Placeholder) -->
+                    <div class="pds-health-row health-box-disabled" id="health-box-integration2">
+                        <i class="bi bi-puzzle text-muted health-icon" id="health-icon-integration2"></i>
+                        <span class="pds-health-row__name text-muted">Integration 2</span>
+                        <span class="pds-pill pds-pill--muted" id="health-badge-integration2">{{ t('admin_server.status_disabled') }}</span>
+                        <span class="pds-health-row__detail" id="health-message-integration2">{{ t('admin_server.not_enabled') }}</span>
+                        <span class="pds-health-row__meta" id="health-meta-integration2"><span id="health-latency-integration2">-</span><span class="pds-health-row__checked" id="health-checked-integration2">-</span></span>
+                        <button class="pds-btn pds-btn--ghost pds-btn--xs" id="health-retest-integration2" disabled>
+                            <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
+                        </button>
+                        <button class="pds-btn pds-btn--ghost pds-btn--xs" onclick="navigateToSettings('integration2')">
+                            <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
+                        </button>
                     </div>
                 </div>
 
                 <div class="mt-3">
-                    <button class="btn btn-primary btn-sm" id="runHealthCheckBtn" onclick="runHealthCheck()">
+                    <button class="pds-btn pds-btn--primary pds-btn--xs" id="runHealthCheckBtn" onclick="runHealthCheck()">
                         <i class="bi bi-arrow-clockwise me-1"></i>{{ t('admin_server.check_all_systems') }}
                     </button>
                 </div>
@@ -922,13 +872,14 @@
 
 <style>
     /* ===== Server tab — pds design language (uses --pds-* tokens from .pds-root) =====
-       CSS-only reskin. The DOM and every script/wiring detail (form ids, input
-       names/ids, onclick handlers, fetch endpoints, CSRF-token usage, data-bs-* collapse /
-       tab / modal mechanics, Twig conditionals, CSRF tokens) are preserved byte-for-byte. Bootstrap
-       component classes (.accordion/.nav-tabs/.badge/.btn/.form-control/.card/.modal)
-       are restyled in place, so any className the scripts reassign at runtime
-       (e.g. health badges, the API save button) still renders in the pds look.
-       Scoped under .pds-server so nothing leaks to other tabs or global chrome. */
+       The System-Health checks and the API-key blocks were restructured into
+       compact rows in the DOM (pds-health-row / pds-key) and the health + API JS
+       was updated to emit matching pds markup (pds-pill, pds-btn) so the design
+       survives runtime re-render. The collapsible settings cards and OAuth/email
+       sub-tabs keep their Bootstrap data-bs-* mechanics and are restyled in place.
+       Every wiring detail (form ids, input ids, onclick handlers, fetch endpoints,
+       CSRF-token usage, data-bs-* collapse/tab/modal mechanics, Twig conditionals)
+       is preserved. Scoped under .pds-server so nothing leaks to other tabs. */
 
     .pds-server {
         color: var(--pds-text);
@@ -1329,109 +1280,160 @@
     .pds-server .bg-dark.text-light .text-success { color: var(--pds-success) !important; }
 
     /* =======================================================================
-       System Health card (kept as a static pds card; each check as a row)
-       Health JS reassigns badge/icon classes at runtime, so these are styled
-       via Bootstrap classes + element ids only — never via added classes.
+       Status pills — JS-assignable, survive className resets in the health JS
        ======================================================================= */
-    .pds-server .card.admin-card {
-        background: var(--pds-surface);
-        border: 1px solid var(--pds-border);
-        border-radius: var(--pds-r);
-        overflow: hidden;
+    .pds-server .pds-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-family: var(--pds-font-mono);
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        line-height: 1.4;
+        border-radius: 999px;
+        padding: 3px 10px;
+        border: 1px solid transparent;
+        white-space: nowrap;
     }
-    .pds-server .card.admin-card > .card-header.health-card-header {
-        background: var(--pds-surface);
-        color: var(--pds-text);
+    /* Configured → solid gold pill (KONFIGURIERT) */
+    .pds-server .pds-pill--gold {
+        background: var(--pds-gold);
+        color: #12140F;
+        border-color: var(--pds-gold);
+    }
+    /* Healthy → green tinted */
+    .pds-server .pds-pill--success {
+        background: rgba(76, 175, 110, 0.10);
+        color: var(--pds-success);
+        border-color: rgba(76, 175, 110, 0.35);
+    }
+    /* Degraded → amber tinted */
+    .pds-server .pds-pill--warning {
+        background: rgba(251, 188, 9, 0.12);
+        color: var(--pds-gold);
+        border-color: rgba(251, 188, 9, 0.40);
+    }
+    /* Down / unhealthy → red tinted */
+    .pds-server .pds-pill--danger {
+        background: rgba(192, 57, 43, 0.10);
+        color: var(--pds-danger);
+        border-color: rgba(192, 57, 43, 0.35);
+    }
+    /* Unknown / disabled / not configured → bordered muted */
+    .pds-server .pds-pill--muted {
+        background: transparent;
+        color: var(--pds-muted);
+        border-color: var(--pds-border);
+    }
+
+    /* Extra-small button (health retest / settings / run-all) */
+    .pds-server .pds-btn--xs { padding: 5px 11px; font-size: 12px; }
+    .pds-server .pds-btn--xs i { font-size: 12px; }
+
+    /* =======================================================================
+       System Health card — compact single-line rows
+       ======================================================================= */
+    .pds-server .pds-health-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 22px;
         border-bottom: 1px solid var(--pds-hair);
-        padding: 18px 22px !important;
-        font-weight: 600;
-        font-size: 15px;
     }
-    .pds-server .card.admin-card > .card-header.health-card-header i { color: var(--pds-gold); }
-    .pds-server .card.admin-card > .card-header.health-card-header #health-last-run {
+    .pds-server .pds-health-head__title { font-size: 15px; font-weight: 600; color: var(--pds-text); }
+    .pds-server .pds-health-head__title i { color: var(--pds-gold); }
+    .pds-server .pds-health-head__note {
         font-family: var(--pds-font-mono);
         font-size: 12px;
+        color: var(--pds-muted);
+        white-space: nowrap;
     }
-    .pds-server .card.admin-card > .card-body { background: var(--pds-surface); padding: 12px 22px 22px; }
 
-    /* Stack the health checks as full-width rows */
-    .pds-server .card.admin-card .row.g-3 { --bs-gutter-y: 0; --bs-gutter-x: 0; }
-    .pds-server .card.admin-card .row.g-3 > [class*="col-"] {
-        flex: 0 0 100%;
-        max-width: 100%;
+    .pds-server .pds-health-list { display: flex; flex-direction: column; }
+
+    .pds-server .pds-health-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-height: 52px;
+        padding: 8px 0;
         border-bottom: 1px solid var(--pds-hair);
     }
-    .pds-server .card.admin-card .row.g-3 > [class*="col-"]:last-child { border-bottom: none; }
+    .pds-server .pds-health-row:last-child { border-bottom: none; }
+    .pds-server .pds-health-row.health-box-disabled { opacity: 0.55; }
+    /* Decorative status icon dropped in row layout (pill conveys state) */
+    .pds-server .pds-health-row .health-icon { display: none !important; }
 
-    .pds-server .health-box {
-        background: transparent;
-        border: none !important;
-        border-radius: 0;
-        transition: none;
-        box-shadow: none;
-    }
-    .pds-server .health-box:hover { transform: none; box-shadow: none; }
-    .pds-server .health-box-disabled { opacity: 0.55; }
-
-    .pds-server .health-box .card-body {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        text-align: left !important;
-        gap: 16px;
-        padding: 14px 4px;
-        background: transparent;
-    }
-    /* Drop the large decorative status icon in row layout (status pill conveys it) */
-    .pds-server .health-box .health-icon { display: none !important; }
-
-    .pds-server .health-box .card-title {
-        flex: 0 0 140px;
-        margin: 0 !important;
+    .pds-server .pds-health-row__name {
+        flex: 0 0 150px;
         font-size: 14px;
         font-weight: 600;
         color: var(--pds-text);
     }
-    .pds-server .health-box .badge {
-        margin: 0 !important;
-        flex: 0 0 auto;
-        align-self: center;
-    }
-    /* Status message = flexible muted detail */
-    .pds-server .health-box p[id^="health-message-"] {
+    .pds-server .pds-health-row__detail {
         flex: 1 1 auto;
-        margin: 0 !important;
-        color: var(--pds-muted);
+        min-width: 0;
         font-size: 13px;
+        color: var(--pds-muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
-    /* Latency / checked meta = mono, right aligned */
-    .pds-server .health-box p[id^="health-meta-"] {
+    .pds-server .pds-health-row__meta {
         flex: 0 0 auto;
-        margin: 0 !important;
         font-family: var(--pds-font-mono);
         font-size: 12px;
         color: var(--pds-dim);
         text-align: right;
         white-space: nowrap;
     }
-    /* Button cluster pinned right */
-    .pds-server .health-box .mt-auto {
-        margin-top: 0 !important;
-        margin-left: auto;
-        flex: 0 0 auto;
-        display: inline-flex;
-        gap: 8px;
-        white-space: nowrap;
+    .pds-server .pds-health-row__checked::before {
+        content: "·";
+        margin: 0 6px;
+        color: var(--pds-hair);
     }
 
     .pds-server #runHealthCheckBtn { margin-top: 4px; }
 
+    /* =======================================================================
+       API key rows — compact head (name + pill + updated) over input row
+       ======================================================================= */
+    .pds-server .pds-key + .pds-key {
+        margin-top: 18px;
+        padding-top: 20px;
+        border-top: 1px solid var(--pds-hair);
+    }
+    .pds-server .pds-key__head {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .pds-server .pds-key__name { font-size: 14px; font-weight: 600; color: var(--pds-text); }
+    .pds-server .pds-key__name i { color: var(--pds-dim); font-weight: 400; }
+    .pds-server .pds-key__status {
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 12px;
+    }
+    .pds-server .pds-key__meta { font-family: var(--pds-font-mono); font-size: 12px; color: var(--pds-dim); }
+    .pds-server .pds-key__row { display: flex; align-items: center; gap: 8px; }
+    .pds-server .pds-key__input { flex: 1 1 auto; min-width: 0; }
+    .pds-server .pds-key__eye { padding: 9px 12px; }
+    .pds-server .pds-key__save { margin-top: 22px; }
+
     @media (max-width: 767.98px) {
-        .pds-server .health-box .card-body {
-            flex-wrap: wrap;
-        }
-        .pds-server .health-box .card-title { flex-basis: 100%; }
-        .pds-server .health-box .mt-auto { margin-left: 0; }
+        .pds-server .pds-health-row { flex-wrap: wrap; }
+        .pds-server .pds-health-row__name { flex-basis: 100%; }
+        .pds-server .pds-health-row__detail { flex-basis: 100%; text-align: left; }
+        .pds-server .pds-key__row { flex-wrap: wrap; }
+        .pds-server .pds-key__input { flex-basis: 100%; }
     }
 
     /* =======================================================================
@@ -1458,8 +1460,7 @@
     }
     .pds-server #testEmailModal .btn-close { filter: invert(0.6); opacity: 0.7; }
 
-    [data-bs-theme="light"] .pds-server #testEmailModal .btn-close,
-    [data-bs-theme="light"] .pds-server .health-box .health-icon { filter: none; }
+    [data-bs-theme="light"] .pds-server #testEmailModal .btn-close { filter: none; }
 
     /* Diagnostics result card blocks */
     .pds-server #smtpDiagnosticsResults .card,
@@ -1477,6 +1478,89 @@
 </style>
 
 <script>
+    // ── i18n strings + date formatters injected from Twig so JS-produced
+    //    markup stays German and survives runtime re-render. ──
+    const serverI18n = {
+        statusConfigured: {{ t('admin_server.status_configured')|json_encode|raw }},
+        statusNotConfigured: {{ t('admin_server.status_not_configured')|json_encode|raw }},
+        statusUnknown: {{ t('admin_server.status_unknown')|json_encode|raw }},
+        statusDisabled: {{ t('admin_server.status_disabled')|json_encode|raw }},
+        statusHealthy: {{ t('admin.server.status_healthy')|json_encode|raw }},
+        statusDegraded: {{ t('admin.server.status_degraded')|json_encode|raw }},
+        statusDown: {{ t('admin.server.status_down')|json_encode|raw }},
+        notEnabled: {{ t('admin_server.not_enabled')|json_encode|raw }},
+        noMessage: {{ t('admin.server.no_message')|json_encode|raw }},
+        updatedPrefix: {{ t('admin.server.updated_prefix')|json_encode|raw }},
+        getApiKey: {{ t('admin.server.get_api_key')|json_encode|raw }},
+        failedLoadStatus: {{ t('admin.server.failed_load_status')|json_encode|raw }},
+        envReadonly: {{ t('admin.server.env_configured_readonly')|json_encode|raw }},
+        envNote: {{ t('admin.server.env_configured_note')|json_encode|raw }},
+        saved: {{ t('admin.server.saved')|json_encode|raw }},
+        saveKeys: {{ t('admin.server.save_keys')|json_encode|raw }},
+        noChangesHint: {{ t('admin.server.no_changes_hint')|json_encode|raw }},
+    };
+
+    // Date as DD.MM.YYYY (never US M/D/YYYY)
+    function pdsFormatDate(raw) {
+        if (!raw) return '';
+        const d = new Date(String(raw).replace(' ', 'T'));
+        if (isNaN(d.getTime())) return '';
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+    }
+
+    // Date + time as DD.MM.YYYY, HH:MM (defaults to now when raw omitted)
+    function pdsFormatDateTime(raw) {
+        const d = raw ? new Date(String(raw).replace(' ', 'T')) : new Date();
+        if (isNaN(d.getTime())) return '';
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    // Clock time as HH:MM:SS
+    function pdsFormatTime(raw) {
+        if (!raw) return '-';
+        const d = new Date(String(raw).replace(' ', 'T'));
+        if (isNaN(d.getTime())) return '-';
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+
+    // Shared renderer for the TMDB/OMDb key status line (pds pill + updated date)
+    function renderApiKeyStatus(statusEl, removeBtn, opts) {
+        if (!statusEl) return;
+        if (opts.configured) {
+            const updated = pdsFormatDate(opts.updatedAt);
+            let html = `
+                <span class="pds-pill pds-pill--gold">
+                    <i class="bi bi-check-circle-fill"></i>${serverI18n.statusConfigured}
+                </span>`;
+            if (updated) {
+                html += `<span class="pds-key__meta">${serverI18n.updatedPrefix} ${updated}</span>`;
+            }
+            html += `<a href="${opts.getKeyUrl}" target="_blank" rel="noopener">${serverI18n.getApiKey}</a>`;
+            if (opts.isEnvironment) {
+                html += `
+                    <div class="alert alert-info py-1 px-2 mt-2 mb-0 small" style="flex-basis:100%;">
+                        <i class="bi bi-info-circle me-1"></i>${serverI18n.envNote}
+                    </div>`;
+            }
+            statusEl.innerHTML = html;
+            if (removeBtn) {
+                removeBtn.style.display = opts.isEnvironment ? 'none' : 'inline-flex';
+            }
+        } else {
+            statusEl.innerHTML = `
+                <span class="pds-pill pds-pill--muted">
+                    <i class="bi bi-x-circle"></i>${serverI18n.statusNotConfigured}
+                </span>
+                <a href="${opts.getKeyUrl}" target="_blank" rel="noopener">${serverI18n.getApiKey}</a>`;
+            if (removeBtn) {
+                removeBtn.style.display = 'none';
+            }
+        }
+    }
+
     // Load TMDB and OMDb status on page load
     document.addEventListener('DOMContentLoaded', async () => {
         await loadTmdbStatus();
@@ -1516,7 +1600,7 @@
             updateTmdbStatus(data.configured, data.updated_at, data.is_environment);
         } catch (error) {
             document.getElementById('tmdbKeyStatus').innerHTML =
-                '<i class="bi bi-exclamation-circle text-warning"></i> Failed to load status';
+                '<i class="bi bi-exclamation-circle text-warning me-1"></i>' + serverI18n.failedLoadStatus;
         }
     }
 
@@ -1540,51 +1624,16 @@
         if (inputEl) {
             inputEl.disabled = isEnvironment;
             if (isEnvironment) {
-                inputEl.placeholder = 'Configured via environment file (read-only)';
+                inputEl.placeholder = serverI18n.envReadonly;
             }
         }
 
-        if (configured) {
-            const timestamp = updatedAt ? new Date(updatedAt.replace(' ', 'T')).toLocaleString() : 'Unknown';
-            let statusHtml = `
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge bg-success fs-6">
-                        <i class="bi bi-check-circle-fill me-1"></i>Key Configured
-                    </span>
-                    <span class="text-muted small">Last updated: ${timestamp}</span>
-                    <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener" class="small">Get API key</a>
-                </div>
-            `;
-
-            if (isEnvironment) {
-                statusHtml += `
-                    <div class="alert alert-info py-1 px-2 mt-2 mb-0 small">
-                        <i class="bi bi-info-circle me-1"></i>Key is configured via environment file and cannot be modified or removed here.
-                    </div>
-                `;
-            }
-
-            statusEl.innerHTML = statusHtml;
-
-            // Show remove button only if not from environment
-            if (removeBtn) {
-                removeBtn.style.display = isEnvironment ? 'none' : 'inline-block';
-            }
-        } else {
-            statusEl.innerHTML = `
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge bg-secondary">
-                        <i class="bi bi-x-circle me-1"></i>Not Configured
-                    </span>
-                    <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener" class="small">Get API key</a>
-                </div>
-            `;
-
-            // Hide remove button when not configured
-            if (removeBtn) {
-                removeBtn.style.display = 'none';
-            }
-        }
+        renderApiKeyStatus(statusEl, removeBtn, {
+            configured,
+            updatedAt,
+            isEnvironment,
+            getKeyUrl: 'https://www.themoviedb.org/settings/api',
+        });
 
         updateSaveButtonState();
     }
@@ -1596,36 +1645,22 @@
 
         if (!saveBtn) return;
 
-        const bothConfigured = tmdbConfigured && omdbConfigured;
         const anyDirty = tmdbDirty || omdbDirty;
-        const noneConfigured = !tmdbConfigured && !omdbConfigured;
+        const anyConfigured = tmdbConfigured || omdbConfigured;
 
-        if (bothConfigured && !anyDirty) {
-            // Both configured and no changes
-            saveBtn.className = 'btn btn-success';
-            saveBtn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Saved';
+        if (!anyDirty && anyConfigured) {
+            // At least one key configured, nothing pending → "Gespeichert"
+            saveBtn.className = 'pds-btn pds-btn--ghost';
+            saveBtn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>' + serverI18n.saved;
             saveBtn.disabled = true;
-            helperText.style.display = 'block';
-            helperMessage.textContent = 'No changes to save. Enter new API keys to update.';
-        } else if (anyDirty) {
-            // User has made changes
-            saveBtn.className = 'btn btn-primary';
-            saveBtn.innerHTML = '<i class="bi bi-save me-1"></i>Save API Settings';
-            saveBtn.disabled = false;
-            helperText.style.display = 'none';
-        } else if (!noneConfigured && !anyDirty) {
-            // At least one configured, no changes
-            saveBtn.className = 'btn btn-success';
-            saveBtn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Saved';
-            saveBtn.disabled = true;
-            helperText.style.display = 'block';
-            helperMessage.textContent = 'No changes to save. Enter new API keys to update.';
+            if (helperText) helperText.style.display = 'block';
+            if (helperMessage) helperMessage.textContent = serverI18n.noChangesHint;
         } else {
-            // Not configured
-            saveBtn.className = 'btn btn-primary';
-            saveBtn.innerHTML = '<i class="bi bi-save me-1"></i>Save API Settings';
+            // Pending changes or nothing configured yet → "Keys speichern"
+            saveBtn.className = 'pds-btn pds-btn--primary';
+            saveBtn.innerHTML = '<i class="bi bi-save me-1"></i>' + serverI18n.saveKeys;
             saveBtn.disabled = false;
-            helperText.style.display = 'none';
+            if (helperText) helperText.style.display = 'none';
         }
     }
 
@@ -1783,7 +1818,7 @@
             updateOmdbStatus(data.configured, data.updated_at, data.is_environment);
         } catch (error) {
             document.getElementById('omdbKeyStatus').innerHTML =
-                '<i class="bi bi-exclamation-circle text-warning"></i> Failed to load status';
+                '<i class="bi bi-exclamation-circle text-warning me-1"></i>' + serverI18n.failedLoadStatus;
         }
     }
 
@@ -1799,51 +1834,16 @@
         if (inputEl) {
             inputEl.disabled = isEnvironment;
             if (isEnvironment) {
-                inputEl.placeholder = 'Configured via environment file (read-only)';
+                inputEl.placeholder = serverI18n.envReadonly;
             }
         }
 
-        if (configured) {
-            const timestamp = updatedAt ? new Date(updatedAt.replace(' ', 'T')).toLocaleString() : 'Unknown';
-            let statusHtml = `
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge bg-success fs-6">
-                        <i class="bi bi-check-circle-fill me-1"></i>Key Configured
-                    </span>
-                    <span class="text-muted small">Last updated: ${timestamp}</span>
-                    <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener" class="small">Get API key</a>
-                </div>
-            `;
-
-            if (isEnvironment) {
-                statusHtml += `
-                    <div class="alert alert-info py-1 px-2 mt-2 mb-0 small">
-                        <i class="bi bi-info-circle me-1"></i>Key is configured via environment file and cannot be modified or removed here.
-                    </div>
-                `;
-            }
-
-            statusEl.innerHTML = statusHtml;
-
-            // Show remove button only if not from environment
-            if (removeBtn) {
-                removeBtn.style.display = isEnvironment ? 'none' : 'inline-block';
-            }
-        } else {
-            statusEl.innerHTML = `
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge bg-secondary">
-                        <i class="bi bi-x-circle me-1"></i>Not Configured
-                    </span>
-                    <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener" class="small">Get API key</a>
-                </div>
-            `;
-
-            // Hide remove button when not configured
-            if (removeBtn) {
-                removeBtn.style.display = 'none';
-            }
-        }
+        renderApiKeyStatus(statusEl, removeBtn, {
+            configured,
+            updatedAt,
+            isEnvironment,
+            getKeyUrl: 'https://www.omdbapi.com/apikey.aspx',
+        });
 
         updateSaveButtonState();
     }
@@ -2328,7 +2328,7 @@
     function updateLastRunTime() {
         const timeEl = document.getElementById('health-last-run-time');
         if (timeEl) {
-            timeEl.textContent = new Date().toLocaleString();
+            timeEl.textContent = pdsFormatDateTime();
         }
     }
 
@@ -2590,9 +2590,9 @@
             box?.classList.add('health-box-disabled');
             icon?.classList.remove('text-success', 'text-warning', 'text-danger', 'text-secondary');
             icon?.classList.add('text-muted');
-            badge.textContent = 'Disabled';
-            badge.className = 'badge bg-secondary mb-2';
-            messageEl.textContent = 'Not enabled';
+            badge.textContent = serverI18n.statusDisabled;
+            badge.className = 'pds-pill pds-pill--muted';
+            messageEl.textContent = serverI18n.notEnabled;
             latencyEl.textContent = '-';
             checkedEl.textContent = '-';
             if (retestBtn) {
@@ -2612,27 +2612,27 @@
         switch (status.status) {
             case 'healthy':
                 icon?.classList.add('text-success');
-                badge.className = 'badge bg-success mb-2';
-                badge.textContent = 'Healthy';
+                badge.className = 'pds-pill pds-pill--success';
+                badge.textContent = serverI18n.statusHealthy;
                 break;
             case 'degraded':
                 icon?.classList.add('text-warning');
-                badge.className = 'badge bg-warning mb-2';
-                badge.textContent = 'Degraded';
+                badge.className = 'pds-pill pds-pill--warning';
+                badge.textContent = serverI18n.statusDegraded;
                 break;
             case 'down':
                 icon?.classList.add('text-danger');
-                badge.className = 'badge bg-danger mb-2';
-                badge.textContent = 'Down';
+                badge.className = 'pds-pill pds-pill--danger';
+                badge.textContent = serverI18n.statusDown;
                 break;
             default:
                 icon?.classList.add('text-secondary');
-                badge.className = 'badge bg-secondary mb-2';
-                badge.textContent = 'Unknown';
+                badge.className = 'pds-pill pds-pill--muted';
+                badge.textContent = serverI18n.statusUnknown;
         }
 
         // Update message
-        messageEl.textContent = status.message || 'No message';
+        messageEl.textContent = status.message || serverI18n.noMessage;
 
         // Update latency
         if (status.latency_ms !== undefined && status.latency_ms > 0) {
@@ -2641,13 +2641,8 @@
             latencyEl.textContent = '-';
         }
 
-        // Update checked timestamp
-        if (status.checked_at) {
-            const timestamp = new Date(status.checked_at.replace(' ', 'T')).toLocaleTimeString();
-            checkedEl.textContent = timestamp;
-        } else {
-            checkedEl.textContent = '-';
-        }
+        // Update checked timestamp (HH:MM:SS)
+        checkedEl.textContent = status.checked_at ? pdsFormatTime(status.checked_at) : '-';
     }
 
     // ===========================
