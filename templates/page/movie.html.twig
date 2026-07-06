@@ -58,7 +58,7 @@
             </div>
 
             <div style="padding-left: 1rem">
-                <h6 style="margin-bottom: 0.2rem">Genres</h6>
+                <h6 style="margin-bottom: 0.2rem">{{ t('pmovie.genres') }}</h6>
                 <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">
                         {% if movieGenres|length == 0 %} - {% endif %}
@@ -67,7 +67,7 @@
                     </span>
                 </div>
 
-                <h6 style="margin-bottom: 0.2rem">Runtime</h6>
+                <h6 style="margin-bottom: 0.2rem">{{ t('pmovie.runtime') }}</h6>
                 <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">
                         {% if movie.runtime == '' %} - {% endif %}
@@ -75,7 +75,7 @@
                     </span>
                 </div>
 
-                <h6 style="margin-bottom: 0.2rem">Language</h6>
+                <h6 style="margin-bottom: 0.2rem">{{ t('pmovie.language') }}</h6>
                 <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">
                         {% if movie.originalLanguage == '' %} - {% endif %}
@@ -83,7 +83,7 @@
                     </span>
                 </div>
 
-                <h6 style="margin-bottom: 0.2rem">Release</h6>
+                <h6 style="margin-bottom: 0.2rem">{{ t('pmovie.release') }}</h6>
                 <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">
                         {% if movie.releaseDate == '' %}
@@ -102,7 +102,7 @@
                     style="margin-bottom: 0;
                     margin-right: .5rem"
                     data-bs-toggle="tooltip"
-                    data-bs-title="On Watchlist"
+                    data-bs-title="{{ t('pmovie.on_watchlist') }}"
                     id="bookmarkIcon"
                 >
                     <a class="bi bi-bookmark-fill h5" href="{{ applicationUrl }}/watchlist"></a>
@@ -151,7 +151,7 @@
                         onclick="toggleWatchDates()"
                         id="toggleWatchDatesButton"
                         {% if totalPlays == 0 %}disabled{% endif %}>
-                    {{ totalPlays }}x Play{% if totalPlays == 0 or totalPlays > 1 %}s{% endif %} <span style="font-size: 0.8rem">- View all</span>
+                    {{ totalPlays }}x {% if totalPlays == 0 or totalPlays > 1 %}{{ t('pmovie.plays') }}{% else %}{{ t('pmovie.play') }}{% endif %} <span style="font-size: 0.8rem">- {{ t('pmovie.view_all') }}</span>
                 </button>
             </div>
         </div>
@@ -168,7 +168,7 @@
                             data-comment="{{ watchDate.comment }}"
                             data-position="{{ watchDate.position }}"
                             data-location="{{ watchDate.location_id }}">
-                            {{ watchDate.watched_at is null ? 'Unkown date' : watchDate.watched_at|date(dateFormatPhp) }}
+                            {{ watchDate.watched_at is null ? t('pmovie.unknown_date') : watchDate.watched_at|date(dateFormatPhp) }}
                             {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
                             <span style="position: absolute; right:.7rem; top:50%; transform: translateY(-50%); display: flex; gap: 0.5rem;">
                                 {% if watchDate.comment != '' %}
@@ -190,7 +190,7 @@
                     <button type="button"
                             class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             id="logSpecificMovieButton"
-                            onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, {{ movie.title|json_encode() }}, {{ movie.releaseDate|date("Y") }})">Add play
+                            onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, {{ movie.title|json_encode() }}, {{ movie.releaseDate|date("Y") }})">{{ t('pmovie.add_play') }}
                     </button>
                 </div>
                 <div class="row mb-2">
@@ -200,7 +200,7 @@
                         id="watchlistButton"
                         onclick="toggleWatchlist({{ isOnWatchlist }})"
                     >
-                        {{ isOnWatchlist == true ? 'Remove from' : 'Add to' }} Watchlist
+                        {{ isOnWatchlist == true ? t('pmovie.remove_from_watchlist') : t('pmovie.add_to_watchlist') }}
                     </button>
                 </div>
             </div>
@@ -211,7 +211,7 @@
                             class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             data-bs-toggle="modal"
                             data-bs-target="#moreModal">
-                        More
+                        {{ t('pmovie.more') }}
                     </button>
                 </div>
             </div>
@@ -225,7 +225,7 @@
         {# --- Tagline --- #}
 
         {% if movie.tagline is not null %}
-            <h6 style="margin-bottom: 0.3rem;">Tagline</h6>
+            <h6 style="margin-bottom: 0.3rem;">{{ t('pmovie.tagline') }}</h6>
             <div class="carousel">
                 <p style="margin-bottom: 0">
                     {{ movie.tagline }}
@@ -235,7 +235,7 @@
 
         {# --- Plot --- #}
 
-        <h6 style="margin-bottom: 0.4rem;">Plot</h6>
+        <h6 style="margin-bottom: 0.4rem;">{{ t('pmovie.plot') }}</h6>
         <div class="carousel">
             <p style="margin-bottom: 0">
                 {% if movie.overview == '' %} - {% endif %}
@@ -245,7 +245,7 @@
 
         {# --- Acting --- #}
 
-        <h6 style="margin-bottom: 0.4rem">Cast</h6>
+        <h6 style="margin-bottom: 0.4rem">{{ t('pmovie.cast') }}</h6>
         <div class="carousel">
             {% if castMembers|length == 0 %} - {% endif %}
             {% for castMember in castMembers|slice(0, 40) %}
@@ -291,7 +291,7 @@
 
         {# --- Director --- #}
 
-        <h6 style="margin-top: 0.8rem">Director</h6>
+        <h6 style="margin-top: 0.8rem">{{ t('pmovie.director') }}</h6>
         <div class="carousel">
             {% if directors|length == 0 %} - {% endif %}
             {% for director in directors|slice(0, 25) %}
@@ -326,7 +326,7 @@
 
         {# --- Production countries --- #}
 
-        <h6 style="margin-bottom: 0.4rem;margin-top: 1rem">Production countries</h6>
+        <h6 style="margin-bottom: 0.4rem;margin-top: 1rem">{{ t('pmovie.production_countries') }}</h6>
         <div class="carousel">
             <p style="margin-bottom: 0">
                 {% if movieProductionCountries|length == 0 %} - {% endif %}
@@ -337,8 +337,8 @@
 
         {# Poster Lightbox #}
         <div id="posterLightbox" class="lightbox-overlay" style="display: none;">
-            <button class="lightbox-close" aria-label="Close">&times;</button>
-            <img id="posterLightboxImage" src="" alt="Movie Poster" class="lightbox-image">
+            <button class="lightbox-close" aria-label="{{ t('pmovie.close') }}">&times;</button>
+            <img id="posterLightboxImage" src="" alt="{{ t('pmovie.movie_poster') }}" class="lightbox-image">
         </div>
     </main>
 {% endblock %}

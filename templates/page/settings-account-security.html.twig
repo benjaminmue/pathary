@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - Password
+    {{ t('settings_security.title_password') }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -21,9 +21,9 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
-                <h5>Password change</h5>
+                <h5>{{ t('settings_security.password_change') }}</h5>
                 <div class="mb-3">
-                    <label for="currentPassword" class="form-label"><b>Current password</b> <span class="text-danger">*</span></label>
+                    <label for="currentPassword" class="form-label"><b>{{ t('settings_security.current_password') }}</b> <span class="text-danger">*</span></label>
                     <input type="password"
                            class="form-control"
                            id="currentPassword"
@@ -31,11 +31,11 @@
                            minlength="10"
                            {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                            style="text-align: center;">
-                    <div id="currentPassword" class="form-text">Enter your current password</div>
+                    <div id="currentPassword" class="form-text">{{ t('settings_security.current_password_help') }}</div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="newPassword" class="form-label"><b>New password</b> <span class="text-danger">*</span></label>
+                    <label for="newPassword" class="form-label"><b>{{ t('settings_security.new_password') }}</b> <span class="text-danger">*</span></label>
                     <input type="password"
                            class="form-control"
                            id="newPassword"
@@ -44,24 +44,24 @@
                            {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                            style="text-align: center;">
                     <div class="form-text small">
-                        <div class="text-muted mb-1">Password must contain:</div>
-                        <div class="text-muted">• At least 10 characters</div>
-                        <div class="text-muted">• One uppercase letter</div>
-                        <div class="text-muted">• One lowercase letter</div>
-                        <div class="text-muted">• One number</div>
-                        <div class="text-muted">• One special character</div>
+                        <div class="text-muted mb-1">{{ t('settings_security.password_must_contain') }}</div>
+                        <div class="text-muted">• {{ t('settings_security.pw_req_length') }}</div>
+                        <div class="text-muted">• {{ t('settings_security.pw_req_uppercase') }}</div>
+                        <div class="text-muted">• {{ t('settings_security.pw_req_lowercase') }}</div>
+                        <div class="text-muted">• {{ t('settings_security.pw_req_number') }}</div>
+                        <div class="text-muted">• {{ t('settings_security.pw_req_special') }}</div>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="newPasswordRepeat" class="form-label"><b>Repeat new password</b> <span class="text-danger">*</span></label>
+                    <label for="newPasswordRepeat" class="form-label"><b>{{ t('settings_security.repeat_new_password') }}</b> <span class="text-danger">*</span></label>
                     <input type="password"
                            class="form-control"
                            id="newPasswordRepeat"
                            required minlength="10"
                            {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                            style="text-align: center;">
-                    <div id="newPasswordRepeat" class="form-text">Must match new password</div>
+                    <div id="newPasswordRepeat" class="form-text">{{ t('settings_security.repeat_help') }}</div>
                 </div>
 
                 <div id="alertChangePasswordDiv"></div>
@@ -70,19 +70,19 @@
                         type="button"
                         id="changePasswordUpdateButton"
                         {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
-                    Submit
+                    {{ t('settings.submit') }}
                 </button>
             </div>
 
             <hr>
 
-            <h5 style="margin-bottom: .7rem">Security Settings</h5>
+            <h5 style="margin-bottom: .7rem">{{ t('settings_security.security_settings') }}</h5>
             <div class="alert alert-info" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                <i class="bi bi-info-circle"></i> <strong>Security settings have moved!</strong><br>
-                Two-Factor Authentication, Recovery Codes, and Trusted Devices are now available in your <a href="{{ applicationUrl }}/profile" class="alert-link">Profile Settings</a> under the Security tab.
+                <i class="bi bi-info-circle"></i> <strong>{{ t('settings_security.moved_title') }}</strong><br>
+                {{ t('settings_security.moved_before') }} <a href="{{ applicationUrl }}/profile" class="alert-link">{{ t('settings_security.profile_settings_link') }}</a> {{ t('settings_security.moved_after') }}
                 <div style="margin-top: 1rem">
                     <a href="{{ applicationUrl }}/profile" class="btn btn-sm btn-primary">
-                        <i class="bi bi-shield-lock"></i> Go to Profile Security Settings
+                        <i class="bi bi-shield-lock"></i> {{ t('settings_security.go_to_profile') }}
                     </a>
                 </div>
             </div>

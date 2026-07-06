@@ -1,6 +1,6 @@
 {% extends 'layouts/app_base.twig' %}
 
-{% block title %}All Movies{% endblock %}
+{% block title %}{{ t('movies.title') }}{% endblock %}
 
 {% block stylesheets %}
 <style>
@@ -412,26 +412,26 @@
 <div class="container">
     <header class="page-header">
         <div>
-            <h1 class="page-title">All Movies</h1>
-            <p class="page-subtitle">{{ totalMovies }} movie{{ totalMovies != 1 ? 's' : '' }} in library</p>
+            <h1 class="page-title">{{ t('movies.title') }}</h1>
+            <p class="page-subtitle">{{ totalMovies }} {{ t('movies.in_library') }}</p>
         </div>
 
         <div class="controls">
             <button class="btn btn-outline-secondary btn-filter-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas">
-                <i class="bi bi-funnel"></i> Filters
+                <i class="bi bi-funnel"></i> {{ t('movies.filters') }}
             </button>
 
             <select class="form-select sort-select" id="sortSelect" onchange="updateSort(this.value)">
-                <option value="added-desc" {{ currentSort == 'added' and currentOrder == 'desc' ? 'selected' : '' }}>Recently Added</option>
-                <option value="added-asc" {{ currentSort == 'added' and currentOrder == 'asc' ? 'selected' : '' }}>Oldest Added</option>
-                <option value="title-asc" {{ currentSort == 'title' and currentOrder == 'asc' ? 'selected' : '' }}>Title A-Z</option>
-                <option value="title-desc" {{ currentSort == 'title' and currentOrder == 'desc' ? 'selected' : '' }}>Title Z-A</option>
-                <option value="release_date-desc" {{ currentSort == 'release_date' and currentOrder == 'desc' ? 'selected' : '' }}>Newest Release</option>
-                <option value="release_date-asc" {{ currentSort == 'release_date' and currentOrder == 'asc' ? 'selected' : '' }}>Oldest Release</option>
-                <option value="global_rating-desc" {{ currentSort == 'global_rating' and currentOrder == 'desc' ? 'selected' : '' }}>Highest Rated</option>
-                <option value="global_rating-asc" {{ currentSort == 'global_rating' and currentOrder == 'asc' ? 'selected' : '' }}>Lowest Rated</option>
-                <option value="own_rating-desc" {{ currentSort == 'own_rating' and currentOrder == 'desc' ? 'selected' : '' }}>My Rating (High)</option>
-                <option value="own_rating-asc" {{ currentSort == 'own_rating' and currentOrder == 'asc' ? 'selected' : '' }}>My Rating (Low)</option>
+                <option value="added-desc" {{ currentSort == 'added' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_recently_added') }}</option>
+                <option value="added-asc" {{ currentSort == 'added' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_oldest_added') }}</option>
+                <option value="title-asc" {{ currentSort == 'title' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_title_az') }}</option>
+                <option value="title-desc" {{ currentSort == 'title' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_title_za') }}</option>
+                <option value="release_date-desc" {{ currentSort == 'release_date' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_newest_release') }}</option>
+                <option value="release_date-asc" {{ currentSort == 'release_date' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_oldest_release') }}</option>
+                <option value="global_rating-desc" {{ currentSort == 'global_rating' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_highest_rated') }}</option>
+                <option value="global_rating-asc" {{ currentSort == 'global_rating' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_lowest_rated') }}</option>
+                <option value="own_rating-desc" {{ currentSort == 'own_rating' and currentOrder == 'desc' ? 'selected' : '' }}>{{ t('movies.sort_my_rating_high') }}</option>
+                <option value="own_rating-asc" {{ currentSort == 'own_rating' and currentOrder == 'asc' ? 'selected' : '' }}>{{ t('movies.sort_my_rating_low') }}</option>
             </select>
         </div>
     </header>
@@ -445,12 +445,12 @@
             {% endif %}
             {% if currentRatingMin or currentRatingMax %}
                 <span class="active-filter-badge">
-                    🍿 Rating: {{ currentRatingMin ?? 1 }} - {{ currentRatingMax ?? 7 }}
+                    🍿 {{ t('movies.badge_rating') }} {{ currentRatingMin ?? 1 }} - {{ currentRatingMax ?? 7 }}
                 </span>
             {% endif %}
             {% if currentYearMin or currentYearMax %}
                 <span class="active-filter-badge">
-                    <i class="bi bi-calendar"></i> Year: {{ currentYearMin ?? yearRange.min }} - {{ currentYearMax ?? yearRange.max }}
+                    <i class="bi bi-calendar"></i> {{ t('movies.badge_year') }} {{ currentYearMin ?? yearRange.min }} - {{ currentYearMax ?? yearRange.max }}
                 </span>
             {% endif %}
             {% if currentTmdbMin or currentTmdbMax %}
@@ -476,9 +476,9 @@
         <aside class="filters-sidebar">
             <div class="filters-card">
                 <h2 class="filters-title">
-                    Filters
+                    {{ t('movies.filters') }}
                     {% if currentGenre or currentRatingMin or currentRatingMax or currentYearMin or currentYearMax or currentTmdbMin or currentTmdbMax or currentImdbMin or currentImdbMax or currentRtMin or currentRtMax %}
-                        <a href="{{ applicationUrl }}/movies?sort={{ currentSort }}&order={{ currentOrder }}" class="btn btn-sm btn-clear-filters">Clear</a>
+                        <a href="{{ applicationUrl }}/movies?sort={{ currentSort }}&order={{ currentOrder }}" class="btn btn-sm btn-clear-filters">{{ t('movies.clear') }}</a>
                     {% endif %}
                 </h2>
 
@@ -487,9 +487,9 @@
                     <input type="hidden" name="order" value="{{ currentOrder }}">
 
                     <div class="filter-group">
-                        <label class="filter-label">Genre</label>
+                        <label class="filter-label">{{ t('movies.genre') }}</label>
                         <select name="genre" class="filter-select">
-                            <option value="">All Genres</option>
+                            <option value="">{{ t('movies.all_genres') }}</option>
                             {% for g in genres %}
                                 <option value="{{ g }}" {{ currentGenre == g ? 'selected' : '' }}>{{ g }}</option>
                             {% endfor %}
@@ -497,7 +497,7 @@
                     </div>
 
                     <div class="filter-group">
-                        <label class="filter-label">Global Rating (avg)</label>
+                        <label class="filter-label">{{ t('movies.global_rating') }}</label>
                         <div class="dual-range-slider">
                             <div class="dual-range-slider-track"></div>
                             <div class="dual-range-slider-range" id="rating-range"></div>
@@ -510,20 +510,20 @@
                         </div>
                         <input type="hidden" name="rating_min" id="rating_min" value="{{ currentRatingMin }}">
                         <input type="hidden" name="rating_max" id="rating_max" value="{{ currentRatingMax }}">
-                        <p class="filter-info">Filters by rounded average (1-7 popcorn scale)</p>
+                        <p class="filter-info">{{ t('movies.rating_info') }}</p>
                     </div>
 
                     <div class="filter-group">
-                        <label class="filter-label">Release Year</label>
+                        <label class="filter-label">{{ t('movies.release_year') }}</label>
                         <div class="filter-range">
-                            <input type="number" name="year_min" class="filter-input" placeholder="{{ yearRange.min ?? 'Min' }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMin }}">
+                            <input type="number" name="year_min" class="filter-input" placeholder="{{ yearRange.min ?? t('movies.min') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMin }}">
                             <span class="filter-range-separator">-</span>
-                            <input type="number" name="year_max" class="filter-input" placeholder="{{ yearRange.max ?? 'Max' }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMax }}">
+                            <input type="number" name="year_max" class="filter-input" placeholder="{{ yearRange.max ?? t('movies.max') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMax }}">
                         </div>
                     </div>
 
                     <div class="filter-group">
-                        <label class="filter-label">TMDB Rating</label>
+                        <label class="filter-label">{{ t('movies.tmdb_rating') }}</label>
                         <div class="dual-range-slider">
                             <div class="dual-range-slider-track"></div>
                             <div class="dual-range-slider-range" id="tmdb-range"></div>
@@ -536,12 +536,12 @@
                         </div>
                         <input type="hidden" name="tmdb_min" id="tmdb_min" value="{{ currentTmdbMin }}">
                         <input type="hidden" name="tmdb_max" id="tmdb_max" value="{{ currentTmdbMax }}">
-                        <p class="filter-info">Scale: 0-10</p>
+                        <p class="filter-info">{{ t('movies.scale_0_10') }}</p>
                     </div>
 
                     {% if omdbConfigured %}
                         <div class="filter-group">
-                            <label class="filter-label">IMDB Rating</label>
+                            <label class="filter-label">{{ t('movies.imdb_rating') }}</label>
                             <div class="dual-range-slider">
                                 <div class="dual-range-slider-track"></div>
                                 <div class="dual-range-slider-range" id="imdb-range"></div>
@@ -554,7 +554,7 @@
                             </div>
                             <input type="hidden" name="imdb_min" id="imdb_min" value="{{ currentImdbMin }}">
                             <input type="hidden" name="imdb_max" id="imdb_max" value="{{ currentImdbMax }}">
-                            <p class="filter-info">Scale: 0-10</p>
+                            <p class="filter-info">{{ t('movies.scale_0_10') }}</p>
                         </div>
 
                         <div class="filter-group">
@@ -571,12 +571,12 @@
                             </div>
                             <input type="hidden" name="rt_min" id="rt_min" value="{{ currentRtMin }}">
                             <input type="hidden" name="rt_max" id="rt_max" value="{{ currentRtMax }}">
-                            <p class="filter-info">Scale: 0-100</p>
+                            <p class="filter-info">{{ t('movies.scale_0_100') }}</p>
                         </div>
                     {% endif %}
 
                     <div class="filter-actions">
-                        <button type="submit" class="btn btn-apply-filters">Apply Filters</button>
+                        <button type="submit" class="btn btn-apply-filters">{{ t('movies.apply_filters') }}</button>
                     </div>
                 </form>
             </div>
@@ -613,8 +613,8 @@
                     {% endfor %}
                 {% else %}
                     <div class="no-movies">
-                        <h3>No movies found</h3>
-                        <p>Try adjusting your filters or add some movies to the library.</p>
+                        <h3>{{ t('movies.no_movies_found') }}</h3>
+                        <p>{{ t('movies.no_movies_hint') }}</p>
                     </div>
                 {% endif %}
             </div>
@@ -625,8 +625,8 @@
 <!-- Mobile Filters Offcanvas -->
 <div class="offcanvas offcanvas-end offcanvas-filters" tabindex="-1" id="filtersOffcanvas" aria-labelledby="filtersOffcanvasLabel">
     <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="filtersOffcanvasLabel">Filters</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <h5 class="offcanvas-title" id="filtersOffcanvasLabel">{{ t('movies.filters') }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="{{ t('movies.close') }}"></button>
     </div>
     <div class="offcanvas-body">
         <form id="filtersFormMobile" action="{{ applicationUrl }}/movies" method="get">
@@ -634,9 +634,9 @@
             <input type="hidden" name="order" value="{{ currentOrder }}">
 
             <div class="filter-group">
-                <label class="filter-label">Genre</label>
+                <label class="filter-label">{{ t('movies.genre') }}</label>
                 <select name="genre" class="filter-select">
-                    <option value="">All Genres</option>
+                    <option value="">{{ t('movies.all_genres') }}</option>
                     {% for g in genres %}
                         <option value="{{ g }}" {{ currentGenre == g ? 'selected' : '' }}>{{ g }}</option>
                     {% endfor %}
@@ -644,7 +644,7 @@
             </div>
 
             <div class="filter-group">
-                <label class="filter-label">Global Rating (avg)</label>
+                <label class="filter-label">{{ t('movies.global_rating') }}</label>
                 <div class="dual-range-slider">
                     <div class="dual-range-slider-track"></div>
                     <div class="dual-range-slider-range" id="rating-range-mobile"></div>
@@ -657,20 +657,20 @@
                 </div>
                 <input type="hidden" name="rating_min" id="rating_min_mobile" value="{{ currentRatingMin }}">
                 <input type="hidden" name="rating_max" id="rating_max_mobile" value="{{ currentRatingMax }}">
-                <p class="filter-info">Filters by rounded average (1-7 popcorn scale)</p>
+                <p class="filter-info">{{ t('movies.rating_info') }}</p>
             </div>
 
             <div class="filter-group">
-                <label class="filter-label">Release Year</label>
+                <label class="filter-label">{{ t('movies.release_year') }}</label>
                 <div class="filter-range">
-                    <input type="number" name="year_min" class="filter-input" placeholder="{{ yearRange.min ?? 'Min' }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMin }}">
+                    <input type="number" name="year_min" class="filter-input" placeholder="{{ yearRange.min ?? t('movies.min') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMin }}">
                     <span class="filter-range-separator">-</span>
-                    <input type="number" name="year_max" class="filter-input" placeholder="{{ yearRange.max ?? 'Max' }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMax }}">
+                    <input type="number" name="year_max" class="filter-input" placeholder="{{ yearRange.max ?? t('movies.max') }}" min="{{ yearRange.min }}" max="{{ yearRange.max }}" value="{{ currentYearMax }}">
                 </div>
             </div>
 
             <div class="filter-group">
-                <label class="filter-label">TMDB Rating</label>
+                <label class="filter-label">{{ t('movies.tmdb_rating') }}</label>
                 <div class="dual-range-slider">
                     <div class="dual-range-slider-track"></div>
                     <div class="dual-range-slider-range" id="tmdb-range-mobile"></div>
@@ -683,12 +683,12 @@
                 </div>
                 <input type="hidden" name="tmdb_min" id="tmdb_min_mobile" value="{{ currentTmdbMin }}">
                 <input type="hidden" name="tmdb_max" id="tmdb_max_mobile" value="{{ currentTmdbMax }}">
-                <p class="filter-info">Scale: 0-10</p>
+                <p class="filter-info">{{ t('movies.scale_0_10') }}</p>
             </div>
 
             {% if omdbConfigured %}
                 <div class="filter-group">
-                    <label class="filter-label">IMDB Rating</label>
+                    <label class="filter-label">{{ t('movies.imdb_rating') }}</label>
                     <div class="dual-range-slider">
                         <div class="dual-range-slider-track"></div>
                         <div class="dual-range-slider-range" id="imdb-range-mobile"></div>
@@ -701,7 +701,7 @@
                     </div>
                     <input type="hidden" name="imdb_min" id="imdb_min_mobile" value="{{ currentImdbMin }}">
                     <input type="hidden" name="imdb_max" id="imdb_max_mobile" value="{{ currentImdbMax }}">
-                    <p class="filter-info">Scale: 0-10</p>
+                    <p class="filter-info">{{ t('movies.scale_0_10') }}</p>
                 </div>
 
                 <div class="filter-group">
@@ -718,13 +718,13 @@
                     </div>
                     <input type="hidden" name="rt_min" id="rt_min_mobile" value="{{ currentRtMin }}">
                     <input type="hidden" name="rt_max" id="rt_max_mobile" value="{{ currentRtMax }}">
-                    <p class="filter-info">Scale: 0-100</p>
+                    <p class="filter-info">{{ t('movies.scale_0_100') }}</p>
                 </div>
             {% endif %}
 
             <div class="filter-actions">
-                <button type="submit" class="btn btn-apply-filters">Apply Filters</button>
-                <a href="{{ applicationUrl }}/movies?sort={{ currentSort }}&order={{ currentOrder }}" class="btn btn-clear-filters">Clear</a>
+                <button type="submit" class="btn btn-apply-filters">{{ t('movies.apply_filters') }}</button>
+                <a href="{{ applicationUrl }}/movies?sort={{ currentSort }}&order={{ currentOrder }}" class="btn btn-clear-filters">{{ t('movies.clear') }}</a>
             </div>
         </form>
     </div>

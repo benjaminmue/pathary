@@ -184,37 +184,37 @@
 
     <!-- Password Section -->
     <div class="security-section">
-        <h3><i class="bi bi-key"></i> Password</h3>
-        <p>Change your password regularly to keep your account secure.</p>
+        <h3><i class="bi bi-key"></i> {{ t('security.password') }}</h3>
+        <p>{{ t('security.password_hint') }}</p>
         <button type="button" class="btn btn-primary" id="changePasswordBtn">
-            <i class="bi bi-key"></i> Change Password
+            <i class="bi bi-key"></i> {{ t('security.change_password') }}
         </button>
     </div>
 
     <!-- Two-Factor Authentication Section -->
     <div class="security-section">
-        <h3><i class="bi {% if totpEnabled %}bi-lock-fill{% else %}bi-unlock-fill{% endif %}"></i> Two-Factor Authentication</h3>
-        <p>Add an extra layer of security to your account with 2FA using an authenticator app.</p>
+        <h3><i class="bi {% if totpEnabled %}bi-lock-fill{% else %}bi-unlock-fill{% endif %}"></i> {{ t('security.two_factor') }}</h3>
+        <p>{{ t('security.two_factor_hint') }}</p>
 
         {% if totpEnabled %}
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="status-badge enabled">
-                    <i class="bi bi-check-circle-fill"></i> Enabled
+                    <i class="bi bi-check-circle-fill"></i> {{ t('security.enabled') }}
                 </span>
                 <span class="text-body-secondary small">
-                    <i class="bi bi-shield-lock-fill"></i> Required - cannot be disabled
+                    <i class="bi bi-shield-lock-fill"></i> {{ t('security.required_cannot_disable') }}
                 </span>
             </div>
             <button type="button" class="btn btn-sm btn-outline-primary" id="reconfigure2FABtn">
-                <i class="bi bi-phone"></i> Set up on a new device
+                <i class="bi bi-phone"></i> {{ t('security.setup_new_device') }}
             </button>
         {% else %}
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="status-badge disabled">
-                    <i class="bi bi-circle"></i> Disabled
+                    <i class="bi bi-circle"></i> {{ t('security.disabled') }}
                 </span>
                 <button type="button" class="btn btn-primary" id="enable2FABtn">
-                    <i class="bi bi-shield-plus"></i> Enable 2FA
+                    <i class="bi bi-shield-plus"></i> {{ t('security.enable_2fa') }}
                 </button>
             </div>
         {% endif %}
@@ -223,12 +223,12 @@
     <!-- Recovery Codes Section -->
     {% if totpEnabled %}
         <div class="security-section">
-            <h3><i class="bi bi-life-preserver"></i> Recovery Codes</h3>
-            <p>Use recovery codes to access your account if you lose your authenticator device.</p>
+            <h3><i class="bi bi-life-preserver"></i> {{ t('security.recovery_codes') }}</h3>
+            <p>{{ t('security.recovery_codes_hint') }}</p>
             <div class="d-flex justify-content-between align-items-center">
-                <span class="text-muted">{{ recoveryCodesCount }} unused codes remaining</span>
+                <span class="text-muted">{{ recoveryCodesCount }} {{ t('security.unused_codes') }}</span>
                 <button type="button" class="btn btn-outline-primary" id="regenerateCodesBtn">
-                    <i class="bi bi-arrow-clockwise"></i> Regenerate Codes
+                    <i class="bi bi-arrow-clockwise"></i> {{ t('security.regenerate_codes') }}
                 </button>
             </div>
         </div>
@@ -237,8 +237,8 @@
     <!-- Trusted Devices Section -->
     {% if totpEnabled %}
         <div class="security-section">
-            <h3><i class="bi bi-laptop"></i> Trusted Devices</h3>
-            <p>Devices you've marked as trusted will not require 2FA for 30 days.</p>
+            <h3><i class="bi bi-laptop"></i> {{ t('security.trusted_devices') }}</h3>
+            <p>{{ t('security.trusted_devices_hint') }}</p>
 
             {% if trustedDevices is not empty %}
                 <ul class="device-list">
@@ -247,29 +247,29 @@
                             <div class="device-info">
                                 <h4><i class="bi bi-laptop"></i> {{ device.deviceName }}</h4>
                                 <p>
-                                    Added: {{ device.createdAt|date('Y-m-d H:i') }}
+                                    {{ t('security.added') }} {{ device.createdAt|date('Y-m-d H:i') }}
                                     {% if device.lastUsedAt %}
-                                        | Last used: {{ device.lastUsedAt|date('Y-m-d H:i') }}
+                                        | {{ t('security.last_used') }} {{ device.lastUsedAt|date('Y-m-d H:i') }}
                                     {% endif %}
-                                    | Expires: {{ device.expiresAt|date('Y-m-d H:i') }}
+                                    | {{ t('security.expires') }} {{ device.expiresAt|date('Y-m-d H:i') }}
                                 </p>
                             </div>
                             <button type="button" class="btn btn-sm btn-outline-danger revoke-device-btn" data-device-id="{{ device.id }}">
-                                <i class="bi bi-x-circle"></i> Revoke
+                                <i class="bi bi-x-circle"></i> {{ t('security.revoke') }}
                             </button>
                         </li>
                     {% endfor %}
                 </ul>
                 <div class="mt-3">
                     <button type="button" class="btn btn-outline-danger" id="revokeAllDevicesBtn">
-                        <i class="bi bi-x-circle"></i> Revoke All Trusted Devices
+                        <i class="bi bi-x-circle"></i> {{ t('security.revoke_all') }}
                     </button>
                 </div>
             {% else %}
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle"></i>
-                    <strong>No trusted devices yet.</strong>
-                    <p class="mb-0 mt-2">When logging in with 2FA, check "Trust this device" to skip verification on this device for 30 days.</p>
+                    <strong>{{ t('security.no_trusted_devices') }}</strong>
+                    <p class="mb-0 mt-2">{{ t('security.trust_device_hint') }}</p>
                 </div>
             {% endif %}
         </div>
@@ -277,8 +277,8 @@
 
     <!-- Security Activity Log Section -->
     <div class="security-section">
-        <h3><i class="bi bi-activity"></i> Security Activity</h3>
-        <p>Recent security-related events on your account.</p>
+        <h3><i class="bi bi-activity"></i> {{ t('security.security_activity') }}</h3>
+        <p>{{ t('security.security_activity_hint') }}</p>
 
         {% if securityEvents is not empty %}
             <div class="security-activity-container{% if securityEvents|length > 5 %} collapsed{% endif %}" id="securityActivityContainer">
@@ -300,17 +300,17 @@
                                     {% else %}
                                         <i class="bi bi-info-circle"></i>
                                     {% endif %}
-                                    {% if event.event_type == 'totp_enabled' %}2FA Enabled
-                                    {% elseif event.event_type == 'totp_disabled' %}2FA Disabled
-                                    {% elseif event.event_type == 'password_changed' %}Password Changed
-                                    {% elseif event.event_type == 'recovery_codes_generated' %}Recovery Codes Generated
-                                    {% elseif event.event_type == 'recovery_code_used' %}Recovery Code Used
-                                    {% elseif event.event_type == 'trusted_device_added' %}Trusted Device Added
-                                    {% elseif event.event_type == 'trusted_device_removed' %}Trusted Device Removed
-                                    {% elseif event.event_type == 'login_success' %}Login Success
-                                    {% elseif event.event_type == 'login_failed_password' %}Login Failed (Password)
-                                    {% elseif event.event_type == 'login_failed_totp' %}Login Failed (2FA)
-                                    {% elseif event.event_type == 'logout' %}Logout
+                                    {% if event.event_type == 'totp_enabled' %}{{ t('security.event_totp_enabled') }}
+                                    {% elseif event.event_type == 'totp_disabled' %}{{ t('security.event_totp_disabled') }}
+                                    {% elseif event.event_type == 'password_changed' %}{{ t('security.event_password_changed') }}
+                                    {% elseif event.event_type == 'recovery_codes_generated' %}{{ t('security.event_recovery_generated') }}
+                                    {% elseif event.event_type == 'recovery_code_used' %}{{ t('security.event_recovery_used') }}
+                                    {% elseif event.event_type == 'trusted_device_added' %}{{ t('security.event_device_added') }}
+                                    {% elseif event.event_type == 'trusted_device_removed' %}{{ t('security.event_device_removed') }}
+                                    {% elseif event.event_type == 'login_success' %}{{ t('security.event_login_success') }}
+                                    {% elseif event.event_type == 'login_failed_password' %}{{ t('security.event_login_failed_password') }}
+                                    {% elseif event.event_type == 'login_failed_totp' %}{{ t('security.event_login_failed_totp') }}
+                                    {% elseif event.event_type == 'logout' %}{{ t('security.event_logout') }}
                                     {% else %}{{ event.event_type }}
                                     {% endif %}
                                 </span>
@@ -319,7 +319,7 @@
                             {% if event.ip_address or event.user_agent %}
                                 <div class="event-details">
                                     {% if event.ip_address %}
-                                        IP: {{ event.ip_address }}
+                                        {{ t('security.ip') }} {{ event.ip_address }}
                                     {% endif %}
                                     {% if event.user_agent %}
                                         | {{ event.user_agent|slice(0, 60) }}{% if event.user_agent|length > 60 %}...{% endif %}
@@ -332,14 +332,14 @@
                 {% if securityEvents|length > 5 %}
                     <div class="security-activity-fade-overlay" id="securityActivityOverlay">
                         <button type="button" class="show-more-btn" id="showMoreSecurityBtn" aria-expanded="false" aria-controls="securityEventList">
-                            <span id="showMoreBtnText">Show more</span>
+                            <span id="showMoreBtnText">{{ t('security.show_more') }}</span>
                             <i class="bi bi-chevron-down"></i>
                         </button>
                     </div>
                 {% endif %}
             </div>
         {% else %}
-            <p class="text-muted">No security events recorded yet.</p>
+            <p class="text-muted">{{ t('security.no_events') }}</p>
         {% endif %}
     </div>
 </div>

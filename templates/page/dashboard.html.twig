@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ routeUsername }}'s dashboard
+    {{ routeUsername }}{{ t('dashboard.title_suffix') }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -19,28 +19,28 @@
         <div style="text-align: center;padding-bottom: 1rem">
             {{ include('component/user-select.html.twig') }}
 
-            <h2 style="padding-bottom: 0.5rem">Overview</h2>
+            <h2 style="padding-bottom: 0.5rem">{{ t('dashboard.overview') }}</h2>
             <div class="row justify-content-md-center {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color">
                 <div class="col ">
-                    <span class="stat-value">{{ totalPlayCount }}</span><br><span class="stat-description">TOTAL PLAYS</span>
+                    <span class="stat-value">{{ totalPlayCount }}</span><br><span class="stat-description">{{ t('dashboard.total_plays') }}</span>
                 </div>
                 <div class="col ">
-                    <span class="stat-value">{{ uniqueMoviesCount }}</span><br><span class="stat-description">UNIQUE MOVIES</span>
+                    <span class="stat-value">{{ uniqueMoviesCount }}</span><br><span class="stat-description">{{ t('dashboard.unique_movies') }}</span>
                 </div>
                 <div class="col">
-                    <span class="stat-value">{{ totalHoursWatched }}</span><br><span class="stat-description font-weight-light">HOURS WATCHED</span>
+                    <span class="stat-value">{{ totalHoursWatched }}</span><br><span class="stat-description font-weight-light">{{ t('dashboard.hours_watched') }}</span>
                 </div>
             </div>
             <br>
             <div class="row justify-content-md-center {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color">
                 <div class="col ">
-                    <span class="stat-value">{{ averagePlaysPerDay }}</span><br><span class="stat-description">PLAYS PER DAY</span>
+                    <span class="stat-value">{{ averagePlaysPerDay }}</span><br><span class="stat-description">{{ t('dashboard.plays_per_day') }}</span>
                 </div>
                 <div class="col ">
-                    <span class="stat-value">{{ averageRuntime }}</span><br><span class="stat-description">AVERAGE RUNTIME</span>
+                    <span class="stat-value">{{ averageRuntime }}</span><br><span class="stat-description">{{ t('dashboard.average_runtime') }}</span>
                 </div>
                 <div class="col ">
-                    <span class="stat-value">{{ averagePersonalRating }}</span><br><span class="stat-description">AVERAGE RATING</span>
+                    <span class="stat-value">{{ averagePersonalRating }}</span><br><span class="stat-description">{{ t('dashboard.average_rating') }}</span>
                 </div>
             </div>
 

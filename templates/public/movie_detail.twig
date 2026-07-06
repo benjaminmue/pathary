@@ -526,7 +526,7 @@
 {% block body %}
 <div class="container">
     <a href="{{ applicationUrl }}/" class="back-link">
-        <i class="bi bi-arrow-left"></i> Back to Home
+        <i class="bi bi-arrow-left"></i> {{ t('movie.back_to_home') }}
     </a>
 
     <div class="movie-hero">
@@ -577,14 +577,14 @@
 
     {% if movie.overview %}
         <section class="movie-synopsis">
-            <h2>Synopsis</h2>
+            <h2>{{ t('movie.synopsis') }}</h2>
             <p>{{ movie.overview }}</p>
         </section>
     {% endif %}
 
     {# External Ratings Section #}
     <section class="external-ratings-section">
-        <h2>External Ratings</h2>
+        <h2>{{ t('movie.external_ratings') }}</h2>
         <div class="external-ratings-grid{% if not isOmdbEnabled %} external-ratings-grid-single{% endif %}">
             {# TMDB Rating #}
             <div class="external-rating-item">
@@ -597,7 +597,7 @@
                         <span class="external-rating-score" style="display: inline;">{{ movie.tmdbRatingAverage|number_format(1) }}</span><span class="external-rating-max" style="display: inline;">/10</span>
                     </div>
                 {% else %}
-                    <div class="external-rating-na">N/A</div>
+                    <div class="external-rating-na">{{ t('movie.na') }}</div>
                 {% endif %}
             </div>
 
@@ -613,7 +613,7 @@
                         <span class="external-rating-score" style="display: inline;">{{ movie.imdbRatingAverage|number_format(1) }}</span><span class="external-rating-max" style="display: inline;">/10</span>
                     </div>
                 {% else %}
-                    <div class="external-rating-na">N/A</div>
+                    <div class="external-rating-na">{{ t('movie.na') }}</div>
                 {% endif %}
             </div>
 
@@ -626,16 +626,16 @@
                 {% if movie.rtRatingAverage and movie.rtRatingAverage > 0 %}
                     <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                         {% if movie.rtRatingAverage >= 60 %}
-                            <img src="{{ applicationUrl }}/images/rt-fresh-icon.svg" alt="Fresh" style="width: 1.5rem; height: 1.5rem;">
+                            <img src="{{ applicationUrl }}/images/rt-fresh-icon.svg" alt="{{ t('movie.rt_fresh') }}" style="width: 1.5rem; height: 1.5rem;">
                         {% else %}
-                            <img src="{{ applicationUrl }}/images/rt-rotten-icon.svg" alt="Rotten" style="width: 1.5rem; height: 1.5rem;">
+                            <img src="{{ applicationUrl }}/images/rt-rotten-icon.svg" alt="{{ t('movie.rt_rotten') }}" style="width: 1.5rem; height: 1.5rem;">
                         {% endif %}
                         <div>
                             <span class="external-rating-score" style="display: inline;">{{ movie.rtRatingAverage }}</span><span class="external-rating-max" style="display: inline;">%</span>
                         </div>
                     </div>
                 {% else %}
-                    <div class="external-rating-na">N/A</div>
+                    <div class="external-rating-na">{{ t('movie.na') }}</div>
                 {% endif %}
             </div>
             {% endif %}{# End isOmdbEnabled #}
@@ -643,7 +643,7 @@
     </section>
 
     <section class="global-rating-section">
-        <h2>Community Rating</h2>
+        <h2>{{ t('movie.community_rating') }}</h2>
         <div class="global-rating-display">
             {% include 'components/popcorn_rating.twig' with {
                 valueInt: displayPopcorn,
@@ -652,10 +652,10 @@
             } %}
             <div class="global-rating-stats">
                 {% if stats.rating_count > 0 %}
-                    avg: {{ stats.avg_popcorn|number_format(1) }} / 7
-                    ({{ stats.rating_count }} rating{{ stats.rating_count != 1 ? 's' : '' }})
+                    {{ t('movie.avg') }} {{ stats.avg_popcorn|number_format(1) }} / 7
+                    ({{ stats.rating_count }} {{ t('movie.ratings_count') }})
                 {% else %}
-                    No ratings yet
+                    {{ t('movie.no_ratings_yet') }}
                 {% endif %}
             </div>
         </div>
@@ -663,11 +663,11 @@
 
     {% if loggedIn %}
         <section class="rating-form-section">
-            <h2>Your Rating</h2>
+            <h2>{{ t('movie.your_rating') }}</h2>
             <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate" method="post" id="ratingForm">
                 <div class="rating-form-row">
                     <div class="rating-form-col">
-                        <label>Rating</label>
+                        <label>{{ t('movie.rating') }}</label>
                         {% include 'components/popcorn_rating.twig' with {
                             valueInt: userRating.rating_popcorn ?? 0,
                             mode: 'input',
@@ -679,23 +679,23 @@
                     <div class="rating-form-divider"></div>
 
                     <div class="rating-form-col">
-                        <label>Watched Date</label>
+                        <label>{{ t('movie.watched_date') }}</label>
                         <div class="date-dropdowns">
                             <select name="watched_day" id="watched_day" class="day-select">
-                                <option value="">Day</option>
+                                <option value="">{{ t('movie.day') }}</option>
                                 {% for d in 1..31 %}
                                     <option value="{{ d }}" {{ (userRating.watched_day ?? '') == d ? 'selected' : '' }}>{{ d }}</option>
                                 {% endfor %}
                             </select>
                             <select name="watched_month" id="watched_month" class="month-select">
-                                <option value="">Month</option>
-                                {% set months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                                <option value="">{{ t('movie.month') }}</option>
+                                {% set months = [t('movie.month_jan'), t('movie.month_feb'), t('movie.month_mar'), t('movie.month_apr'), t('movie.month_may'), t('movie.month_jun'), t('movie.month_jul'), t('movie.month_aug'), t('movie.month_sep'), t('movie.month_oct'), t('movie.month_nov'), t('movie.month_dec')] %}
                                 {% for m in 1..12 %}
                                     <option value="{{ m }}" {{ (userRating.watched_month ?? '') == m ? 'selected' : '' }}>{{ months[m - 1] }}</option>
                                 {% endfor %}
                             </select>
                             <select name="watched_year" id="watched_year" class="year-select">
-                                <option value="">Year</option>
+                                <option value="">{{ t('movie.year') }}</option>
                                 {% set currentYear = "now"|date("Y") + 1 %}
                                 {% for y in currentYear..1950 %}
                                     <option value="{{ y }}" {{ (userRating.watched_year ?? '') == y ? 'selected' : '' }}>{{ y }}</option>
@@ -707,27 +707,27 @@
                     <div class="rating-form-divider"></div>
 
                     <div class="rating-form-col">
-                        <label>Location</label>
+                        <label>{{ t('movie.location') }}</label>
                         <select name="location_id" id="location_id">
-                            <option value="">Select location</option>
+                            <option value="">{{ t('movie.select_location') }}</option>
                             <!-- Populated dynamically from database -->
                         </select>
                         <div id="no-locations-message" class="alert alert-info" style="display: none; margin-top: 0.5rem; font-size: 0.875rem;">
-                            No locations have been set up. Ask an admin to navigate to <a href="{{ applicationUrl }}/admin/movies" class="alert-link">Admin → Movies</a> to add custom locations.
+                            {{ t('movie.no_locations_pre') }}<a href="{{ applicationUrl }}/admin/movies" class="alert-link">{{ t('movie.admin_movies_link') }}</a>{{ t('movie.no_locations_post') }}
                         </div>
                     </div>
                 </div>
 
                 <div class="rating-form-group">
-                    <label for="comment">Comment (optional)</label>
-                    <textarea id="comment" name="comment" placeholder="Share your thoughts about this movie...">{{ userRating.comment ?? '' }}</textarea>
+                    <label for="comment">{{ t('movie.comment_optional') }}</label>
+                    <textarea id="comment" name="comment" placeholder="{{ t('movie.comment_placeholder') }}">{{ userRating.comment ?? '' }}</textarea>
                 </div>
 
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
                 <div class="rating-form-actions">
                     <button type="submit" class="btn btn-submit-rating">
-                        {{ userRating ? 'Update Rating' : 'Submit Rating' }}
+                        {{ userRating ? t('movie.update_rating') : t('movie.submit_rating') }}
                     </button>
                 </div>
             </form>
@@ -737,7 +737,7 @@
                 <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate/delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete your rating? This action cannot be undone.');">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-trash"></i> Delete Rating
+                        <i class="bi bi-trash"></i> {{ t('movie.delete_rating') }}
                     </button>
                 </form>
             {% endif %}
@@ -852,7 +852,7 @@
     {% endif %}
 
     <section id="ratings" class="individual-ratings-section">
-        <h2>Individual Ratings</h2>
+        <h2>{{ t('movie.individual_ratings') }}</h2>
 
         {% if individualRatings|length > 0 %}
             <div class="rating-cards">
@@ -863,13 +863,13 @@
 
                             <div class="rating-user-popcorn">
                                 {% if rating.rating_popcorn %}
-                                    <div class="popcorn-rating popcorn-rating--small" aria-label="Rating: {{ rating.rating_popcorn }} out of 7">
+                                    <div class="popcorn-rating popcorn-rating--small" aria-label="{{ t('movie.rating') }}: {{ rating.rating_popcorn }} {{ t('movie.out_of') }} 7">
                                         {% for i in 1..7 %}
                                             <span class="popcorn-rating__item {{ i <= rating.rating_popcorn ? 'popcorn-on' : 'popcorn-off' }}" aria-hidden="true">🍿</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    <span class="rating-unrated">Unrated</span>
+                                    <span class="rating-unrated">{{ t('movie.unrated') }}</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -902,7 +902,7 @@
 
                         {% if rating.updated_at %}
                             <div class="rating-date">
-                                Last update: {{ rating.updated_at|date('Y-m-d') }}
+                                {{ t('movie.last_update') }} {{ rating.updated_at|date('Y-m-d') }}
                             </div>
                         {% endif %}
                     </div>
@@ -910,10 +910,10 @@
             </div>
         {% else %}
             <div class="no-ratings-message">
-                <p>No individual ratings yet. Be the first to rate this movie!</p>
+                <p>{{ t('movie.no_individual_ratings') }}</p>
                 {% if not loggedIn %}
                     <a href="{{ applicationUrl }}/login" class="btn btn-warning mt-2" style="background-color: var(--pathe-yellow); border-color: var(--pathe-yellow); color: var(--pathe-dark);">
-                        Login to Rate
+                        {{ t('movie.login_to_rate') }}
                     </a>
                 {% endif %}
             </div>
@@ -922,8 +922,8 @@
 
     {# Poster Lightbox #}
     <div id="posterLightbox" class="lightbox-overlay" style="display: none;">
-        <button class="lightbox-close" aria-label="Close">&times;</button>
-        <img id="posterLightboxImage" src="" alt="Movie Poster" class="lightbox-image">
+        <button class="lightbox-close" aria-label="{{ t('movie.close') }}">&times;</button>
+        <img id="posterLightboxImage" src="" alt="{{ t('movie.poster_alt') }}" class="lightbox-image">
     </div>
 </div>
 {% endblock %}

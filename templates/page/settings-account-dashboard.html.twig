@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - General Account
+    {{ t('settings_account.title_general') }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -20,12 +20,12 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
-                <h5 class="text-center">Dashboard customization</h5>
+                <h5 class="text-center">{{ t('settings_account.dashboard_customization') }}</h5>
 
                 <div style="padding-bottom: .8rem">
-                    <p>Customize the dashboard statistic rows to your personal taste and preferences.</p>
-                    <h4 class="text-center float-start" style="padding-top: .4rem">Dashboard rows</h4>
-                    <button type="button" class="btn btn-info float-end" data-bs-toggle="modal" data-bs-target="#dashboardRowsHelpModal">Help</button>
+                    <p>{{ t('settings_account.dashboard_customize_desc') }}</p>
+                    <h4 class="text-center float-start" style="padding-top: .4rem">{{ t('settings_account.dashboard_rows') }}</h4>
+                    <button type="button" class="btn btn-info float-end" data-bs-toggle="modal" data-bs-target="#dashboardRowsHelpModal">{{ t('settings.help') }}</button>
                 </div>
                 <br>
 
@@ -47,14 +47,14 @@
                     <div id="accountDashboardSettingsLog">
                         {% if dashboardRowsSuccessfullyReset %}
                             <div class="alert alert-success alert-dismissible" role="alert">
-                                Dashboard rows successfully reset.
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                {{ t('settings_account.dashboard_rows_reset_success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('settings.close') }}"></button>
                             </div>
                         {% endif %}
                     </div>
 
-                    <button type="button" class="btn btn-danger float-start" onclick="resetDashboardRows()">Reset</button>
-                    <button type="button" class="btn btn-primary float-end" onclick="updateDashboardRows()">Update</button>
+                    <button type="button" class="btn btn-danger float-start" onclick="resetDashboardRows()">{{ t('settings.reset') }}</button>
+                    <button type="button" class="btn btn-primary float-end" onclick="updateDashboardRows()">{{ t('settings.update') }}</button>
 
                 </div>
             </div>

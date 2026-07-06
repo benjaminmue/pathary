@@ -1,6 +1,6 @@
 {% extends 'layouts/app_base.twig' %}
 
-{% block title %}Profile Settings{% endblock %}
+{% block title %}{{ t('profile.title') }}{% endblock %}
 
 {% block stylesheets %}
 <style>
@@ -311,8 +311,8 @@
 <div class="container mt-4">
     <!-- Page Header -->
     <div class="profile-header mb-4">
-        <h1 class="h3"><i class="bi bi-person-circle me-2"></i>Profile Settings</h1>
-        <p class="text-muted">Manage your profile information and security settings</p>
+        <h1 class="h3"><i class="bi bi-person-circle me-2"></i>{{ t('profile.title') }}</h1>
+        <p class="text-muted">{{ t('profile.subtitle') }}</p>
     </div>
 
     <ul class="nav nav-tabs" id="profileTabs" role="tablist">
@@ -320,14 +320,14 @@
             <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
                 <i class="bi bi-person icon-outline" aria-hidden="true"></i>
                 <i class="bi bi-person-fill icon-filled" aria-hidden="true"></i>
-                <span>Profile</span>
+                <span>{{ t('profile.tab_profile') }}</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
                 <i class="bi bi-shield-lock icon-outline" aria-hidden="true"></i>
                 <i class="bi bi-shield-lock-fill icon-filled" aria-hidden="true"></i>
-                <span>Security</span>
+                <span>{{ t('profile.tab_security') }}</span>
             </button>
         </li>
     </ul>
@@ -350,7 +350,7 @@
 
                 <form action="{{ applicationUrl }}/profile" method="post" enctype="multipart/form-data" id="profileForm">
                     <div class="profile-image-section">
-                        <h3><i class="bi bi-person-circle"></i> Profile Photo</h3>
+                        <h3><i class="bi bi-person-circle"></i> {{ t('profile.photo') }}</h3>
                         <div class="profile-image-container">
                             {% if profileImage %}
                                 <img src="{{ applicationUrl }}/profile-images/{{ profileImage }}" alt="{{ userName }}" class="profile-image" id="profileImagePreview">
@@ -364,45 +364,45 @@
 
                         <div class="profile-image-actions">
                             <label class="btn btn-upload">
-                                <i class="bi bi-camera"></i> Upload Photo
+                                <i class="bi bi-camera"></i> {{ t('profile.upload_photo') }}
                                 <input type="file" name="profile_image" accept="image/jpeg,image/png,image/gif,image/webp" id="profileImageInput">
                             </label>
                             {% if profileImage %}
                                 <button type="button" class="btn btn-remove-image" id="removeImageBtn">
-                                    <i class="bi bi-trash"></i> Remove
+                                    <i class="bi bi-trash"></i> {{ t('profile.remove') }}
                                 </button>
                             {% endif %}
                         </div>
-                        <p class="image-requirements">JPEG, PNG, GIF, or WebP. Max 5MB.</p>
+                        <p class="image-requirements">{{ t('profile.image_requirements') }}</p>
                         <input type="hidden" name="remove_image" id="removeImageFlag" value="0">
                     </div>
 
                     <div class="form-group">
-                        <label for="name"><i class="bi bi-person-badge"></i> Display Name</label>
+                        <label for="name"><i class="bi bi-person-badge"></i> {{ t('profile.display_name') }}</label>
                         <input type="text" id="name" name="name" value="{{ userName }}" required pattern="[a-zA-Z0-9]+" minlength="2" maxlength="24">
-                        <p class="form-hint">Only letters and numbers, 2-24 characters.</p>
+                        <p class="form-hint">{{ t('profile.name_hint') }}</p>
                     </div>
 
                     <div class="form-group">
-                        <label for="email"><i class="bi bi-envelope"></i> Email Address</label>
+                        <label for="email"><i class="bi bi-envelope"></i> {{ t('profile.email') }}</label>
                         <input type="email" id="email" name="email" value="{{ userEmail }}">
-                        <p class="form-hint">Used for account recovery and notifications.</p>
+                        <p class="form-hint">{{ t('profile.email_hint') }}</p>
                     </div>
 
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
                     <div class="form-actions">
                         <button type="submit" class="btn btn-save">
-                            <i class="bi bi-check-lg"></i> Save Changes
+                            <i class="bi bi-check-lg"></i> {{ t('profile.save_changes') }}
                         </button>
                     </div>
                 </form>
 
                 <div class="logout-section">
-                    <h3><i class="bi bi-box-arrow-right"></i> Sign Out</h3>
-                    <p>Sign out of your account on this device.</p>
+                    <h3><i class="bi bi-box-arrow-right"></i> {{ t('profile.sign_out') }}</h3>
+                    <p>{{ t('profile.sign_out_hint') }}</p>
                     <button type="button" class="btn btn-logout" onclick="logoutAndRedirect()">
-                        <i class="bi bi-box-arrow-right"></i> Logout
+                        <i class="bi bi-box-arrow-right"></i> {{ t('profile.logout') }}
                     </button>
                 </div>
             </div>
@@ -414,7 +414,7 @@
                 {% if securityTabContent is defined %}
                     {{ securityTabContent|raw }}
                 {% else %}
-                    <p class="text-center"><i class="bi bi-hourglass-split"></i> Loading security settings...</p>
+                    <p class="text-center"><i class="bi bi-hourglass-split"></i> {{ t('profile.loading_security') }}</p>
                 {% endif %}
             </div>
         </div>

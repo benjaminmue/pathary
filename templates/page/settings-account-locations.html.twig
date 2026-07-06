@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - General Account
+    {{ t('settings_account.title_general') }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -20,15 +20,15 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
-                <h5 class="text-center">Locations</h5>
+                <h5 class="text-center">{{ t('settings_account.locations') }}</h5>
 
                 <div style="padding-bottom: .8rem">
-                    <p>You can set the location where you have watched a movie.</p>
+                    <p>{{ t('settings_account.locations_desc') }}</p>
 
                     {% if locationsEnabled %}
-                        <button type="button" class="btn btn-outline-danger" onclick="toggleLocationFeature()" id="toggleLocationsFeatureBtn">Disable locations</button>
+                        <button type="button" class="btn btn-outline-danger" onclick="toggleLocationFeature()" id="toggleLocationsFeatureBtn">{{ t('settings_account.disable_locations') }}</button>
                     {% else %}
-                        <button type="button" class="btn btn-primary" onclick="toggleLocationFeature()" id="toggleLocationsFeatureBtn">Enable locations</button>
+                        <button type="button" class="btn btn-primary" onclick="toggleLocationFeature()" id="toggleLocationsFeatureBtn">{{ t('settings_account.enable_locations') }}</button>
                     {% endif %}
                 </div>
 
@@ -38,17 +38,17 @@
                     <table class="table table-hover" id="locationsTable">
                         <thead>
                         <tr>
-                            <th scope="col">Manage your locations</th>
+                            <th scope="col">{{ t('settings_account.manage_locations') }}</th>
                         </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
                 <div class="spinner-border d-none" role="status" id="locationsTableLoadingSpinner" style="margin-bottom: .5rem">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">{{ t('settings.loading') }}</span>
                 </div>
 
-                <button type="button" class="btn btn-primary" style="width: 100%" onclick="showCreateLocationModal()" id="createLocationBtn" {% if locationsEnabled == false %}disabled{% endif %}>Add Location</button>
+                <button type="button" class="btn btn-primary" style="width: 100%" onclick="showCreateLocationModal()" id="createLocationBtn" {% if locationsEnabled == false %}disabled{% endif %}>{{ t('settings_account.add_location') }}</button>
                 <br>
             </div>
         </div>
