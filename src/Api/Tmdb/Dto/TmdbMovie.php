@@ -23,6 +23,10 @@ class TmdbMovie
         private readonly ?string $backdropPath,
         private readonly ?string $imdbId,
         private readonly TmdbCredits $credits,
+        private readonly ?int $budget,
+        private readonly ?int $revenue,
+        private readonly ?string $status,
+        private readonly ?string $originalTitle,
     ) {
     }
 
@@ -45,7 +49,31 @@ class TmdbMovie
             $data['backdrop_path'],
             empty($data['imdb_id']) === true ? null : $data['imdb_id'],
             empty($data['credits']) === true ? TmdbCredits::create() : TmdbCredits::createFromArray($data['credits']),
+            $data['budget'] ?? null,
+            $data['revenue'] ?? null,
+            empty($data['status']) === true ? null : $data['status'],
+            empty($data['original_title']) === true ? null : $data['original_title'],
         );
+    }
+
+    public function getBudget() : ?int
+    {
+        return $this->budget;
+    }
+
+    public function getRevenue() : ?int
+    {
+        return $this->revenue;
+    }
+
+    public function getStatus() : ?string
+    {
+        return $this->status;
+    }
+
+    public function getOriginalTitle() : ?string
+    {
+        return $this->originalTitle;
     }
 
     public function getBackdropPath() : ?string

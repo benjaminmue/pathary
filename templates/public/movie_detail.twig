@@ -5,513 +5,678 @@
 {% block stylesheets %}
 <link href="{{ applicationUrl }}/css/lightbox.css" rel="stylesheet">
 <style>
-    .movie-hero {
-        padding: 2rem 0;
+    /* ===== Movie detail design system tokens (--pds-*), scoped to .pds-root ===== */
+    .pds-root {
+        --pds-gold: #FBBC09;
+        --pds-bg: #15171B;
+        --pds-surface: #1C1F24;
+        --pds-surface-2: #22262C;
+        --pds-border: #2A2E35;
+        --pds-hair: rgba(255, 255, 255, .06);
+        --pds-text: #F2F3F5;
+        --pds-muted: #A9B0BA;
+        --pds-dim: #7A828C;
+        --pds-nav: #101216;
+        --pds-danger: #E5654B;
+        --pds-success: #4FB477;
+        --pds-r: 14px;
+        --pds-r-sm: 8px;
+        --pds-s-xs: 4px;
+        --pds-s-sm: 8px;
+        --pds-s-md: 16px;
+        --pds-s-lg: 24px;
+        --pds-s-xl: 40px;
+        --pds-font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --pds-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
-    .movie-header {
+    [data-bs-theme="light"] .pds-root {
+        --pds-bg: #FFFFFF;
+        --pds-surface: #FBFBFC;
+        --pds-surface-2: #F5F6F8;
+        --pds-border: #E3E6EA;
+        --pds-hair: #EEF0F3;
+        --pds-text: #15171B;
+        --pds-muted: #5B636E;
+        --pds-dim: #8A9099;
+        --pds-danger: #C0392B;
+        --pds-success: #198754;
+    }
+
+    .pds-root {
+        color: var(--pds-text);
+        font-family: var(--pds-font);
+    }
+
+    .pds-mono {
+        font-family: var(--pds-font-mono);
+    }
+
+    /* ===== Hero ===== */
+    .pds-hero {
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid var(--pds-hair);
+        margin-bottom: var(--pds-s-xl);
+    }
+
+    .pds-hero-backdrop {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        filter: blur(40px) brightness(.35) saturate(1.1);
+        transform: scale(1.2);
+        z-index: 0;
+    }
+
+    [data-bs-theme="light"] .pds-hero-backdrop {
+        filter: blur(40px) brightness(.6) saturate(1.1);
+    }
+
+    .pds-hero-inner {
+        position: relative;
+        z-index: 1;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 40px 32px 36px;
+    }
+
+    .pds-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #cfd4db;
+        text-decoration: none;
+        margin-bottom: var(--pds-s-lg);
+    }
+
+    .pds-back-link:hover {
+        color: var(--pds-gold);
+    }
+
+    .pds-hero-body {
         display: flex;
-        gap: 2rem;
+        gap: 40px;
         align-items: flex-start;
     }
 
-    .movie-poster {
+    .pds-hero-poster {
+        width: 240px;
+        aspect-ratio: 2/3;
         flex-shrink: 0;
-        width: 200px;
-        border-radius: 8px;
+        border-radius: var(--pds-r);
+        border: 1px solid rgba(255, 255, 255, .12);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, .55);
         overflow: hidden;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
 
-    .movie-poster img {
+    .pds-hero-poster img {
         width: 100%;
-        height: auto;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        cursor: zoom-in;
+    }
+
+    .pds-hero-poster-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 1rem;
+        background: linear-gradient(135deg, #2a2d33 0%, #3a3a3a 100%);
+        color: #cbd0d7;
+        font-size: 14px;
+    }
+
+    .pds-hero-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--pds-s-md);
+        color: #EAEDF1;
+    }
+
+    .pds-hero-title {
+        font-size: 42px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+        color: #fff;
+        margin: 0;
+    }
+
+    [data-bs-theme="light"] .pds-hero-info,
+    [data-bs-theme="light"] .pds-hero-title {
+        color: #fff;
+    }
+
+    .pds-hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--pds-s-md);
+        font-family: var(--pds-font-mono);
+        font-size: 13px;
+        color: #c3c9d1;
+    }
+
+    .pds-hero-meta .sep {
+        opacity: .5;
+    }
+
+    .pds-genres {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--pds-s-sm);
+    }
+
+    .pds-genre-pill {
+        font-size: 12px;
+        font-weight: 600;
+        background: rgba(255, 255, 255, .08);
+        border: 1px solid rgba(255, 255, 255, .14);
+        border-radius: 999px;
+        padding: 5px 14px;
+        color: #EAEDF1;
+    }
+
+    .pds-tagline {
+        font-size: 15px;
+        font-style: italic;
+        color: var(--pds-gold);
+        margin: 0;
+    }
+
+    .pds-overview {
+        font-size: 15px;
+        line-height: 1.6;
+        max-width: 640px;
+        text-wrap: pretty;
+        color: #d6dae0;
+        margin: 0;
+    }
+
+    .pds-hero-rating {
+        display: flex;
+        align-items: center;
+        gap: var(--pds-s-md);
+    }
+
+    .pds-hero-rating-stats {
+        font-family: var(--pds-font-mono);
+        font-size: 13px;
+        color: #c3c9d1;
+    }
+
+    .pds-ext-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--pds-s-sm);
+    }
+
+    .pds-ext-badge {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        background: rgba(0, 0, 0, .35);
+        border: 1px solid rgba(255, 255, 255, .12);
+        border-radius: var(--pds-r-sm);
+        padding: 8px 14px;
+    }
+
+    .pds-ext-label {
+        font-family: var(--pds-font-mono);
+        font-size: 11px;
+        letter-spacing: .1em;
+        color: #aab0b9;
+        text-transform: uppercase;
+    }
+
+    .pds-ext-value {
+        font-family: var(--pds-font-mono);
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--pds-gold);
+    }
+
+    .pds-ext-unit {
+        font-family: var(--pds-font-mono);
+        font-size: 11px;
+        color: #8b919a;
+    }
+
+    /* ===== Main ===== */
+    .pds-main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 32px 72px;
+        display: flex;
+        flex-direction: column;
+        gap: 56px;
+    }
+
+    .pds-section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--pds-s-md);
+        margin-bottom: var(--pds-s-lg);
+    }
+
+    .pds-section-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--pds-text);
+        margin: 0;
+    }
+
+    .pds-section-count {
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+        color: var(--pds-dim);
+    }
+
+    /* ===== TMDB facts ===== */
+    .pds-facts-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: var(--pds-s-md);
+    }
+
+    .pds-fact {
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        padding: 14px 16px;
+    }
+
+    .pds-fact-label {
+        font-family: var(--pds-font-mono);
+        font-size: 10px;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--pds-dim);
+    }
+
+    .pds-fact-value {
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 6px;
+        line-height: 1.35;
+        color: var(--pds-text);
+    }
+
+    /* ===== Cast carousel ===== */
+    .pds-cast-scroll {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+        scroll-behavior: smooth;
+    }
+
+    .pds-cast-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    .pds-cast-card {
+        width: 132px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .pds-cast-photo {
+        width: 132px;
+        height: 165px;
+        border-radius: var(--pds-r-sm);
+        background: var(--pds-surface-2);
+        border: 1px solid var(--pds-hair);
+        overflow: hidden;
+    }
+
+    .pds-cast-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
         display: block;
     }
 
-    .movie-poster-placeholder {
+    .pds-cast-photo-empty {
         width: 100%;
-        aspect-ratio: 2/3;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, var(--pathe-dark) 0%, #3a3a3a 100%);
-        color: #888;
-        font-size: 0.875rem;
-        text-align: center;
-        padding: 1rem;
-    }
-
-    .movie-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .movie-title {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color: var(--bs-body-color);
-    }
-
-    .movie-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem 1rem;
-        margin-bottom: 1rem;
-        color: var(--bs-secondary-color);
-        font-size: 0.9rem;
-    }
-
-    .movie-genres {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .genre-badge {
-        background: var(--bs-tertiary-bg);
-        color: var(--bs-body-color);
-        padding: 0.25rem 0.75rem;
-        border-radius: 1rem;
-        font-size: 0.8rem;
-    }
-
-    .movie-synopsis {
-        margin-bottom: 2rem;
-    }
-
-    .movie-synopsis h2 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 0.75rem;
-    }
-
-    .movie-synopsis p {
-        color: var(--bs-secondary-color);
-        line-height: 1.7;
-    }
-
-    /* External Ratings Section */
-    .external-ratings-section {
-        background: var(--bs-tertiary-bg);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .external-ratings-section h2 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-
-    .external-ratings-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
-    }
-
-    /* Single column layout when OMDb is not configured */
-    .external-ratings-grid-single {
-        grid-template-columns: 1fr;
-        max-width: 400px;
-        margin: 0 auto;
-    }
-
-    .external-rating-item {
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-        text-align: center;
-        padding: 1rem;
-        background: var(--bs-body-bg);
-        border-radius: 8px;
-        border: 1px solid var(--bs-border-color);
+        justify-content: center;
+        gap: 8px;
     }
 
-    .external-rating-logo {
-        height: 2.5rem;
-        width: 100%;
+    .pds-cast-initials {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: 1px solid var(--pds-border);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 0.75rem;
-    }
-
-    .external-rating-logo img.rating-logo {
-        max-height: 2rem;
-        max-width: 100%;
-        width: auto;
-        height: auto;
-    }
-
-    .external-rating-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--bs-secondary-color);
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .external-rating-score {
-        font-size: 2rem;
+        font-family: var(--pds-font-mono);
+        font-size: 18px;
         font-weight: 700;
-        color: var(--pathe-yellow);
-        line-height: 1;
+        color: var(--pds-gold);
     }
 
-    .external-rating-max {
-        font-size: 1rem;
-        color: var(--bs-secondary-color);
-        margin-bottom: 0.25rem;
+    .pds-cast-nophoto-hint {
+        font-family: var(--pds-font-mono);
+        font-size: 10px;
+        color: var(--pds-dim);
     }
 
-    .external-rating-votes {
-        font-size: 0.75rem;
-        color: var(--bs-tertiary-color);
-    }
-
-    .external-rating-na {
-        font-size: 1.5rem;
-        color: var(--bs-secondary-color);
-        font-weight: 500;
-        margin-top: 0.5rem;
-    }
-
-    .external-rating-note {
-        font-size: 0.7rem;
-        color: var(--bs-tertiary-color);
-        margin-top: 0.25rem;
-        font-style: italic;
-    }
-
-    @media (max-width: 768px) {
-        .external-ratings-grid {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-    }
-
-    /* Global Rating Section */
-    .global-rating-section {
-        background: var(--bs-tertiary-bg);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .global-rating-section h2 {
-        font-size: 1.25rem;
+    .pds-cast-name {
+        font-size: 13px;
         font-weight: 600;
-        margin-bottom: 1rem;
+        color: var(--pds-text);
     }
 
-    .global-rating-display {
+    .pds-cast-role {
+        font-size: 12px;
+        color: var(--pds-muted);
+        margin-top: 2px;
+    }
+
+    .pds-scroll-btns {
+        display: flex;
+        gap: 8px;
+    }
+
+    .pds-scroll-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid var(--pds-border);
+        background: transparent;
+        color: var(--pds-muted);
         display: flex;
         align-items: center;
-        gap: 1rem;
+        justify-content: center;
+        cursor: pointer;
+        transition: color .15s, border-color .15s;
     }
 
-    .global-rating-stats {
-        color: var(--bs-secondary-color);
-        font-size: 0.9rem;
+    .pds-scroll-btn:hover {
+        color: var(--pds-gold);
+        border-color: var(--pds-gold);
     }
 
-    /* Individual Ratings Section */
-    .individual-ratings-section {
-        margin-bottom: 2rem;
-    }
-
-    .individual-ratings-section h2 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-
-    .rating-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1rem;
-    }
-
-    .rating-card {
-        background: var(--bs-body-bg);
-        border: 1px solid var(--bs-border-color);
-        border-radius: 8px;
-        padding: 1rem;
-    }
-
-    .rating-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 0.75rem;
-        gap: 1rem;
-    }
-
-    .rating-user-name {
-        font-weight: 600;
-        font-size: 1rem;
+    /* ===== Cards (rating form + reviews) ===== */
+    .pds-card {
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r);
         overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        min-width: 0;
-        flex: 1;
     }
 
-    .rating-user-popcorn {
+    .pds-card-head {
         display: flex;
         align-items: center;
-        flex-shrink: 0;
+        justify-content: space-between;
+        gap: var(--pds-s-md);
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--pds-hair);
     }
 
-    .rating-unrated {
-        color: var(--bs-secondary-color);
-        font-size: 0.85rem;
-        font-style: italic;
-    }
-
-    .rating-comment {
-        color: var(--bs-secondary-color);
-        font-size: 0.9rem;
-        line-height: 1.5;
-        margin-bottom: 0.5rem;
-    }
-
-    .rating-date {
-        font-size: 0.75rem;
-        color: var(--bs-tertiary-color);
-    }
-
-    .rating-meta {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 0.5rem;
-        font-size: 0.8rem;
-        color: var(--bs-secondary-color);
-    }
-
-    .rating-meta i {
-        margin-right: 0.25rem;
-        opacity: 0.7;
-    }
-
-    .rating-watched-date,
-    .rating-location {
-        display: flex;
-        align-items: center;
-    }
-
-    .no-ratings-message {
-        text-align: center;
-        padding: 2rem;
-        color: var(--bs-secondary-color);
-    }
-
-    /* Rating Form */
-    .rating-form-section {
-        background: var(--bs-tertiary-bg);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .rating-form-section h2 {
-        font-size: 1.25rem;
+    .pds-card-title {
+        font-size: 17px;
         font-weight: 600;
-        margin-bottom: 1rem;
+        margin: 0;
     }
 
-    .rating-form-row {
+    .pds-card-sub {
+        font-size: 13px;
+        color: var(--pds-muted);
+    }
+
+    .pds-card-body {
+        padding: 24px;
+    }
+
+    .pds-card-foot {
+        padding: 16px 24px;
+        border-top: 1px solid var(--pds-hair);
+        background: var(--pds-surface-2);
         display: flex;
-        gap: 0;
-        margin-bottom: 1rem;
+        justify-content: flex-end;
+        align-items: center;
+        gap: var(--pds-s-md);
+    }
+
+    /* Rating form layout inside card */
+    .rating-form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: var(--pds-s-lg);
+        margin-bottom: var(--pds-s-lg);
     }
 
     .rating-form-col {
-        flex: 1;
-        padding: 0 1rem;
         display: flex;
         flex-direction: column;
     }
 
-    .rating-form-col:first-child {
-        padding-left: 0;
-    }
-
-    .rating-form-col:last-child {
-        padding-right: 0;
-    }
-
-    .rating-form-divider {
-        width: 2px;
-        background: linear-gradient(180deg, transparent, var(--accent-purple), transparent);
-        box-shadow: 0 0 8px rgba(111, 45, 189, 0.3);
-        flex-shrink: 0;
-    }
-
-    .rating-form-col label {
+    .rating-form-col label,
+    .rating-form-group label {
         display: block;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: var(--pds-dim);
+        margin-bottom: var(--pds-s-sm);
     }
 
-    .rating-form-col select {
+    .pds-root select,
+    .pds-root textarea {
         width: 100%;
-        padding: 0.5rem;
-        border: 1px solid var(--bs-border-color);
-        border-radius: 6px;
-        background: var(--bs-body-bg);
-        color: var(--bs-body-color);
-        font-size: 0.85rem;
-        cursor: pointer;
+        padding: 10px 12px;
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        background: var(--pds-bg);
+        color: var(--pds-text);
+        font-family: inherit;
+        font-size: 14px;
     }
 
-    .rating-form-col select:focus {
+    .pds-root select:focus,
+    .pds-root textarea:focus {
         outline: none;
-        border-color: var(--accent-purple);
-        box-shadow: 0 0 0 3px rgba(111, 45, 189, 0.1);
+        border-color: var(--pds-gold);
+        box-shadow: 0 0 0 3px rgba(251, 188, 9, .15);
     }
 
-    .rating-form-col select:disabled {
-        opacity: 0.5;
+    .pds-root select:disabled {
+        opacity: .5;
         cursor: not-allowed;
     }
 
     .date-dropdowns {
         display: flex;
-        gap: 0.5rem;
+        gap: var(--pds-s-sm);
     }
 
     .date-dropdowns select {
         flex: 1;
     }
 
-    .date-dropdowns select.day-select {
-        flex: 0.8;
-    }
-
-    .date-dropdowns select.month-select {
-        flex: 1.2;
-    }
-
-    .date-dropdowns select.year-select {
-        flex: 1;
-    }
-
     .rating-form-group {
-        margin-bottom: 1rem;
-    }
-
-    .rating-form-group label {
-        display: block;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0;
     }
 
     .rating-form-group textarea {
-        width: 100%;
-        min-height: 100px;
-        padding: 0.75rem;
-        border: 1px solid var(--bs-border-color);
-        border-radius: 8px;
-        background: var(--bs-body-bg);
-        color: var(--bs-body-color);
-        font-family: inherit;
-        font-size: 0.9rem;
+        min-height: 96px;
         resize: vertical;
     }
 
-    .rating-form-group textarea:focus {
-        outline: none;
-        border-color: var(--accent-purple);
-        box-shadow: 0 0 0 3px rgba(111, 45, 189, 0.1);
-    }
-
-    .rating-form-actions {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-    }
-
-    .btn-submit-rating {
-        background: var(--pathe-yellow);
-        border-color: var(--pathe-yellow);
-        color: var(--pathe-dark);
+    .pds-btn {
+        font-size: 13px;
         font-weight: 600;
-        padding: 0.5rem 1.5rem;
-    }
-
-    .btn-submit-rating:hover {
-        background: #e0a808;
-        border-color: #e0a808;
-        color: var(--pathe-dark);
-    }
-
-    @media (max-width: 768px) {
-        .rating-form-row {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .rating-form-col {
-            padding: 0;
-        }
-
-        .rating-form-divider {
-            display: none;
-        }
-    }
-
-    .back-link {
+        border-radius: var(--pds-r-sm);
+        padding: 9px 18px;
+        cursor: pointer;
+        border: 1px solid transparent;
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        color: var(--bs-secondary-color);
-        text-decoration: none;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
+        justify-content: center;
+        gap: .4rem;
+        line-height: 1.2;
+        transition: background .15s, border-color .15s, color .15s;
     }
 
-    .back-link:hover {
-        color: var(--accent-purple);
+    .pds-btn-primary {
+        background: var(--pds-gold);
+        color: #12140F;
     }
 
-    /* Responsive */
+    .pds-btn-primary:hover {
+        background: #e0a808;
+        color: #12140F;
+    }
+
+    .pds-btn-danger {
+        background: transparent;
+        border-color: var(--pds-danger);
+        color: var(--pds-danger);
+    }
+
+    .pds-btn-danger:hover {
+        background: rgba(192, 57, 43, .08);
+    }
+
+    #no-locations-message {
+        margin-top: var(--pds-s-sm);
+        font-size: 13px;
+        color: var(--pds-muted);
+    }
+
+    /* ===== Reviews grid ===== */
+    .pds-reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--pds-s-lg);
+    }
+
+    .pds-review {
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .pds-review-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--pds-s-md);
+    }
+
+    .pds-review-user {
+        font-weight: 600;
+        font-size: 15px;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .pds-review-popcorn {
+        flex-shrink: 0;
+    }
+
+    .pds-review-comment {
+        font-size: 14px;
+        line-height: 1.55;
+        color: var(--pds-muted);
+    }
+
+    .pds-review-comment.is-empty {
+        font-style: italic;
+        color: var(--pds-dim);
+    }
+
+    .pds-review-meta {
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+        color: var(--pds-dim);
+        margin-top: auto;
+    }
+
+    .pds-empty {
+        text-align: center;
+        padding: 40px;
+        color: var(--pds-muted);
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r);
+    }
+
+    /* Popcorn kernels for review cards */
+    .popcorn-rating--small .popcorn-off {
+        filter: grayscale(1);
+        opacity: .35;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 900px) {
+        .pds-facts-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .pds-reviews-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
     @media (max-width: 768px) {
-        .movie-header {
+        .pds-hero-body {
             flex-direction: column;
             align-items: center;
             text-align: center;
         }
 
-        .movie-poster {
-            width: 160px;
+        .pds-hero-poster {
+            width: 180px;
         }
 
-        .movie-title {
-            font-size: 1.5rem;
+        .pds-hero-title {
+            font-size: 30px;
         }
 
-        .movie-meta {
+        .pds-hero-meta,
+        .pds-genres,
+        .pds-hero-rating,
+        .pds-ext-row {
             justify-content: center;
         }
 
-        .movie-genres {
-            justify-content: center;
+        .pds-facts-grid {
+            grid-template-columns: repeat(2, 1fr);
         }
 
-        .global-rating-display {
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
+        .rating-form-row {
+            grid-template-columns: 1fr;
         }
 
-        .rating-cards {
+        .pds-reviews-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -524,406 +689,494 @@
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <a href="{{ applicationUrl }}/" class="back-link">
-        <i class="bi bi-arrow-left"></i> {{ t('movie.back_to_home') }}
-    </a>
+<div class="pds-root">
 
-    <div class="movie-hero">
-        <div class="movie-header">
-            <div class="movie-poster">
-                {% if movie.posterPath %}
-                    <img id="moviePoster"
-                         src="{{ movie.posterPath }}"
-                         alt="{{ movie.title }}"
-                         class="poster-clickable"
-                         onclick="openPosterLightbox('{{ movie.posterPath|e('js') }}', '{{ movie.title|e('js') }}')">
-                {% else %}
-                    <div class="movie-poster-placeholder">
-                        {{ movie.title }}
-                    </div>
-                {% endif %}
-            </div>
+    {# ===== HERO ===== #}
+    <div class="pds-hero">
+        {% if movie.posterPath %}
+            <div class="pds-hero-backdrop" style="background-image: url('{{ movie.posterPath }}');"></div>
+        {% endif %}
+        <div class="pds-hero-inner">
+            <a href="{{ applicationUrl }}/" class="pds-back-link">
+                <i class="bi bi-arrow-left"></i> {{ t('movie.back_to_home') }}
+            </a>
 
-            <div class="movie-info">
-                <h1 class="movie-title">{{ movie.title }}</h1>
-
-                <div class="movie-meta">
-                    {% if movie.releaseDate %}
-                        <span>{{ movie.releaseDate|date('Y') }}</span>
-                    {% endif %}
-                    {% if movie.runtime %}
-                        <span>{{ movie.runtime }}</span>
-                    {% endif %}
-                    {% if movie.originalLanguage %}
-                        <span>{{ movie.originalLanguage }}</span>
+            <div class="pds-hero-body">
+                <div class="pds-hero-poster">
+                    {% if movie.posterPath %}
+                        <img id="moviePoster"
+                             src="{{ movie.posterPath }}"
+                             alt="{{ movie.title }}"
+                             class="poster-clickable"
+                             onclick="openPosterLightbox('{{ movie.posterPath|e('js') }}', '{{ movie.title|e('js') }}')">
+                    {% else %}
+                        <div class="pds-hero-poster-placeholder">{{ movie.title }}</div>
                     {% endif %}
                 </div>
 
-                {% if genres and genres|length > 0 %}
-                    <div class="movie-genres">
-                        {% for genre in genres %}
-                            <span class="genre-badge">{{ genre.name }}</span>
+                <div class="pds-hero-info">
+                    <h1 class="pds-hero-title">{{ movie.title }}</h1>
+
+                    <div class="pds-hero-meta">
+                        {% set metaParts = [] %}
+                        {% if movie.releaseDate %}{% set metaParts = metaParts|merge([movie.releaseDate|date('Y')]) %}{% endif %}
+                        {% if movie.runtime %}{% set metaParts = metaParts|merge([movie.runtime]) %}{% endif %}
+                        {% if movie.originalLanguage %}{% set metaParts = metaParts|merge([movie.originalLanguage]) %}{% endif %}
+                        {% if directors and directors|length > 0 %}
+                            {% set directorNames = [] %}
+                            {% for d in directors %}{% if d.name %}{% set directorNames = directorNames|merge([d.name]) %}{% endif %}{% endfor %}
+                            {% if directorNames|length > 0 %}
+                                {% set metaParts = metaParts|merge([t('movie.director') ~ ': ' ~ directorNames|join(', ')]) %}
+                            {% endif %}
+                        {% endif %}
+                        {% for part in metaParts %}
+                            {% if not loop.first %}<span class="sep">·</span>{% endif %}
+                            <span>{{ part }}</span>
                         {% endfor %}
                     </div>
-                {% endif %}
 
-                {% if movie.tagline %}
-                    <p class="text-muted fst-italic mb-3">"{{ movie.tagline }}"</p>
-                {% endif %}
+                    {% if genres and genres|length > 0 %}
+                        <div class="pds-genres">
+                            {% for genre in genres %}
+                                <span class="pds-genre-pill">{{ genre.name }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if movie.tagline %}
+                        <p class="pds-tagline">"{{ movie.tagline }}"</p>
+                    {% endif %}
+
+                    {% if movie.overview %}
+                        <p class="pds-overview">{{ movie.overview }}</p>
+                    {% endif %}
+
+                    <div class="pds-hero-rating">
+                        {% include 'components/popcorn_rating.twig' with {
+                            valueInt: displayPopcorn,
+                            mode: 'display',
+                            readonly: true
+                        } %}
+                        <span class="pds-hero-rating-stats">
+                            {% if stats.rating_count > 0 %}
+                                {{ stats.avg_popcorn|number_format(1) }} / 7 · {{ stats.rating_count }} {{ t('movie.ratings_count') }}
+                            {% else %}
+                                {{ t('movie.no_ratings_yet') }}
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    {% set hasTmdb = movie.tmdbRatingAverage and movie.tmdbRatingAverage > 0 %}
+                    {% set hasImdb = isOmdbEnabled and movie.imdbRatingAverage and movie.imdbRatingAverage > 0 %}
+                    {% set hasRt = isOmdbEnabled and movie.rtRatingAverage and movie.rtRatingAverage > 0 %}
+                    {% if hasTmdb or hasImdb or hasRt %}
+                        <div class="pds-ext-row">
+                            {% if hasTmdb %}
+                                <div class="pds-ext-badge">
+                                    <span class="pds-ext-label">TMDB</span>
+                                    <span class="pds-ext-value">{{ movie.tmdbRatingAverage|number_format(1) }}</span>
+                                    <span class="pds-ext-unit">/10</span>
+                                </div>
+                            {% endif %}
+                            {% if hasImdb %}
+                                <div class="pds-ext-badge">
+                                    <span class="pds-ext-label">IMDB</span>
+                                    <span class="pds-ext-value">{{ movie.imdbRatingAverage|number_format(1) }}</span>
+                                    <span class="pds-ext-unit">/10</span>
+                                </div>
+                            {% endif %}
+                            {% if hasRt %}
+                                <div class="pds-ext-badge">
+                                    <span class="pds-ext-label">Rotten Tomatoes</span>
+                                    <span class="pds-ext-value">{{ movie.rtRatingAverage }}</span>
+                                    <span class="pds-ext-unit">%</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 
-    {% if movie.overview %}
-        <section class="movie-synopsis">
-            <h2>{{ t('movie.synopsis') }}</h2>
-            <p>{{ movie.overview }}</p>
-        </section>
-    {% endif %}
+    <main class="pds-main">
 
-    {# External Ratings Section #}
-    <section class="external-ratings-section">
-        <h2>{{ t('movie.external_ratings') }}</h2>
-        <div class="external-ratings-grid{% if not isOmdbEnabled %} external-ratings-grid-single{% endif %}">
-            {# TMDB Rating #}
-            <div class="external-rating-item">
-                <div class="external-rating-logo">
-                    <img src="{{ applicationUrl }}/images/tmdb-logo.svg" alt="TMDB" class="rating-logo">
-                </div>
-                <div class="external-rating-label">TMDB</div>
-                {% if movie.tmdbRatingAverage and movie.tmdbRatingAverage > 0 %}
-                    <div>
-                        <span class="external-rating-score" style="display: inline;">{{ movie.tmdbRatingAverage|number_format(1) }}</span><span class="external-rating-max" style="display: inline;">/10</span>
-                    </div>
-                {% else %}
-                    <div class="external-rating-na">{{ t('movie.na') }}</div>
-                {% endif %}
-            </div>
-
-            {% if isOmdbEnabled %}
-            {# IMDb Rating #}
-            <div class="external-rating-item">
-                <div class="external-rating-logo">
-                    <img src="{{ applicationUrl }}/images/imdb-logo.svg" alt="IMDb" class="rating-logo">
-                </div>
-                <div class="external-rating-label">IMDb</div>
-                {% if movie.imdbRatingAverage and movie.imdbRatingAverage > 0 %}
-                    <div>
-                        <span class="external-rating-score" style="display: inline;">{{ movie.imdbRatingAverage|number_format(1) }}</span><span class="external-rating-max" style="display: inline;">/10</span>
-                    </div>
-                {% else %}
-                    <div class="external-rating-na">{{ t('movie.na') }}</div>
-                {% endif %}
-            </div>
-
-            {# Rotten Tomatoes Rating #}
-            <div class="external-rating-item">
-                <div class="external-rating-logo">
-                    <img src="{{ applicationUrl }}/images/rt-logo.svg" alt="Rotten Tomatoes" class="rating-logo">
-                </div>
-                <div class="external-rating-label">Rotten Tomatoes</div>
-                {% if movie.rtRatingAverage and movie.rtRatingAverage > 0 %}
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        {% if movie.rtRatingAverage >= 60 %}
-                            <img src="{{ applicationUrl }}/images/rt-fresh-icon.svg" alt="{{ t('movie.rt_fresh') }}" style="width: 1.5rem; height: 1.5rem;">
-                        {% else %}
-                            <img src="{{ applicationUrl }}/images/rt-rotten-icon.svg" alt="{{ t('movie.rt_rotten') }}" style="width: 1.5rem; height: 1.5rem;">
-                        {% endif %}
-                        <div>
-                            <span class="external-rating-score" style="display: inline;">{{ movie.rtRatingAverage }}</span><span class="external-rating-max" style="display: inline;">%</span>
+        {# ===== TMDB FACTS ===== #}
+        {% set factStatus = tmdbFacts.status is defined ? tmdbFacts.status : null %}
+        {% set factOriginalTitle = tmdbFacts.original_title is defined ? tmdbFacts.original_title : null %}
+        {% set factBudget = tmdbFacts.budget is defined ? tmdbFacts.budget : null %}
+        {% set factRevenue = tmdbFacts.revenue is defined ? tmdbFacts.revenue : null %}
+        {% set companyNames = [] %}
+        {% for c in productionCompanies %}{% if c.name %}{% set companyNames = companyNames|merge([c.name]) %}{% endif %}{% endfor %}
+        {% set showOriginalTitle = factOriginalTitle and factOriginalTitle != movie.title %}
+        {% set hasFacts = factStatus or showOriginalTitle or (factBudget and factBudget > 0) or (factRevenue and factRevenue > 0) or companyNames|length > 0 or (productionCountries and productionCountries|length > 0) %}
+        {% if hasFacts %}
+            <section>
+                <div class="pds-facts-grid">
+                    {% if factStatus %}
+                        <div class="pds-fact">
+                            <div class="pds-fact-label">{{ t('movie.status') }}</div>
+                            <div class="pds-fact-value">{{ factStatus }}</div>
                         </div>
-                    </div>
-                {% else %}
-                    <div class="external-rating-na">{{ t('movie.na') }}</div>
-                {% endif %}
-            </div>
-            {% endif %}{# End isOmdbEnabled #}
-        </div>
-    </section>
-
-    <section class="global-rating-section">
-        <h2>{{ t('movie.community_rating') }}</h2>
-        <div class="global-rating-display">
-            {% include 'components/popcorn_rating.twig' with {
-                valueInt: displayPopcorn,
-                mode: 'display',
-                readonly: true
-            } %}
-            <div class="global-rating-stats">
-                {% if stats.rating_count > 0 %}
-                    {{ t('movie.avg') }} {{ stats.avg_popcorn|number_format(1) }} / 7
-                    ({{ stats.rating_count }} {{ t('movie.ratings_count') }})
-                {% else %}
-                    {{ t('movie.no_ratings_yet') }}
-                {% endif %}
-            </div>
-        </div>
-    </section>
-
-    {% if loggedIn %}
-        <section class="rating-form-section">
-            <h2>{{ t('movie.your_rating') }}</h2>
-            <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate" method="post" id="ratingForm">
-                <div class="rating-form-row">
-                    <div class="rating-form-col">
-                        <label>{{ t('movie.rating') }}</label>
-                        {% include 'components/popcorn_rating.twig' with {
-                            valueInt: userRating.rating_popcorn ?? 0,
-                            mode: 'input',
-                            name: 'rating_popcorn',
-                            readonly: false
-                        } %}
-                    </div>
-
-                    <div class="rating-form-divider"></div>
-
-                    <div class="rating-form-col">
-                        <label>{{ t('movie.watched_date') }}</label>
-                        <div class="date-dropdowns">
-                            <select name="watched_day" id="watched_day" class="day-select">
-                                <option value="">{{ t('movie.day') }}</option>
-                                {% for d in 1..31 %}
-                                    <option value="{{ d }}" {{ (userRating.watched_day ?? '') == d ? 'selected' : '' }}>{{ d }}</option>
-                                {% endfor %}
-                            </select>
-                            <select name="watched_month" id="watched_month" class="month-select">
-                                <option value="">{{ t('movie.month') }}</option>
-                                {% set months = [t('movie.month_jan'), t('movie.month_feb'), t('movie.month_mar'), t('movie.month_apr'), t('movie.month_may'), t('movie.month_jun'), t('movie.month_jul'), t('movie.month_aug'), t('movie.month_sep'), t('movie.month_oct'), t('movie.month_nov'), t('movie.month_dec')] %}
-                                {% for m in 1..12 %}
-                                    <option value="{{ m }}" {{ (userRating.watched_month ?? '') == m ? 'selected' : '' }}>{{ months[m - 1] }}</option>
-                                {% endfor %}
-                            </select>
-                            <select name="watched_year" id="watched_year" class="year-select">
-                                <option value="">{{ t('movie.year') }}</option>
-                                {% set currentYear = "now"|date("Y") + 1 %}
-                                {% for y in currentYear..1950 %}
-                                    <option value="{{ y }}" {{ (userRating.watched_year ?? '') == y ? 'selected' : '' }}>{{ y }}</option>
-                                {% endfor %}
-                            </select>
+                    {% endif %}
+                    {% if showOriginalTitle %}
+                        <div class="pds-fact">
+                            <div class="pds-fact-label">{{ t('movie.original_title') }}</div>
+                            <div class="pds-fact-value">{{ factOriginalTitle }}</div>
                         </div>
-                    </div>
-
-                    <div class="rating-form-divider"></div>
-
-                    <div class="rating-form-col">
-                        <label>{{ t('movie.location') }}</label>
-                        <select name="location_id" id="location_id">
-                            <option value="">{{ t('movie.select_location') }}</option>
-                            <!-- Populated dynamically from database -->
-                        </select>
-                        <div id="no-locations-message" class="alert alert-info" style="display: none; margin-top: 0.5rem; font-size: 0.875rem;">
-                            {{ t('movie.no_locations_pre') }}<a href="{{ applicationUrl }}/admin/movies" class="alert-link">{{ t('movie.admin_movies_link') }}</a>{{ t('movie.no_locations_post') }}
+                    {% endif %}
+                    {% if factBudget and factBudget > 0 %}
+                        <div class="pds-fact">
+                            <div class="pds-fact-label">{{ t('movie.budget') }}</div>
+                            <div class="pds-fact-value">${{ (factBudget / 1000000)|number_format(1, '.', ',') }} {{ t('movie.million_abbr') }}</div>
                         </div>
+                    {% endif %}
+                    {% if factRevenue and factRevenue > 0 %}
+                        <div class="pds-fact">
+                            <div class="pds-fact-label">{{ t('movie.revenue') }}</div>
+                            <div class="pds-fact-value">${{ (factRevenue / 1000000)|number_format(1, '.', ',') }} {{ t('movie.million_abbr') }}</div>
+                        </div>
+                    {% endif %}
+                    {% if companyNames|length > 0 %}
+                        <div class="pds-fact">
+                            <div class="pds-fact-label">{{ t('movie.production') }}</div>
+                            <div class="pds-fact-value">{{ companyNames|join(', ') }}</div>
+                        </div>
+                    {% endif %}
+                    {% if productionCountries and productionCountries|length > 0 %}
+                        <div class="pds-fact">
+                            <div class="pds-fact-label">{{ t('movie.country') }}</div>
+                            <div class="pds-fact-value">{{ productionCountries|join(', ') }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        {% endif %}
+
+        {# ===== CAST ===== #}
+        {% if cast and cast|length > 0 %}
+            <section>
+                <div class="pds-section-head">
+                    <div style="display: flex; align-items: baseline; gap: var(--pds-s-md);">
+                        <h2 class="pds-section-title">{{ t('movie.cast') }}</h2>
+                        <span class="pds-section-count">{{ cast|length }} {{ t('movie.out_of') }} {{ cast|length }}</span>
+                    </div>
+                    <div class="pds-scroll-btns">
+                        <button type="button" class="pds-scroll-btn" data-cast-scroll="-1" aria-label="{{ t('movie.cast') }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button type="button" class="pds-scroll-btn" data-cast-scroll="1" aria-label="{{ t('movie.cast') }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
-
-                <div class="rating-form-group">
-                    <label for="comment">{{ t('movie.comment_optional') }}</label>
-                    <textarea id="comment" name="comment" placeholder="{{ t('movie.comment_placeholder') }}">{{ userRating.comment ?? '' }}</textarea>
-                </div>
-
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-
-                <div class="rating-form-actions">
-                    <button type="submit" class="btn btn-submit-rating">
-                        {{ userRating ? t('movie.update_rating') : t('movie.submit_rating') }}
-                    </button>
-                </div>
-            </form>
-
-            {% if userRating and (userRating.rating_popcorn or userRating.comment or userRating.watched_year or userRating.location_id) %}
-                <hr class="my-3">
-                <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate/delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete your rating? This action cannot be undone.');">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-trash"></i> {{ t('movie.delete_rating') }}
-                    </button>
-                </form>
-            {% endif %}
-        </section>
-
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const yearSelect = document.getElementById('watched_year');
-            const monthSelect = document.getElementById('watched_month');
-            const daySelect = document.getElementById('watched_day');
-            const locationSelect = document.getElementById('location_id');
-
-            function updateDateDropdowns() {
-                const year = yearSelect.value;
-                const month = monthSelect.value;
-
-                // Month requires year
-                if (!year) {
-                    monthSelect.disabled = true;
-                    monthSelect.value = '';
-                    daySelect.disabled = true;
-                    daySelect.value = '';
-                } else {
-                    monthSelect.disabled = false;
-
-                    // Day requires month
-                    if (!month) {
-                        daySelect.disabled = true;
-                        daySelect.value = '';
-                    } else {
-                        daySelect.disabled = false;
-                        updateDayOptions(parseInt(year), parseInt(month));
-                    }
-                }
-            }
-
-            function updateDayOptions(year, month) {
-                const currentDay = daySelect.value;
-                const daysInMonth = new Date(year, month, 0).getDate();
-
-                // Clear options except first
-                while (daySelect.options.length > 1) {
-                    daySelect.remove(1);
-                }
-
-                // Add day options
-                for (let d = 1; d <= daysInMonth; d++) {
-                    const option = document.createElement('option');
-                    option.value = d;
-                    option.text = d;
-                    if (d == currentDay) option.selected = true;
-                    daySelect.add(option);
-                }
-
-                // Reset if current day exceeds max
-                if (currentDay && parseInt(currentDay) > daysInMonth) {
-                    daySelect.value = '';
-                }
-            }
-
-            // Load locations from database
-            async function loadLocations() {
-                const noLocationsMessage = document.getElementById('no-locations-message');
-
-                try {
-                    const response = await fetch('{{ applicationUrl }}/old/settings/locations');
-                    if (!response.ok) {
-                        console.error('Failed to load locations');
-                        return;
-                    }
-
-                    const locations = await response.json();
-                    const currentLocationId = {{ userRating.location_id ?? 'null' }};
-
-                    // Clear existing options except the first (placeholder)
-                    while (locationSelect.options.length > 1) {
-                        locationSelect.remove(1);
-                    }
-
-                    // Show message if no locations available
-                    if (locations.length === 0) {
-                        noLocationsMessage.style.display = 'block';
-                        locationSelect.disabled = true;
-                    } else {
-                        noLocationsMessage.style.display = 'none';
-                        locationSelect.disabled = false;
-
-                        // Populate with locations from database
-                        locations.forEach(location => {
-                            const option = document.createElement('option');
-                            option.value = location.id;
-                            option.text = location.name;
-                            if (currentLocationId && currentLocationId === location.id) {
-                                option.selected = true;
-                            }
-                            locationSelect.add(option);
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error loading locations:', error);
-                }
-            }
-
-            yearSelect.addEventListener('change', updateDateDropdowns);
-            monthSelect.addEventListener('change', updateDateDropdowns);
-
-            // Initialize state
-            updateDateDropdowns();
-            loadLocations();
-        });
-        </script>
-    {% endif %}
-
-    <section id="ratings" class="individual-ratings-section">
-        <h2>{{ t('movie.individual_ratings') }}</h2>
-
-        {% if individualRatings|length > 0 %}
-            <div class="rating-cards">
-                {% for rating in individualRatings %}
-                    <div class="rating-card">
-                        <div class="rating-card-header">
-                            <span class="rating-user-name">{{ rating.user_name }}</span>
-
-                            <div class="rating-user-popcorn">
-                                {% if rating.rating_popcorn %}
-                                    <div class="popcorn-rating popcorn-rating--small" aria-label="{{ t('movie.rating') }}: {{ rating.rating_popcorn }} {{ t('movie.out_of') }} 7">
-                                        {% for i in 1..7 %}
-                                            <span class="popcorn-rating__item {{ i <= rating.rating_popcorn ? 'popcorn-on' : 'popcorn-off' }}" aria-hidden="true">🍿</span>
-                                        {% endfor %}
-                                    </div>
+                <div class="pds-cast-scroll" id="castScroll">
+                    {% for member in cast %}
+                        <div class="pds-cast-card">
+                            <div class="pds-cast-photo">
+                                {% if member.posterPath and '/images/placeholder/' not in member.posterPath %}
+                                    <img src="{{ member.posterPath }}" alt="{{ member.name }}" loading="lazy">
                                 {% else %}
-                                    <span class="rating-unrated">{{ t('movie.unrated') }}</span>
+                                    <div class="pds-cast-photo-empty">
+                                        <div class="pds-cast-initials">
+                                            {% set nameParts = member.name|trim|split(' ')|filter(p => p is not empty) %}
+                                            {%- if nameParts|length > 0 -%}
+                                                {{ nameParts|first|slice(0, 1)|upper }}{% if nameParts|length > 1 %}{{ nameParts|last|slice(0, 1)|upper }}{% endif %}
+                                            {%- else -%}?{%- endif -%}
+                                        </div>
+                                        <div class="pds-cast-nophoto-hint">{{ t('movie.photo_via_tmdb') }}</div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="pds-cast-name">{{ member.name }}</div>
+                                {% if member.characterName %}
+                                    <div class="pds-cast-role">{{ member.characterName }}</div>
                                 {% endif %}
                             </div>
                         </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
 
-                        {% if rating.comment %}
-                            <p class="rating-comment">"{{ rating.comment }}"</p>
-                        {% endif %}
+        {# ===== DEINE BEWERTUNG ===== #}
+        {% if loggedIn %}
+            <section class="pds-card">
+                <div class="pds-card-head">
+                    <h2 class="pds-card-title">{{ t('movie.your_rating') }}</h2>
+                    <span class="pds-card-sub">
+                        {{ userRating ? t('movie.update_rating') : t('movie.submit_rating') }}
+                    </span>
+                </div>
+                <div class="pds-card-body">
+                    <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate" method="post" id="ratingForm">
+                        <div class="rating-form-row">
+                            <div class="rating-form-col">
+                                <label>{{ t('movie.rating') }}</label>
+                                {% include 'components/popcorn_rating.twig' with {
+                                    valueInt: userRating.rating_popcorn ?? 0,
+                                    mode: 'input',
+                                    name: 'rating_popcorn',
+                                    readonly: false
+                                } %}
+                            </div>
 
-                        <div class="rating-meta">
-                            {% if rating.watched_year %}
-                                <span class="rating-watched-date">
-                                    <i class="bi bi-calendar-event"></i>
-                                    {% if rating.watched_day and rating.watched_month %}
-                                        {{ '%02d'|format(rating.watched_day) }}.{{ '%02d'|format(rating.watched_month) }}.{{ rating.watched_year }}
-                                    {% elseif rating.watched_month %}
-                                        {{ '%02d'|format(rating.watched_month) }}.{{ rating.watched_year }}
-                                    {% else %}
-                                        {{ rating.watched_year }}
-                                    {% endif %}
-                                </span>
-                            {% endif %}
+                            <div class="rating-form-col">
+                                <label>{{ t('movie.watched_date') }}</label>
+                                <div class="date-dropdowns">
+                                    <select name="watched_day" id="watched_day" class="day-select">
+                                        <option value="">{{ t('movie.day') }}</option>
+                                        {% for d in 1..31 %}
+                                            <option value="{{ d }}" {{ (userRating.watched_day ?? '') == d ? 'selected' : '' }}>{{ d }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <select name="watched_month" id="watched_month" class="month-select">
+                                        <option value="">{{ t('movie.month') }}</option>
+                                        {% set months = [t('movie.month_jan'), t('movie.month_feb'), t('movie.month_mar'), t('movie.month_apr'), t('movie.month_may'), t('movie.month_jun'), t('movie.month_jul'), t('movie.month_aug'), t('movie.month_sep'), t('movie.month_oct'), t('movie.month_nov'), t('movie.month_dec')] %}
+                                        {% for m in 1..12 %}
+                                            <option value="{{ m }}" {{ (userRating.watched_month ?? '') == m ? 'selected' : '' }}>{{ months[m - 1] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <select name="watched_year" id="watched_year" class="year-select">
+                                        <option value="">{{ t('movie.year') }}</option>
+                                        {% set currentYear = "now"|date("Y") + 1 %}
+                                        {% for y in currentYear..1950 %}
+                                            <option value="{{ y }}" {{ (userRating.watched_year ?? '') == y ? 'selected' : '' }}>{{ y }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
 
-                            {% if rating.location_name %}
-                                <span class="rating-location">
-                                    <i class="bi bi-geo-alt"></i>
-                                    {{ rating.location_name }}
-                                </span>
-                            {% endif %}
+                            <div class="rating-form-col">
+                                <label>{{ t('movie.location') }}</label>
+                                <select name="location_id" id="location_id">
+                                    <option value="">{{ t('movie.select_location') }}</option>
+                                    <!-- Populated dynamically from database -->
+                                </select>
+                                <div id="no-locations-message" class="alert alert-info" style="display: none;">
+                                    {{ t('movie.no_locations_pre') }}<a href="{{ applicationUrl }}/admin/movies" class="alert-link">{{ t('movie.admin_movies_link') }}</a>{{ t('movie.no_locations_post') }}
+                                </div>
+                            </div>
                         </div>
 
-                        {% if rating.updated_at %}
-                            <div class="rating-date">
-                                {{ t('movie.last_update') }} {{ rating.updated_at|date('Y-m-d') }}
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="no-ratings-message">
-                <p>{{ t('movie.no_individual_ratings') }}</p>
-                {% if not loggedIn %}
-                    <a href="{{ applicationUrl }}/login" class="btn btn-warning mt-2" style="background-color: var(--pathe-yellow); border-color: var(--pathe-yellow); color: var(--pathe-dark);">
-                        {{ t('movie.login_to_rate') }}
-                    </a>
-                {% endif %}
-            </div>
+                        <div class="rating-form-group">
+                            <label for="comment">{{ t('movie.comment_optional') }}</label>
+                            <textarea id="comment" name="comment" placeholder="{{ t('movie.comment_placeholder') }}">{{ userRating.comment ?? '' }}</textarea>
+                        </div>
+
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    </form>
+                </div>
+                <div class="pds-card-foot">
+                    {% if userRating and (userRating.rating_popcorn or userRating.comment or userRating.watched_year or userRating.location_id) %}
+                        <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate/delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete your rating? This action cannot be undone.');">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="pds-btn pds-btn-danger">
+                                <i class="bi bi-trash"></i> {{ t('movie.delete_rating') }}
+                            </button>
+                        </form>
+                    {% endif %}
+                    <button type="submit" form="ratingForm" class="pds-btn pds-btn-primary">
+                        {{ userRating ? t('movie.update_rating') : t('movie.submit_rating') }}
+                    </button>
+                </div>
+            </section>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const yearSelect = document.getElementById('watched_year');
+                const monthSelect = document.getElementById('watched_month');
+                const daySelect = document.getElementById('watched_day');
+                const locationSelect = document.getElementById('location_id');
+
+                function updateDateDropdowns() {
+                    const year = yearSelect.value;
+                    const month = monthSelect.value;
+
+                    // Month requires year
+                    if (!year) {
+                        monthSelect.disabled = true;
+                        monthSelect.value = '';
+                        daySelect.disabled = true;
+                        daySelect.value = '';
+                    } else {
+                        monthSelect.disabled = false;
+
+                        // Day requires month
+                        if (!month) {
+                            daySelect.disabled = true;
+                            daySelect.value = '';
+                        } else {
+                            daySelect.disabled = false;
+                            updateDayOptions(parseInt(year), parseInt(month));
+                        }
+                    }
+                }
+
+                function updateDayOptions(year, month) {
+                    const currentDay = daySelect.value;
+                    const daysInMonth = new Date(year, month, 0).getDate();
+
+                    // Clear options except first
+                    while (daySelect.options.length > 1) {
+                        daySelect.remove(1);
+                    }
+
+                    // Add day options
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const option = document.createElement('option');
+                        option.value = d;
+                        option.text = d;
+                        if (d == currentDay) option.selected = true;
+                        daySelect.add(option);
+                    }
+
+                    // Reset if current day exceeds max
+                    if (currentDay && parseInt(currentDay) > daysInMonth) {
+                        daySelect.value = '';
+                    }
+                }
+
+                // Load locations from database
+                async function loadLocations() {
+                    const noLocationsMessage = document.getElementById('no-locations-message');
+
+                    try {
+                        const response = await fetch('{{ applicationUrl }}/old/settings/locations');
+                        if (!response.ok) {
+                            console.error('Failed to load locations');
+                            return;
+                        }
+
+                        const locations = await response.json();
+                        const currentLocationId = {{ userRating.location_id ?? 'null' }};
+
+                        // Clear existing options except the first (placeholder)
+                        while (locationSelect.options.length > 1) {
+                            locationSelect.remove(1);
+                        }
+
+                        // Show message if no locations available
+                        if (locations.length === 0) {
+                            noLocationsMessage.style.display = 'block';
+                            locationSelect.disabled = true;
+                        } else {
+                            noLocationsMessage.style.display = 'none';
+                            locationSelect.disabled = false;
+
+                            // Populate with locations from database
+                            locations.forEach(location => {
+                                const option = document.createElement('option');
+                                option.value = location.id;
+                                option.text = location.name;
+                                if (currentLocationId && currentLocationId === location.id) {
+                                    option.selected = true;
+                                }
+                                locationSelect.add(option);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error loading locations:', error);
+                    }
+                }
+
+                yearSelect.addEventListener('change', updateDateDropdowns);
+                monthSelect.addEventListener('change', updateDateDropdowns);
+
+                // Initialize state
+                updateDateDropdowns();
+                loadLocations();
+            });
+            </script>
         {% endif %}
-    </section>
+
+        {# ===== EINZELBEWERTUNGEN ===== #}
+        <section id="ratings">
+            <div class="pds-section-head">
+                <div style="display: flex; align-items: baseline; gap: var(--pds-s-md);">
+                    <h2 class="pds-section-title">{{ t('movie.individual_ratings') }}</h2>
+                    {% if individualRatings|length > 0 %}
+                        <span class="pds-section-count">{{ individualRatings|length }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if individualRatings|length > 0 %}
+                <div class="pds-reviews-grid">
+                    {% for rating in individualRatings %}
+                        <div class="pds-review">
+                            <div class="pds-review-head">
+                                <span class="pds-review-user">{{ rating.user_name }}</span>
+                                <div class="pds-review-popcorn">
+                                    {% if rating.rating_popcorn %}
+                                        <div class="popcorn-rating popcorn-rating--small" aria-label="{{ t('movie.rating') }}: {{ rating.rating_popcorn }} {{ t('movie.out_of') }} 7">
+                                            {% for i in 1..7 %}
+                                                <span class="popcorn-rating__item {{ i <= rating.rating_popcorn ? 'popcorn-on' : 'popcorn-off' }}" aria-hidden="true">🍿</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <span class="pds-card-sub">{{ t('movie.unrated') }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if rating.comment %}
+                                <p class="pds-review-comment">"{{ rating.comment }}"</p>
+                            {% else %}
+                                <p class="pds-review-comment is-empty">{{ t('movie.rated_without_comment') }}</p>
+                            {% endif %}
+
+                            {% set metaBits = [] %}
+                            {% if rating.watched_year %}
+                                {% if rating.watched_day and rating.watched_month %}
+                                    {% set metaBits = metaBits|merge(['%02d.%02d.%s'|format(rating.watched_day, rating.watched_month, rating.watched_year)]) %}
+                                {% elseif rating.watched_month %}
+                                    {% set metaBits = metaBits|merge(['%02d.%s'|format(rating.watched_month, rating.watched_year)]) %}
+                                {% else %}
+                                    {% set metaBits = metaBits|merge([rating.watched_year]) %}
+                                {% endif %}
+                            {% endif %}
+                            {% if rating.location_name %}
+                                {% set metaBits = metaBits|merge([rating.location_name]) %}
+                            {% endif %}
+                            {% if metaBits|length > 0 %}
+                                <div class="pds-review-meta">{{ metaBits|join(' · ') }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="pds-empty no-ratings-message">
+                    <p>{{ t('movie.no_individual_ratings') }}</p>
+                    {% if not loggedIn %}
+                        <a href="{{ applicationUrl }}/login" class="pds-btn pds-btn-primary" style="margin-top: 0.5rem;">
+                            {{ t('movie.login_to_rate') }}
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+    </main>
 
     {# Poster Lightbox #}
     <div id="posterLightbox" class="lightbox-overlay" style="display: none;">
         <button class="lightbox-close" aria-label="{{ t('movie.close') }}">&times;</button>
         <img id="posterLightboxImage" src="" alt="{{ t('movie.poster_alt') }}" class="lightbox-image">
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const castScroll = document.getElementById('castScroll');
+        if (castScroll) {
+            document.querySelectorAll('[data-cast-scroll]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const dir = parseInt(btn.getAttribute('data-cast-scroll'), 10);
+                    castScroll.scrollBy({ left: dir * 320, behavior: 'smooth' });
+                });
+            });
+        }
+    });
+    </script>
 </div>
 {% endblock %}
