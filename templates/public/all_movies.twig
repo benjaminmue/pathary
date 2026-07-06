@@ -397,6 +397,26 @@
         transform: translateY(-4px);
     }
 
+    /* Staggered "Pop" reveal on initial load and page navigation.
+       Diagonal wave (top-left -> bottom-right) via --d = row + col.
+       backwards fill (not both) so hover transforms still work afterwards. */
+    @keyframes moviePop {
+        0%   { opacity: 0; transform: scale(0.6); }
+        70%  { opacity: 1; transform: scale(1.03); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+
+    .movie-grid.revealing .movie-card {
+        animation: moviePop 620ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+        animation-delay: calc(var(--d, 0) * 90ms);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .movie-grid.revealing .movie-card {
+            animation: none;
+        }
+    }
+
     .movie-poster,
     .movie-poster-placeholder {
         width: 100%;
@@ -1251,6 +1271,33 @@ document.addEventListener('DOMContentLoaded', function() {
         return items;
     }
 
+    function prefersReducedMotion() {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    function gridColumnCount() {
+        try {
+            var tpl = window.getComputedStyle(grid).gridTemplateColumns;
+            return tpl ? tpl.split(' ').filter(Boolean).length : 5;
+        } catch (e) {
+            return 5;
+        }
+    }
+
+    // Staggered "Pop" reveal of the current page's cards in a top-left -> bottom-right
+    // wave. Called on initial load and page navigation only (not on live filter/sort).
+    function triggerReveal() {
+        if (prefersReducedMotion()) return;
+        var shown = filtered.slice((current - 1) * PER_PAGE, current * PER_PAGE);
+        var cols = gridColumnCount();
+        shown.forEach(function (card, i) {
+            card.style.setProperty('--d', Math.floor(i / cols) + (i % cols));
+        });
+        grid.classList.remove('revealing');
+        void grid.offsetWidth; // reflow so the animation restarts each time
+        grid.classList.add('revealing');
+    }
+
     function renderControls() {
         if (!paginationEl) return;
         if (pageCount <= 1) {
@@ -1266,7 +1313,7 @@ document.addEventListener('DOMContentLoaded', function() {
         prevBtn.className = 'am-page-btn';
         prevBtn.innerHTML = '&larr; ' + I18N.prev;
         prevBtn.disabled = current === 1;
-        prevBtn.addEventListener('click', function () { if (current > 1) showPage(current - 1, true); });
+        prevBtn.addEventListener('click', function () { if (current > 1) { showPage(current - 1, true); triggerReveal(); } });
         paginationEl.appendChild(prevBtn);
 
         buildPageItems().forEach(function (item) {
@@ -1282,7 +1329,7 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.className = 'am-page-num' + (item === current ? ' active' : '');
             btn.textContent = item;
             if (item === current) btn.setAttribute('aria-current', 'page');
-            btn.addEventListener('click', function () { showPage(item, true); });
+            btn.addEventListener('click', function () { showPage(item, true); triggerReveal(); });
             paginationEl.appendChild(btn);
         });
 
@@ -1291,7 +1338,7 @@ document.addEventListener('DOMContentLoaded', function() {
         nextBtn.className = 'am-page-btn';
         nextBtn.innerHTML = I18N.next + ' &rarr;';
         nextBtn.disabled = current === pageCount;
-        nextBtn.addEventListener('click', function () { if (current < pageCount) showPage(current + 1, true); });
+        nextBtn.addEventListener('click', function () { if (current < pageCount) { showPage(current + 1, true); triggerReveal(); } });
         paginationEl.appendChild(nextBtn);
     }
 
@@ -1383,6 +1430,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial render (also normalises the server-rendered header range).
     apply();
+    triggerReveal(); // staggered reveal on first load
 })();
 </script>
 {% endblock %}
