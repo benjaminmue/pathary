@@ -8,6 +8,8 @@ use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
+use Movary\Service\Exception\LoginRateLimitExceeded;
+use Movary\Service\LoginRateLimiterService;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -20,32 +22,18 @@ class AuthenticationController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
+        private readonly LoginRateLimiterService $loginRateLimiter,
     ) {
     }
 
     public function createToken(Request $request) : Response
     {
         $tokenRequestBody = Json::decode($request->getBody());
-
-        if (isset($tokenRequestBody['email']) === false || isset($tokenRequestBody['password']) === false) {
-            return Response::createBadRequest(
-                Json::encode([
-                    'error' => 'MissingCredentials',
-                    'message' => 'Email or password is missing'
-                ]),
-                [Header::createContentTypeJson()],
-            );
-        }
-
         $headers = $request->getHeaders();
-        if (isset($headers['X-Movary-Client']) === false) {
-            return Response::createBadRequest(
-                Json::encode([
-                    'error' => 'MissingRequestHeader',
-                    'message' => 'Missing request header X-Movary-Client'
-                ]),
-                [Header::createContentTypeJson()],
-            );
+
+        $validationError = $this->validateTokenRequest($tokenRequestBody, $headers);
+        if ($validationError !== null) {
+            return $validationError;
         }
 
         $requestClient = $headers['X-Movary-Client'];
@@ -53,6 +41,22 @@ class AuthenticationController
         $recoveryCode = empty($tokenRequestBody['recoveryCode']) === true ? null : trim($tokenRequestBody['recoveryCode']);
         $rememberMe = $tokenRequestBody['rememberMe'] ?? false;
         $trustDevice = $tokenRequestBody['trustDevice'] ?? false;
+
+        // Persistent, IP-based brute-force protection. This endpoint is the only
+        // login choke point (the web login form posts here too) and runs before
+        // authentication, so a session-based limiter would be trivially bypassed.
+        $clientIp = $this->getClientIp();
+        try {
+            $this->loginRateLimiter->ensureNotRateLimited($clientIp);
+        } catch (LoginRateLimitExceeded $e) {
+            return Response::createJson(
+                Json::encode([
+                    'error' => 'RateLimitExceeded',
+                    'message' => $e->getMessage(),
+                ]),
+                StatusCode::createTooManyRequests(),
+            );
+        }
 
         try {
             $userAndAuthToken = $this->authenticationService->login(
@@ -74,6 +78,8 @@ class AuthenticationController
                 [Header::createContentTypeJson()],
             );
         } catch (InvalidTotpCode) {
+            $this->loginRateLimiter->logAttempt($clientIp, false);
+
             return Response::createUnauthorized(
                 Json::encode([
                     'error' => 'InvalidTotpCode',
@@ -82,6 +88,8 @@ class AuthenticationController
                 [Header::createContentTypeJson()],
             );
         } catch (InvalidCredentials $e) {
+            $this->loginRateLimiter->logAttempt($clientIp, false);
+
             return Response::createUnauthorized(
                 Json::encode([
                     'error' => 'InvalidCredentials',
@@ -90,6 +98,9 @@ class AuthenticationController
                 [Header::createContentTypeJson()],
             );
         }
+
+        // Credentials (and TOTP, if configured) were valid.
+        $this->loginRateLimiter->logAttempt($clientIp, true);
 
         $user = $userAndAuthToken['user'];
 
@@ -120,6 +131,48 @@ class AuthenticationController
                 ]
             ]),
         );
+    }
+
+    /**
+     * @param array<string, mixed> $tokenRequestBody
+     * @param array<string, mixed> $headers
+     */
+    private function validateTokenRequest(array $tokenRequestBody, array $headers) : ?Response
+    {
+        if (isset($tokenRequestBody['email']) === false || isset($tokenRequestBody['password']) === false) {
+            return Response::createBadRequest(
+                Json::encode([
+                    'error' => 'MissingCredentials',
+                    'message' => 'Email or password is missing'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        if (isset($headers['X-Movary-Client']) === false) {
+            return Response::createBadRequest(
+                Json::encode([
+                    'error' => 'MissingRequestHeader',
+                    'message' => 'Missing request header X-Movary-Client'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        return null;
+    }
+
+    private function getClientIp() : string
+    {
+        // Prefer the real client IP behind a reverse proxy (e.g. NPM), otherwise
+        // fall back to the direct connection address.
+        if (empty($_SERVER['HTTP_X_FORWARDED_FOR']) === false) {
+            $forwardedIps = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+
+            return trim($forwardedIps[0]);
+        }
+
+        return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     }
 
     public function destroyToken(Request $request) : Response
