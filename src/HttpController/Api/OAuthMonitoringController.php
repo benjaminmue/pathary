@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Service\Email\OAuthConfig;
 use Movary\Service\Email\OAuthConfigService;
 use Movary\Service\Email\OAuthMonitoringService;
 use Movary\Util\Json;
@@ -27,6 +28,7 @@ class OAuthMonitoringController
      *
      * Returns whether banner should be shown and relevant data
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function getMonitoringStatus(Request $request) : Response
     {
         // Only accessible to admins
@@ -97,7 +99,7 @@ class OAuthMonitoringController
     /**
      * Get human-readable status message based on config
      */
-    private function getStatusMessage($config) : string
+    private function getStatusMessage(OAuthConfig $config) : string
     {
         if ($config->reauthRequired) {
             return 'Re-authorization is required. Email sending is disabled until you reconnect.';
@@ -125,18 +127,5 @@ class OAuthMonitoringController
         }
 
         return 'OAuth connection is healthy.';
-    }
-
-    private function getDaysSinceConnection($config) : ?int
-    {
-        if ($config->connectedAt === null) {
-            return null;
-        }
-
-        $connected = strtotime($config->connectedAt);
-        $now = time();
-        $diff = $now - $connected;
-
-        return (int)floor($diff / 86400);
     }
 }

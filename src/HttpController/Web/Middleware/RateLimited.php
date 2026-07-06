@@ -235,7 +235,6 @@ class RateLimited implements MiddlewareInterface
         return Response::createJson(
             \Movary\Util\Json::encode(['error' => $message]),
             \Movary\ValueObject\Http\StatusCode::createTooManyRequests(),
-            [\Movary\ValueObject\Http\Header::createRetryAfter($retryAfter)]
         );
     }
 }

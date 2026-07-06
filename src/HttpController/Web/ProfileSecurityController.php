@@ -182,6 +182,7 @@ class ProfileSecurityController
         );
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function regenerateRecoveryCodes(Request $request) : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();
@@ -267,6 +268,7 @@ class ProfileSecurityController
         ]));
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function revokeAllTrustedDevices(Request $request) : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();

@@ -68,15 +68,7 @@ class EmailService
         }
 
         // Map encryption value to PHPMailer constants
-        $encryption = $smtpConfig->getEncryption();
-        if ($encryption === 'tls') {
-            $this->phpMailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        } elseif ($encryption === 'ssl') {
-            $this->phpMailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        } else {
-            // No encryption - explicitly set to false
-            $this->phpMailer->SMTPSecure = false;
-        }
+        $this->phpMailer->SMTPSecure = $this->resolveSmtpSecure($smtpConfig->getEncryption());
 
         // Validate SMTP credentials before attempting authentication
         if ($emailAuthMode !== 'smtp_oauth' && $smtpConfig->isWithAuthentication()) {
@@ -113,40 +105,55 @@ class EmailService
         $this->phpMailer->CharSet = 'UTF-8';
 
         if ($this->phpMailer->send() === false || $this->phpMailer->isError() === true) {
-            // Provide more detailed error information
-            $errorInfo = $this->phpMailer->ErrorInfo;
-
-            // Add context to common errors
-            if (str_contains($errorInfo, 'SMTP connect() failed')) {
-                throw new CannotSendEmailException(
-                    'SMTP connect() failed. Please verify: ' .
-                    '1) SMTP host and port are correct, ' .
-                    '2) Encryption setting matches port (587=TLS, 465=SSL), ' .
-                    '3) Firewall allows outbound connection. ' .
-                    'Error: ' . $errorInfo
-                );
-            }
-
-            // Microsoft 365 specific error: SMTP AUTH disabled
-            if (str_contains($errorInfo, 'SmtpClientAuthentication is disabled')) {
-                throw new CannotSendEmailException(
-                    'Microsoft 365 SMTP authentication is disabled for your tenant or account. ' .
-                    'Your M365 administrator must enable SMTP AUTH. ' .
-                    'See: https://aka.ms/smtp_auth_disabled ' .
-                    'Error: ' . $errorInfo
-                );
-            }
-
-            if (str_contains($errorInfo, 'Authentication failed') || str_contains($errorInfo, '535')) {
-                throw new CannotSendEmailException(
-                    'SMTP authentication failed. Please verify username and password are correct. ' .
-                    'For M365, use your full email as username and an app password if MFA is enabled. ' .
-                    'Error: ' . $errorInfo
-                );
-            }
-
-            throw new CannotSendEmailException($errorInfo);
+            throw new CannotSendEmailException($this->buildSendErrorMessage($this->phpMailer->ErrorInfo));
         }
+    }
+
+    /**
+     * Map the active encryption setting to the matching PHPMailer constant.
+     */
+    private function resolveSmtpSecure(?string $encryption) : string
+    {
+        if ($encryption === 'tls') {
+            return PHPMailer::ENCRYPTION_STARTTLS;
+        }
+        if ($encryption === 'ssl') {
+            return PHPMailer::ENCRYPTION_SMTPS;
+        }
+
+        // No encryption - explicitly disable (PHPMailer treats an empty string as "no encryption")
+        return '';
+    }
+
+    /**
+     * Build a helpful error message from PHPMailer's raw error info.
+     */
+    private function buildSendErrorMessage(string $errorInfo) : string
+    {
+        // Add context to common errors
+        if (str_contains($errorInfo, 'SMTP connect() failed')) {
+            return 'SMTP connect() failed. Please verify: ' .
+                '1) SMTP host and port are correct, ' .
+                '2) Encryption setting matches port (587=TLS, 465=SSL), ' .
+                '3) Firewall allows outbound connection. ' .
+                'Error: ' . $errorInfo;
+        }
+
+        // Microsoft 365 specific error: SMTP AUTH disabled
+        if (str_contains($errorInfo, 'SmtpClientAuthentication is disabled')) {
+            return 'Microsoft 365 SMTP authentication is disabled for your tenant or account. ' .
+                'Your M365 administrator must enable SMTP AUTH. ' .
+                'See: https://aka.ms/smtp_auth_disabled ' .
+                'Error: ' . $errorInfo;
+        }
+
+        if (str_contains($errorInfo, 'Authentication failed') || str_contains($errorInfo, '535')) {
+            return 'SMTP authentication failed. Please verify username and password are correct. ' .
+                'For M365, use your full email as username and an app password if MFA is enabled. ' .
+                'Error: ' . $errorInfo;
+        }
+
+        return $errorInfo;
     }
 
     /**
@@ -268,6 +275,27 @@ class EmailService
     /**
      * Send welcome email to a newly created user
      *
+     * Send an HTML email using the SMTP configuration stored in the current server settings.
+     *
+     * @throws CannotSendEmailException
+     */
+    public function sendEmailUsingServerSettings(string $targetEmailAddress, string $subject, string $htmlMessage) : void
+    {
+        $smtpConfig = SmtpConfig::create(
+            $this->serverSettings->getSmtpHost() ?? '',
+            $this->serverSettings->getSmtpPort() ?? 587,
+            $this->serverSettings->getFromAddress() ?? '',
+            $this->serverSettings->getSmtpEncryption() ?? 'tls',
+            $this->serverSettings->getSmtpWithAuthentication() ?? true,
+            $this->serverSettings->getSmtpUser(),
+            $this->serverSettings->getSmtpPassword(),
+            $this->serverSettings->getFromDisplayName(),
+        );
+
+        $this->sendEmail($targetEmailAddress, $subject, $htmlMessage, $smtpConfig);
+    }
+
+    /**
      * @param string $recipientEmail Email address of the recipient
      * @param string $recipientName Display name of the recipient
      * @param string|null $invitationToken Optional invitation token for password setup
@@ -281,7 +309,7 @@ class EmailService
         try {
             // Get application settings
             $applicationName = $this->serverSettings->getApplicationName() ?? 'Pathary';
-            $applicationUrl = (string)$this->applicationUrlService->createApplicationUrl();
+            $applicationUrl = $this->applicationUrlService->createApplicationUrl();
 
             // Build logo URL (prefer PNG for email compatibility)
             $logoUrl = $applicationUrl . '/images/pathary-logo-192x192.png';

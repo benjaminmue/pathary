@@ -4,7 +4,6 @@ namespace Movary\Service\Email;
 
 use Doctrine\DBAL\Connection;
 use Movary\Domain\User\Service\SecurityAuditService;
-use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -18,23 +17,22 @@ use Psr\Log\LoggerInterface;
 class OAuthMonitoringService
 {
     // Health thresholds (days)
-    public const THRESHOLD_45_DAYS = 45;
-    public const THRESHOLD_30_DAYS = 30;
-    public const THRESHOLD_15_DAYS = 15;
-    public const DAILY_ALERT_START = 14; // Start daily alerts at 14 days
+    public const int THRESHOLD_45_DAYS = 45;
+    public const int THRESHOLD_30_DAYS = 30;
+    public const int THRESHOLD_15_DAYS = 15;
+    public const int DAILY_ALERT_START = 14; // Start daily alerts at 14 days
 
     // Token health criteria
-    public const MAX_DAYS_WITHOUT_REFRESH = 60; // Consider unhealthy if no refresh for 60 days
-    public const MAX_CONSECUTIVE_FAILURES = 3; // Critical after 3 consecutive failures
+    public const int MAX_DAYS_WITHOUT_REFRESH = 60; // Consider unhealthy if no refresh for 60 days
+    public const int MAX_CONSECUTIVE_FAILURES = 3; // Critical after 3 consecutive failures
 
     // Banner acknowledgement TTL (3 hours)
-    public const BANNER_ACK_TTL_SECONDS = 10800;
+    public const int BANNER_ACK_TTL_SECONDS = 10800;
 
     public function __construct(
         private readonly OAuthConfigService $oauthConfigService,
         private readonly OAuthTokenService $oauthTokenService,
         private readonly SecurityAuditService $securityAuditService,
-        private readonly UserApi $userApi,
         private readonly EmailService $emailService,
         private readonly Connection $dbConnection,
         private readonly LoggerInterface $logger,
@@ -263,6 +261,7 @@ class OAuthMonitoringService
     /**
      * Determine if notification should be sent based on threshold and last notification
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     private function shouldNotifyAt(string $threshold, OAuthConfig $config) : bool
     {
         // If next_notification_at is null or in the past, we should notify
@@ -290,7 +289,7 @@ class OAuthMonitoringService
             default => null,
         };
 
-        return $nextTime !== null ? date('Y-m-d H:i:s', $nextTime) : null;
+        return is_int($nextTime) ? date('Y-m-d H:i:s', $nextTime) : null;
     }
 
     /**
@@ -347,13 +346,7 @@ class OAuthMonitoringService
         $body = $this->getEmailBody($name, $config, $healthEval);
 
         // Use legacy email service (will use SMTP password if OAuth is failing)
-        $this->emailService->sendEmail(
-            toEmail: $email,
-            toName: $name,
-            subject: $subject,
-            body: $body,
-            isHtml: true
-        );
+        $this->emailService->sendEmailUsingServerSettings($email, $subject, $body);
     }
 
     /**
@@ -384,25 +377,9 @@ class OAuthMonitoringService
 
         $settingsUrl = getenv('APPLICATION_URL') . '/admin/server/email';
 
-        $urgencyColor = match ($alertLevel) {
-            'expired', 'critical' => '#dc3545',
-            'warn' => '#ffc107',
-            default => '#0d6efd',
-        };
-
-        $urgencyLabel = match ($alertLevel) {
-            'expired' => 'URGENT - IMMEDIATE ACTION REQUIRED',
-            'critical' => 'CRITICAL - ACTION NEEDED SOON',
-            'warn' => 'WARNING - ATTENTION NEEDED',
-            default => 'INFORMATION',
-        };
-
-        $actionText = match ($alertLevel) {
-            'expired' => 'Your OAuth connection has expired and emails cannot be sent. Please reconnect immediately.',
-            'critical' => 'Your OAuth connection is experiencing issues. Please check the connection and reconnect if necessary.',
-            'warn' => 'Your OAuth connection may need attention soon. Please review the connection status.',
-            default => 'This is an informational message about your OAuth connection.',
-        };
+        $urgencyColor = $this->resolveUrgencyColor($alertLevel);
+        $urgencyLabel = $this->resolveUrgencyLabel($alertLevel);
+        $actionText = $this->resolveActionText($alertLevel);
 
         return <<<HTML
         <!DOCTYPE html>
@@ -461,6 +438,35 @@ class OAuthMonitoringService
         HTML;
     }
 
+    private function resolveUrgencyColor(string $alertLevel) : string
+    {
+        return match ($alertLevel) {
+            'expired', 'critical' => '#dc3545',
+            'warn' => '#ffc107',
+            default => '#0d6efd',
+        };
+    }
+
+    private function resolveUrgencyLabel(string $alertLevel) : string
+    {
+        return match ($alertLevel) {
+            'expired' => 'URGENT - IMMEDIATE ACTION REQUIRED',
+            'critical' => 'CRITICAL - ACTION NEEDED SOON',
+            'warn' => 'WARNING - ATTENTION NEEDED',
+            default => 'INFORMATION',
+        };
+    }
+
+    private function resolveActionText(string $alertLevel) : string
+    {
+        return match ($alertLevel) {
+            'expired' => 'Your OAuth connection has expired and emails cannot be sent. Please reconnect immediately.',
+            'critical' => 'Your OAuth connection is experiencing issues. Please check the connection and reconnect if necessary.',
+            'warn' => 'Your OAuth connection may need attention soon. Please review the connection status.',
+            default => 'This is an informational message about your OAuth connection.',
+        };
+    }
+
     private function renderDaysToAction(?int $days) : string
     {
         if ($days === null || $days <= 0) {
@@ -488,7 +494,12 @@ class OAuthMonitoringService
             return 'Never';
         }
 
-        return date('Y-m-d H:i:s', strtotime($timestamp));
+        $parsed = strtotime($timestamp);
+        if ($parsed === false) {
+            return $timestamp;
+        }
+
+        return date('Y-m-d H:i:s', $parsed);
     }
 
     /**
@@ -561,8 +572,17 @@ class OAuthMonitoringService
      */
     private function getAdminUsers() : array
     {
-        return $this->dbConnection->fetchAllAssociative(
+        $rows = $this->dbConnection->fetchAllAssociative(
             'SELECT id, email, name FROM user WHERE is_admin = 1 AND email IS NOT NULL AND email != ""'
+        );
+
+        return array_map(
+            static fn(array $row) : array => [
+                'id' => (int)$row['id'],
+                'email' => $row['email'] === null ? null : (string)$row['email'],
+                'name' => (string)$row['name'],
+            ],
+            $rows,
         );
     }
 
@@ -611,7 +631,7 @@ class OAuthMonitoringService
     /**
      * Extract error code from error message
      */
-    private function extractErrorCode(string $errorMessage) : ?string
+    private function extractErrorCode(string $errorMessage) : string
     {
         // Try to extract structured error code
         if (preg_match('/error["\']?\s*:\s*["\']?([a-z_]+)["\']?/i', $errorMessage, $matches)) {

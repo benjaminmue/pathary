@@ -41,7 +41,7 @@ class CsrfProtection implements MiddlewareInterface
 
         // Validate token
         if (!$this->csrfTokenService->validateToken($token)) {
-            return Response::createForbidden('CSRF token validation failed');
+            return Response::createForbidden();
         }
 
         return null;

@@ -452,7 +452,7 @@ class ServerSettings
             $value = $this->config->getAsString($key);
 
             // If environment value is empty, check database instead
-            if ($value === '' || $value === null) {
+            if ($value === '') {
                 $value = $this->fetchValueFromDatabase($key);
             }
         } catch (ConfigNotSetException $e) {
@@ -471,7 +471,7 @@ class ServerSettings
         try {
             $value = $this->config->getAsString($key);
             // Treat empty strings as not set
-            return $value !== null && $value !== '';
+            return $value !== '';
         } catch (ConfigNotSetException) {
             return false;
         }

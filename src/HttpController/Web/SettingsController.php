@@ -576,32 +576,7 @@ class SettingsController
 
         // Check email auth mode to determine how to send the email
         $emailAuthMode = $this->serverSettings->getEmailAuthMode();
-
-        if ($emailAuthMode === 'smtp_oauth') {
-            // For OAuth mode, load settings from database
-            $smtpConfig = SmtpConfig::create(
-                $this->serverSettings->getSmtpHost() ?? '',
-                $this->serverSettings->getSmtpPort() ?? 587,
-                $this->serverSettings->getFromAddress() ?? '',
-                $this->serverSettings->getSmtpEncryption() ?? 'tls',
-                true, // OAuth always uses authentication
-                null,
-                null,
-                $this->serverSettings->getFromDisplayName(),
-            );
-        } else {
-            // For password mode, use settings from request
-            $smtpConfig = SmtpConfig::create(
-                (string)$requestData['smtpHost'],
-                (int)$requestData['smtpPort'],
-                (string)$requestData['smtpFromAddress'],
-                (string)$requestData['smtpEncryption'],
-                (bool)$requestData['smtpWithAuthentication'],
-                isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'],
-                isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'],
-                isset($requestData['smtpFromDisplayName']) === false ? null : $requestData['smtpFromDisplayName'],
-            );
-        }
+        $smtpConfig = $this->buildTestSmtpConfig($emailAuthMode, $requestData);
 
         try {
             $this->emailService->sendEmail(
@@ -617,6 +592,40 @@ class SettingsController
         return Response::createOk();
     }
 
+    /**
+     * Build the SMTP config used for the test email based on the active auth mode.
+     *
+     * @param array<string, mixed> $requestData
+     */
+    private function buildTestSmtpConfig(?string $emailAuthMode, array $requestData) : SmtpConfig
+    {
+        if ($emailAuthMode === 'smtp_oauth') {
+            // For OAuth mode, load settings from database
+            return SmtpConfig::create(
+                $this->serverSettings->getSmtpHost() ?? '',
+                $this->serverSettings->getSmtpPort() ?? 587,
+                $this->serverSettings->getFromAddress() ?? '',
+                $this->serverSettings->getSmtpEncryption() ?? 'tls',
+                true, // OAuth always uses authentication
+                null,
+                null,
+                $this->serverSettings->getFromDisplayName(),
+            );
+        }
+
+        // For password mode, use settings from request
+        return SmtpConfig::create(
+            (string)$requestData['smtpHost'],
+            (int)$requestData['smtpPort'],
+            (string)$requestData['smtpFromAddress'],
+            (string)$requestData['smtpEncryption'],
+            (bool)$requestData['smtpWithAuthentication'],
+            isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'],
+            isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'],
+            isset($requestData['smtpFromDisplayName']) === false ? null : $requestData['smtpFromDisplayName'],
+        );
+    }
+
     public function diagnoseSMTP(Request $request) : Response
     {
         $requestData = Json::decode($request->getBody());
@@ -625,6 +634,7 @@ class SettingsController
         $port = (int)($requestData['smtpPort'] ?? 0);
         $encryption = trim((string)($requestData['smtpEncryption'] ?? ''));
 
+        /** @var array{host: string, port: int, encryption: string, tests: array<string, array{status: string, message: string, latency_ms?: int}>, overall_status?: string} $diagnostics */
         $diagnostics = [
             'host' => $host,
             'port' => $port,
@@ -652,7 +662,12 @@ class SettingsController
 
         // Test 2: DNS resolution
         $startTime = microtime(true);
-        $dnsResult = @gethostbyname($host);
+        set_error_handler(static fn () => true);
+        try {
+            $dnsResult = gethostbyname($host);
+        } finally {
+            restore_error_handler();
+        }
         $dnsLatency = (int)round((microtime(true) - $startTime) * 1000);
 
         if ($dnsResult === $host || filter_var($dnsResult, FILTER_VALIDATE_IP) === false) {
@@ -679,7 +694,12 @@ class SettingsController
         $startTime = microtime(true);
         $errno = 0;
         $errstr = '';
-        $socket = @fsockopen($host, $port, $errno, $errstr, 10);
+        set_error_handler(static fn () => true);
+        try {
+            $socket = fsockopen($host, $port, $errno, $errstr, 10);
+        } finally {
+            restore_error_handler();
+        }
         $connectLatency = (int)round((microtime(true) - $startTime) * 1000);
 
         if ($socket === false) {
@@ -703,7 +723,12 @@ class SettingsController
         ];
 
         // Test 4: SMTP banner (optional)
-        $banner = @fgets($socket, 512);
+        set_error_handler(static fn () => true);
+        try {
+            $banner = fgets($socket, 512);
+        } finally {
+            restore_error_handler();
+        }
         if ($banner !== false) {
             $diagnostics['tests']['smtp_banner'] = [
                 'status' => 'success',
@@ -711,9 +736,33 @@ class SettingsController
             ];
         }
 
-        @fclose($socket);
+        set_error_handler(static fn () => true);
+        try {
+            fclose($socket);
+        } finally {
+            restore_error_handler();
+        }
 
         // Test 5: Encryption/port recommendation
+        $diagnostics['tests']['encryption_port_match'] = $this->buildEncryptionPortMatchResult($port, $encryption);
+
+        // Overall status
+        $diagnostics['overall_status'] = $this->determineDiagnosticsStatus($diagnostics['tests']);
+
+        return Response::create(
+            StatusCode::createOk(),
+            Json::encode($diagnostics),
+            [Header::createContentTypeJson()],
+        );
+    }
+
+    /**
+     * Build the encryption/port compatibility test result.
+     *
+     * @return array{status: string, message: string}
+     */
+    private function buildEncryptionPortMatchResult(int $port, string $encryption) : array
+    {
         $portEncryptionMatch = true;
         $recommendation = '';
 
@@ -728,29 +777,28 @@ class SettingsController
             $recommendation = 'Port 25 typically does not use encryption (may not be allowed for submission)';
         }
 
-        $diagnostics['tests']['encryption_port_match'] = [
+        return [
             'status' => $portEncryptionMatch ? 'success' : 'warning',
             'message' => $portEncryptionMatch
                 ? 'Port and encryption settings appear compatible'
                 : $recommendation,
         ];
+    }
 
-        // Overall status
-        $hasError = false;
-        foreach ($diagnostics['tests'] as $test) {
+    /**
+     * Determine overall diagnostics status from individual test results.
+     *
+     * @param array<string, array{status: string, ...}> $tests
+     */
+    private function determineDiagnosticsStatus(array $tests) : string
+    {
+        foreach ($tests as $test) {
             if ($test['status'] === 'error') {
-                $hasError = true;
-                break;
+                return 'failed';
             }
         }
 
-        $diagnostics['overall_status'] = $hasError ? 'failed' : 'passed';
-
-        return Response::create(
-            StatusCode::createOk(),
-            Json::encode($diagnostics),
-            [Header::createContentTypeJson()],
-        );
+        return 'passed';
     }
 
     public function traktVerifyCredentials(Request $request) : Response

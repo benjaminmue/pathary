@@ -11,7 +11,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\SecurityAuditService;
 use Movary\Domain\User\Service\UserInvitationService;
 use Movary\Domain\User\UserApi;
-use Movary\Service\CsrfTokenService;
+use Movary\Domain\User\UserEntity;
 use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
 use Movary\Util\Json;
@@ -27,7 +27,6 @@ class UserController
         private readonly UserApi $userApi,
         private readonly EmailService $emailService,
         private readonly UserInvitationService $invitationService,
-        private readonly CsrfTokenService $csrfTokenService,
         private readonly SecurityAuditService $securityAuditService,
         private readonly LoggerInterface $logger,
     ) {
@@ -56,41 +55,9 @@ class UserController
         }
 
         // Validation exceptions are thrown before any database changes
-        try {
-            // Validate user data (throws exceptions if invalid)
-            $this->userApi->createUser(
-                $requestUserData['email'],
-                $password,
-                $requestUserData['name'],
-                $requestUserData['isAdmin'] ?? false,
-            );
-        } catch (EmailNotUnique) {
-            // Log specific error for debugging, but return generic message to prevent user enumeration
-            $this->logger->info('User creation failed: email already exists', [
-                'attempted_email' => $requestUserData['email'],
-                'admin_id' => $currentUser->getId(),
-            ]);
-            return Response::createBadRequest('User creation failed. Please check your input and try again.');
-        } catch (UsernameNotUnique) {
-            // Log specific error for debugging, but return generic message to prevent user enumeration
-            $this->logger->info('User creation failed: username already exists', [
-                'attempted_username' => $requestUserData['name'],
-                'admin_id' => $currentUser->getId(),
-            ]);
-            return Response::createBadRequest('User creation failed. Please check your input and try again.');
-        } catch (UsernameInvalidFormat) {
-            // Log specific error for debugging, but return generic message to prevent user enumeration
-            $this->logger->info('User creation failed: invalid username format', [
-                'attempted_username' => $requestUserData['name'],
-                'admin_id' => $currentUser->getId(),
-            ]);
-            return Response::createBadRequest('User creation failed. Please check your input and try again.');
-        } catch (PasswordTooShort) {
-            // Password policy errors don't reveal user existence, can be specific
-            return Response::createBadRequest('Password too short.');
-        } catch (PasswordPolicyViolation $e) {
-            // Password policy errors don't reveal user existence, can be specific
-            return Response::createBadRequest($e->getMessage());
+        $validationError = $this->validateAndCreateUser($requestUserData, $password, $currentUser);
+        if ($validationError !== null) {
+            return $validationError;
         }
 
         // Get the newly created user
@@ -107,63 +74,29 @@ class UserController
 
         // Send welcome email with invitation token if requested
         // This must succeed when welcome email is requested, otherwise user cannot log in
-        $invitationToken = null;
         if ($sendWelcomeEmail) {
-            try {
-                // Generate invitation token (3 days expiration)
-                $invitationToken = $this->invitationService->createInvitation($newUser->getId());
-
-                // Send welcome email with token (pass sender user ID for rate limiting)
-                $this->emailService->sendWelcomeEmail(
-                    $requestUserData['email'],
-                    $requestUserData['name'],
-                    $invitationToken,
-                    $currentUser->getId()
-                );
-            } catch (\Movary\Service\Email\Exception\EmailRateLimitExceededException $e) {
-                // Rate limit exceeded - delete the created user and return error
-                $this->userApi->deleteUser($newUser->getId());
-
-                $this->logger->warning('User creation failed: email rate limit exceeded', [
-                    'email' => $requestUserData['email'],
-                    'admin_user_id' => $currentUser->getId(),
-                ]);
-
-                return Response::createJson(
-                    Json::encode(['error' => $e->getMessage()]),
-                    StatusCode::createTooManyRequests()
-                );
-            } catch (CannotSendEmailException $e) {
-                // Email send failed - delete the created user and return error
-                // This prevents leaving the user in an inaccessible state
-                $this->userApi->deleteUser($newUser->getId());
-
-                $this->logger->error('User creation failed: could not send welcome email', [
-                    'email' => $requestUserData['email'],
-                    'admin_user_id' => $currentUser->getId(),
-                    'error' => $e->getMessage(),
-                ]);
-
-                // Log failed user creation attempt
-                $this->securityAuditService->log(
-                    $currentUser->getId(),
-                    SecurityAuditService::EVENT_USER_WELCOME_EMAIL_FAILED,
-                    $_SERVER['REMOTE_ADDR'] ?? null,
-                    $_SERVER['HTTP_USER_AGENT'] ?? null,
-                    [
-                        'target_email' => $requestUserData['email'],
-                        'error' => $e->getMessage(),
-                        'rollback' => true,
-                    ]
-                );
-
-                return Response::create(
-                    StatusCode::createInternalServerError(),
-                    'User creation failed: could not send welcome email. Please check email configuration and try again.'
-                );
+            $emailError = $this->sendWelcomeEmailForNewUser($requestUserData, $newUser, $currentUser);
+            if ($emailError !== null) {
+                return $emailError;
             }
         }
 
+        $this->logUserCreation($currentUser, $newUser, $requestUserData, $sendWelcomeEmail);
+
+        return Response::createOk();
+    }
+
+    /**
+     * Write the security-audit entries for a freshly created user.
+     *
+     * @param array<string, mixed> $requestUserData
+     */
+    private function logUserCreation(
+        UserEntity $currentUser,
+        UserEntity $newUser,
+        array $requestUserData,
+        mixed $sendWelcomeEmail,
+    ) : void {
         // Log successful user creation
         $this->securityAuditService->log(
             $currentUser->getId(),
@@ -192,8 +125,6 @@ class UserController
                 ]
             );
         }
-
-        return Response::createOk();
     }
 
     public function deleteUser(Request $request) : Response
@@ -208,10 +139,6 @@ class UserController
 
         // Get user info before deletion for audit logging
         $targetUser = $this->userApi->fetchUser($userId);
-        if ($targetUser === null) {
-            return Response::createNotFound();
-        }
-
         $targetEmail = $this->userApi->findUserEmail($userId);
 
         // Log user deletion event before deleting
@@ -257,9 +184,8 @@ class UserController
 
         // Get user before update to track changes
         $targetUser = $this->userApi->fetchUser($userId);
-        if ($targetUser === null) {
-            return Response::createNotFound();
-        }
+
+        $targetEmail = $this->userApi->findUserEmail($userId);
 
         $changedFields = [];
         $passwordChanged = false;
@@ -274,7 +200,7 @@ class UserController
             }
 
             // Track email changes
-            if ($requestUserData['email'] !== $targetUser->getEmail()) {
+            if ($requestUserData['email'] !== $targetEmail) {
                 $this->userApi->updateEmail($userId, $requestUserData['email']);
                 $changedFields[] = 'email';
             }
@@ -323,45 +249,181 @@ class UserController
             return Response::createBadRequest($e->getMessage());
         }
 
-        // Log user update event if any changes were made
-        if (count($changedFields) > 0 || $passwordChanged) {
-            $metadata = [
-                'target_user_id' => $userId,
-                'target_email' => $requestUserData['email'],
-                'changed_fields' => $changedFields,
-            ];
-
-            if ($adminStatusChanged) {
-                $metadata['admin_status_change'] = [
-                    'from' => $previousAdminStatus,
-                    'to' => $requestUserData['isAdmin'],
-                ];
-            }
-
-            $this->securityAuditService->log(
-                $currentUser->getId(),
-                SecurityAuditService::EVENT_USER_UPDATED,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-                $metadata
-            );
-
-            // Log separate event for password change by admin (if not self-update)
-            if ($passwordChanged && $currentUser->getId() !== $userId) {
-                $this->securityAuditService->log(
-                    $currentUser->getId(),
-                    SecurityAuditService::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN,
-                    $_SERVER['REMOTE_ADDR'] ?? null,
-                    $_SERVER['HTTP_USER_AGENT'] ?? null,
-                    [
-                        'target_user_id' => $userId,
-                        'target_email' => $requestUserData['email'],
-                    ]
-                );
-            }
-        }
+        $this->logUserUpdate(
+            $currentUser,
+            $userId,
+            $requestUserData,
+            $changedFields,
+            $passwordChanged,
+            $adminStatusChanged,
+            $previousAdminStatus,
+        );
 
         return Response::createOk();
+    }
+
+    /**
+     * Write security-audit entries for a user update (no-op when nothing changed).
+     *
+     * @param array<string, mixed> $requestUserData
+     * @param list<string> $changedFields
+     */
+    private function logUserUpdate(
+        UserEntity $currentUser,
+        int $userId,
+        array $requestUserData,
+        array $changedFields,
+        bool $passwordChanged,
+        bool $adminStatusChanged,
+        bool $previousAdminStatus,
+    ) : void {
+        // Only log when something actually changed
+        if (count($changedFields) === 0 && $passwordChanged === false) {
+            return;
+        }
+
+        $metadata = [
+            'target_user_id' => $userId,
+            'target_email' => $requestUserData['email'],
+            'changed_fields' => $changedFields,
+        ];
+
+        if ($adminStatusChanged) {
+            $metadata['admin_status_change'] = [
+                'from' => $previousAdminStatus,
+                'to' => $requestUserData['isAdmin'],
+            ];
+        }
+
+        $this->securityAuditService->log(
+            $currentUser->getId(),
+            SecurityAuditService::EVENT_USER_UPDATED,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            $metadata
+        );
+
+        // Log separate event for password change by admin (if not self-update)
+        if ($passwordChanged && $currentUser->getId() !== $userId) {
+            $this->securityAuditService->log(
+                $currentUser->getId(),
+                SecurityAuditService::EVENT_USER_PASSWORD_CHANGED_BY_ADMIN,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'target_user_id' => $userId,
+                    'target_email' => $requestUserData['email'],
+                ]
+            );
+        }
+    }
+
+    /**
+     * Validate and persist the new user. Returns an error Response on failure, or null on success.
+     */
+    private function validateAndCreateUser(array $requestUserData, string $password, UserEntity $currentUser) : ?Response
+    {
+        try {
+            // Validate user data (throws exceptions if invalid)
+            $this->userApi->createUser(
+                $requestUserData['email'],
+                $password,
+                $requestUserData['name'],
+                $requestUserData['isAdmin'] ?? false,
+            );
+        } catch (EmailNotUnique) {
+            // Log specific error for debugging, but return generic message to prevent user enumeration
+            $this->logger->info('User creation failed: email already exists', [
+                'attempted_email' => $requestUserData['email'],
+                'admin_id' => $currentUser->getId(),
+            ]);
+            return Response::createBadRequest('User creation failed. Please check your input and try again.');
+        } catch (UsernameNotUnique) {
+            // Log specific error for debugging, but return generic message to prevent user enumeration
+            $this->logger->info('User creation failed: username already exists', [
+                'attempted_username' => $requestUserData['name'],
+                'admin_id' => $currentUser->getId(),
+            ]);
+            return Response::createBadRequest('User creation failed. Please check your input and try again.');
+        } catch (UsernameInvalidFormat) {
+            // Log specific error for debugging, but return generic message to prevent user enumeration
+            $this->logger->info('User creation failed: invalid username format', [
+                'attempted_username' => $requestUserData['name'],
+                'admin_id' => $currentUser->getId(),
+            ]);
+            return Response::createBadRequest('User creation failed. Please check your input and try again.');
+        } catch (PasswordTooShort) {
+            // Password policy errors don't reveal user existence, can be specific
+            return Response::createBadRequest('Password too short.');
+        } catch (PasswordPolicyViolation $e) {
+            // Password policy errors don't reveal user existence, can be specific
+            return Response::createBadRequest($e->getMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Send the welcome email with invitation token. Rolls back the created user and returns an error
+     * Response on failure, or null on success.
+     */
+    private function sendWelcomeEmailForNewUser(array $requestUserData, UserEntity $newUser, UserEntity $currentUser) : ?Response
+    {
+        try {
+            // Generate invitation token (3 days expiration)
+            $invitationToken = $this->invitationService->createInvitation($newUser->getId());
+
+            // Send welcome email with token (pass sender user ID for rate limiting)
+            $this->emailService->sendWelcomeEmail(
+                $requestUserData['email'],
+                $requestUserData['name'],
+                $invitationToken,
+                $currentUser->getId()
+            );
+        } catch (\Movary\Service\Email\Exception\EmailRateLimitExceededException $e) {
+            // Rate limit exceeded - delete the created user and return error
+            $this->userApi->deleteUser($newUser->getId());
+
+            $this->logger->warning('User creation failed: email rate limit exceeded', [
+                'email' => $requestUserData['email'],
+                'admin_user_id' => $currentUser->getId(),
+            ]);
+
+            return Response::createJson(
+                Json::encode(['error' => $e->getMessage()]),
+                StatusCode::createTooManyRequests()
+            );
+        } catch (CannotSendEmailException $e) {
+            // Email send failed - delete the created user and return error
+            // This prevents leaving the user in an inaccessible state
+            $this->userApi->deleteUser($newUser->getId());
+
+            $this->logger->error('User creation failed: could not send welcome email', [
+                'email' => $requestUserData['email'],
+                'admin_user_id' => $currentUser->getId(),
+                'error' => $e->getMessage(),
+            ]);
+
+            // Log failed user creation attempt
+            $this->securityAuditService->log(
+                $currentUser->getId(),
+                SecurityAuditService::EVENT_USER_WELCOME_EMAIL_FAILED,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                [
+                    'target_email' => $requestUserData['email'],
+                    'error' => $e->getMessage(),
+                    'rollback' => true,
+                ]
+            );
+
+            return Response::create(
+                StatusCode::createInternalServerError(),
+                'User creation failed: could not send welcome email. Please check email configuration and try again.'
+            );
+        }
+
+        return null;
     }
 
     /**

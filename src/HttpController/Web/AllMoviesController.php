@@ -40,39 +40,19 @@ class AllMoviesController
         }
 
         // Parse filter parameters
-        $ratingMin = isset($params['rating_min']) && $params['rating_min'] !== ''
-            ? (int)$params['rating_min']
-            : null;
-        $ratingMax = isset($params['rating_max']) && $params['rating_max'] !== ''
-            ? (int)$params['rating_max']
-            : null;
-        $genre = isset($params['genre']) && $params['genre'] !== ''
-            ? $params['genre']
-            : null;
-        $yearMin = isset($params['year_min']) && $params['year_min'] !== ''
-            ? (int)$params['year_min']
-            : null;
-        $yearMax = isset($params['year_max']) && $params['year_max'] !== ''
-            ? (int)$params['year_max']
-            : null;
-        $tmdbMin = isset($params['tmdb_min']) && $params['tmdb_min'] !== ''
-            ? (float)$params['tmdb_min']
-            : null;
-        $tmdbMax = isset($params['tmdb_max']) && $params['tmdb_max'] !== ''
-            ? (float)$params['tmdb_max']
-            : null;
-        $imdbMin = isset($params['imdb_min']) && $params['imdb_min'] !== ''
-            ? (float)$params['imdb_min']
-            : null;
-        $imdbMax = isset($params['imdb_max']) && $params['imdb_max'] !== ''
-            ? (float)$params['imdb_max']
-            : null;
-        $rtMin = isset($params['rt_min']) && $params['rt_min'] !== ''
-            ? (int)$params['rt_min']
-            : null;
-        $rtMax = isset($params['rt_max']) && $params['rt_max'] !== ''
-            ? (int)$params['rt_max']
-            : null;
+        [
+            'ratingMin' => $ratingMin,
+            'ratingMax' => $ratingMax,
+            'genre' => $genre,
+            'yearMin' => $yearMin,
+            'yearMax' => $yearMax,
+            'tmdbMin' => $tmdbMin,
+            'tmdbMax' => $tmdbMax,
+            'imdbMin' => $imdbMin,
+            'imdbMax' => $imdbMax,
+            'rtMin' => $rtMin,
+            'rtMax' => $rtMax,
+        ] = $this->parseMovieFilters($params);
 
         // Fetch movies with filters
         $movies = $this->groupMovieService->getAllMovies(
@@ -119,5 +99,52 @@ class AllMoviesController
                 'totalMovies' => count($movies),
             ]),
         );
+    }
+
+    /**
+     * Parse and normalise the movie filter query parameters.
+     *
+     * @param array<string, mixed> $params
+     * @return array{ratingMin: ?int, ratingMax: ?int, genre: ?string, yearMin: ?int, yearMax: ?int, tmdbMin: ?float, tmdbMax: ?float, imdbMin: ?float, imdbMax: ?float, rtMin: ?int, rtMax: ?int}
+     */
+    private function parseMovieFilters(array $params) : array
+    {
+        return [
+            'ratingMin' => $this->optionalInt($params, 'rating_min'),
+            'ratingMax' => $this->optionalInt($params, 'rating_max'),
+            'genre' => $this->optionalString($params, 'genre'),
+            'yearMin' => $this->optionalInt($params, 'year_min'),
+            'yearMax' => $this->optionalInt($params, 'year_max'),
+            'tmdbMin' => $this->optionalFloat($params, 'tmdb_min'),
+            'tmdbMax' => $this->optionalFloat($params, 'tmdb_max'),
+            'imdbMin' => $this->optionalFloat($params, 'imdb_min'),
+            'imdbMax' => $this->optionalFloat($params, 'imdb_max'),
+            'rtMin' => $this->optionalInt($params, 'rt_min'),
+            'rtMax' => $this->optionalInt($params, 'rt_max'),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     */
+    private function optionalInt(array $params, string $key) : ?int
+    {
+        return isset($params[$key]) && $params[$key] !== '' ? (int)$params[$key] : null;
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     */
+    private function optionalFloat(array $params, string $key) : ?float
+    {
+        return isset($params[$key]) && $params[$key] !== '' ? (float)$params[$key] : null;
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     */
+    private function optionalString(array $params, string $key) : ?string
+    {
+        return isset($params[$key]) && $params[$key] !== '' ? (string)$params[$key] : null;
     }
 }

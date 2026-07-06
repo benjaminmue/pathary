@@ -32,6 +32,7 @@ class ScheduledSync extends Command
         parent::__construct();
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $this->generateOutput($output, '=== Starting scheduled sync ===');

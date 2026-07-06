@@ -91,9 +91,11 @@ class SetPasswordController
     public function setPassword(Request $request) : Response
     {
         $postParameters = $request->getPostParameters();
-        $token = $postParameters['token'] ?? null;
-        $password = $postParameters['password'] ?? null;
-        $repeatPassword = $postParameters['repeatPassword'] ?? null;
+        [
+            'token' => $token,
+            'password' => $password,
+            'repeatPassword' => $repeatPassword,
+        ] = $this->readSetPasswordInput($postParameters);
 
         // Validate CSRF token first
         if ($this->csrfTokenService->validateToken($postParameters['_csrf_token'] ?? null) === false) {
@@ -123,7 +125,7 @@ class SetPasswordController
         if ($password !== $repeatPassword) {
             $this->sessionWrapper->set('errorPasswordNotEqual', true);
             // Log failed attempt
-            $this->passwordSetupRateLimiter->logAttempt($token, false, $_SERVER['REMOTE_ADDR'] ?? null);
+            $this->logPasswordAttempt($token, false);
             return $this->redirectToSetupPage($token);
         }
 
@@ -147,7 +149,7 @@ class SetPasswordController
             $this->invitationService->markTokenAsUsed($token);
 
             // Log successful password setup
-            $this->passwordSetupRateLimiter->logAttempt($token, true, $_SERVER['REMOTE_ADDR'] ?? null);
+            $this->logPasswordAttempt($token, true);
 
             // Set success flag for 2FA recommendation modal
             $this->sessionWrapper->set('passwordSetSuccess', true);
@@ -163,14 +165,32 @@ class SetPasswordController
         } catch (PasswordTooShort) {
             $this->sessionWrapper->set('errorPasswordTooShort', true);
             // Log failed attempt
-            $this->passwordSetupRateLimiter->logAttempt($token, false, $_SERVER['REMOTE_ADDR'] ?? null);
+            $this->logPasswordAttempt($token, false);
             return $this->redirectToSetupPage($token);
         } catch (PasswordPolicyViolation $e) {
             $this->sessionWrapper->set('errorPasswordPolicyViolation', $e->getMessage());
             // Log failed attempt
-            $this->passwordSetupRateLimiter->logAttempt($token, false, $_SERVER['REMOTE_ADDR'] ?? null);
+            $this->logPasswordAttempt($token, false);
             return $this->redirectToSetupPage($token);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $postParameters
+     * @return array{token: mixed, password: mixed, repeatPassword: mixed}
+     */
+    private function readSetPasswordInput(array $postParameters) : array
+    {
+        return [
+            'token' => $postParameters['token'] ?? null,
+            'password' => $postParameters['password'] ?? null,
+            'repeatPassword' => $postParameters['repeatPassword'] ?? null,
+        ];
+    }
+
+    private function logPasswordAttempt(string $token, bool $success) : void
+    {
+        $this->passwordSetupRateLimiter->logAttempt($token, $success, $_SERVER['REMOTE_ADDR'] ?? null);
     }
 
     private function redirectToSetupPage(?string $token) : Response

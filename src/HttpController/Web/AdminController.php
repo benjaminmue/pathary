@@ -17,7 +17,7 @@ use Twig\Environment;
 class AdminController
 {
     // Tab registry - central configuration for all admin tabs
-    private const TAB_REGISTRY = [
+    private const array TAB_REGISTRY = [
         'movies' => [
             'id' => 'movies',
             'label' => 'Movie Management',
@@ -74,6 +74,7 @@ class AdminController
     /**
      * Main admin panel - redirects to first enabled tab
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function index(Request $request) : Response
     {
         $firstTab = $this->getFirstEnabledTab();
@@ -83,6 +84,7 @@ class AdminController
     /**
      * Render Movie Management tab
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function renderMoviesTab(Request $request) : Response
     {
         return $this->renderTab('movies', [
@@ -93,6 +95,7 @@ class AdminController
     /**
      * Render User Management tab
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function renderUsersTab(Request $request) : Response
     {
         return $this->renderTab('users', [
@@ -103,6 +106,7 @@ class AdminController
     /**
      * Render Server Management tab
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function renderServerTab(Request $request) : Response
     {
         // Load SMTP settings from database/environment
@@ -165,6 +169,7 @@ class AdminController
     /**
      * Render Integrations tab
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function renderIntegrationsTab(Request $request) : Response
     {
         return $this->renderTab('integrations', [
@@ -175,6 +180,7 @@ class AdminController
     /**
      * Render Events tab
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function renderEventsTab(Request $request) : Response
     {
         // Fetch distinct event types for filter dropdown
@@ -192,7 +198,7 @@ class AdminController
     private function renderTab(string $tabId, array $additionalData = []) : Response
     {
         $tabs = $this->getEnabledTabs();
-        $activeTab = self::TAB_REGISTRY[$tabId] ?? null;
+        $activeTab = $this->getTabRegistry()[$tabId] ?? null;
 
         if ($activeTab === null || $activeTab['enabled'] === false) {
             return Response::createNotFound();
@@ -215,7 +221,17 @@ class AdminController
      */
     private function getEnabledTabs() : array
     {
-        return array_filter(self::TAB_REGISTRY, fn($tab) => $tab['enabled'] === true);
+        return array_filter($this->getTabRegistry(), fn($tab) => $tab['enabled'] === true);
+    }
+
+    /**
+     * Tab registry typed so the "enabled" flag is treated as a boolean feature switch.
+     *
+     * @return array<string, array{id: string, label: string, icon: string, route: string, template: string, enabled: bool}>
+     */
+    private function getTabRegistry() : array
+    {
+        return self::TAB_REGISTRY;
     }
 
     /**
@@ -224,6 +240,8 @@ class AdminController
     private function getFirstEnabledTab() : array
     {
         $enabledTabs = $this->getEnabledTabs();
-        return reset($enabledTabs);
+        $firstTab = reset($enabledTabs);
+
+        return $firstTab === false ? [] : $firstTab;
     }
 }
