@@ -299,7 +299,7 @@
     /* ===== TMDB facts ===== */
     .pds-facts-grid {
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: var(--pds-s-md);
     }
 
@@ -324,6 +324,12 @@
         margin-top: 6px;
         line-height: 1.35;
         color: var(--pds-text);
+    }
+
+    .pds-fact-value--empty {
+        color: var(--pds-dim);
+        font-weight: 500;
+        font-style: italic;
     }
 
     /* ===== Cast carousel ===== */
@@ -651,10 +657,6 @@
 
     /* ===== Responsive ===== */
     @media (max-width: 900px) {
-        .pds-facts-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
         .pds-reviews-grid {
             grid-template-columns: repeat(2, 1fr);
         }
@@ -680,10 +682,6 @@
         .pds-hero-rating,
         .pds-ext-row {
             justify-content: center;
-        }
-
-        .pds-facts-grid {
-            grid-template-columns: repeat(2, 1fr);
         }
 
         .rating-form-row {
@@ -826,49 +824,64 @@
         {% set companyNames = [] %}
         {% for c in productionCompanies %}{% if c.name %}{% set companyNames = companyNames|merge([c.name]) %}{% endif %}{% endfor %}
         {% set showOriginalTitle = factOriginalTitle and factOriginalTitle != movie.title %}
-        {% set hasFacts = factStatus or showOriginalTitle or (factBudget and factBudget > 0) or (factRevenue and factRevenue > 0) or companyNames|length > 0 or (productionCountries and productionCountries|length > 0) %}
-        {% if hasFacts %}
-            <section>
-                <div class="pds-facts-grid">
+        {% set statusMap = {
+            'Released': t('movie.status_released'),
+            'Rumored': t('movie.status_rumored'),
+            'Planned': t('movie.status_planned'),
+            'In Production': t('movie.status_in_production'),
+            'Post Production': t('movie.status_post_production'),
+            'Canceled': t('movie.status_canceled')
+        } %}
+        <section>
+            <div class="pds-facts-grid">
+                <div class="pds-fact">
+                    <div class="pds-fact-label">{{ t('movie.status') }}</div>
                     {% if factStatus %}
-                        <div class="pds-fact">
-                            <div class="pds-fact-label">{{ t('movie.status') }}</div>
-                            <div class="pds-fact-value">{{ factStatus }}</div>
-                        </div>
-                    {% endif %}
-                    {% if showOriginalTitle %}
-                        <div class="pds-fact">
-                            <div class="pds-fact-label">{{ t('movie.original_title') }}</div>
-                            <div class="pds-fact-value">{{ factOriginalTitle }}</div>
-                        </div>
-                    {% endif %}
-                    {% if factBudget and factBudget > 0 %}
-                        <div class="pds-fact">
-                            <div class="pds-fact-label">{{ t('movie.budget') }}</div>
-                            <div class="pds-fact-value">${{ (factBudget / 1000000)|number_format(1, '.', ',') }} {{ t('movie.million_abbr') }}</div>
-                        </div>
-                    {% endif %}
-                    {% if factRevenue and factRevenue > 0 %}
-                        <div class="pds-fact">
-                            <div class="pds-fact-label">{{ t('movie.revenue') }}</div>
-                            <div class="pds-fact-value">${{ (factRevenue / 1000000)|number_format(1, '.', ',') }} {{ t('movie.million_abbr') }}</div>
-                        </div>
-                    {% endif %}
-                    {% if companyNames|length > 0 %}
-                        <div class="pds-fact">
-                            <div class="pds-fact-label">{{ t('movie.production') }}</div>
-                            <div class="pds-fact-value">{{ companyNames|join(', ') }}</div>
-                        </div>
-                    {% endif %}
-                    {% if productionCountries and productionCountries|length > 0 %}
-                        <div class="pds-fact">
-                            <div class="pds-fact-label">{{ t('movie.country') }}</div>
-                            <div class="pds-fact-value">{{ productionCountries|join(', ') }}</div>
-                        </div>
+                        <div class="pds-fact-value">{{ statusMap[factStatus] ?? factStatus }}</div>
+                    {% else %}
+                        <div class="pds-fact-value pds-fact-value--empty">{{ t('movie.not_available') }}</div>
                     {% endif %}
                 </div>
-            </section>
-        {% endif %}
+                {% if showOriginalTitle %}
+                    <div class="pds-fact">
+                        <div class="pds-fact-label">{{ t('movie.original_title') }}</div>
+                        <div class="pds-fact-value">{{ factOriginalTitle }}</div>
+                    </div>
+                {% endif %}
+                <div class="pds-fact">
+                    <div class="pds-fact-label">{{ t('movie.budget') }}</div>
+                    {% if factBudget and factBudget > 0 %}
+                        <div class="pds-fact-value">${{ (factBudget / 1000000)|number_format(1, '.', ',') }} {{ t('movie.million_abbr') }}</div>
+                    {% else %}
+                        <div class="pds-fact-value pds-fact-value--empty">{{ t('movie.not_available') }}</div>
+                    {% endif %}
+                </div>
+                <div class="pds-fact">
+                    <div class="pds-fact-label">{{ t('movie.revenue') }}</div>
+                    {% if factRevenue and factRevenue > 0 %}
+                        <div class="pds-fact-value">${{ (factRevenue / 1000000)|number_format(1, '.', ',') }} {{ t('movie.million_abbr') }}</div>
+                    {% else %}
+                        <div class="pds-fact-value pds-fact-value--empty">{{ t('movie.not_available') }}</div>
+                    {% endif %}
+                </div>
+                <div class="pds-fact">
+                    <div class="pds-fact-label">{{ t('movie.production') }}</div>
+                    {% if companyNames|length > 0 %}
+                        <div class="pds-fact-value">{{ companyNames|join(', ') }}</div>
+                    {% else %}
+                        <div class="pds-fact-value pds-fact-value--empty">{{ t('movie.not_available') }}</div>
+                    {% endif %}
+                </div>
+                <div class="pds-fact">
+                    <div class="pds-fact-label">{{ t('movie.country') }}</div>
+                    {% if productionCountries and productionCountries|length > 0 %}
+                        <div class="pds-fact-value">{{ productionCountries|join(', ') }}</div>
+                    {% else %}
+                        <div class="pds-fact-value pds-fact-value--empty">{{ t('movie.not_available') }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
 
         {# ===== CAST ===== #}
         {% if cast and cast|length > 0 %}
