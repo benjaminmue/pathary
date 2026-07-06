@@ -17,10 +17,10 @@ use Psr\Log\LoggerInterface;
 class OAuthLazyMonitoringService
 {
     // Run monitoring at most every 6 hours
-    private const MIN_INTERVAL_SECONDS = 21600; // 6 hours
+    private const int MIN_INTERVAL_SECONDS = 21600; // 6 hours
 
     // Lock timeout (prevent stuck locks)
-    private const LOCK_TIMEOUT_SECONDS = 300; // 5 minutes
+    private const int LOCK_TIMEOUT_SECONDS = 300; // 5 minutes
 
     public function __construct(
         private readonly Connection $dbConnection,
