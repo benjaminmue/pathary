@@ -1,0 +1,24 @@
+name: release-please
+
+# Maintains a rolling "release PR" on main: release-please reads the conventional
+# commit messages (feat/fix/BREAKING), computes the next version and updates the
+# changelog. Merging that PR creates the git tag + GitHub release, which in turn
+# triggers docker-image.yml to build and publish the versioned GHCR image.
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
