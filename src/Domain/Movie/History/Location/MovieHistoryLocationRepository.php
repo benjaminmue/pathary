@@ -78,6 +78,26 @@ class MovieHistoryLocationRepository
         return MovieHistoryLocationEntityList::createFromArray($data);
     }
 
+    /**
+     * @return array<int, int>
+     */
+    public function fetchUsageCountsByLocationId() : array
+    {
+        $rows = $this->dbConnection->fetchAllAssociative(
+            'SELECT location_id, COUNT(*) AS cnt
+            FROM movie_user_watch_dates
+            WHERE location_id IS NOT NULL
+            GROUP BY location_id',
+        );
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int)$row['location_id']] = (int)$row['cnt'];
+        }
+
+        return $counts;
+    }
+
     public function updateLocation(int $locationId, string $name, bool $isCinema) : void
     {
         $this->dbConnection->update(

@@ -352,7 +352,7 @@
         container.innerHTML = locations.map(location => {
             const rawCount = (location.usageCount ?? location.usage_count);
             const countHtml = (typeof rawCount === 'number')
-                ? `<span class="pds-place-count">${rawCount}×</span>`
+                ? `<span class="pds-place-count">${rawCount} Sichtungen</span>`
                 : '';
             return `
             <div class="pds-place-row">

@@ -420,7 +420,7 @@
                         ? `<span class="pdsu-pill pdsu-pill--admin">${ROLE_ADMIN}</span>`
                         : `<span class="pdsu-pill pdsu-pill--user">${ROLE_USER}</span>`}
                 </span>
-                <span class="pdsu-c-ratings">-</span>
+                <span class="pdsu-c-ratings">${user.ratingsCount ?? 0}</span>
                 <span class="pdsu-c-actions">
                     <button class="pds-btn pds-btn--ghost pdsu-btn-sm btn-edit-user"
                             data-user-id="${user.id}"

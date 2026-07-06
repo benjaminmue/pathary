@@ -59,6 +59,14 @@ class MovieHistoryLocationApi
         return $this->locationRepository->findLocationsByUserId($userId);
     }
 
+    /**
+     * @return array<int, int>
+     */
+    public function fetchUsageCountsByLocationId() : array
+    {
+        return $this->locationRepository->fetchUsageCountsByLocationId();
+    }
+
     public function updateLocation(int $locationId, string $name, bool $isCinema) : void
     {
         $this->locationRepository->updateLocation($locationId, $name, $isCinema);

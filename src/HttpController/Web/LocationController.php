@@ -71,8 +71,16 @@ class LocationController
     {
         // Fetch system-wide locations (user_id = NULL)
         $locations = $this->locationApi->findLocationsByUserId(null);
+        $usageCounts = $this->locationApi->fetchUsageCountsByLocationId();
 
-        return Response::createJson(Json::encode($locations));
+        $payload = [];
+        foreach ($locations as $location) {
+            $locationData = $location->jsonSerialize();
+            $locationData['usageCount'] = $usageCounts[$location->getId()] ?? 0;
+            $payload[] = $locationData;
+        }
+
+        return Response::createJson(Json::encode($payload));
     }
 
     public function fetchToggleFeature() : Response

@@ -100,6 +100,14 @@ class UserApi
         return $this->repository->fetchAll();
     }
 
+    /**
+     * @return array<int, int>
+     */
+    public function fetchRatingCountsByUserId() : array
+    {
+        return $this->repository->fetchRatingCountsByUserId();
+    }
+
     public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array
     {
         return $this->repository->fetchAllHavingWatchedMovieInternVisibleUsernames($movieId);
