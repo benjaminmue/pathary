@@ -222,6 +222,15 @@ class GroupMovieService
                 m.release_date,
                 m.tmdb_poster_path,
                 m.poster_path,
+                m.tmdb_vote_average AS tmdb_rating,
+                m.imdb_rating_average AS imdb_rating,
+                m.rt_rating_average AS rt_rating,
+                (
+                    SELECT GROUP_CONCAT(g.name)
+                    FROM movie_genre mg2
+                    JOIN genre g ON g.id = mg2.genre_id
+                    WHERE mg2.movie_id = m.id
+                ) AS genres,
                 MAX(muwd.watched_at) AS last_added_at,
                 (
                     SELECT AVG(mur.rating_popcorn)

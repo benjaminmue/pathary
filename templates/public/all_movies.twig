@@ -816,7 +816,16 @@
                 <div class="movie-grid" id="movieGrid">
                     {% if movies|length > 0 %}
                         {% for movie in movies %}
-                            <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="movie-card">
+                            <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="movie-card"
+                               data-year="{{ movie.release_date ? movie.release_date|slice(0,4) : '' }}"
+                               data-global="{{ movie.avg_popcorn ?? '' }}"
+                               data-tmdb="{{ movie.tmdb_rating ?? '' }}"
+                               data-imdb="{{ movie.imdb_rating ?? '' }}"
+                               data-rt="{{ movie.rt_rating ?? '' }}"
+                               data-genres="{{ movie.genres ?? '' }}"
+                               data-title="{{ movie.title|lower }}"
+                               data-added="{{ loop.index0 }}"
+                               data-own="{{ movie.own_rating ?? '' }}">
                                 {% if movie.poster_path %}
                                     <img src="{{ movie.poster_path }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
                                 {% else %}
@@ -974,12 +983,10 @@
 
 {% block scripts %}
 <script>
-function updateSort(value) {
-    const [sort, order] = value.split('-');
-    const url = new URL(window.location.href);
-    url.searchParams.set('sort', sort);
-    url.searchParams.set('order', order);
-    window.location.href = url.toString();
+// updateSort is wired to the #sortSelect onchange attribute. Live client-side
+// sorting is handled inside the pagination/filter IIFE below via window.__amApply().
+function updateSort() {
+    if (window.__amApply) window.__amApply();
 }
 
 // Dual Range Slider functionality
@@ -1051,32 +1058,178 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// Client-side pagination over the rendered movie grid (no server pagination available).
+// Live client-side filtering + sorting + pagination over the fully-rendered movie
+// grid (all movies are already in the DOM; there is no server pagination).
 (function () {
     const PER_PAGE = 30;
     const grid = document.getElementById('movieGrid');
     if (!grid) return;
 
-    const cards = Array.prototype.slice.call(grid.querySelectorAll('.movie-card'));
-    const total = cards.length;
-    const pageCount = Math.max(1, Math.ceil(total / PER_PAGE));
-
+    const allCards = Array.prototype.slice.call(grid.querySelectorAll('.movie-card'));
     const paginationEl = document.getElementById('pagination');
     const statusEl = document.getElementById('pageStatus');
     const rangeEl = document.getElementById('resultRange');
+    const sortSelect = document.getElementById('sortSelect');
+    const forms = [document.getElementById('filtersForm'), document.getElementById('filtersFormMobile')].filter(Boolean);
 
     // i18n templates (placeholders replaced client-side).
     const I18N = {
         rangeOf: {{ t('movies.range_of')|json_encode|raw }},
         status: {{ t('movies.pagination_status')|json_encode|raw }},
         prev: {{ t('movies.prev')|json_encode|raw }},
-        next: {{ t('movies.next')|json_encode|raw }}
+        next: {{ t('movies.next')|json_encode|raw }},
+        noFound: {{ t('movies.no_movies_found')|json_encode|raw }},
+        noHint: {{ t('movies.no_movies_hint')|json_encode|raw }}
     };
 
+    let filtered = allCards.slice(); // currently visible (filtered + sorted) cards
     let current = 1;
+    let pageCount = 1;
 
+    // Reuse the server-rendered empty state if present, otherwise build one lazily.
+    let emptyEl = grid.querySelector('.no-movies');
+    function ensureEmpty() {
+        if (!emptyEl) {
+            emptyEl = document.createElement('div');
+            emptyEl.className = 'no-movies';
+            emptyEl.innerHTML = '<h3>' + I18N.noFound + '</h3><p>' + I18N.noHint + '</p>';
+            grid.appendChild(emptyEl);
+        }
+        return emptyEl;
+    }
+
+    // ---- Filter state ---------------------------------------------------------
+    function byId(id) { return document.getElementById(id); }
+
+    function readGenre() {
+        for (const form of forms) {
+            const sel = form.querySelector('select[name="genre"]');
+            if (sel && sel.value) return sel.value;
+        }
+        return '';
+    }
+
+    function readYear(name) {
+        for (const form of forms) {
+            const inp = form.querySelector('input[name="' + name + '"]');
+            if (inp && inp.value !== '') {
+                const v = parseFloat(inp.value);
+                if (!isNaN(v)) return v;
+            }
+        }
+        return null;
+    }
+
+    // Combine the desktop + mobile slider pair into the most restrictive range.
+    // Untouched sliders sit at their extremes, so they never over-restrict.
+    function readRange(ids) {
+        let min = -Infinity, max = Infinity;
+        ids.forEach(function (id) {
+            const el = byId(id);
+            if (!el) return;
+            const v = parseFloat(el.value);
+            if (isNaN(v)) return;
+            if (id.indexOf('-min') !== -1) min = Math.max(min, v);
+            else max = Math.min(max, v);
+        });
+        return {
+            min: isFinite(min) ? min : null,
+            max: isFinite(max) ? max : null
+        };
+    }
+
+    function readFilters() {
+        return {
+            genre: readGenre(),
+            yearMin: readYear('year_min'),
+            yearMax: readYear('year_max'),
+            global: readRange(['rating-min', 'rating-max', 'rating-min-mobile', 'rating-max-mobile']),
+            tmdb: readRange(['tmdb-min', 'tmdb-max', 'tmdb-min-mobile', 'tmdb-max-mobile']),
+            imdb: readRange(['imdb-min', 'imdb-max', 'imdb-min-mobile', 'imdb-max-mobile']),
+            rt: readRange(['rt-min', 'rt-max', 'rt-min-mobile', 'rt-max-mobile'])
+        };
+    }
+
+    // Empty rating value passes any range (mirrors server "IS NULL OR ..." logic).
+    function rangePass(raw, range) {
+        const v = parseFloat(raw);
+        if (isNaN(v)) return true;
+        if (range.min !== null && v < range.min) return false;
+        if (range.max !== null && v > range.max) return false;
+        return true;
+    }
+
+    function matches(card, f) {
+        const d = card.dataset;
+
+        // Genre: card's comma-list must contain the selected genre.
+        if (f.genre) {
+            const genres = (d.genres || '').split(',').map(function (s) { return s.trim(); });
+            if (genres.indexOf(f.genre) === -1) return false;
+        }
+
+        // Year: only enforced when a bound is set. NULL year is excluded then
+        // (mirrors server YEAR(release_date) comparison dropping NULLs).
+        if (f.yearMin !== null || f.yearMax !== null) {
+            const year = parseFloat(d.year);
+            if (isNaN(year)) return false;
+            if (f.yearMin !== null && year < f.yearMin) return false;
+            if (f.yearMax !== null && year > f.yearMax) return false;
+        }
+
+        // Ratings: empty value always passes (server "IS NULL OR" semantics).
+        if (!rangePass(d.global, f.global)) return false;
+        if (!rangePass(d.tmdb, f.tmdb)) return false;
+        if (!rangePass(d.imdb, f.imdb)) return false;
+        if (!rangePass(d.rt, f.rt)) return false;
+
+        return true;
+    }
+
+    // ---- Sorting --------------------------------------------------------------
+    function addedIndex(card) { return parseFloat(card.dataset.added); }
+
+    function compareCards(a, b) {
+        const value = sortSelect ? sortSelect.value : 'added-desc';
+        const parts = value.split('-');
+        const order = parts.pop();          // 'asc' | 'desc'
+        const field = parts.join('-');      // 'added' | 'title' | 'release_date' | 'global_rating' | 'own_rating'
+
+        // "Recently added" (added-desc) = delivered order; "oldest added" reverses it.
+        if (field === 'added') {
+            const d = addedIndex(a) - addedIndex(b);
+            return order === 'asc' ? -d : d;
+        }
+
+        let va, vb, missingA, missingB;
+        if (field === 'title') {
+            va = a.dataset.title || '';
+            vb = b.dataset.title || '';
+            missingA = va === '';
+            missingB = vb === '';
+        } else {
+            const key = field === 'release_date' ? 'year' : (field === 'global_rating' ? 'global' : 'own');
+            va = parseFloat(a.dataset[key]);
+            vb = parseFloat(b.dataset[key]);
+            missingA = isNaN(va);
+            missingB = isNaN(vb);
+        }
+
+        // Missing values always sink to the end, regardless of direction.
+        if (missingA && missingB) return addedIndex(a) - addedIndex(b);
+        if (missingA) return 1;
+        if (missingB) return -1;
+
+        let r = field === 'title' ? (va < vb ? -1 : (va > vb ? 1 : 0)) : (va - vb);
+        if (order === 'desc') r = -r;
+        if (r === 0) return addedIndex(a) - addedIndex(b);
+        return r;
+    }
+
+    // ---- Pagination rendering -------------------------------------------------
     function updateHeaderRange() {
         if (!rangeEl) return;
+        const total = filtered.length;
         const from = total === 0 ? 0 : (current - 1) * PER_PAGE + 1;
         const to = Math.min(current * PER_PAGE, total);
         const shown = total === 0 ? '0' : '<span class="mono">' + from + '-' + to + '</span>';
@@ -1100,6 +1253,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderControls() {
         if (!paginationEl) return;
+        if (pageCount <= 1) {
+            paginationEl.style.display = 'none';
+            paginationEl.innerHTML = '';
+            return;
+        }
+        paginationEl.style.display = '';
         paginationEl.innerHTML = '';
 
         const prevBtn = document.createElement('button');
@@ -1107,7 +1266,7 @@ document.addEventListener('DOMContentLoaded', function() {
         prevBtn.className = 'am-page-btn';
         prevBtn.innerHTML = '&larr; ' + I18N.prev;
         prevBtn.disabled = current === 1;
-        prevBtn.addEventListener('click', function () { if (current > 1) showPage(current - 1); });
+        prevBtn.addEventListener('click', function () { if (current > 1) showPage(current - 1, true); });
         paginationEl.appendChild(prevBtn);
 
         buildPageItems().forEach(function (item) {
@@ -1123,7 +1282,7 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.className = 'am-page-num' + (item === current ? ' active' : '');
             btn.textContent = item;
             if (item === current) btn.setAttribute('aria-current', 'page');
-            btn.addEventListener('click', function () { showPage(item); });
+            btn.addEventListener('click', function () { showPage(item, true); });
             paginationEl.appendChild(btn);
         });
 
@@ -1132,12 +1291,17 @@ document.addEventListener('DOMContentLoaded', function() {
         nextBtn.className = 'am-page-btn';
         nextBtn.innerHTML = I18N.next + ' &rarr;';
         nextBtn.disabled = current === pageCount;
-        nextBtn.addEventListener('click', function () { if (current < pageCount) showPage(current + 1); });
+        nextBtn.addEventListener('click', function () { if (current < pageCount) showPage(current + 1, true); });
         paginationEl.appendChild(nextBtn);
     }
 
     function renderStatus() {
         if (!statusEl) return;
+        if (pageCount <= 1) {
+            statusEl.style.display = 'none';
+            return;
+        }
+        statusEl.style.display = '';
         statusEl.textContent = I18N.status
             .replace('{page}', current)
             .replace('{total}', pageCount)
@@ -1146,25 +1310,79 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showPage(page, scroll) {
         current = Math.min(Math.max(1, page), pageCount);
-        cards.forEach(function (card, index) {
-            const onPage = index >= (current - 1) * PER_PAGE && index < current * PER_PAGE;
-            card.style.display = onPage ? '' : 'none';
-        });
+
+        // Hide everything, then reveal only the current page of the filtered set.
+        allCards.forEach(function (card) { card.style.display = 'none'; });
+        const start = (current - 1) * PER_PAGE;
+        const end = current * PER_PAGE;
+        for (let i = start; i < end && i < filtered.length; i++) {
+            filtered[i].style.display = '';
+        }
+
+        if (filtered.length === 0) {
+            ensureEmpty().style.display = '';
+        } else if (emptyEl) {
+            emptyEl.style.display = 'none';
+        }
+
         updateHeaderRange();
         renderControls();
         renderStatus();
         if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    if (total <= PER_PAGE) {
-        // Single page: hide pagination bar + status, but still fix the header range.
-        if (paginationEl) paginationEl.style.display = 'none';
-        if (statusEl) statusEl.style.display = 'none';
-        updateHeaderRange();
-        return;
+    // ---- Apply (filter -> sort -> reorder DOM -> paginate) --------------------
+    function apply() {
+        const f = readFilters();
+        filtered = allCards.filter(function (card) { return matches(card, f); });
+        filtered.sort(compareCards);
+        // Reflect the sorted order in the DOM so the visible page shows correctly.
+        filtered.forEach(function (card) { grid.appendChild(card); });
+        pageCount = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+        showPage(1, false);
     }
 
-    showPage(1, false);
+    // Reset all filters to their defaults without a page reload.
+    function resetFilters() {
+        forms.forEach(function (form) {
+            const genre = form.querySelector('select[name="genre"]');
+            if (genre) genre.value = '';
+            form.querySelectorAll('input[name="year_min"], input[name="year_max"]').forEach(function (inp) { inp.value = ''; });
+        });
+        document.querySelectorAll('.dual-range-slider input[type="range"]').forEach(function (inp) {
+            inp.value = inp.id.indexOf('-min') !== -1 ? inp.min : inp.max;
+            inp.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        apply();
+    }
+
+    // ---- Wiring ---------------------------------------------------------------
+    window.__amApply = apply; // used by the inline updateSort() on #sortSelect
+
+    forms.forEach(function (form) {
+        // No reloads: "Filter anwenden" just re-runs the client filter.
+        form.addEventListener('submit', function (e) { e.preventDefault(); apply(); });
+
+        const genre = form.querySelector('select[name="genre"]');
+        if (genre) genre.addEventListener('change', apply);
+        form.querySelectorAll('input[name="year_min"], input[name="year_max"]').forEach(function (inp) {
+            inp.addEventListener('input', apply);
+        });
+    });
+
+    // Every dual-range slider triggers a live re-filter (in addition to its own
+    // track/value updates wired by initDualRangeSlider).
+    document.querySelectorAll('.dual-range-slider input[type="range"]').forEach(function (inp) {
+        inp.addEventListener('input', apply);
+    });
+
+    // Clear/reset links reset the filters in place instead of navigating away.
+    document.querySelectorAll('.btn-clear-filters').forEach(function (link) {
+        link.addEventListener('click', function (e) { e.preventDefault(); resetFilters(); });
+    });
+
+    // Initial render (also normalises the server-rendered header range).
+    apply();
 })();
 </script>
 {% endblock %}
