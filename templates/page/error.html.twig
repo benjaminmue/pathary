@@ -2,15 +2,15 @@
 
 {% block title %}
     {% if statusCode == 404 %}
-        Page Not Found
+        {{ t('error.heading_404') }}
     {% elseif statusCode == 401 %}
-        Login Required
+        {{ t('error.heading_401') }}
     {% elseif statusCode == 403 %}
-        Access Denied
+        {{ t('error.heading_403') }}
     {% elseif statusCode == 500 %}
-        Server Error
+        {{ t('error.title_500') }}
     {% else %}
-        Error {{ statusCode }}
+        {{ t('error.error_prefix') }} {{ statusCode }}
     {% endif %}
 {% endblock %}
 
@@ -28,30 +28,30 @@
                     {# Dynamic title based on status code #}
                     <h1 class="error-title">
                         {% if statusCode == 404 %}
-                            Page Not Found
+                            {{ t('error.heading_404') }}
                         {% elseif statusCode == 401 %}
-                            Login Required
+                            {{ t('error.heading_401') }}
                         {% elseif statusCode == 403 %}
-                            Access Denied
+                            {{ t('error.heading_403') }}
                         {% elseif statusCode == 500 %}
-                            Something Went Wrong
+                            {{ t('error.heading_500') }}
                         {% else %}
-                            Request Error
+                            {{ t('error.heading_generic') }}
                         {% endif %}
                     </h1>
 
                     {# Dynamic message based on status code #}
                     <p class="error-message">
                         {% if statusCode == 404 %}
-                            The page you're looking for doesn't exist or has been moved.
+                            {{ t('error.message_404') }}
                         {% elseif statusCode == 401 %}
-                            You need to be logged in to access this page. Please sign in to continue.
+                            {{ t('error.message_401') }}
                         {% elseif statusCode == 403 %}
-                            You don't have permission to access this resource. This page may require administrator privileges.
+                            {{ t('error.message_403') }}
                         {% elseif statusCode == 500 %}
-                            We're experiencing technical difficulties. Our team has been notified and is working to fix the issue.
+                            {{ t('error.message_500') }}
                         {% else %}
-                            An unexpected error occurred while processing your request.
+                            {{ t('error.message_generic') }}
                         {% endif %}
                     </p>
 
@@ -60,48 +60,48 @@
                         {% if statusCode == 404 %}
                             {% if referer and referer != currentUrl %}
                                 <a href="{{ referer }}" class="btn btn-error-secondary">
-                                    <i class="bi bi-arrow-left"></i>Go Back
+                                    <i class="bi bi-arrow-left"></i>{{ t('error.go_back') }}
                                 </a>
                             {% endif %}
                             {% if isAuthenticated %}
                                 <a href="{{ applicationUrl }}/search" class="btn btn-error-primary">
-                                    <i class="bi bi-search"></i>Search Movies
+                                    <i class="bi bi-search"></i>{{ t('error.search_movies') }}
                                 </a>
                             {% else %}
                                 <a href="{{ applicationUrl }}/" class="btn btn-error-primary">
-                                    <i class="bi bi-house"></i>Go Home
+                                    <i class="bi bi-house"></i>{{ t('error.go_home') }}
                                 </a>
                             {% endif %}
 
                         {% elseif statusCode == 401 %}
                             <a href="{{ applicationUrl }}/login{% if currentUrl %}?redirect={{ currentUrl|url_encode }}{% endif %}" class="btn btn-error-primary">
-                                <i class="bi bi-box-arrow-in-right"></i>Go to Login
+                                <i class="bi bi-box-arrow-in-right"></i>{{ t('error.go_to_login') }}
                             </a>
 
                         {% elseif statusCode == 403 %}
                             {% if isAuthenticated %}
                                 <a href="{{ applicationUrl }}/profile" class="btn btn-error-primary">
-                                    <i class="bi bi-person"></i>Go to Profile
+                                    <i class="bi bi-person"></i>{{ t('error.go_to_profile') }}
                                 </a>
                             {% else %}
                                 <a href="{{ applicationUrl }}/" class="btn btn-error-primary">
-                                    <i class="bi bi-house"></i>Go Home
+                                    <i class="bi bi-house"></i>{{ t('error.go_home') }}
                                 </a>
                             {% endif %}
 
                         {% elseif statusCode == 500 %}
                             {% if referer and referer != currentUrl %}
                                 <a href="{{ referer }}" class="btn btn-error-secondary">
-                                    <i class="bi bi-arrow-clockwise"></i>Try Again
+                                    <i class="bi bi-arrow-clockwise"></i>{{ t('error.try_again') }}
                                 </a>
                             {% endif %}
                             <a href="{{ applicationUrl }}/" class="btn btn-error-primary">
-                                <i class="bi bi-house"></i>Go Home
+                                <i class="bi bi-house"></i>{{ t('error.go_home') }}
                             </a>
 
                         {% else %}
                             <a href="{{ applicationUrl }}/" class="btn btn-error-primary">
-                                <i class="bi bi-house"></i>Go Home
+                                <i class="bi bi-house"></i>{{ t('error.go_home') }}
                             </a>
                         {% endif %}
 
@@ -129,22 +129,22 @@
                            target="_blank"
                            rel="noopener noreferrer"
                            class="btn btn-outline-secondary">
-                            <i class="bi bi-bug"></i>Report Issue
+                            <i class="bi bi-bug"></i>{{ t('error.report_issue') }}
                         </a>
                     </div>
 
                     {# Error metadata #}
                     <div class="error-meta">
                         <span class="error-meta-item">
-                            <strong>Error Code:</strong> {{ statusCode }}
+                            <strong>{{ t('error.meta_error_code') }}</strong> {{ statusCode }}
                         </span>
                         {% if currentUrl %}
                         <span class="error-meta-item">
-                            <strong>Path:</strong> {{ currentUrl }}
+                            <strong>{{ t('error.meta_path') }}</strong> {{ currentUrl }}
                         </span>
                         {% endif %}
                         <span class="error-meta-item">
-                            <strong>Time:</strong> <span id="error-timestamp"></span>
+                            <strong>{{ t('error.meta_time') }}</strong> <span id="error-timestamp"></span>
                         </span>
                     </div>
                 </div>

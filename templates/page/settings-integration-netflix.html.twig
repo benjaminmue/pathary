@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - Netflix
+    {{ t('integrations.settings') }} - Netflix
 {% endblock %}
 
 {% block scripts %}
@@ -21,27 +21,26 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
-                <h5>Import Netflix</h5>
+                <h5>{{ t('integration_netflix.import_heading') }}</h5>
                 <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
-                    <b>Download your Netflix history</b>
+                    <b>{{ t('integration_netflix.download_heading') }}</b>
                     <br/>
-                    Go to <a href="https://www.netflix.com/settings/viewed">https://www.netflix.com/settings/viewed</a> to view your Netflix history and scroll down to click on the
-                    'download all' link.
+                    {{ t('integration_netflix.step_goto_pre') }} <a href="https://www.netflix.com/settings/viewed">https://www.netflix.com/settings/viewed</a> {{ t('integration_netflix.step_goto_post') }}
                     <br/>
-                    Below select the downloaded CSV file and enter the used date format, then press upload (can take a while for big histories).
+                    {{ t('integration_netflix.step_upload') }}
                     <br>
-                    This will populate a table with the movie watch dates and the auto generated Netflix to TMDB matches to import.
+                    {{ t('integration_netflix.step_populate') }}
                     <br>
-                    Press the import button at the end of the page when you are ready to import watch dates from the table.
+                    {{ t('integration_netflix.step_import') }}
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label" for="netflixCsvInput">Upload Your CSV File</label>
+                    <label class="form-label" for="netflixCsvInput">{{ t('integration_netflix.upload_label') }}</label>
                     <input id="netflixCsvInput" class="form-control" accept="text/csv" name="csvinput" type="file" required="required"/>
                 </div>
                 <div class="input-group" style="margin-bottom: 1rem">
-                    <span class="input-group-text">CSV Date Format</span>
-                    <input id="netflixCsvDateFormatInput" class="form-control" placeholder="e.g. d/m/y" name="csvDateFormat" type="text" required="required"/>
+                    <span class="input-group-text">{{ t('integration_netflix.csv_date_format') }}</span>
+                    <input id="netflixCsvDateFormatInput" class="form-control" placeholder="{{ t('integration_netflix.date_format_placeholder') }}" name="csvDateFormat" type="text" required="required"/>
                     <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#csvDateFormatHelpModal">
                         <i class="bi bi-question-lg"></i>
                     </button>
@@ -49,28 +48,28 @@
 
                 <div class="d-none" role="alert" id="netflixCsvUploadAlert"></div>
                 <button class="btn btn-primary" name="button" onclick="uploadNetflixHistory()" type="button" id="netflixCsvUploadButton" disabled>
-                    Upload CSV
+                    {{ t('integration_netflix.upload_csv_btn') }}
                 </button>
 
                 <hr>
 
                 <div class="input-group mb-3">
-                    <label for="selectFilterInput" class="input-group-text">Filter</label>
+                    <label for="selectFilterInput" class="input-group-text">{{ t('integration_netflix.filter_label') }}</label>
                     <select id="selectFilterInput" onchange="updateTable()" class="form-select" disabled>
-                        <option value="all">All</option>
-                        <option value="notfound">Not found</option>
+                        <option value="all">{{ t('integration_netflix.filter_all') }}</option>
+                        <option value="notfound">{{ t('integration_netflix.filter_notfound') }}</option>
                     </select>
-                    <label for="amountToShowInput" class="input-group-text">Per page</label>
+                    <label for="amountToShowInput" class="input-group-text">{{ t('integration_netflix.per_page') }}</label>
                     <select id="amountToShowInput" onchange="updateTable()" class="form-select" disabled>
                         <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
-                        <option value="all">All</option>
+                        <option value="all">{{ t('integration_netflix.filter_all') }}</option>
                     </select>
                 </div>
                 <div class="input-group mb-3">
-                    <label for="searchInput" class="input-group-text">Search table</label>
+                    <label for="searchInput" class="input-group-text">{{ t('integration_netflix.search_table') }}</label>
                     <input type="text" class="form-control disabled" onkeyup="searchTable()" id="searchInput" disabled/>
                 </div>
 
@@ -78,23 +77,23 @@
                     <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Date watched</th>
-                        <th scope="col">Netflix name</th>
-                        <th scope="col">TMDB item</th>
+                        <th scope="col">{{ t('integration_netflix.col_date_watched') }}</th>
+                        <th scope="col">{{ t('integration_netflix.col_netflix_name') }}</th>
+                        <th scope="col">{{ t('integration_netflix.col_tmdb_item') }}</th>
                     </tr>
                     </thead>
                     <tbody id="netflixTableBody">
                     <tr>
-                        <td colspan="4">Waiting for Netflix CSV to be uploaded...</td>
+                        <td colspan="4">{{ t('integration_netflix.waiting_csv') }}</td>
                     </tr>
                     </tbody>
                 </table>
 
-                <nav aria-label="Page navigation">
+                <nav aria-label="{{ t('integration_netflix.page_navigation') }}">
                     <ul class="pagination align-self-center justify-content-center">
-                        <li class="page-item disabled"><a class="page-link" style="cursor: pointer">Previous</a></li>
+                        <li class="page-item disabled"><a class="page-link" style="cursor: pointer">{{ t('integration_netflix.previous') }}</a></li>
                         <li class="page-item disabled"><a class="page-link">#</a></li>
-                        <li class="page-item disabled"><a class="page-link" style="cursor: pointer">Next</a></li>
+                        <li class="page-item disabled"><a class="page-link" style="cursor: pointer">{{ t('integration_netflix.next') }}</a></li>
                     </ul>
                 </nav>
 
@@ -105,7 +104,7 @@
                         id="importNetflixButton"
                         onclick="importNetflixHistory();"
                         disabled>
-                    Import data
+                    {{ t('integration_netflix.import_data_btn') }}
                 </button>
             </div>
         </div>
@@ -116,12 +115,12 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="tmdbSearchModalTitle">Replace matched movie</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="tmdbSearchModalTitle">{{ t('integration_netflix.replace_movie_title') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('integrations.close') }}"></button>
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">
-                        <label for="searchtmdb" class="form-label">Search for better match on TMDB</label>
+                        <label for="searchtmdb" class="form-label">{{ t('integration_netflix.search_better_match') }}</label>
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" name="searchtmdb" id="tmdbSearchModalInput">
                             <button class="btn btn-success" type="button" onclick="searchTMDB(event)"><i class="bi bi-search"></i></button>
@@ -131,8 +130,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="saveTMDBItem()">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('integrations.close') }}</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTMDBItem()">{{ t('integrations.save') }}</button>
                 </div>
             </div>
         </div>
@@ -143,17 +142,17 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="removeNetflixItemModalTitle">Remove Netflix item</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="removeNetflixItemModalTitle">{{ t('integration_netflix.remove_item_title') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('integrations.close') }}"></button>
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">
-                        <p>Are you sure to delete this item? You can later import this item again</p>
+                        <p>{{ t('integration_netflix.remove_item_body') }}</p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" id="removeNetflixItemBtn" onclick="removeNetflixItem()">Remove</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('integrations.close') }}</button>
+                    <button type="button" class="btn btn-danger" id="removeNetflixItemBtn" onclick="removeNetflixItem()">{{ t('integrations.remove') }}</button>
                 </div>
             </div>
         </div>
@@ -164,19 +163,19 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="csvDateFormatHelpModalTitle">Help: CSV Date Format</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="csvDateFormatHelpModalTitle">{{ t('integration_netflix.help_date_format_title') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('integrations.close') }}"></button>
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">
                         <p>
-                            Open the Netflix CSV file to see how your watch dates look like and translate this into a date format. Examples:
+                            {{ t('integration_netflix.help_intro') }}
                         </p>
                         <table class="table">
                             <thead>
                             <tr>
-                                <th scope="col">Watch Date in CSV</th>
-                                <th scope="col">CSV Date Format</th>
+                                <th scope="col">{{ t('integration_netflix.col_watch_date_csv') }}</th>
+                                <th scope="col">{{ t('integration_netflix.csv_date_format') }}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -194,15 +193,15 @@
                             </tr>
                             </tbody>
                         </table>
-                        <p> To represent the day, month and year you have the following options</p>
+                        <p> {{ t('integration_netflix.help_options_intro') }}</p>
                         <ul>
-                            <li><b>d</b> => Day of the month with two digits</li>
-                            <li><b>m</b> => Month of the year with two digits</li>
-                            <li><b>y</b> => Year with two digits</li>
-                            <li><b>Y</b> => Year with four digits</li>
+                            <li><b>d</b> => {{ t('integration_netflix.help_d') }}</li>
+                            <li><b>m</b> => {{ t('integration_netflix.help_m') }}</li>
+                            <li><b>y</b> => {{ t('integration_netflix.help_y') }}</li>
+                            <li><b>Y</b> => {{ t('integration_netflix.help_Y') }}</li>
                         </ul>
-                        <p> More format characters can be found
-                            <a href="https://www.php.net/manual/en/datetime.format.php#refsect1-datetime.format-parameters" target="_blank">here</a>.
+                        <p> {{ t('integration_netflix.help_more_pre') }}
+                            <a href="https://www.php.net/manual/en/datetime.format.php#refsect1-datetime.format-parameters" target="_blank">{{ t('integration_netflix.help_more_link') }}</a>.
                         </p>
                     </div>
                 </div>

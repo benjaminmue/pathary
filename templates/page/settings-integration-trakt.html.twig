@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - Trakt.tv
+    {{ t('integrations.settings') }} - Trakt.tv
 {% endblock %}
 
 {% block scripts %}
@@ -19,32 +19,32 @@
             {{ include('component/modal-trakt-import-ratings.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
-                <h5>Trakt.tv API Access</h5>
+                <h5>{{ t('integration_trakt.api_access_heading') }}</h5>
 
-                <p class="text-muted" style="margin-bottom: 0.5rem">To get your username and client id from Trakt visit <a href="https://trakt.tv/oauth/applications"
-                                                                                                                           target="_blank">this url</a>.</p>
+                <p class="text-muted" style="margin-bottom: 0.5rem">{{ t('integration_trakt.get_credentials_pre') }} <a href="https://trakt.tv/oauth/applications"
+                                                                                                                           target="_blank">{{ t('integration_trakt.this_url') }}</a>.</p>
 
                 <form action="{{ applicationUrl }}/settings/trakt" method="post">
-                    <p style="margin-bottom: 0.5rem">Username:</p>
+                    <p style="margin-bottom: 0.5rem">{{ t('integrations.username') }}:</p>
                     <div class="input-group mb-3">
                         <input type="text"
                                class="form-control"
                                name="traktUserName"
                                id="traktUserName"
-                               placeholder="Enter username here"
+                               placeholder="{{ t('integration_trakt.username_placeholder') }}"
                                value="{{ traktUserName }}"
                                style="margin-left: 5%;margin-right: 5%;text-align: center;"
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
 
-                    <p style="margin-bottom: 0.5rem">Client ID:</p>
+                    <p style="margin-bottom: 0.5rem">{{ t('integration_trakt.client_id') }}:</p>
                     <div class="input-group mb-3">
                         <input type="text"
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                                class="form-control"
                                name="traktClientId"
                                id="traktClientId"
-                               placeholder="Enter client id here"
+                               placeholder="{{ t('integration_trakt.client_id_placeholder') }}"
                                value="{{ traktClientId }}"
                                style="margin-left: 5%;margin-right: 5%;text-align: center;"
                                 {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
@@ -54,8 +54,8 @@
                     <div id="alerts" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;">
                         {% if traktCredentialsUpdated == true %}
                             <div class="alert alert-success alert-dismissible" role="alert">
-                                Trakt credentials were updated.
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                {{ t('integration_trakt.credentials_updated') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('integrations.close') }}"></button>
                             </div>
                         {% endif %}
                     </div>
@@ -64,33 +64,33 @@
 
                     <button class="btn btn-outline-primary" type="button" {% if coreAccountChangesDisabled == true %}disabled{% endif %} onclick="verifyTraktCredentials()"
                             id="verifyButton">
-                        Verify
+                        {{ t('integrations.verify') }}
                     </button>
-                    <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Save</button>
+                    <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>{{ t('integrations.save') }}</button>
                 </form>
 
                 <hr>
 
-                <h5>Import data</h5>
+                <h5>{{ t('integration_trakt.import_data_heading') }}</h5>
 
-                <p class="text-muted">Requires Trakt username and client id to be set.<br>
-                    The import only adds missing data, it will not change existing data.
+                <p class="text-muted">{{ t('integration_trakt.import_requires') }}<br>
+                    {{ t('integration_trakt.import_only_missing') }}
                 </p>
 
                 <div style="margin-top: 0.9rem">
                     <div id="alertHistoryImportDiv" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem"></div>
 
-                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_history')" style="margin-right: .3rem">Show imports</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_history')" style="margin-right: .3rem">{{ t('integrations.show_imports') }}</button>
                     <button class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
-                       data-bs-toggle="modal" data-bs-target="#traktImportHistory">Import history</button>
+                       data-bs-toggle="modal" data-bs-target="#traktImportHistory">{{ t('integration_trakt.import_history_btn') }}</button>
 
                     <br>
 
                     <div id="alertRatingsImportDiv" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem"></div>
 
-                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_ratings')" style="margin-right: .3rem;">Show imports</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_ratings')" style="margin-right: .3rem;">{{ t('integrations.show_imports') }}</button>
                     <button class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
-                       data-bs-toggle="modal" data-bs-target="#traktImportRatings">Import ratings</button>
+                       data-bs-toggle="modal" data-bs-target="#traktImportRatings">{{ t('integration_trakt.import_ratings_btn') }}</button>
                 </div>
             </div>
         </div>

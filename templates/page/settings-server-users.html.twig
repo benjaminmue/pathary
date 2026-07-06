@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - App
+    {{ t('server.page_title') }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -20,9 +20,9 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
-                <h5 style="margin-bottom: 1rem;">User Management</h5>
+                <h5 style="margin-bottom: 1rem;">{{ t('server.user_management') }}</h5>
 
-                <p class="text-muted">List of all users. Click on table row to edit/delete users.</p>
+                <p class="text-muted">{{ t('server.user_list_hint') }}</p>
 
                 <div id="userManagementAlerts"></div>
 
@@ -30,22 +30,22 @@
                     <table class="table table-hover" id="usersTable">
                         <thead>
                         <tr>
-                            <th scope="col">Id</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Admin</th>
+                            <th scope="col">{{ t('server.col_id') }}</th>
+                            <th scope="col">{{ t('server.col_name') }}</th>
+                            <th scope="col">{{ t('server.col_email') }}</th>
+                            <th scope="col">{{ t('server.col_admin') }}</th>
                         </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
                 <div class="spinner-border d-none" role="status" id="userTableLoadingSpinner">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">{{ t('server.loading') }}</span>
                 </div>
             </div>
         </div>
 
-        <button type="button" class="btn btn-primary float-end" style="width: 100%" onclick="showCreateUserModal()">Create User</button>
+        <button type="button" class="btn btn-primary float-end" style="width: 100%" onclick="showCreateUserModal()">{{ t('server.create_user') }}</button>
 
         {{ include('component/modal-user.html.twig') }}
     </main>

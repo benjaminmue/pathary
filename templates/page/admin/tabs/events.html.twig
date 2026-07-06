@@ -1,11 +1,11 @@
 <div class="card admin-card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-activity me-2"></i>Security Events Log</span>
-        <span class="badge bg-secondary" id="totalEventsCount">Loading...</span>
+        <span><i class="bi bi-activity me-2"></i>{{ t('admin_events.title') }}</span>
+        <span class="badge bg-secondary" id="totalEventsCount">{{ t('admin_events.loading') }}</span>
     </div>
     <div class="card-body">
         <p class="text-muted">
-            Monitor and investigate security events, login attempts, and system activity.
+            {{ t('admin_events.intro') }}
         </p>
 
         <!-- Filters -->
@@ -14,9 +14,9 @@
                 <form id="eventsFilterForm" class="row g-3">
                     <!-- Event Type Filter -->
                     <div class="col-md-3">
-                        <label for="eventTypeFilter" class="form-label">Event Type</label>
+                        <label for="eventTypeFilter" class="form-label">{{ t('admin_events.event_type') }}</label>
                         <select class="form-select" id="eventTypeFilter">
-                            <option value="">All Events</option>
+                            <option value="">{{ t('admin_events.all_events') }}</option>
                             {% for eventType in eventTypes %}
                                 <option value="{{ eventType }}">{{ eventType }}</option>
                             {% endfor %}
@@ -25,19 +25,19 @@
 
                     <!-- Search Query -->
                     <div class="col-md-3">
-                        <label for="searchQuery" class="form-label">Search</label>
-                        <input type="text" class="form-control" id="searchQuery" placeholder="IP, user agent, metadata...">
+                        <label for="searchQuery" class="form-label">{{ t('admin_events.search_label') }}</label>
+                        <input type="text" class="form-control" id="searchQuery" placeholder="{{ t('admin_events.search_placeholder') }}">
                     </div>
 
                     <!-- Date From -->
                     <div class="col-md-2">
-                        <label for="dateFrom" class="form-label">From Date</label>
+                        <label for="dateFrom" class="form-label">{{ t('admin_events.from_date') }}</label>
                         <input type="date" class="form-control" id="dateFrom">
                     </div>
 
                     <!-- Date To -->
                     <div class="col-md-2">
-                        <label for="dateTo" class="form-label">To Date</label>
+                        <label for="dateTo" class="form-label">{{ t('admin_events.to_date') }}</label>
                         <input type="date" class="form-control" id="dateTo">
                     </div>
 
@@ -45,7 +45,7 @@
                     <div class="col-md-2 d-flex align-items-end">
                         <div class="btn-group w-100">
                             <button type="button" class="btn btn-primary" onclick="applyFilters()">
-                                <i class="bi bi-funnel"></i> Apply
+                                <i class="bi bi-funnel"></i> {{ t('admin_events.apply') }}
                             </button>
                             <button type="button" class="btn btn-outline-secondary" onclick="resetFilters()">
                                 <i class="bi bi-x-circle"></i>
@@ -61,19 +61,19 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Event Type</th>
-                        <th>User</th>
-                        <th>IP Address</th>
-                        <th>Timestamp</th>
-                        <th>Actions</th>
+                        <th>{{ t('admin_events.th_id') }}</th>
+                        <th>{{ t('admin_events.event_type') }}</th>
+                        <th>{{ t('admin_events.th_user') }}</th>
+                        <th>{{ t('admin_events.th_ip_address') }}</th>
+                        <th>{{ t('admin_events.th_timestamp') }}</th>
+                        <th>{{ t('admin_events.th_actions') }}</th>
                     </tr>
                 </thead>
                 <tbody id="eventsTableBody">
                     <tr>
                         <td colspan="6" class="text-center text-muted">
                             <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                            Loading events...
+                            {{ t('admin_events.loading_events') }}
                         </td>
                     </tr>
                 </tbody>
@@ -83,9 +83,9 @@
         <!-- Pagination -->
         <div class="d-flex justify-content-between align-items-center mt-3">
             <div class="text-muted" id="paginationInfo">
-                Showing 0-0 of 0 events
+                {{ t('admin_events.pagination_info_initial') }}
             </div>
-            <nav aria-label="Events pagination">
+            <nav aria-label="{{ t('admin_events.pagination_aria') }}">
                 <ul class="pagination mb-0" id="paginationControls">
                     <!-- Pagination buttons will be inserted here -->
                 </ul>
@@ -99,19 +99,19 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-info-circle me-2"></i>Event Details</h5>
+                <h5 class="modal-title"><i class="bi bi-info-circle me-2"></i>{{ t('admin_events.event_details') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div id="eventDetailsContent">
                     <div class="text-center text-muted">
                         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                        Loading event details...
+                        {{ t('admin_events.loading_event_details') }}
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('admin.close') }}</button>
             </div>
         </div>
     </div>

@@ -3,7 +3,7 @@
 {% set showFooter = false %}
 
 {% block title %}
-    Setup Wizard
+    {{ t('wizard.page_title') }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -224,25 +224,25 @@
 
         <!-- Setup Card -->
         <div class="login-card">
-            <h1 class="text-center mb-4">Welcome to {{ applicationName ?? 'Pathary' }}</h1>
+            <h1 class="text-center mb-4">{{ t('wizard.welcome') }} {{ applicationName ?? 'Pathary' }}</h1>
 
             <!-- Step Indicator -->
             <ul class="step-indicator">
                 <li id="step-indicator-1" class="active">
                     <span class="step-circle">1</span>
-                    <div>Account</div>
+                    <div>{{ t('wizard.step_account') }}</div>
                 </li>
                 <li id="step-indicator-2">
                     <span class="step-circle">2</span>
-                    <div>2FA Setup</div>
+                    <div>{{ t('wizard.step_2fa') }}</div>
                 </li>
                 <li id="step-indicator-3">
                     <span class="step-circle">3</span>
-                    <div>Recovery</div>
+                    <div>{{ t('wizard.step_recovery') }}</div>
                 </li>
                 <li id="step-indicator-4">
                     <span class="step-circle">4</span>
-                    <div>Complete</div>
+                    <div>{{ t('wizard.step_complete') }}</div>
                 </li>
             </ul>
 
@@ -252,7 +252,7 @@
             <!-- Step 1: Create Admin Account -->
             <div id="step-1" class="wizard-step active">
                 <p class="text-center text-muted mb-4">
-                    Let's create your admin account. You'll need this to manage {{ applicationName ?? 'Pathary' }}.
+                    {{ t('wizard.create_admin_intro') }} {{ applicationName ?? 'Pathary' }} {{ t('wizard.create_admin_intro_after') }}
                 </p>
 
                 <div class="form-floating mb-3">
@@ -262,37 +262,37 @@
                            placeholder="name@example.com"
                            autocomplete="email"
                            required>
-                    <label for="email">Email address</label>
+                    <label for="email">{{ t('wizard.email_label') }}</label>
                 </div>
 
                 <div class="form-floating mb-3">
                     <input type="text"
                            class="form-control"
                            id="name"
-                           placeholder="Your name"
+                           placeholder="{{ t('wizard.name_placeholder') }}"
                            autocomplete="name"
                            required>
-                    <label for="name">Name</label>
+                    <label for="name">{{ t('wizard.name_label') }}</label>
                 </div>
 
                 <div class="form-floating mb-3">
                     <input type="password"
                            class="form-control"
                            id="password"
-                           placeholder="Password"
+                           placeholder="{{ t('wizard.password') }}"
                            autocomplete="new-password"
                            oninput="validatePassword(); checkPasswordMatch();"
                            required>
-                    <label for="password">Password</label>
+                    <label for="password">{{ t('wizard.password') }}</label>
                 </div>
 
                 <div class="password-requirements">
                     <ul class="list-unstyled">
-                        <li id="req-length"><i class="bi bi-circle"></i> At least 10 characters</li>
-                        <li id="req-uppercase"><i class="bi bi-circle"></i> One uppercase letter</li>
-                        <li id="req-lowercase"><i class="bi bi-circle"></i> One lowercase letter</li>
-                        <li id="req-number"><i class="bi bi-circle"></i> One number</li>
-                        <li id="req-special"><i class="bi bi-circle"></i> One special character</li>
+                        <li id="req-length"><i class="bi bi-circle"></i> {{ t('wizard.req_length') }}</li>
+                        <li id="req-uppercase"><i class="bi bi-circle"></i> {{ t('wizard.req_uppercase') }}</li>
+                        <li id="req-lowercase"><i class="bi bi-circle"></i> {{ t('wizard.req_lowercase') }}</li>
+                        <li id="req-number"><i class="bi bi-circle"></i> {{ t('wizard.req_number') }}</li>
+                        <li id="req-special"><i class="bi bi-circle"></i> {{ t('wizard.req_special') }}</li>
                     </ul>
                 </div>
 
@@ -300,33 +300,33 @@
                     <input type="password"
                            class="form-control"
                            id="passwordConfirmation"
-                           placeholder="Confirm password"
+                           placeholder="{{ t('wizard.confirm_password') }}"
                            autocomplete="new-password"
                            oninput="checkPasswordMatch()"
                            required>
-                    <label for="passwordConfirmation">Confirm password</label>
+                    <label for="passwordConfirmation">{{ t('wizard.confirm_password') }}</label>
                 </div>
 
                 <button class="w-100 btn btn-lg btn-primary" type="button" onclick="createAccount()">
-                    Continue
+                    {{ t('wizard.continue') }}
                 </button>
             </div>
 
             <!-- Step 2: Setup Two-Factor Authentication -->
             <div id="step-2" class="wizard-step">
                 <p class="text-center text-muted mb-4">
-                    Scan this QR code with your authenticator app (Google Authenticator, Authy, 1Password, etc.)
+                    {{ t('wizard.scan_qr') }}
                 </p>
 
                 <div class="qr-code-container">
                     <div id="qrcode"></div>
-                    <p class="text-muted small mt-3">Or enter this secret manually:</p>
+                    <p class="text-muted small mt-3">{{ t('wizard.enter_secret_manual') }}</p>
                     <div class="secret-container">
                         <div class="secret-code-box">
                             <p class="font-monospace text-break mb-0" id="totpSecret"></p>
                         </div>
                         <button type="button" class="btn btn-sm btn-outline-primary copy-secret-btn" onclick="copySecret()">
-                            <i class="bi bi-clipboard"></i> Copy
+                            <i class="bi bi-clipboard"></i> {{ t('wizard.copy') }}
                         </button>
                     </div>
                 </div>
@@ -342,11 +342,11 @@
                            pattern="[0-9]*"
                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                            required>
-                    <label for="totpCode">Enter 6-digit code</label>
+                    <label for="totpCode">{{ t('wizard.enter_code') }}</label>
                 </div>
 
                 <button class="w-100 btn btn-lg btn-primary" type="button" onclick="verifyTotp()">
-                    Verify & Continue
+                    {{ t('wizard.verify_continue') }}
                 </button>
             </div>
 
@@ -354,16 +354,16 @@
             <div id="step-3" class="wizard-step">
                 <div class="alert alert-warning">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <strong>Important:</strong> Save these recovery codes in a secure location. You won't be able to see them again.
+                    <strong>{{ t('wizard.important') }}</strong> {{ t('wizard.save_codes_hint') }}
                 </div>
 
-                <p class="text-center mb-3">Use these codes to access your account if you lose your authenticator device.</p>
+                <p class="text-center mb-3">{{ t('wizard.recovery_codes_intro') }}</p>
 
                 <div class="recovery-codes-grid" id="recoveryCodesGrid"></div>
 
                 <div class="d-flex justify-content-center mb-3">
                     <button class="btn btn-outline-primary" type="button" onclick="copyRecoveryCodes()">
-                        <i class="bi bi-clipboard"></i> Copy All Codes
+                        <i class="bi bi-clipboard"></i> {{ t('wizard.copy_all_codes') }}
                     </button>
                 </div>
 
@@ -373,12 +373,12 @@
                            id="acknowledgeBackup"
                            required>
                     <label class="form-check-label" for="acknowledgeBackup">
-                        I have saved these recovery codes in a secure location
+                        {{ t('wizard.acknowledge_backup') }}
                     </label>
                 </div>
 
                 <button class="w-100 btn btn-lg btn-primary" type="button" onclick="completeSetup()" id="completeSetupBtn" disabled>
-                    Complete Setup
+                    {{ t('wizard.complete_setup') }}
                 </button>
             </div>
 
@@ -386,15 +386,15 @@
             <div id="step-4" class="wizard-step">
                 <div class="text-center">
                     <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
-                    <h2 class="mt-3">Setup Complete!</h2>
+                    <h2 class="mt-3">{{ t('wizard.setup_complete') }}</h2>
                     <p class="text-muted mb-4">
-                        Your {{ applicationName ?? 'Pathary' }} instance is ready to use.
+                        {{ t('wizard.instance_ready_before') }} {{ applicationName ?? 'Pathary' }} {{ t('wizard.instance_ready_after') }}
                     </p>
                     <p class="mb-4">
-                        You can now log in with your email and password. Remember to use your authenticator app for the 6-digit code.
+                        {{ t('wizard.login_hint') }}
                     </p>
                     <a href="/login" class="btn btn-lg btn-primary">
-                        Go to Login
+                        {{ t('wizard.go_to_login') }}
                     </a>
                 </div>
             </div>

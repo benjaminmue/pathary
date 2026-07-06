@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - Letterboxd
+    {{ t('integrations.settings') }} - Letterboxd
 {% endblock %}
 
 {% block scripts %}
@@ -17,46 +17,46 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
-                <h5 style="margin-bottom: 0.5rem">Letterboxd Import</h5>
+                <h5 style="margin-bottom: 0.5rem">{{ t('integration_letterboxd.import_heading') }}</h5>
 
                 <p class="text-muted" style="margin-bottom: 0.8rem">
-                    Export your data from <a href="https://letterboxd.com/settings/data/" target="_blank">letterboxd</a>.
+                    {{ t('integration_letterboxd.export_intro_pre') }} <a href="https://letterboxd.com/settings/data/" target="_blank">letterboxd</a>.
                     <br>
-                    The received zip archive contains csv files with your data, which can be imported into movary.
+                    {{ t('integration_letterboxd.export_intro_post') }}
                 </p>
 
                 <div class="alert alert-warning" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
                     <ul style="margin-bottom: 0">
-                        <li>Import only adds missing watch dates or ratings, it will not overwrite existing data</li>
-                        <li>Ratings are only imported for already existing movies (import diary first!)</li>
-                        <li>Importing a big history for the first time can take a few minutes</li>
-                        <li>If movies are missing after a successful import check the logs to find out why</li>
+                        <li>{{ t('integration_letterboxd.warn_missing') }}</li>
+                        <li>{{ t('integration_letterboxd.warn_ratings') }}</li>
+                        <li>{{ t('integration_letterboxd.warn_time') }}</li>
+                        <li>{{ t('integration_letterboxd.warn_logs') }}</li>
                     </ul>
                 </div>
 
                 <form action="{{ applicationUrl }}/jobs/schedule/letterboxd-diary-sync" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                    <h5 style="margin-bottom: 0.5rem">Import History</h5>
-                    <p class="text-muted" style="margin-bottom: 0.5rem">Upload the diary.csv file</p>
+                    <h5 style="margin-bottom: 0.5rem">{{ t('integration_letterboxd.import_history_heading') }}</h5>
+                    <p class="text-muted" style="margin-bottom: 0.5rem">{{ t('integration_letterboxd.upload_diary') }}</p>
                     <div class="input-group mb-3">
                         <input type="file" class="form-control" accept=".csv" name="diaryCsv" id="diaryCsv" required
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
 
-                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('letterboxd_import_history')" style="margin-right: .3rem">Show imports</button>
-                    <button type="submit" class="btn btn-warning" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import history</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('letterboxd_import_history')" style="margin-right: .3rem">{{ t('integrations.show_imports') }}</button>
+                    <button type="submit" class="btn btn-warning" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>{{ t('integration_letterboxd.import_history_btn') }}</button>
 
                     {% if letterboxdDiarySyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            History import scheduled
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            {{ t('integration_letterboxd.history_scheduled') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('integrations.close') }}"></button>
                         </div>
 
                     {% endif %}
                     {% if letterboxdDiaryImportFileInvalid == true %}
                         <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Csv file invalid: Must contain the columns "Date", "Letterboxd URI" and "Watched date".
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            {{ t('integration_letterboxd.diary_invalid') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('integrations.close') }}"></button>
                         </div>
                     {% endif %}
                 </form>
@@ -65,41 +65,41 @@
 
                 <form action="{{ applicationUrl }}/jobs/schedule/letterboxd-ratings-sync" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                    <h5 style="margin-bottom: 0.5rem">Import Ratings</h5>
-                    <p class="text-muted" style="margin-bottom: 0.5rem">Upload the ratings.csv file</p>
+                    <h5 style="margin-bottom: 0.5rem">{{ t('integration_letterboxd.import_ratings_heading') }}</h5>
+                    <p class="text-muted" style="margin-bottom: 0.5rem">{{ t('integration_letterboxd.upload_ratings') }}</p>
                     <div class="input-group mb-3">
                         <input type="file" class="form-control" accept=".csv" name="ratingsCsv" id="ratingsCsv" required
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
 
-                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('letterboxd_import_ratings')" style="margin-right: .3rem">Show imports</button>
-                    <button type="submit" class="btn btn-warning" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import ratings</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('letterboxd_import_ratings')" style="margin-right: .3rem">{{ t('integrations.show_imports') }}</button>
+                    <button type="submit" class="btn btn-warning" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>{{ t('integration_letterboxd.import_ratings_btn') }}</button>
 
                     {% if letterboxdRatingsSyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Ratings import scheduled
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            {{ t('integration_letterboxd.ratings_scheduled') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('integrations.close') }}"></button>
                         </div>
                     {% endif %}
                     {% if letterboxdRatingsImportFileInvalid == true %}
                         <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Csv file invalid: Must contain the columns "Rating", "Letterboxd URI" and "Name".
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            {{ t('integration_letterboxd.ratings_invalid') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('integrations.close') }}"></button>
                         </div>
                     {% endif %}
                 </form>
 
                 <hr>
 
-                <h4 style="margin-bottom: 0.5rem">Letterboxd Export</h4>
+                <h4 style="margin-bottom: 0.5rem">{{ t('integration_letterboxd.export_heading') }}</h4>
 
                 <p class="text-muted" style="margin-bottom: 0.8rem">
-                    Download your data as csv and import them via the <a href="https://letterboxd.com/about/importing-data/" target="_blank">letterboxd importer</a>.
+                    {{ t('integration_letterboxd.export_desc_pre') }} <a href="https://letterboxd.com/about/importing-data/" target="_blank">{{ t('integration_letterboxd.importer_link') }}</a>.
                     <br>
-                    The downloaded zip archive may contain multiple files, every one of them has to be imported.
+                    {{ t('integration_letterboxd.export_desc_post') }}
                 </p>
 
-                <a class="btn btn-primary" href="{{ applicationUrl }}/settings/letterboxd-export" target="_blank">Generate export data</a>
+                <a class="btn btn-primary" href="{{ applicationUrl }}/settings/letterboxd-export" target="_blank">{{ t('integration_letterboxd.generate_export_btn') }}</a>
             </div>
         </div>
 
