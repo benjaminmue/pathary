@@ -1,21 +1,21 @@
 {% extends 'layouts/public_base.twig' %}
 
-{% block title %}Startseite{% endblock %}
+{% block title %}{{ t('home.page_title') }}{% endblock %}
 
 {% block body %}
 <div class="showcase-home">
 
     {# 2. Hero #}
     <section class="sc-hero">
-        <div class="sc-hero__kicker">Ein privater Kinoklub</div>
-        <h1 class="sc-hero__title">Filmabend,<br>in Popcorn bewertet.</h1>
-        <p class="sc-hero__sub">Jeder Film, den wir zusammen schauen - bewertet 1-7 auf der einzigen Skala, die zählt.</p>
-        <div class="sc-pop" role="img" aria-label="5 von 7 Popcorn">
+        <div class="sc-hero__kicker">{{ t('home.kicker') }}</div>
+        <h1 class="sc-hero__title">{{ t('home.hero_title_1') }}<br>{{ t('home.hero_title_2') }}</h1>
+        <p class="sc-hero__sub">{{ t('home.hero_sub') }}</p>
+        <div class="sc-pop" role="img" aria-label="{{ t('home.popcorn_aria') }}">
             {% for i in 1..7 %}<span class="k{{ i > 5 ? ' off' }}" aria-hidden="true">🍿</span>{% endfor %}
         </div>
         {% if loggedIn %}
         <div class="sc-hero__actions">
-            <a href="{{ applicationUrl }}/movies" class="sc-btn sc-btn--ghost">Bibliothek durchstöbern</a>
+            <a href="{{ applicationUrl }}/movies" class="sc-btn sc-btn--ghost">{{ t('home.browse_library') }}</a>
         </div>
         {% endif %}
     </section>
@@ -44,16 +44,16 @@
         <div class="sc-statsband__inner">
             <div class="sc-stat">
                 <div class="sc-stat__value">{{ globalStats.total_movies }}</div>
-                <div class="sc-stat__label">Geschaute Filme</div>
+                <div class="sc-stat__label">{{ t('home.stat_movies') }}</div>
             </div>
             <div class="sc-stat">
                 <div class="sc-stat__value">{{ globalStats.total_ratings }}</div>
-                <div class="sc-stat__label">Popcorn-Urteile</div>
+                <div class="sc-stat__label">{{ t('home.stat_ratings') }}</div>
             </div>
             {% if globalStats.avg_rating %}
             <div class="sc-stat">
                 <div class="sc-stat__value">{{ globalStats.avg_rating }} <span>🍿</span></div>
-                <div class="sc-stat__label">Durchschnitt</div>
+                <div class="sc-stat__label">{{ t('home.stat_average') }}</div>
             </div>
             {% endif %}
         </div>
@@ -65,8 +65,8 @@
         {# 5. Was wir zuletzt geschaut haben - 12 neueste #}
         {% if movies|length > 0 %}
         <div class="sc-heading">
-            <h2>Was wir zuletzt geschaut haben</h2>
-            <p>Frisch vom Projektor</p>
+            <h2>{{ t('home.recent_heading') }}</h2>
+            <p>{{ t('home.recent_sub') }}</p>
         </div>
         <div class="sc-wall">
             {% for item in movies|slice(0, 12) %}
@@ -98,8 +98,8 @@
         {% if globalStats.random_comments|length > 0 %}
         <div class="sc-section">
             <div class="sc-heading">
-                <h2>Direkt aus dem Gruppenchat</h2>
-                <p>Keine PR-Zitate. Echte Urteile.</p>
+                <h2>{{ t('home.comments_heading') }}</h2>
+                <p>{{ t('home.comments_sub') }}</p>
             </div>
             <div class="sc-comments">
                 {% for comment in globalStats.random_comments %}
@@ -120,11 +120,11 @@
         {% if globalStats.highest_rated|length > 0 or globalStats.lowest_rated|length > 0 %}
         <div class="sc-section">
             <div class="sc-heading">
-                <h2>Ruhmeshalle - und Schandhalle</h2>
+                <h2>{{ t('home.hall_heading') }}</h2>
             </div>
             <div class="sc-panels">
                 <div class="sc-panel">
-                    <div class="sc-panel__title">👍 Am besten bewertet</div>
+                    <div class="sc-panel__title">👍 {{ t('home.hall_best') }}</div>
                     {% for movie in globalStats.highest_rated %}
                         <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="sc-rank">
                             <span class="sc-rank__thumb">
@@ -132,14 +132,14 @@
                             </span>
                             <span class="sc-rank__body">
                                 <span class="sc-rank__title" title="{{ movie.title }}">{{ movie.title }}</span>
-                                <span class="sc-rank__sub">{{ movie.rating_count }} Bewertung{{ movie.rating_count != 1 ? 'en' }}</span>
+                                <span class="sc-rank__sub">{{ movie.rating_count }} {{ movie.rating_count != 1 ? t('home.ratings_plural') : t('home.rating_singular') }}</span>
                             </span>
                             <span class="sc-rank__score">🍿 {{ movie.avg_popcorn|number_format(1) }} <small>/ 7</small></span>
                         </a>
                     {% endfor %}
                 </div>
                 <div class="sc-panel">
-                    <div class="sc-panel__title">👎 Am schlechtesten bewertet</div>
+                    <div class="sc-panel__title">👎 {{ t('home.hall_worst') }}</div>
                     {% for movie in globalStats.lowest_rated %}
                         <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="sc-rank">
                             <span class="sc-rank__thumb">
@@ -147,7 +147,7 @@
                             </span>
                             <span class="sc-rank__body">
                                 <span class="sc-rank__title" title="{{ movie.title }}">{{ movie.title }}</span>
-                                <span class="sc-rank__sub">{{ movie.rating_count }} Bewertung{{ movie.rating_count != 1 ? 'en' }}</span>
+                                <span class="sc-rank__sub">{{ movie.rating_count }} {{ movie.rating_count != 1 ? t('home.ratings_plural') : t('home.rating_singular') }}</span>
                             </span>
                             <span class="sc-rank__score">🍿 {{ movie.avg_popcorn|number_format(1) }} <small>/ 7</small></span>
                         </a>
@@ -161,16 +161,16 @@
 
     {# 8. Footer-CTA #}
     <div class="sc-cta">
-        <div class="sc-cta__title">Nimm Platz. 🍿</div>
+        <div class="sc-cta__title">{{ t('home.cta_title') }} 🍿</div>
         {% if loggedIn %}
         <div>
-            <a href="{{ applicationUrl }}/movies" class="sc-btn sc-btn--primary">Bibliothek durchstöbern</a>
+            <a href="{{ applicationUrl }}/movies" class="sc-btn sc-btn--primary">{{ t('home.browse_library') }}</a>
         </div>
         {% endif %}
         <div class="sc-cta__links">
             <a href="https://github.com/benjaminmue/pathary" target="_blank" rel="noopener noreferrer">GitHub</a>
             <a href="https://benjaminmue.github.io/pathary/" target="_blank" rel="noopener noreferrer">Wiki</a>
-            <a href="https://github.com/benjaminmue/pathary/issues/new" target="_blank" rel="noopener noreferrer">Fehler melden</a>
+            <a href="https://github.com/benjaminmue/pathary/issues/new" target="_blank" rel="noopener noreferrer">{{ t('home.report_bug') }}</a>
         </div>
     </div>
 

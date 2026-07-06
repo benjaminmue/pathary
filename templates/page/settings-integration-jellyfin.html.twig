@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - Jellyfin
+    {{ t('integrations.settings') }} - Jellyfin
 {% endblock %}
 
 {% block scripts %}
@@ -21,22 +21,22 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
-                <h5>Jellyfin webhook url</h5>
+                <h5>{{ t('integration_jellyfin.webhook_url_heading') }}</h5>
 
                 <p class="text-muted" style="margin-bottom: 0.5rem">
-                    Keep Pathary automatically up to date with your latest watches in Jellyfin.
+                    {{ t('integration_jellyfin.webhook_intro') }}
                 </p>
 
                 <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
-                    <b>Configuration</b>
+                    <b>{{ t('integrations.configuration') }}</b>
                     <br style="margin-bottom: 0.5rem">
-                    Requires activated <a href="https://github.com/jellyfin/jellyfin-plugin-webhook" target="_blank">webhook plugin</a> in Jellyfin
+                    {{ t('integration_jellyfin.requires_plugin_pre') }} <a href="https://github.com/jellyfin/jellyfin-plugin-webhook" target="_blank">{{ t('integration_jellyfin.webhook_plugin') }}</a> {{ t('integration_jellyfin.requires_plugin_post') }}
                     <br style="margin-bottom: 0.5rem">
-                    Add a <b>Generic Destination</b> with the generated webhook url and only activate:
+                    {{ t('integration_jellyfin.add_destination_pre') }} <b>{{ t('integration_jellyfin.generic_destination') }}</b> {{ t('integration_jellyfin.add_destination_post') }}
                     <ul style="margin-bottom: 0">
-                        <li>Notification Type => "Playback Stop"</li>
-                        <li>User Filter => Choose your user</li>
-                        <li>Item Type => "Movies" + "Send All Properties (ignores template)"</li>
+                        <li>{{ t('integration_jellyfin.config_li_notification') }}</li>
+                        <li>{{ t('integration_jellyfin.config_li_user') }}</li>
+                        <li>{{ t('integration_jellyfin.config_li_item') }}</li>
                     </ul>
                 </div>
 
@@ -51,7 +51,7 @@
                     <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
                          role="alert"
                          style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                        Webhook disabled - {% if currentUserIsAdmin == true %}<a href="{{ applicationUrl }}/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
+                        {{ t('integrations.webhook_disabled') }} - {% if currentUserIsAdmin == true %}<a href="{{ applicationUrl }}/settings/server/general">{{ t('integrations.application_url') }}</a>{% else %}{{ t('integrations.application_url') }}{% endif %} {{ t('integrations.required') }}
                     </div>
                 </div>
 
@@ -59,12 +59,12 @@
                         type="button"
                         class="btn btn-danger {% if jellyfinWebhookUrl == '-' %}disabled{% endif %}"
                         onclick="deleteJellyfinWebhook()">
-                    Delete url
+                    {{ t('integrations.delete_url') }}
                 </button>
-                <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" onclick="regenerateJellyfinWebhook()">Regenerate url</button>
+                <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" onclick="regenerateJellyfinWebhook()">{{ t('integrations.regenerate_url') }}</button>
             </div>
 
-            <h5 style="margin-top: 1rem">Options</h5>
+            <h5 style="margin-top: 1rem">{{ t('integrations.options') }}</h5>
 
             <div style="padding-bottom: 1rem;padding-top: 0.5rem">
                 <input class="form-check-input"
@@ -75,26 +75,26 @@
                        {% if jellyfinWebhookUrl == '-' %}disabled{% endif %}
                         {% if scrobbleWatches == true %}checked{% endif %}
                        style="margin-right: 0.2rem">
-                <label class="form-check-label" for="scrobbleWatchesCheckbox">Scrobble completed watches</label>
+                <label class="form-check-label" for="scrobbleWatchesCheckbox">{{ t('integrations.scrobble_completed_watches') }}</label>
             </div>
 
             <div id="alertWebhookOptionsDiv"></div>
 
-            <button type="submit" class="btn btn-primary" {% if jellyfinWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">Save</button>
+            <button type="submit" class="btn btn-primary" {% if jellyfinWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">{{ t('integrations.save') }}</button>
 
             <hr>
 
-            <h5>Jellyfin authentication</h5>
+            <h5>{{ t('integration_jellyfin.authentication_heading') }}</h5>
 
             <p class="text-muted" style="padding-bottom: 0">
-                For personal data access you have to authenticate against Jellyfin.
+                {{ t('integration_jellyfin.auth_intro') }}
             </p>
 
             <div id="alertJellyfinAuthenticationDiv">
                 <div class="alert alert-warning {% if jellyfinDeviceId == true %}d-none{% endif %}"
                      role="alert"
                      style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                    Authentication disabled - Jellyfin device id required
+                    {{ t('integration_jellyfin.auth_disabled_device') }}
                 </div>
             </div>
 
@@ -105,16 +105,16 @@
                         data-bs-target="#jellyfinAuthenticationModal"
                         id="authenticateWithJellyfinButton"
                         {% if jellyfinServerUrl == null %}disabled{% endif %}>
-                    Authenticate
+                    {{ t('integrations.authenticate') }}
                 </button>
             </div>
             <div id="removeAuthenticationWithJellyfinDiv" class="{% if jellyfinIsAuthenticated == false %}d-none{% endif %}">
-                <button type="button" class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()">Remove Authentication</button>
-                <p>Username: {{ jellyfinUsername }}</p>
+                <button type="button" class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()">{{ t('integrations.remove_authentication') }}</button>
+                <p>{{ t('integrations.username') }}: {{ jellyfinUsername }}</p>
             </div>
 
             <div class="input-group mb-3">
-                <span class="input-group-text" id="jellyfinServerUrlInputPrefix">Server Url</span>
+                <span class="input-group-text" id="jellyfinServerUrlInputPrefix">{{ t('integrations.server_url') }}</span>
                 <input type="text"
                        name="jellyfinServerUrlInput"
                        id="jellyfinServerUrlInput"
@@ -128,7 +128,7 @@
             </div>
 
             <div class="spinner-border d-none" role="status" id="alertJellyfinServerUrlLoadingSpinner" style="margin-bottom: 1rem">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">{{ t('integrations.loading') }}</span>
             </div>
             <div id="alertJellyfinServerUrlDiv"></div>
 
@@ -137,44 +137,44 @@
                     id="verifyServerUrlButton"
                     onclick="verifyJellyfinServerUrl()"
                     {% if jellyfinServerUrl == null or jellyfinDeviceId == null %} disabled {% endif %}
-            >Test connection
+            >{{ t('integrations.test_connection') }}
             </button>
             <button type="submit"
                     class="btn btn-primary mb-3"
                     id="saveServerUrlButton"
                     onclick="saveJellyfinServerUrl()"
                     {% if jellyfinDeviceId == null %} disabled {% endif %}
-            >Save url
+            >{{ t('integrations.save_url') }}
             </button>
 
             <div class="modal fade" id="jellyfinAuthenticationModal" tabindex="-1" aria-labelledby="jellyfinAuthenticationModal" aria-hidden="true" data-bs-keyboard="false">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Jellyfin authentication</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title">{{ t('integration_jellyfin.authentication_heading') }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('integrations.close') }}"></button>
                         </div>
                         <div class="modal-body" id="jellyfinModalBody" style="padding-bottom: 0">
                             <div class="input-group mb-3">
-                                <span class="input-group-text">Server Url</span>
+                                <span class="input-group-text">{{ t('integrations.server_url') }}</span>
                                 <input type="text" class="form-control disabled" id="jellyfinAuthenticationModalServerUrlInput" value="{{ jellyfinServerUrl }}" disabled/>
                             </div>
                             <div class="input-group mb-3">
-                                <span class="input-group-text">Username</span>
+                                <span class="input-group-text">{{ t('integrations.username') }}</span>
                                 <input type="text" class="form-control disabled" id="jellyfinAuthenticationModalUsernameInput"/>
                             </div>
                             <div class="input-group mb-3">
-                                <span class="input-group-text">Password</span>
+                                <span class="input-group-text">{{ t('integrations.password') }}</span>
                                 <input type="password" class="form-control disabled" id="jellyfinAuthenticationModalPasswordInput"/>
                             </div>
                             <div class="spinner-border d-none" role="status" id="jellyfinAuthenticationModalLoadingSpinner" style="margin-bottom: .8rem">
-                                <span class="visually-hidden">Loading...</span>
+                                <span class="visually-hidden">{{ t('integrations.loading') }}</span>
                             </div>
                             <div id="alertJellyfinAuthenticationModalDiv"></div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-primary" onclick="authenticateJellyfinAccount()"
-                                    id="jellyfinAuthenticationModalAuthenticateButton" {% if jellyfinServerUrl == null %} disabled {% endif %}>Authenticate
+                                    id="jellyfinAuthenticationModalAuthenticateButton" {% if jellyfinServerUrl == null %} disabled {% endif %}>{{ t('integrations.authenticate') }}
                             </button>
                         </div>
                     </div>
@@ -185,14 +185,13 @@
                 <div class="modal-dialog modal-dialog-centered text-start">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="jellyfinServerUrlHelpModalTitle">Help: Jellyfin Server Url</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title" id="jellyfinServerUrlHelpModalTitle">{{ t('integration_jellyfin.help_server_url_title') }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('integrations.close') }}"></button>
                         </div>
                         <div class="modal-body">
                             <div class="container-fluid">
                                 <p>
-                                    You have to provide a Jellyfin server url which can be accessed by Pathary.
-                                    If your Jellyfin server is in a restricted network make sure Pathary has access to it. Example urls:
+                                    {{ t('integration_jellyfin.help_server_url_body') }}
                                 </p>
                                 <ul>
                                     <li>http://localhost:8096</li>
@@ -200,7 +199,7 @@
                                     <li>https://jellyfin.yourDomain.com</li>
                                 </ul>
                                 <p>
-                                    Note: A valid url must start with the protocol (e.g. http://)
+                                    {{ t('integrations.url_note') }}
                                 </p>
                             </div>
                         </div>
@@ -209,13 +208,13 @@
             </div>
             <hr>
 
-            <h5>Jellyfin sync</h5>
+            <h5>{{ t('integration_jellyfin.sync_heading') }}</h5>
 
             <div id="alertJellyfinSyncDiv">
                 <div class="alert alert-warning {% if jellyfinIsAuthenticated == true %}d-none{% endif %}"
                      role="alert"
                      style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                    Sync disabled - Authentication required
+                    {{ t('integration_jellyfin.sync_disabled') }}
                 </div>
             </div>
 
@@ -223,7 +222,7 @@
 
             <div style="margin-bottom: 1rem;margin-top: 1rem">
                 <button type="button" class="btn btn-outline-primary" onclick="showJobModal('jellyfin_import_history')">
-                    Show imports
+                    {{ t('integrations.show_imports') }}
                 </button>
                 <button type="button"
                         class="btn btn-warning"
@@ -231,7 +230,7 @@
                         data-bs-toggle="modal"
                         id="jellyfinHistoryImportButton"
                         {% if jellyfinIsAuthenticated == false %}disabled{% endif %}>
-                    Import history from Jellyfin
+                    {{ t('integration_jellyfin.import_history_btn') }}
                 </button>
             </div>
 
@@ -239,7 +238,7 @@
 
             <div style="margin-bottom: 1rem;margin-top: 1rem">
                 <button type="button" class="btn btn-outline-primary" onclick="showJobModal('jellyfin_export_history')">
-                    Show exports
+                    {{ t('integrations.show_exports') }}
                 </button>
                 <button type="button"
                         class="btn btn-warning"
@@ -247,7 +246,7 @@
                         data-bs-toggle="modal"
                         id="jellyfinHistoryExportButton"
                         {% if jellyfinIsAuthenticated == false %}disabled{% endif %}>
-                    Export history to Jellyfin
+                    {{ t('integration_jellyfin.export_history_btn') }}
                 </button>
             </div>
 
@@ -260,12 +259,12 @@
                        {% if jellyfinIsAuthenticated == false %}disabled{% endif %}
                         {% if jellyfinSyncEnabled == true %}checked{% endif %}
                        style="margin-right: 0.2rem">
-                <label class="form-check-label" for="automaticWatchStateSyncCheckbox">Automatically export history changes to Jellyfin</label>
+                <label class="form-check-label" for="automaticWatchStateSyncCheckbox">{{ t('integration_jellyfin.auto_export') }}</label>
             </div>
 
             <div id="alertJellyfinSyncOptionsDiv"></div>
 
-            <button type="submit" class="btn btn-primary" {% if jellyfinIsAuthenticated == false %}disabled{% endif %} id="syncSaveButton" onclick="updateSyncOptions()">Save
+            <button type="submit" class="btn btn-primary" {% if jellyfinIsAuthenticated == false %}disabled{% endif %} id="syncSaveButton" onclick="updateSyncOptions()">{{ t('integrations.save') }}
             </button>
         </div>
 
@@ -275,18 +274,16 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Confirm export</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">{{ t('integration_jellyfin.confirm_export_title') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('integrations.close') }}"></button>
                     </div>
                     <div class="modal-body">
-                        <strong>Are you sure you want to export your history?</strong>
+                        <strong>{{ t('integration_jellyfin.confirm_export_q') }}</strong>
                         <br>
-                        <p style="padding-top: 1rem;margin-bottom: 0">This will mark all movies with Pathary watch dates as watched in Jellyfin and update their last play date to
-                            the latest watch
-                            date.</p>
+                        <p style="padding-top: 1rem;margin-bottom: 0">{{ t('integration_jellyfin.confirm_export_body') }}</p>
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-primary" onclick="exportJellyfin()">Submit</a>
+                        <a class="btn btn-primary" onclick="exportJellyfin()">{{ t('integrations.submit') }}</a>
                     </div>
                 </div>
             </div>
@@ -296,16 +293,16 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Confirm import</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">{{ t('integration_jellyfin.confirm_import_title') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('integrations.close') }}"></button>
                     </div>
                     <div class="modal-body">
-                        <strong>Are you sure you want to import your history?</strong>
+                        <strong>{{ t('integration_jellyfin.confirm_import_q') }}</strong>
                         <br>
-                        <p style="padding-top: 1rem;margin-bottom: 0">This will add missing watch dates to Pathary for all movies with Jellyfin plays. Movies with multiple plays in Jellyfin will result in only one watch date, using the most recent date.</p>
+                        <p style="padding-top: 1rem;margin-bottom: 0">{{ t('integration_jellyfin.confirm_import_body') }}</p>
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-primary" onclick="importJellyfin()">Submit</a>
+                        <a class="btn btn-primary" onclick="importJellyfin()">{{ t('integrations.submit') }}</a>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 {% if watchProviders|length == 0 %}
-    <p style="margin-top: 1rem;margin-bottom: 0">No watch providers found.</p>
+    <p style="margin-top: 1rem;margin-bottom: 0">{{ t('watch_providers.none_found') }}</p>
 {% else %}
     <ul style="margin-top: 1rem;margin-bottom: 0" id="whereToWatchModalProvidersList">
         {% for watchProvider in watchProviders %}

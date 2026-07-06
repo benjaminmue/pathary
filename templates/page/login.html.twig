@@ -3,7 +3,7 @@
 {% set showFooter = false %}
 
 {% block title %}
-    Login
+    {{ t('login.page_title') }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -43,11 +43,11 @@
                            oninput="validateEmailInput(event)"
                            autocomplete="email"
                            pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
-                           title="Please enter a valid email address"
+                           title="{{ t('login.email_invalid_title') }}"
                            required>
-                    <label for="email">Email address</label>
+                    <label for="email">{{ t('login.email_label') }}</label>
                     <div class="invalid-feedback" id="emailError">
-                        Please enter a valid email address.
+                        {{ t('login.email_invalid') }}
                     </div>
                 </div>
 
@@ -56,11 +56,11 @@
                            value="{{ defaultPassword }}"
                            class="form-control"
                            id="password"
-                           placeholder="Password"
+                           placeholder="{{ t('login.password') }}"
                            onkeydown="submitCredentialsOnEnter(event)"
                            autocomplete="current-password"
                            required>
-                    <label for="password">Password</label>
+                    <label for="password">{{ t('login.password') }}</label>
                 </div>
 
                 <div class="form-check">
@@ -69,40 +69,40 @@
                            id="rememberMe"
                            value="true"
                            {{ defaultRememberMe == 'true' ? 'checked' : '' }}>
-                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                    <label class="form-check-label" for="rememberMe">{{ t('login.remember_me') }}</label>
                 </div>
 
                 <div id="loginErrors"></div>
 
                 {% if redirect != false %}
                     <div class="alert alert-danger" role="alert" id="forbiddenPageAlert">
-                        Sign in to access page
+                        {{ t('login.signin_to_access') }}
                     </div>
                     <input type="hidden" value="{{ redirect }}" name="redirect">
                 {% endif %}
 
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">
-                    Sign in
+                    {{ t('login.sign_in') }}
                 </button>
             </div>
 
             <div id="totpForm" class="d-none">
-                <h1 class="text-center">Verification</h1>
+                <h1 class="text-center">{{ t('login.verification') }}</h1>
 
                 <!-- Mode Switch -->
                 <div class="text-center mb-3">
-                    <div class="btn-group" role="group" aria-label="Verification mode">
+                    <div class="btn-group" role="group" aria-label="{{ t('login.verification_mode') }}">
                         <input type="radio" class="btn-check" name="verificationMode" id="modeAuthenticator" value="totp" checked autocomplete="off" onchange="switchVerificationMode('totp')">
-                        <label class="btn btn-outline-primary" for="modeAuthenticator">Authenticator code</label>
+                        <label class="btn btn-outline-primary" for="modeAuthenticator">{{ t('login.authenticator_code') }}</label>
 
                         <input type="radio" class="btn-check" name="verificationMode" id="modeRecovery" value="recovery" autocomplete="off" onchange="switchVerificationMode('recovery')">
-                        <label class="btn btn-outline-primary" for="modeRecovery">Recovery code</label>
+                        <label class="btn btn-outline-primary" for="modeRecovery">{{ t('login.recovery_code') }}</label>
                     </div>
                 </div>
 
                 <!-- Authenticator Code Input -->
                 <div id="authenticatorModeContent">
-                    <p class="text-center">Enter the 6-digit code from your authenticator app.</p>
+                    <p class="text-center">{{ t('login.enter_totp') }}</p>
 
                     <input type="text"
                            class="form-control form-control-lg text-center mb-3"
@@ -123,16 +123,16 @@
                                id="trustDevice"
                                value="1">
                         <label class="form-check-label" for="trustDevice">
-                            Trust this device
-                            <small class="text-muted d-block">Skip verification on this device for 30 days</small>
+                            {{ t('login.trust_device') }}
+                            <small class="text-muted d-block">{{ t('login.trust_device_hint') }}</small>
                         </label>
                     </div>
                 </div>
 
                 <!-- Recovery Code Input -->
                 <div id="recoveryModeContent" class="d-none">
-                    <p class="text-center">Enter one of your recovery codes.</p>
-                    <p class="text-center text-muted small">Format: XXXX-XXXX-XX (case-insensitive, spaces/dashes optional)</p>
+                    <p class="text-center">{{ t('login.enter_recovery') }}</p>
+                    <p class="text-center text-muted small">{{ t('login.recovery_format') }}</p>
 
                     <input type="text"
                            class="form-control form-control-lg text-center mb-3"
@@ -147,21 +147,21 @@
                 <div id="totpErrors"></div>
 
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">
-                    Continue
+                    {{ t('login.continue') }}
                 </button>
 
                 <!-- Help Section -->
                 <div class="alert alert-info small">
-                    <strong>Help:</strong>
+                    <strong>{{ t('login.help') }}</strong>
                     <ul class="mb-0 ps-3">
-                        <li><strong>No access to your authenticator app?</strong> Select "Recovery code" and enter one recovery code.</li>
-                        <li>Each recovery code works once.</li>
-                        <li>After login, go to <strong>Profile → Security</strong> to regenerate codes.</li>
+                        <li><strong>{{ t('login.help_no_access') }}</strong> {{ t('login.help_no_access_answer') }}</li>
+                        <li>{{ t('login.help_once') }}</li>
+                        <li>{{ t('login.help_regen_before') }} <strong>{{ t('login.profile_security') }}</strong> {{ t('login.help_regen_after') }}</li>
                     </ul>
                 </div>
 
                 <div class="text-center">
-                    <a href="{{ applicationUrl }}/login">Back to login</a>
+                    <a href="{{ applicationUrl }}/login">{{ t('login.back_to_login') }}</a>
                 </div>
             </div>
         </div>
@@ -174,23 +174,23 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="twoFactorModalLabel">
-                        <i class="bi bi-shield-lock me-2"></i>Secure Your Account
+                        <i class="bi bi-shield-lock me-2"></i>{{ t('login.secure_account') }}
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('login.close') }}"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="mb-3">Your password has been created successfully!</p>
-                    <p class="mb-3">We strongly recommend enabling <strong>Two-Factor Authentication (2FA)</strong> to add an extra layer of security to your account.</p>
+                    <p class="mb-3">{{ t('login.password_created') }}</p>
+                    <p class="mb-3">{{ t('login.recommend_2fa_before') }} <strong>{{ t('login.two_factor_auth') }}</strong> {{ t('login.recommend_2fa_after') }}</p>
                     <div class="alert alert-info mb-0">
-                        <strong>What is 2FA?</strong>
-                        <p class="mb-2 mt-2">Two-Factor Authentication requires a verification code from your phone in addition to your password when you log in.</p>
-                        <p class="mb-0">You can enable 2FA in <strong>Profile → Security</strong> after you log in.</p>
+                        <strong>{{ t('login.what_is_2fa') }}</strong>
+                        <p class="mb-2 mt-2">{{ t('login.what_is_2fa_text') }}</p>
+                        <p class="mb-0">{{ t('login.enable_2fa_before') }} <strong>{{ t('login.profile_security') }}</strong> {{ t('login.enable_2fa_after') }}</p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Maybe Later</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('login.maybe_later') }}</button>
                     <button type="button" class="btn btn-primary" onclick="acknowledgeAndDismiss()">
-                        <i class="bi bi-check-circle me-1"></i>Got It
+                        <i class="bi bi-check-circle me-1"></i>{{ t('login.got_it') }}
                     </button>
                 </div>
             </div>

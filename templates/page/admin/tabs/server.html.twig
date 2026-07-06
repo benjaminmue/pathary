@@ -6,7 +6,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#apiSettings" aria-expanded="true">
-                    <i class="bi bi-key me-2"></i>API Settings
+                    <i class="bi bi-key me-2"></i>{{ t('admin_server.api_settings') }}
                 </button>
             </h2>
             <div id="apiSettings" class="accordion-collapse collapse show" data-bs-parent="#serverSettingsAccordion">
@@ -14,26 +14,26 @@
                 <form id="apiSettingsForm">
                     <div class="mb-3">
                         <label for="tmdbApiKey" class="form-label">
-                            TMDB API Key
-                            <i class="bi bi-info-circle text-muted" title="Required for movie metadata" data-bs-toggle="tooltip"></i>
+                            {{ t('admin_server.tmdb_api_key') }}
+                            <i class="bi bi-info-circle text-muted" title="{{ t('admin_server.tmdb_key_tooltip') }}" data-bs-toggle="tooltip"></i>
                         </label>
                         <div class="input-group">
                             <input type="password" class="form-control font-monospace" id="tmdbApiKey"
-                                   placeholder="Enter TMDB API key (32 hexadecimal characters)">
+                                   placeholder="{{ t('admin_server.tmdb_key_placeholder') }}">
                             <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('tmdbApiKey')">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </div>
                         <div class="form-text" id="tmdbKeyStatus">
                             <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                            Loading status...
+                            {{ t('admin_server.loading_status') }}
                         </div>
                         <div class="mt-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="testTmdbConnection()">
-                                <i class="bi bi-lightning me-1"></i>Test TMDB Connection
+                                <i class="bi bi-lightning me-1"></i>{{ t('admin_server.test_tmdb') }}
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-danger" id="removeTmdbKeyBtn" onclick="removeTmdbKey()" style="display: none;">
-                                <i class="bi bi-trash me-1"></i>Remove Key
+                                <i class="bi bi-trash me-1"></i>{{ t('admin_server.remove_key') }}
                             </button>
                         </div>
                     </div>
@@ -42,33 +42,33 @@
 
                     <div class="mb-3">
                         <label for="omdbApiKey" class="form-label">
-                            OMDb API Key
-                            <i class="bi bi-info-circle text-muted" title="Optional: For IMDb and Rotten Tomatoes ratings" data-bs-toggle="tooltip"></i>
+                            {{ t('admin_server.omdb_api_key') }}
+                            <i class="bi bi-info-circle text-muted" title="{{ t('admin_server.omdb_key_tooltip') }}" data-bs-toggle="tooltip"></i>
                         </label>
                         <div class="input-group">
                             <input type="password" class="form-control font-monospace" id="omdbApiKey"
-                                   placeholder="Enter OMDb API key (8 characters)">
+                                   placeholder="{{ t('admin_server.omdb_key_placeholder') }}">
                             <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('omdbApiKey')">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </div>
                         <div class="form-text" id="omdbKeyStatus">
                             <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                            Loading status...
+                            {{ t('admin_server.loading_status') }}
                         </div>
                         <div class="mt-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="testOmdbConnection()">
-                                <i class="bi bi-lightning me-1"></i>Test OMDb Connection
+                                <i class="bi bi-lightning me-1"></i>{{ t('admin_server.test_omdb') }}
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-danger" id="removeOmdbKeyBtn" onclick="removeOmdbKey()" style="display: none;">
-                                <i class="bi bi-trash me-1"></i>Remove Key
+                                <i class="bi bi-trash me-1"></i>{{ t('admin_server.remove_key') }}
                             </button>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <button type="button" class="btn btn-primary" id="saveApiSettingsBtn" onclick="saveApiSettings()">
-                            <i class="bi bi-save me-1"></i>Save API Settings
+                            <i class="bi bi-save me-1"></i>{{ t('admin_server.save_api_settings') }}
                         </button>
                         <div id="saveHelperText" class="form-text mt-2" style="display: none;">
                             <i class="bi bi-info-circle"></i> <span id="saveHelperMessage"></span>
@@ -85,7 +85,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#appSettings" aria-expanded="false">
-                    <i class="bi bi-gear me-2"></i>Application Settings
+                    <i class="bi bi-gear me-2"></i>{{ t('admin_server.application_settings') }}
                 </button>
             </h2>
             <div id="appSettings" class="accordion-collapse collapse" data-bs-parent="#serverSettingsAccordion">
@@ -93,15 +93,15 @@
                 <form id="appSettingsForm">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="appName" class="form-label">Application Name</label>
+                            <label for="appName" class="form-label">{{ t('admin_server.application_name') }}</label>
                             <input type="text" class="form-control" id="appName" value="Pathary">
-                            <div class="form-text">Displayed in navbar and page titles</div>
+                            <div class="form-text">{{ t('admin_server.application_name_help') }}</div>
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label for="appUrl" class="form-label">Application URL</label>
+                            <label for="appUrl" class="form-label">{{ t('admin_server.application_url') }}</label>
                             <input type="url" class="form-control" id="appUrl" value="{{ applicationUrl }}" readonly>
-                            <div class="form-text">Configure via APPLICATION_URL environment variable</div>
+                            <div class="form-text">{{ t('admin_server.application_url_help') }}</div>
                         </div>
                     </div>
 
@@ -109,14 +109,14 @@
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="registrationEnabled">
                             <label class="form-check-label" for="registrationEnabled">
-                                Enable user registration
+                                {{ t('admin_server.enable_registration') }}
                             </label>
                         </div>
-                        <div class="form-text">Allow new users to create accounts without admin approval</div>
+                        <div class="form-text">{{ t('admin_server.enable_registration_help') }}</div>
                     </div>
 
                     <button type="button" class="btn btn-primary" onclick="saveAppSettings()">
-                        <i class="bi bi-save me-1"></i>Save App Settings
+                        <i class="bi bi-save me-1"></i>{{ t('admin_server.save_app_settings') }}
                     </button>
                 </form>
                 </div>
@@ -129,13 +129,13 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#emailSettings" aria-expanded="false">
-                    <i class="bi bi-envelope me-2"></i>Email Settings
+                    <i class="bi bi-envelope me-2"></i>{{ t('admin_server.email_settings') }}
                 </button>
             </h2>
             <div id="emailSettings" class="accordion-collapse collapse" data-bs-parent="#serverSettingsAccordion">
                 <div class="accordion-body">
                 <p class="text-muted small">
-                    Configure email sending via SMTP password or OAuth 2.0 authentication
+                    {{ t('admin_server.email_settings_intro') }}
                 </p>
 
                 <!-- Authentication Mode Tabs -->
@@ -144,7 +144,7 @@
                         <button class="nav-link {{ emailAuthMode == 'smtp_password' or emailAuthMode is not defined ? 'active' : '' }}"
                                 id="smtp-password-tab" data-bs-toggle="tab" data-bs-target="#smtp-password-panel"
                                 type="button" role="tab">
-                            <i class="bi bi-key me-2"></i>SMTP Password
+                            <i class="bi bi-key me-2"></i>{{ t('admin_server.tab_smtp_password') }}
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -153,7 +153,7 @@
                                 type="button" role="tab">
                             <i class="bi bi-shield-lock me-2"></i>OAuth 2.0
                             {% if oauthConfig and oauthConfig.connected %}
-                                <span class="badge bg-success ms-1">Connected</span>
+                                <span class="badge bg-success ms-1">{{ t('admin_server.status_connected') }}</span>
                             {% endif %}
                         </button>
                     </li>
@@ -165,23 +165,23 @@
                         <i class="bi {{ emailAuthMode == 'smtp_oauth' ? 'bi-shield-lock-fill' : 'bi-key-fill' }} fs-4 me-3"></i>
                         <div class="flex-grow-1">
                             <h6 class="mb-1">
-                                <strong>Current Authentication Mode:</strong>
-                                {{ emailAuthMode == 'smtp_oauth' ? 'OAuth 2.0 (Modern Auth)' : 'SMTP Password (Legacy)' }}
+                                <strong>{{ t('admin_server.current_auth_mode') }}</strong>
+                                {{ emailAuthMode == 'smtp_oauth' ? t('admin_server.mode_oauth_full') : t('admin_server.mode_password_full') }}
                             </h6>
                             <small>
                                 {% if emailAuthMode == 'smtp_oauth' %}
-                                    ✓ Using secure OAuth authentication with {{ oauthConfig ? oauthConfig.fromAddress : 'not configured' }}
+                                    ✓ {{ t('admin_server.oauth_using_secure') }} {{ oauthConfig ? oauthConfig.fromAddress : t('admin_server.not_configured') }}
                                 {% else %}
-                                    Using password-based authentication (less secure)
+                                    {{ t('admin_server.password_based_auth') }}
                                 {% endif %}
                             </small>
                         </div>
                         {% if emailAuthMode == 'smtp_oauth' and not oauthConfig %}
-                            <span class="badge bg-danger">Not Configured</span>
+                            <span class="badge bg-danger">{{ t('admin_server.status_not_configured') }}</span>
                         {% elseif emailAuthMode == 'smtp_oauth' and oauthConfig and not oauthConfig.connected %}
-                            <span class="badge bg-warning">Not Connected</span>
+                            <span class="badge bg-warning">{{ t('admin_server.status_not_connected') }}</span>
                         {% elseif emailAuthMode == 'smtp_oauth' and oauthConfig and oauthConfig.connected %}
-                            <span class="badge bg-success">Connected</span>
+                            <span class="badge bg-success">{{ t('admin_server.status_connected') }}</span>
                         {% endif %}
                     </div>
                 </div>
@@ -194,89 +194,89 @@
                         <form id="emailSettingsForm">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="smtpHost" class="form-label">SMTP Host</label>
+                                    <label for="smtpHost" class="form-label">{{ t('admin_server.smtp_host') }}</label>
                                     <input type="text" class="form-control" id="smtpHost" placeholder="smtp.gmail.com"
                                            value="{{ smtpHost ?? '' }}">
                                 </div>
 
                                 <div class="col-md-3 mb-3">
-                                    <label for="smtpPort" class="form-label">Port</label>
+                                    <label for="smtpPort" class="form-label">{{ t('admin_server.port') }}</label>
                                     <input type="number" class="form-control" id="smtpPort"
                                            value="{{ smtpPort ?? 587 }}" placeholder="587">
                                 </div>
 
                                 <div class="col-md-3 mb-3">
-                                    <label for="smtpEncryption" class="form-label">Encryption</label>
+                                    <label for="smtpEncryption" class="form-label">{{ t('admin_server.encryption') }}</label>
                                     <select class="form-select" id="smtpEncryption">
                                         <option value="tls" {{ smtpEncryption == 'tls' ? 'selected' : '' }}>TLS (STARTTLS)</option>
                                         <option value="ssl" {{ smtpEncryption == 'ssl' ? 'selected' : '' }}>SSL</option>
-                                        <option value="" {{ smtpEncryption == '' ? 'selected' : '' }}>None</option>
+                                        <option value="" {{ smtpEncryption == '' ? 'selected' : '' }}>{{ t('admin_server.enc_none') }}</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="smtpUsername" class="form-label">Username / Email</label>
+                                    <label for="smtpUsername" class="form-label">{{ t('admin_server.username_email') }}</label>
                                     <input type="text" class="form-control" id="smtpUsername" placeholder="your-email@gmail.com"
                                            value="{{ smtpUsername ?? '' }}">
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label for="smtpPassword" class="form-label">
-                                        Password / App Password
+                                        {{ t('admin_server.password_app_password') }}
                                         {% if smtpPasswordConfigured %}
                                             <span class="badge bg-success ms-2">
-                                                <i class="bi bi-check-circle-fill"></i> Configured
+                                                <i class="bi bi-check-circle-fill"></i> {{ t('admin_server.status_configured') }}
                                             </span>
                                         {% endif %}
                                     </label>
                                     <div class="input-group">
                                         <input type="password" class="form-control" id="smtpPassword"
-                                               placeholder="{% if smtpPasswordConfigured %}Saved (leave blank to keep current){% else %}Enter password{% endif %}">
+                                               placeholder="{% if smtpPasswordConfigured %}{{ t('admin_server.saved_leave_blank') }}{% else %}{{ t('admin_server.enter_password') }}{% endif %}">
                                         <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('smtpPassword')">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
                                     <div class="form-text">
                                         {% if smtpPasswordConfigured %}
-                                            Password is saved. Leave blank to keep current password.
+                                            {{ t('admin_server.password_saved_help') }}
                                         {% else %}
-                                            Enter your SMTP password or app-specific password
+                                            {{ t('admin_server.password_enter_help') }}
                                         {% endif %}
                                     </div>
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="smtpFromAddress" class="form-label">From Address</label>
+                                <label for="smtpFromAddress" class="form-label">{{ t('admin_server.from_address') }}</label>
                                 <input type="email" class="form-control" id="smtpFromAddress" placeholder="noreply@pathary.local"
                                        value="{{ smtpFromAddress ?? '' }}">
-                                <div class="form-text">Email address shown as sender</div>
+                                <div class="form-text">{{ t('admin_server.from_address_help') }}</div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="smtpFromDisplayName" class="form-label">
-                                    From Display Name <small class="text-muted">(optional)</small>
+                                    {{ t('admin_server.from_display_name') }} <small class="text-muted">{{ t('admin_server.optional_paren') }}</small>
                                 </label>
                                 <input type="text" class="form-control" id="smtpFromDisplayName" placeholder="Email from Pathary"
                                        value="{{ smtpFromDisplayName ?? '' }}">
-                                <div class="form-text">If set, recipients will see "Display Name &lt;email@address&gt;" instead of just the email address</div>
+                                <div class="form-text">{{ t('admin_server.display_name_help') }}</div>
                             </div>
 
                             <div class="border-top pt-3 mt-3">
                                 <button type="button" class="btn btn-primary" onclick="saveEmailSettings()">
-                                    <i class="bi bi-save me-1"></i>Save SMTP Settings
+                                    <i class="bi bi-save me-1"></i>{{ t('admin_server.save_smtp_settings') }}
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary" onclick="sendTestEmail()">
-                                    <i class="bi bi-send me-1"></i>Send Test Email
+                                    <i class="bi bi-send me-1"></i>{{ t('admin_server.send_test_email') }}
                                 </button>
                                 <button type="button" class="btn btn-outline-info" onclick="runSMTPDiagnostics()">
-                                    <i class="bi bi-tools me-1"></i>Run Diagnostics
+                                    <i class="bi bi-tools me-1"></i>{{ t('admin_server.run_diagnostics') }}
                                 </button>
                                 {% if emailAuthMode == 'smtp_oauth' %}
                                     <button type="button" class="btn btn-outline-warning" onclick="switchToPasswordMode()">
-                                        <i class="bi bi-arrow-left-circle me-1"></i>Switch to Password Mode
+                                        <i class="bi bi-arrow-left-circle me-1"></i>{{ t('admin_server.switch_to_password_mode') }}
                                     </button>
                                 {% endif %}
                             </div>
@@ -286,7 +286,7 @@
                         <div id="smtpDiagnosticsResults" class="mt-4" style="display: none;">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>SMTP Diagnostics</h5>
+                                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>{{ t('admin_server.smtp_diagnostics') }}</h5>
                                 </div>
                                 <div class="card-body" id="diagnosticsContent">
                                     <!-- Results will be populated here -->
@@ -301,13 +301,13 @@
 
                         {% if not encryptionKeyConfigured %}
                             <div class="alert alert-warning" role="alert">
-                                <h6 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Encryption Key Required</h6>
-                                <p class="mb-2">OAuth requires an encryption key to securely store credentials.</p>
+                                <h6 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>{{ t('admin_server.encryption_key_required') }}</h6>
+                                <p class="mb-2">{{ t('admin_server.encryption_key_required_desc') }}</p>
                                 <button type="button" class="btn btn-sm btn-warning" onclick="generateEncryptionKey()">
-                                    <i class="bi bi-key me-1"></i>Generate Encryption Key
+                                    <i class="bi bi-key me-1"></i>{{ t('admin_server.generate_encryption_key') }}
                                 </button>
                                 <p class="small text-muted mt-2 mb-0">
-                                    For production, set <code>ENCRYPTION_KEY</code> environment variable instead.
+                                    {{ t('admin_server.encryption_key_prod_part1') }} <code>ENCRYPTION_KEY</code> {{ t('admin_server.encryption_key_prod_part2') }}
                                 </p>
                             </div>
                         {% endif %}
@@ -319,59 +319,59 @@
                                     <i class="bi bi-info-circle-fill fs-4"></i>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
-                                    <h6 class="alert-heading mb-2">Gmail OAuth Setup</h6>
+                                    <h6 class="alert-heading mb-2">{{ t('admin_server.gmail_oauth_setup') }}</h6>
                                     <p class="small mb-2">
-                                        <strong>Quick setup guide:</strong> Follow the steps below or see the
+                                        <strong>{{ t('admin_server.quick_setup_guide') }}</strong> {{ t('admin_server.follow_steps_or_see') }}
                                         <a href="https://docs.pathary.tv/oauth-email-setup/#gmail-setup-requirements" target="_blank" class="alert-link">
-                                            <i class="bi bi-book me-1"></i>complete Gmail OAuth setup guide
+                                            <i class="bi bi-book me-1"></i>{{ t('admin_server.gmail_setup_guide_link') }}
                                         </a>
-                                        for detailed instructions, troubleshooting, and API permission requirements.
+                                        {{ t('admin_server.gmail_setup_guide_suffix') }}
                                     </p>
                                     <button class="btn btn-sm btn-outline-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#gmailInstructionsCollapse">
-                                        <i class="bi bi-chevron-down me-1"></i>Show Quick Setup Steps
+                                        <i class="bi bi-chevron-down me-1"></i>{{ t('admin_server.show_quick_setup_steps') }}
                                     </button>
 
                                     <div class="collapse" id="gmailInstructionsCollapse">
                                         <div class="mt-2">
-                                            <h6 class="text-primary">1. Create Google Cloud Project</h6>
+                                            <h6 class="text-primary">{{ t('admin_server.gmail_step1_title') }}</h6>
                                             <ol class="small mb-3">
-                                                <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
-                                                <li>Create a new project or select existing one</li>
-                                                <li>Name: "Pathary Email OAuth"</li>
+                                                <li>{{ t('admin_server.go_to') }} <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                                                <li>{{ t('admin_server.gmail_step1_li2') }}</li>
+                                                <li>{{ t('admin_server.gmail_step1_li3') }}</li>
                                             </ol>
 
-                                            <h6 class="text-primary">2. Enable Gmail API</h6>
+                                            <h6 class="text-primary">{{ t('admin_server.gmail_step2_title') }}</h6>
                                             <ol class="small mb-3">
-                                                <li>In your project, go to <strong>APIs & Services → Library</strong></li>
-                                                <li>Search for "Gmail API"</li>
-                                                <li>Click on it and click <strong>Enable</strong></li>
+                                                <li>{{ t('admin_server.gmail_step2_li1') }} <strong>APIs & Services → Library</strong></li>
+                                                <li>{{ t('admin_server.gmail_step2_li2') }}</li>
+                                                <li>{{ t('admin_server.gmail_step2_li3') }} <strong>Enable</strong></li>
                                             </ol>
 
-                                            <h6 class="text-primary">3. Configure OAuth Consent Screen</h6>
+                                            <h6 class="text-primary">{{ t('admin_server.gmail_step3_title') }}</h6>
                                             <ol class="small mb-3">
-                                                <li>Go to <strong>APIs & Services → OAuth consent screen</strong></li>
-                                                <li>User Type: Select "Internal" (for Google Workspace) or "External"</li>
-                                                <li>Fill in Application name: "Pathary"</li>
-                                                <li>Add your email as support email</li>
-                                                <li>Click <strong>Save and Continue</strong></li>
+                                                <li>{{ t('admin_server.go_to') }} <strong>APIs & Services → OAuth consent screen</strong></li>
+                                                <li>{{ t('admin_server.gmail_step3_li2') }}</li>
+                                                <li>{{ t('admin_server.gmail_step3_li3') }}</li>
+                                                <li>{{ t('admin_server.gmail_step3_li4') }}</li>
+                                                <li>{{ t('admin_server.click') }} <strong>Save and Continue</strong></li>
                                             </ol>
 
-                                            <h6 class="text-primary">4. Create OAuth Client ID</h6>
+                                            <h6 class="text-primary">{{ t('admin_server.gmail_step4_title') }}</h6>
                                             <ol class="small mb-3">
-                                                <li>Go to <strong>APIs & Services → Credentials</strong></li>
-                                                <li>Click <strong>Create Credentials → OAuth client ID</strong></li>
-                                                <li>Application type: "Web application"</li>
-                                                <li>Name: "Pathary Email OAuth"</li>
-                                                <li>Authorized redirect URIs: Add the redirect URI shown below</li>
-                                                <li>Click <strong>Create</strong></li>
-                                                <li><strong>Copy the Client ID and Client Secret</strong></li>
+                                                <li>{{ t('admin_server.go_to') }} <strong>APIs & Services → Credentials</strong></li>
+                                                <li>{{ t('admin_server.click') }} <strong>Create Credentials → OAuth client ID</strong></li>
+                                                <li>{{ t('admin_server.gmail_step4_li3') }}</li>
+                                                <li>{{ t('admin_server.gmail_step4_li4') }}</li>
+                                                <li>{{ t('admin_server.gmail_step4_li5') }}</li>
+                                                <li>{{ t('admin_server.click') }} <strong>Create</strong></li>
+                                                <li><strong>{{ t('admin_server.gmail_step4_li7') }}</strong></li>
                                             </ol>
 
-                                            <h6 class="text-primary">5. Get Required Values</h6>
+                                            <h6 class="text-primary">5. {{ t('admin_server.get_required_values') }}</h6>
                                             <ul class="small mb-3">
-                                                <li><strong>Client ID</strong>: From step 4</li>
-                                                <li><strong>Client Secret</strong>: From step 4</li>
-                                                <li><strong>Tenant ID</strong>: Not required for Gmail (leave empty)</li>
+                                                <li><strong>Client ID</strong>: {{ t('admin_server.from_step_4') }}</li>
+                                                <li><strong>Client Secret</strong>: {{ t('admin_server.from_step_4') }}</li>
+                                                <li><strong>Tenant ID</strong>: {{ t('admin_server.gmail_tenant_not_required') }}</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -386,67 +386,67 @@
                                     <i class="bi bi-info-circle-fill fs-4"></i>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
-                                    <h6 class="alert-heading mb-2">Azure App Registration Setup</h6>
+                                    <h6 class="alert-heading mb-2">{{ t('admin_server.azure_setup') }}</h6>
                                     <p class="small mb-2">
-                                        <strong>Quick setup guide:</strong> Follow the steps below or see the
+                                        <strong>{{ t('admin_server.quick_setup_guide') }}</strong> {{ t('admin_server.follow_steps_or_see') }}
                                         <a href="https://docs.pathary.tv/oauth-email-setup/#microsoft-365-setup-requirements" target="_blank" class="alert-link">
-                                            <i class="bi bi-book me-1"></i>complete Microsoft 365 OAuth setup guide
+                                            <i class="bi bi-book me-1"></i>{{ t('admin_server.azure_setup_guide_link') }}
                                         </a>
-                                        for detailed instructions, required API permissions, SMTP AUTH configuration, and troubleshooting.
+                                        {{ t('admin_server.azure_setup_guide_suffix') }}
                                     </p>
                                     <button class="btn btn-sm btn-outline-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#azureInstructionsCollapse">
-                                        <i class="bi bi-chevron-down me-1"></i>Show Quick Setup Steps
+                                        <i class="bi bi-chevron-down me-1"></i>{{ t('admin_server.show_quick_setup_steps') }}
                                     </button>
 
                                     <div class="collapse" id="azureInstructionsCollapse">
                                         <div class="mt-2">
-                                            <h6 class="text-primary">1. Create App Registration</h6>
+                                            <h6 class="text-primary">{{ t('admin_server.azure_step1_title') }}</h6>
                                             <ol class="small mb-3">
-                                                <li>Go to <a href="https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank">Azure Portal → App registrations</a></li>
-                                                <li>Click <strong>New registration</strong></li>
-                                                <li>Name: "Pathary Email OAuth"</li>
-                                                <li>Supported account types: "Accounts in this organizational directory only"</li>
-                                                <li>Redirect URI: Select "Web" and enter the URI shown below</li>
-                                                <li>Click <strong>Register</strong></li>
+                                                <li>{{ t('admin_server.go_to') }} <a href="https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank">Azure Portal → App registrations</a></li>
+                                                <li>{{ t('admin_server.click') }} <strong>New registration</strong></li>
+                                                <li>{{ t('admin_server.azure_step1_li3') }}</li>
+                                                <li>{{ t('admin_server.azure_step1_li4') }}</li>
+                                                <li>{{ t('admin_server.azure_step1_li5') }}</li>
+                                                <li>{{ t('admin_server.click') }} <strong>Register</strong></li>
                                             </ol>
 
-                                            <h6 class="text-primary">2. Configure API Permissions</h6>
+                                            <h6 class="text-primary">{{ t('admin_server.azure_step2_title') }}</h6>
                                             <ol class="small mb-3">
-                                                <li>In your app, go to <strong>API permissions</strong></li>
-                                                <li>Click <strong>Add a permission</strong></li>
-                                                <li>Select <strong>Microsoft Graph</strong></li>
-                                                <li>Select <strong>Delegated permissions</strong></li>
-                                                <li>Search for and check these permissions:
+                                                <li>{{ t('admin_server.azure_step2_li1') }} <strong>API permissions</strong></li>
+                                                <li>{{ t('admin_server.click') }} <strong>Add a permission</strong></li>
+                                                <li>{{ t('admin_server.select') }} <strong>Microsoft Graph</strong></li>
+                                                <li>{{ t('admin_server.select') }} <strong>Delegated permissions</strong></li>
+                                                <li>{{ t('admin_server.azure_step2_li5') }}
                                                     <ul>
-                                                        <li><code>SMTP.Send</code> - Send emails from mailboxes using SMTP AUTH</li>
-                                                        <li><code>User.Read</code> - Sign in and read user profile</li>
-                                                        <li><code>offline_access</code> - Maintain access to data</li>
+                                                        <li><code>SMTP.Send</code> - {{ t('admin_server.perm_smtp_send') }}</li>
+                                                        <li><code>User.Read</code> - {{ t('admin_server.perm_user_read') }}</li>
+                                                        <li><code>offline_access</code> - {{ t('admin_server.perm_offline_access') }}</li>
                                                     </ul>
                                                 </li>
-                                                <li>Click <strong>Add permissions</strong></li>
-                                                <li>Click <strong>Grant admin consent for [Your Organization]</strong> (requires admin)</li>
-                                                <li>Verify all three permissions show "✓ Granted" status</li>
+                                                <li>{{ t('admin_server.click') }} <strong>Add permissions</strong></li>
+                                                <li>{{ t('admin_server.click') }} <strong>Grant admin consent for [Your Organization]</strong> {{ t('admin_server.requires_admin') }}</li>
+                                                <li>{{ t('admin_server.azure_step2_li9') }}</li>
                                             </ol>
 
-                                            <h6 class="text-primary">3. Create Client Secret</h6>
+                                            <h6 class="text-primary">{{ t('admin_server.azure_step3_title') }}</h6>
                                             <ol class="small mb-3">
-                                                <li>Go to <strong>Certificates & secrets</strong></li>
-                                                <li>Click <strong>New client secret</strong></li>
-                                                <li>Description: "Pathary OAuth Secret"</li>
-                                                <li>Expires: Choose duration (3-24 months)</li>
-                                                <li>Click <strong>Add</strong></li>
-                                                <li><strong>Copy the secret value immediately</strong> (shown only once)</li>
+                                                <li>{{ t('admin_server.go_to') }} <strong>Certificates & secrets</strong></li>
+                                                <li>{{ t('admin_server.click') }} <strong>New client secret</strong></li>
+                                                <li>{{ t('admin_server.azure_step3_li3') }}</li>
+                                                <li>{{ t('admin_server.azure_step3_li4') }}</li>
+                                                <li>{{ t('admin_server.click') }} <strong>Add</strong></li>
+                                                <li><strong>{{ t('admin_server.azure_step3_li6_bold') }}</strong> {{ t('admin_server.azure_step3_li6_suffix') }}</li>
                                             </ol>
 
-                                            <h6 class="text-primary">4. Get Required Values</h6>
+                                            <h6 class="text-primary">4. {{ t('admin_server.get_required_values') }}</h6>
                                             <ul class="small mb-3">
-                                                <li><strong>Client ID</strong>: App's Overview page → Application (client) ID</li>
-                                                <li><strong>Tenant ID</strong>: App's Overview page → Directory (tenant) ID</li>
-                                                <li><strong>Client Secret</strong>: Value you copied in step 3</li>
+                                                <li><strong>Client ID</strong>: {{ t('admin_server.azure_val_client_id') }}</li>
+                                                <li><strong>Tenant ID</strong>: {{ t('admin_server.azure_val_tenant_id') }}</li>
+                                                <li><strong>Client Secret</strong>: {{ t('admin_server.azure_val_client_secret') }}</li>
                                             </ul>
 
-                                            <h6 class="text-primary">5. Enable SMTP AUTH (Important!)</h6>
-                                            <p class="small mb-2">SMTP AUTH must be enabled for your mailbox:</p>
+                                            <h6 class="text-primary">{{ t('admin_server.azure_step5_title') }}</h6>
+                                            <p class="small mb-2">{{ t('admin_server.azure_step5_desc') }}</p>
                                             <div class="bg-dark text-light p-2 rounded mb-2" style="font-family: monospace; font-size: 0.85em;">
                                                 <div class="text-success"># Connect to Exchange Online PowerShell</div>
                                                 <div>Install-Module ExchangeOnlineManagement</div>
@@ -455,8 +455,8 @@
                                                 <div>Set-CASMailbox -Identity pathary@domain.local -SmtpClientAuthenticationDisabled $false</div>
                                             </div>
 
-                                            <h6 class="text-primary">6. Send As Permission (Optional)</h6>
-                                            <p class="small mb-2">If sending from a different address than the authenticated mailbox:</p>
+                                            <h6 class="text-primary">{{ t('admin_server.azure_step6_title') }}</h6>
+                                            <p class="small mb-2">{{ t('admin_server.azure_step6_desc') }}</p>
                                             <div class="bg-dark text-light p-2 rounded" style="font-family: monospace; font-size: 0.85em;">
                                                 <div class="text-success"># Create the "From" mailbox if it doesn't exist</div>
                                                 <div>New-Mailbox -Shared -Name "No Reply" -PrimarySmtpAddress "noreply@domain.local"</div>
@@ -473,9 +473,9 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="oauthProvider" class="form-label">
-                                        Email Provider
+                                        {{ t('admin_server.email_provider') }}
                                         <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
-                                           title="Select your email service provider. Click 'Show Setup Instructions' above for Azure configuration."></i>
+                                           title="{{ t('admin_server.email_provider_tooltip') }}"></i>
                                     </label>
                                     <select class="form-select" id="oauthProvider" onchange="toggleTenantIdField(); toggleOAuthInstructions();">
                                         <option value="gmail" {{ oauthConfig and oauthConfig.provider == 'gmail' ? 'selected' : '' }}>
@@ -485,90 +485,90 @@
                                             Microsoft 365 / Outlook
                                         </option>
                                     </select>
-                                    <div class="form-text">Select your email service provider</div>
+                                    <div class="form-text">{{ t('admin_server.email_provider_help') }}</div>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label for="oauthFromAddress" class="form-label">
-                                        Authentication Mailbox
+                                        {{ t('admin_server.auth_mailbox') }}
                                         <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
-                                           title="The actual mailbox used for OAuth authentication (e.g., pathary@domain.local). Must be a real mailbox with SMTP AUTH enabled."></i>
+                                           title="{{ t('admin_server.auth_mailbox_tooltip') }}"></i>
                                     </label>
                                     <input type="email" class="form-control" id="oauthFromAddress"
                                            value="{{ oauthConfig ? oauthConfig.fromAddress : '' }}"
                                            placeholder="pathary@domain.local">
-                                    <div class="form-text">Mailbox to authenticate with (must have SMTP AUTH enabled)</div>
+                                    <div class="form-text">{{ t('admin_server.auth_mailbox_help') }}</div>
                                 </div>
                             </div>
 
                             <!-- SMTP Server Settings (Required for OAuth) -->
                             <div class="alert alert-info mb-4" role="alert">
                                 <h6 class="alert-heading">
-                                    <i class="bi bi-info-circle-fill me-2"></i>SMTP Server Settings Required
+                                    <i class="bi bi-info-circle-fill me-2"></i>{{ t('admin_server.smtp_server_required') }}
                                 </h6>
                                 <p class="mb-2 small">
-                                    Even with OAuth authentication, SMTP server settings are required. OAuth replaces your <strong>password</strong> with a secure <strong>access token</strong>,
-                                    but the application still needs to know <strong>which mail server to connect to</strong>.
+                                    {{ t('admin_server.smtp_server_required_desc1') }} <strong>{{ t('admin_server.password_word') }}</strong> {{ t('admin_server.smtp_server_required_desc2') }} <strong>{{ t('admin_server.access_token_word') }}</strong>,
+                                    {{ t('admin_server.smtp_server_required_desc3') }} <strong>{{ t('admin_server.which_mail_server') }}</strong>.
                                 </p>
                                 <p class="mb-0 small">
-                                    The server, port, and encryption below are auto-filled based on your provider selection, but can be edited if needed.
+                                    {{ t('admin_server.smtp_server_autofill') }}
                                 </p>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="oauthSmtpHost" class="form-label">
-                                        SMTP Server <span class="text-danger">*</span>
+                                        {{ t('admin_server.smtp_server') }} <span class="text-danger">*</span>
                                         <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
-                                           title="The SMTP server address for your email provider"></i>
+                                           title="{{ t('admin_server.smtp_server_tooltip') }}"></i>
                                     </label>
                                     <input type="text" class="form-control font-monospace" id="oauthSmtpHost"
                                            value="{{ smtpHost ?? (oauthConfig and oauthConfig.provider == 'gmail' ? 'smtp.gmail.com' : 'smtp.office365.com') }}"
-                                           placeholder="e.g., smtp.gmail.com or smtp.office365.com">
-                                    <div class="form-text">Auto-filled based on provider (editable)</div>
+                                           placeholder="{{ t('admin_server.smtp_server_placeholder') }}">
+                                    <div class="form-text">{{ t('admin_server.smtp_server_help') }}</div>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
                                     <label for="oauthSmtpPort" class="form-label">
-                                        Port <span class="text-danger">*</span>
+                                        {{ t('admin_server.port') }} <span class="text-danger">*</span>
                                     </label>
                                     <input type="number" class="form-control" id="oauthSmtpPort"
                                            value="{{ smtpPort ?? 587 }}"
                                            placeholder="587">
-                                    <div class="form-text">Default: 587 (TLS) or 465 (SSL)</div>
+                                    <div class="form-text">{{ t('admin_server.port_help') }}</div>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
                                     <label for="oauthSmtpEncryption" class="form-label">
-                                        Encryption <span class="text-danger">*</span>
+                                        {{ t('admin_server.encryption') }} <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select" id="oauthSmtpEncryption">
                                         <option value="tls" {{ smtpEncryption == 'tls' or not smtpEncryption ? 'selected' : '' }}>TLS (STARTTLS)</option>
                                         <option value="ssl" {{ smtpEncryption == 'ssl' ? 'selected' : '' }}>SSL</option>
                                     </select>
-                                    <div class="form-text">TLS for port 587, SSL for port 465</div>
+                                    <div class="form-text">{{ t('admin_server.encryption_help') }}</div>
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label for="oauthEmailFromAddress" class="form-label">
-                                        Email From Address (Optional)
+                                        {{ t('admin_server.email_from_address') }}
                                         <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
-                                           title="The 'From' address shown in emails (e.g., noreply@pathary.tv). Leave blank to use authentication mailbox. Requires 'Send As' permission if different."></i>
+                                           title="{{ t('admin_server.email_from_address_tooltip') }}"></i>
                                     </label>
                                     <div class="input-group">
                                         <input type="email" class="form-control" id="oauthEmailFromAddress"
                                                value="{{ serverSettings.fromAddress ?? '' }}"
-                                               placeholder="noreply@pathary.tv (optional - leave blank to use authentication mailbox)">
+                                               placeholder="{{ t('admin_server.email_from_address_placeholder') }}">
                                         <button type="button" class="btn btn-outline-primary" onclick="saveOAuthFromAddress()">
-                                            <i class="bi bi-save me-1"></i>Save
+                                            <i class="bi bi-save me-1"></i>{{ t('admin_server.save') }}
                                         </button>
                                     </div>
                                     <div class="form-text">
-                                        Optional: Send emails from a different address.
-                                        <span class="text-warning">Requires "Send As" permission in Exchange Online</span>
-                                        (see setup instructions above).
+                                        {{ t('admin_server.email_from_address_help1') }}
+                                        <span class="text-warning">{{ t('admin_server.email_from_address_help_warning') }}</span>
+                                        {{ t('admin_server.email_from_address_help2') }}
                                     </div>
                                 </div>
                             </div>
@@ -576,20 +576,20 @@
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label for="oauthFromDisplayName" class="form-label">
-                                        From Display Name <small class="text-muted">(optional)</small>
+                                        {{ t('admin_server.from_display_name') }} <small class="text-muted">{{ t('admin_server.optional_paren') }}</small>
                                         <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
-                                           title="Friendly name shown to recipients (e.g., 'Email from Pathary'). Works with both authentication mailbox and custom From addresses."></i>
+                                           title="{{ t('admin_server.from_display_name_tooltip') }}"></i>
                                     </label>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="oauthFromDisplayName"
                                                value="{{ smtpFromDisplayName ?? '' }}"
                                                placeholder="Email from Pathary">
                                         <button type="button" class="btn btn-outline-primary" onclick="saveOAuthFromDisplayName()">
-                                            <i class="bi bi-save me-1"></i>Save
+                                            <i class="bi bi-save me-1"></i>{{ t('admin_server.save') }}
                                         </button>
                                     </div>
                                     <div class="form-text">
-                                        If set, recipients will see "Display Name &lt;email@address&gt;" instead of just the email address.
+                                        {{ t('admin_server.display_name_help') }}
                                     </div>
                                 </div>
                             </div>
@@ -599,8 +599,8 @@
                                     <label for="oauthClientId" class="form-label">Client ID</label>
                                     <input type="text" class="form-control font-monospace" id="oauthClientId"
                                            value="{{ oauthConfig ? oauthConfig.clientId : '' }}"
-                                           placeholder="Enter client ID from provider">
-                                    <div class="form-text">Public OAuth client identifier</div>
+                                           placeholder="{{ t('admin_server.client_id_placeholder') }}">
+                                    <div class="form-text">{{ t('admin_server.client_id_help') }}</div>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
@@ -608,44 +608,44 @@
                                         Client Secret
                                         {% if oauthConfig %}
                                             <span class="badge bg-success ms-2">
-                                                <i class="bi bi-check-circle-fill"></i> Configured
+                                                <i class="bi bi-check-circle-fill"></i> {{ t('admin_server.status_configured') }}
                                             </span>
                                         {% endif %}
                                     </label>
                                     <div class="input-group">
                                         <input type="password" class="form-control font-monospace" id="oauthClientSecret"
-                                               placeholder="{% if oauthConfig %}Saved (leave blank to keep current){% else %}Enter client secret{% endif %}">
+                                               placeholder="{% if oauthConfig %}{{ t('admin_server.saved_leave_blank') }}{% else %}{{ t('admin_server.enter_client_secret') }}{% endif %}">
                                         <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility('oauthClientSecret')">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
-                                    <div class="form-text">OAuth client secret (stored encrypted)</div>
+                                    <div class="form-text">{{ t('admin_server.client_secret_help') }}</div>
                                 </div>
                             </div>
 
                             <div class="row" id="tenantIdRow" style="display: {{ oauthConfig and oauthConfig.provider == 'microsoft' ? 'flex' : 'none' }};">
                                 <div class="col-md-6 mb-3">
-                                    <label for="oauthTenantId" class="form-label">Tenant ID (Microsoft Only)</label>
+                                    <label for="oauthTenantId" class="form-label">{{ t('admin_server.tenant_id_label') }}</label>
                                     <input type="text" class="form-control font-monospace" id="oauthTenantId"
                                            value="{{ oauthConfig ? oauthConfig.tenantId : '' }}"
-                                           placeholder="common or your-tenant-guid">
-                                    <div class="form-text">Azure AD tenant ID (use "common" for multi-tenant)</div>
+                                           placeholder="{{ t('admin_server.tenant_id_placeholder') }}">
+                                    <div class="form-text">{{ t('admin_server.tenant_id_help') }}</div>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label for="oauthSecretExpiry" class="form-label">Client Secret Expires In</label>
+                                    <label for="oauthSecretExpiry" class="form-label">{{ t('admin_server.secret_expires_in') }}</label>
                                     <select class="form-select" id="oauthSecretExpiry">
                                         {% set savedMonths = oauthConfig and oauthConfig.daysUntilSecretExpiry ? (oauthConfig.daysUntilSecretExpiry / 30)|round(0, 'floor') : 12 %}
                                         {% if savedMonths > 18 %}{% set savedMonths = 24 %}
                                         {% elseif savedMonths > 9 %}{% set savedMonths = 12 %}
                                         {% elseif savedMonths > 4 %}{% set savedMonths = 6 %}
                                         {% else %}{% set savedMonths = 3 %}{% endif %}
-                                        <option value="3" {{ savedMonths == 3 ? 'selected' : '' }}>3 months</option>
-                                        <option value="6" {{ savedMonths == 6 ? 'selected' : '' }}>6 months</option>
-                                        <option value="12" {{ savedMonths == 12 ? 'selected' : '' }}>12 months</option>
-                                        <option value="24" {{ savedMonths == 24 ? 'selected' : '' }}>24 months</option>
+                                        <option value="3" {{ savedMonths == 3 ? 'selected' : '' }}>{{ t('admin_server.months_3') }}</option>
+                                        <option value="6" {{ savedMonths == 6 ? 'selected' : '' }}>{{ t('admin_server.months_6') }}</option>
+                                        <option value="12" {{ savedMonths == 12 ? 'selected' : '' }}>{{ t('admin_server.months_12') }}</option>
+                                        <option value="24" {{ savedMonths == 24 ? 'selected' : '' }}>{{ t('admin_server.months_24') }}</option>
                                     </select>
-                                    <div class="form-text">Track when secret needs renewal</div>
+                                    <div class="form-text">{{ t('admin_server.secret_expires_help') }}</div>
                                 </div>
                             </div>
 
@@ -654,16 +654,16 @@
                                 <div class="alert alert-{{ oauthConfig.tokenStatusVariant }} mb-3" role="alert">
                                     <div class="d-flex align-items-center">
                                         <div class="flex-grow-1">
-                                            <strong>Status:</strong> {{ oauthConfig.tokenStatusLabel }}
+                                            <strong>{{ t('admin_server.status_label') }}</strong> {{ oauthConfig.tokenStatusLabel }}
                                             {% if oauthConfig.tokenStatusMessage %}
                                                 <br><small>{{ oauthConfig.tokenStatusMessage }}</small>
                                             {% endif %}
                                             {% if oauthConfig.connectedAt %}
-                                                <br><small class="text-muted">Connected: {{ oauthConfig.connectedAt }}</small>
+                                                <br><small class="text-muted">{{ t('admin_server.connected_label') }} {{ oauthConfig.connectedAt }}</small>
                                             {% endif %}
                                             {% if oauthConfig.clientSecretExpiring %}
                                                 <br><small class="text-warning">
-                                                    <i class="bi bi-exclamation-triangle"></i> Client secret expires in {{ oauthConfig.daysUntilSecretExpiry }} days
+                                                    <i class="bi bi-exclamation-triangle"></i> {{ t('admin_server.secret_expires_in_prefix') }} {{ oauthConfig.daysUntilSecretExpiry }} {{ t('admin_server.days') }}
                                                 </small>
                                             {% endif %}
                                         </div>
@@ -678,7 +678,7 @@
 
                             <!-- Redirect URI Display -->
                             <div class="mb-3">
-                                <label class="form-label">OAuth Redirect URI</label>
+                                <label class="form-label">{{ t('admin_server.oauth_redirect_uri') }}</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control font-monospace" id="oauthRedirectUri"
                                            value="{{ applicationUrl }}/admin/server/email/oauth/callback" readonly>
@@ -686,55 +686,55 @@
                                         <i class="bi bi-clipboard"></i>
                                     </button>
                                 </div>
-                                <div class="form-text">Configure this URL in your OAuth provider settings</div>
+                                <div class="form-text">{{ t('admin_server.oauth_redirect_uri_help') }}</div>
                             </div>
 
                             <!-- Action Buttons -->
                             <div class="border-top pt-3 mt-3">
                                 <button type="button" class="btn btn-primary" onclick="saveOAuthConfig()" {{ not encryptionKeyConfigured ? 'disabled' : '' }}>
-                                    <i class="bi bi-save me-1"></i>Save OAuth Config
+                                    <i class="bi bi-save me-1"></i>{{ t('admin_server.save_oauth_config') }}
                                 </button>
 
                                 {% if oauthConfig %}
                                     {% if oauthConfig.connected %}
                                         <button type="button" class="btn btn-success" onclick="switchToOAuthMode()">
-                                            <i class="bi bi-check-circle me-1"></i>Use OAuth Mode
+                                            <i class="bi bi-check-circle me-1"></i>{{ t('admin_server.use_oauth_mode') }}
                                         </button>
                                         <button type="button" class="btn btn-outline-secondary" onclick="sendTestEmail()">
-                                            <i class="bi bi-send me-1"></i>Send Test Email
+                                            <i class="bi bi-send me-1"></i>{{ t('admin_server.send_test_email') }}
                                         </button>
                                         <button type="button" class="btn btn-outline-warning" onclick="disconnectOAuth()">
-                                            <i class="bi bi-x-circle me-1"></i>Disconnect
+                                            <i class="bi bi-x-circle me-1"></i>{{ t('admin_server.disconnect') }}
                                         </button>
                                     {% else %}
                                         <button type="button" class="btn btn-success" onclick="authorizeOAuth()">
-                                            <i class="bi bi-box-arrow-up-right me-1"></i>Connect
+                                            <i class="bi bi-box-arrow-up-right me-1"></i>{{ t('admin_server.connect') }}
                                         </button>
                                     {% endif %}
 
                                     <button type="button" class="btn btn-outline-danger" onclick="deleteOAuthConfig()">
-                                        <i class="bi bi-trash me-1"></i>Delete Config
+                                        <i class="bi bi-trash me-1"></i>{{ t('admin_server.delete_config') }}
                                     </button>
                                 {% else %}
                                     <button type="button" class="btn btn-success" onclick="authorizeOAuth()" disabled>
-                                        <i class="bi bi-box-arrow-up-right me-1"></i>Connect (Save config first)
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>{{ t('admin_server.connect_save_first') }}
                                     </button>
                                 {% endif %}
                             </div>
 
                             <!-- Helper Text -->
                             <div class="alert alert-info mt-3" role="alert">
-                                <h6 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Setup Instructions</h6>
+                                <h6 class="alert-heading"><i class="bi bi-info-circle me-2"></i>{{ t('admin_server.setup_instructions') }}</h6>
                                 <ol class="small mb-0">
-                                    <li>Create OAuth app in <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> or <a href="https://portal.azure.com/" target="_blank">Azure Portal</a></li>
-                                    <li>Copy the redirect URI above and add it to your OAuth app settings</li>
-                                    <li>Copy Client ID and Client Secret from your OAuth app</li>
-                                    <li>Paste credentials here and click "Save OAuth Config"</li>
-                                    <li>Click "Connect" to authorize Pathary to send emails</li>
-                                    <li>After successful connection, click "Use OAuth Mode" to switch</li>
+                                    <li>{{ t('admin_server.setup_step1_prefix') }} <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> {{ t('admin_server.or') }} <a href="https://portal.azure.com/" target="_blank">Azure Portal</a></li>
+                                    <li>{{ t('admin_server.setup_step2') }}</li>
+                                    <li>{{ t('admin_server.setup_step3') }}</li>
+                                    <li>{{ t('admin_server.setup_step4') }}</li>
+                                    <li>{{ t('admin_server.setup_step5') }}</li>
+                                    <li>{{ t('admin_server.setup_step6') }}</li>
                                 </ol>
                                 <p class="small text-muted mb-0 mt-2">
-                                    See <a href="https://docs.pathary.tv" target="_blank">GitHub Wiki</a> for detailed setup guides.
+                                    {{ t('admin_server.see_wiki_prefix') }} <a href="https://docs.pathary.tv" target="_blank">GitHub Wiki</a> {{ t('admin_server.see_wiki_suffix') }}
                                 </p>
                             </div>
                         </form>
@@ -752,24 +752,24 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="testEmailModalLabel">
-                        <i class="bi bi-send me-2"></i>Send Test Email
+                        <i class="bi bi-send me-2"></i>{{ t('admin_server.send_test_email') }}
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('admin.close') }}"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="testEmailRecipient" class="form-label">Recipient Email Address</label>
+                        <label for="testEmailRecipient" class="form-label">{{ t('admin_server.recipient_email') }}</label>
                         <input type="email" class="form-control" id="testEmailRecipient"
                                placeholder="user@example.com" required>
-                        <div class="form-text">Enter the address that should receive the test email.</div>
+                        <div class="form-text">{{ t('admin_server.recipient_email_help') }}</div>
                         <div id="testEmailRecipientError" class="invalid-feedback" style="display: none;"></div>
                     </div>
                     <div id="testEmailError" class="alert alert-danger" style="display: none;"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('admin.cancel') }}</button>
                     <button type="button" class="btn btn-primary" id="sendTestEmailBtn" onclick="sendTestEmailSubmit()" disabled>
-                        <i class="bi bi-send me-1"></i>Send Test Email
+                        <i class="bi bi-send me-1"></i>{{ t('admin_server.send_test_email') }}
                     </button>
                 </div>
             </div>
@@ -780,8 +780,8 @@
     <div class="col-md-12 mb-4">
         <div class="card admin-card">
             <div class="card-header health-card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-activity me-2"></i>System Health</span>
-                <small class="text-muted" id="health-last-run">Last check: <span id="health-last-run-time">Never</span></small>
+                <span><i class="bi bi-activity me-2"></i>{{ t('admin_server.system_health') }}</span>
+                <small class="text-muted" id="health-last-run">{{ t('admin_server.last_check') }} <span id="health-last-run-time">{{ t('admin_server.never') }}</span></small>
             </div>
             <div class="card-body">
                 <div class="row g-3">
@@ -789,18 +789,18 @@
                     <div class="col-md-6 col-lg-3">
                         <div class="card h-100 health-box" id="health-box-database">
                             <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3">Database</h6>
+                                <h6 class="card-title mb-3">{{ t('admin_server.health_database') }}</h6>
                                 <div class="health-icon mb-3">
                                     <i class="bi bi-database text-secondary" style="font-size: 3rem;" id="health-icon-database"></i>
                                 </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-database">Unknown</span>
-                                <p class="small text-muted mb-2" id="health-message-database">Not checked yet</p>
+                                <span class="badge bg-secondary mb-2" id="health-badge-database">{{ t('admin_server.status_unknown') }}</span>
+                                <p class="small text-muted mb-2" id="health-message-database">{{ t('admin_server.not_checked_yet') }}</p>
                                 <p class="small text-muted mb-3" id="health-meta-database">
                                     <span id="health-latency-database">-</span> • <span id="health-checked-database">-</span>
                                 </p>
                                 <div class="mt-auto">
                                     <button class="btn btn-sm btn-outline-primary" id="health-retest-database" onclick="retestDatabase()">
-                                        <i class="bi bi-arrow-clockwise"></i> Retest
+                                        <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
                                     </button>
                                 </div>
                             </div>
@@ -811,21 +811,21 @@
                     <div class="col-md-6 col-lg-3">
                         <div class="card h-100 health-box" id="health-box-tmdb">
                             <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3">TMDB API</h6>
+                                <h6 class="card-title mb-3">{{ t('admin_server.health_tmdb') }}</h6>
                                 <div class="health-icon mb-3">
                                     <i class="bi bi-cloud text-secondary" style="font-size: 3rem;" id="health-icon-tmdb"></i>
                                 </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-tmdb">Unknown</span>
-                                <p class="small text-muted mb-2" id="health-message-tmdb">Not checked yet</p>
+                                <span class="badge bg-secondary mb-2" id="health-badge-tmdb">{{ t('admin_server.status_unknown') }}</span>
+                                <p class="small text-muted mb-2" id="health-message-tmdb">{{ t('admin_server.not_checked_yet') }}</p>
                                 <p class="small text-muted mb-3" id="health-meta-tmdb">
                                     <span id="health-latency-tmdb">-</span> • <span id="health-checked-tmdb">-</span>
                                 </p>
                                 <div class="mt-auto">
                                     <button class="btn btn-sm btn-outline-primary me-1" id="health-retest-tmdb" onclick="retestTmdb()">
-                                        <i class="bi bi-arrow-clockwise"></i> Retest
+                                        <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
                                     </button>
                                     <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('tmdb')">
-                                        <i class="bi bi-gear"></i> Settings
+                                        <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
                                     </button>
                                 </div>
                             </div>
@@ -836,21 +836,21 @@
                     <div class="col-md-6 col-lg-3">
                         <div class="card h-100 health-box" id="health-box-oauth">
                             <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3" id="health-title-oauth">Email System</h6>
+                                <h6 class="card-title mb-3" id="health-title-oauth">{{ t('admin_server.health_email') }}</h6>
                                 <div class="health-icon mb-3">
                                     <i class="bi bi-envelope text-secondary" style="font-size: 3rem;" id="health-icon-oauth"></i>
                                 </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-oauth">Unknown</span>
-                                <p class="small text-muted mb-2" id="health-message-oauth">Not checked yet</p>
+                                <span class="badge bg-secondary mb-2" id="health-badge-oauth">{{ t('admin_server.status_unknown') }}</span>
+                                <p class="small text-muted mb-2" id="health-message-oauth">{{ t('admin_server.not_checked_yet') }}</p>
                                 <p class="small text-muted mb-3" id="health-meta-oauth">
                                     <span id="health-latency-oauth">-</span> • <span id="health-checked-oauth">-</span>
                                 </p>
                                 <div class="mt-auto">
                                     <button class="btn btn-sm btn-outline-primary me-1" id="health-retest-oauth" onclick="retestOauth()">
-                                        <i class="bi bi-arrow-clockwise"></i> Retest
+                                        <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
                                     </button>
                                     <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('email')">
-                                        <i class="bi bi-gear"></i> Settings
+                                        <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
                                     </button>
                                 </div>
                             </div>
@@ -861,21 +861,21 @@
                     <div class="col-md-6 col-lg-3">
                         <div class="card h-100 health-box" id="health-box-omdb">
                             <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-3">OMDb API</h6>
+                                <h6 class="card-title mb-3">{{ t('admin_server.health_omdb') }}</h6>
                                 <div class="health-icon mb-3">
                                     <i class="bi bi-film text-secondary" style="font-size: 3rem;" id="health-icon-omdb"></i>
                                 </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-omdb">Unknown</span>
-                                <p class="small text-muted mb-2" id="health-message-omdb">Not checked yet</p>
+                                <span class="badge bg-secondary mb-2" id="health-badge-omdb">{{ t('admin_server.status_unknown') }}</span>
+                                <p class="small text-muted mb-2" id="health-message-omdb">{{ t('admin_server.not_checked_yet') }}</p>
                                 <p class="small text-muted mb-3" id="health-meta-omdb">
                                     <span id="health-latency-omdb">-</span> • <span id="health-checked-omdb">-</span>
                                 </p>
                                 <div class="mt-auto">
                                     <button class="btn btn-sm btn-outline-primary me-1" id="health-retest-omdb" onclick="retestOmdb()">
-                                        <i class="bi bi-arrow-clockwise"></i> Retest
+                                        <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
                                     </button>
                                     <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('omdb')">
-                                        <i class="bi bi-gear"></i> Settings
+                                        <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
                                     </button>
                                 </div>
                             </div>
@@ -890,17 +890,17 @@
                                 <div class="health-icon mb-3">
                                     <i class="bi bi-puzzle text-muted" style="font-size: 3rem;" id="health-icon-integration2"></i>
                                 </div>
-                                <span class="badge bg-secondary mb-2" id="health-badge-integration2">Disabled</span>
-                                <p class="small text-muted mb-2" id="health-message-integration2">Not enabled</p>
+                                <span class="badge bg-secondary mb-2" id="health-badge-integration2">{{ t('admin_server.status_disabled') }}</span>
+                                <p class="small text-muted mb-2" id="health-message-integration2">{{ t('admin_server.not_enabled') }}</p>
                                 <p class="small text-muted mb-3" id="health-meta-integration2">
                                     <span id="health-latency-integration2">-</span> • <span id="health-checked-integration2">-</span>
                                 </p>
                                 <div class="mt-auto">
                                     <button class="btn btn-sm btn-outline-secondary me-1" id="health-retest-integration2" disabled>
-                                        <i class="bi bi-arrow-clockwise"></i> Retest
+                                        <i class="bi bi-arrow-clockwise"></i> {{ t('admin_server.retest') }}
                                     </button>
                                     <button class="btn btn-sm btn-outline-secondary" onclick="navigateToSettings('integration2')">
-                                        <i class="bi bi-gear"></i> Settings
+                                        <i class="bi bi-gear"></i> {{ t('admin_server.settings') }}
                                     </button>
                                 </div>
                             </div>
@@ -910,7 +910,7 @@
 
                 <div class="mt-3">
                     <button class="btn btn-primary btn-sm" id="runHealthCheckBtn" onclick="runHealthCheck()">
-                        <i class="bi bi-arrow-clockwise me-1"></i>Check All Systems
+                        <i class="bi bi-arrow-clockwise me-1"></i>{{ t('admin_server.check_all_systems') }}
                     </button>
                 </div>
 

@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - Radarr
+    {{ t('integrations.settings') }} - Radarr
 {% endblock %}
 
 {% block scripts %}
@@ -20,20 +20,20 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
-                <h5>Radarr Watchlist sync</h5>
+                <h5>{{ t('integration_radarr.sync_heading') }}</h5>
 
                 <p class="text-muted" style="margin-bottom: 0.5rem">
-                    Automatically sync your watchlist with Radarr using its <a href="https://wiki.servarr.com/radarr/supported#stevenluimport" target="_blank">lists import feature</a>.
+                    {{ t('integration_radarr.sync_intro_pre') }} <a href="https://wiki.servarr.com/radarr/supported#stevenluimport" target="_blank">{{ t('integration_radarr.lists_import_feature') }}</a>.
                 </p>
 
                 <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
-                    <b>How to add the watchlist feed url in radarr</b>
+                    <b>{{ t('integration_radarr.how_to_heading') }}</b>
                     <br style="margin-bottom: 0.5rem">
                     <ul style="margin-bottom: 0">
-                        <li>Go to your Radarr Settings and select "Lists"</li>
-                        <li>Click on the plus to add a new list</li>
-                        <li>In the section Advanced List select "StevenLu Custom"</li>
-                        <li>Copy the Pathary feed URL to the "URL" input in Radarr and save</li>
+                        <li>{{ t('integration_radarr.li_settings') }}</li>
+                        <li>{{ t('integration_radarr.li_add') }}</li>
+                        <li>{{ t('integration_radarr.li_stevenlu') }}</li>
+                        <li>{{ t('integration_radarr.li_copy') }}</li>
                     </ul>
                 </div>
 
@@ -49,14 +49,14 @@
                     <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
                          role="alert"
                          style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                        Radarr feed disabled - {% if currentUserIsAdmin == true %}<a href="{{ applicationUrl }}/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
+                        {{ t('integration_radarr.feed_disabled') }} - {% if currentUserIsAdmin == true %}<a href="{{ applicationUrl }}/settings/server/general">{{ t('integrations.application_url') }}</a>{% else %}{{ t('integrations.application_url') }}{% endif %} {{ t('integrations.required') }}
                     </div>
                 </div>
 
                 <button id="deleteRadarrFeedButton" type="button" class="btn btn-danger {% if radarrFeedUrl == '-' %}disabled{% endif %}" data-bs-target="#confirmDeleteModal" data-bs-toggle="modal">
-                    Delete url
+                    {{ t('integrations.delete_url') }}
                 </button>
-                <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" data-bs-target="#confirmRegenerationModal" data-bs-toggle="modal">Regenerate url</button>
+                <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" data-bs-target="#confirmRegenerationModal" data-bs-toggle="modal">{{ t('integrations.regenerate_url') }}</button>
             </div>
         </div>
 
@@ -64,14 +64,14 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Confirm regeneration</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">{{ t('integration_radarr.confirm_regen_title') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('integrations.close') }}"></button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to regenerate your Radarr feed url?
+                        {{ t('integration_radarr.confirm_regen_body') }}
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-primary" onclick="regenerateRadarrFeedId()" data-bs-dismiss="modal" data-bs-target="#confirmRegenerationModal">Confirm</a>
+                        <a class="btn btn-primary" onclick="regenerateRadarrFeedId()" data-bs-dismiss="modal" data-bs-target="#confirmRegenerationModal">{{ t('integrations.confirm') }}</a>
                     </div>
                 </div>
             </div>
@@ -80,14 +80,14 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Confirm deletion</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">{{ t('integration_radarr.confirm_delete_title') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('integrations.close') }}"></button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete your Radarr feed url?
+                        {{ t('integration_radarr.confirm_delete_body') }}
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-danger" onclick="deleteRadarrFeedId()" data-bs-dismiss="modal" data-bs-target="#confirmDeleteModal">Confirm</a>
+                        <a class="btn btn-danger" onclick="deleteRadarrFeedId()" data-bs-dismiss="modal" data-bs-target="#confirmDeleteModal">{{ t('integrations.confirm') }}</a>
                     </div>
                 </div>
             </div>

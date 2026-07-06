@@ -1,42 +1,42 @@
 <div class="card admin-card">
     <div class="card-header">
-        <i class="bi bi-film me-2"></i>Movie Management
+        <i class="bi bi-film me-2"></i>{{ t('admin_movies.title') }}
     </div>
     <div class="card-body">
         <p class="text-muted">
-            Manage movies in your Pathary instance. Delete movies, edit metadata, remove ratings, and sync with TMDB.
+            {{ t('admin_movies.intro') }}
         </p>
 
         <!-- Movie Search Section -->
         <div class="row g-3 mb-4">
             <div class="col-md-8">
-                <label for="movieSearch" class="form-label">Search Movies</label>
+                <label for="movieSearch" class="form-label">{{ t('admin_movies.search_movies') }}</label>
                 <input type="text"
                        class="form-control"
                        id="movieSearch"
-                       placeholder="Search by title, TMDB ID, or IMDB ID..."
+                       placeholder="{{ t('admin_movies.search_placeholder') }}"
                        autocomplete="off">
             </div>
             <div class="col-md-4 d-flex align-items-end">
                 <button class="btn btn-primary w-100" onclick="searchMovies()">
-                    <i class="bi bi-search me-1"></i>Search
+                    <i class="bi bi-search me-1"></i>{{ t('admin_movies.search_button') }}
                 </button>
             </div>
         </div>
 
         <!-- Search Results -->
         <div id="movieSearchResults" class="d-none">
-            <h6 class="border-bottom pb-2 mb-3">Search Results</h6>
+            <h6 class="border-bottom pb-2 mb-3">{{ t('admin_movies.search_results') }}</h6>
             <div id="movieResultsList" class="list-group mb-3"></div>
         </div>
 
         <!-- Selected Movie Details -->
         <div id="movieDetails" class="d-none">
-            <h6 class="border-bottom pb-2 mb-3">Movie Details</h6>
+            <h6 class="border-bottom pb-2 mb-3">{{ t('admin_movies.movie_details') }}</h6>
 
             <div class="row">
                 <div class="col-md-3 text-center mb-3">
-                    <img id="moviePoster" src="" alt="Movie Poster" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                    <img id="moviePoster" src="" alt="{{ t('admin_movies.movie_poster_alt') }}" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
                 </div>
                 <div class="col-md-9">
                     <h4 id="movieTitle" class="mb-2"></h4>
@@ -47,17 +47,17 @@
                     </p>
 
                     <div class="mb-3">
-                        <h6>Synopsis</h6>
+                        <h6>{{ t('admin_movies.synopsis') }}</h6>
                         <p id="movieOverview" class="text-muted small"></p>
                     </div>
 
                     <div class="mb-3">
-                        <h6>Statistics</h6>
+                        <h6>{{ t('admin_movies.statistics') }}</h6>
                         <div class="row g-2">
                             <div class="col-md-4">
                                 <div class="card bg-body-secondary">
                                     <div class="card-body py-2 px-3">
-                                        <div class="small text-muted">Total Ratings</div>
+                                        <div class="small text-muted">{{ t('admin_movies.total_ratings') }}</div>
                                         <div class="h5 mb-0" id="movieRatingCount">-</div>
                                     </div>
                                 </div>
@@ -65,7 +65,7 @@
                             <div class="col-md-4">
                                 <div class="card bg-body-secondary">
                                     <div class="card-body py-2 px-3">
-                                        <div class="small text-muted">Watch Dates</div>
+                                        <div class="small text-muted">{{ t('admin_movies.watch_dates') }}</div>
                                         <div class="h5 mb-0" id="movieWatchCount">-</div>
                                     </div>
                                 </div>
@@ -73,7 +73,7 @@
                             <div class="col-md-4">
                                 <div class="card bg-body-secondary">
                                     <div class="card-body py-2 px-3">
-                                        <div class="small text-muted">Avg Rating</div>
+                                        <div class="small text-muted">{{ t('admin_movies.avg_rating') }}</div>
                                         <div class="h5 mb-0" id="movieAvgRating">-</div>
                                     </div>
                                 </div>
@@ -84,13 +84,13 @@
                     <!-- Action Buttons -->
                     <div class="btn-group mb-3" role="group">
                         <button class="btn btn-outline-primary" onclick="syncMovieFromTMDB()">
-                            <i class="bi bi-arrow-clockwise me-1"></i>Sync from TMDB
+                            <i class="bi bi-arrow-clockwise me-1"></i>{{ t('admin_movies.sync_from_tmdb') }}
                         </button>
                         <button class="btn btn-outline-secondary" onclick="viewMovieRatings()">
-                            <i class="bi bi-star me-1"></i>View All Ratings
+                            <i class="bi bi-star me-1"></i>{{ t('admin_movies.view_all_ratings') }}
                         </button>
                         <button class="btn btn-outline-danger" onclick="confirmDeleteMovie()">
-                            <i class="bi bi-trash me-1"></i>Delete Movie
+                            <i class="bi bi-trash me-1"></i>{{ t('admin_movies.delete_movie') }}
                         </button>
                     </div>
                 </div>
@@ -98,16 +98,16 @@
 
             <!-- Ratings List -->
             <div id="movieRatingsList" class="d-none mt-4">
-                <h6 class="border-bottom pb-2 mb-3">User Ratings</h6>
+                <h6 class="border-bottom pb-2 mb-3">{{ t('admin_movies.user_ratings') }}</h6>
                 <div class="table-responsive">
                     <table class="table table-sm table-hover">
                         <thead>
                             <tr>
-                                <th>User</th>
-                                <th>Rating</th>
-                                <th>Watched Date</th>
-                                <th>Location</th>
-                                <th>Actions</th>
+                                <th>{{ t('admin_movies.th_user') }}</th>
+                                <th>{{ t('admin_movies.th_rating') }}</th>
+                                <th>{{ t('admin_movies.th_watched_date') }}</th>
+                                <th>{{ t('admin_movies.th_location') }}</th>
+                                <th>{{ t('admin_movies.th_actions') }}</th>
                             </tr>
                         </thead>
                         <tbody id="ratingsTableBody"></tbody>
@@ -118,20 +118,20 @@
 
         <!-- Locations Management Section -->
         <div class="mt-5 pt-4 border-top">
-            <h6 class="mb-3"><i class="bi bi-pin-map-fill me-2"></i>Watch Locations</h6>
+            <h6 class="mb-3"><i class="bi bi-pin-map-fill me-2"></i>{{ t('admin_movies.watch_locations') }}</h6>
             <p class="text-muted small mb-3">
-                Manage system-wide locations available to all users when logging movie watches.
+                {{ t('admin_movies.watch_locations_intro') }}
             </p>
 
             <!-- Add New Location Form -->
             <div class="row g-3 mb-4">
                 <div class="col-md-8">
-                    <label for="newLocationName" class="form-label">Location Name</label>
-                    <input type="text" class="form-control" id="newLocationName" placeholder="e.g., Home, Cinema, Other">
+                    <label for="newLocationName" class="form-label">{{ t('admin_movies.location_name') }}</label>
+                    <input type="text" class="form-control" id="newLocationName" placeholder="{{ t('admin_movies.location_name_placeholder') }}">
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
                     <button class="btn btn-primary w-100" onclick="createLocation()">
-                        <i class="bi bi-plus-circle me-1"></i>Add Location
+                        <i class="bi bi-plus-circle me-1"></i>{{ t('admin_movies.add_location') }}
                     </button>
                 </div>
             </div>
@@ -144,15 +144,15 @@
 
         <!-- Bulk Operations Section -->
         <div class="mt-5 pt-4 border-top">
-            <h6 class="mb-3"><i class="bi bi-tools me-2"></i>Bulk Operations</h6>
+            <h6 class="mb-3"><i class="bi bi-tools me-2"></i>{{ t('admin_movies.bulk_operations') }}</h6>
             <div class="row g-2">
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="card-title">Cleanup Orphaned Posters</h6>
-                            <p class="card-text small text-muted">Remove poster images for deleted movies</p>
+                            <h6 class="card-title">{{ t('admin_movies.cleanup_orphaned_posters') }}</h6>
+                            <p class="card-text small text-muted">{{ t('admin_movies.cleanup_orphaned_posters_desc') }}</p>
                             <button class="btn btn-sm btn-outline-danger" onclick="cleanupOrphanedPosters()">
-                                <i class="bi bi-trash me-1"></i>Run Cleanup
+                                <i class="bi bi-trash me-1"></i>{{ t('admin_movies.run_cleanup') }}
                             </button>
                         </div>
                     </div>
@@ -160,10 +160,10 @@
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="card-title">Refresh All TMDB Data</h6>
-                            <p class="card-text small text-muted">Queue job to update all movie metadata from TMDB</p>
+                            <h6 class="card-title">{{ t('admin_movies.refresh_all_tmdb') }}</h6>
+                            <p class="card-text small text-muted">{{ t('admin_movies.refresh_all_tmdb_desc') }}</p>
                             <button class="btn btn-sm btn-outline-primary" onclick="refreshAllTMDB()">
-                                <i class="bi bi-arrow-clockwise me-1"></i>Queue Job
+                                <i class="bi bi-arrow-clockwise me-1"></i>{{ t('admin_movies.queue_job') }}
                             </button>
                         </div>
                     </div>
