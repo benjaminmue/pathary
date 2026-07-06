@@ -21,6 +21,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     # Public Home #
     ###############
     $routes->add('GET', '/', [Web\PublicHomeController::class, 'index'], [Web\Middleware\RedirectToInitIfNeeded::class]);
+    $routes->add('GET', '/language/{locale:[a-z]{2}}', [Web\LanguageController::class, 'switchLanguage']);
     $routes->add('GET', '/movie/{id:[0-9]+}', [Web\PublicMovieController::class, 'detail']);
     $routes->add('POST', '/movie/{id:[0-9]+}/rate', [Web\RateMovieController::class, 'rate'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/movie/{id:[0-9]+}/rate/delete', [Web\RateMovieController::class, 'deleteRating'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);

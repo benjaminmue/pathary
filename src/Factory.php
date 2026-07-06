@@ -361,6 +361,11 @@ class Factory
         // CSRF token function for form protection
         $twig->addFunction(new TwigFunction('csrf_token', [$container->get(CsrfTokenService::class), 'generateToken']));
 
+        // i18n: t('key') translates, locale() returns the active locale (de|en)
+        $translator = $container->get(Service\Translation\Translator::class);
+        $twig->addFunction(new TwigFunction('t', [$translator, 'trans']));
+        $twig->addFunction(new TwigFunction('locale', [$translator, 'getLocale']));
+
         return $twig;
     }
 

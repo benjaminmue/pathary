@@ -11,36 +11,39 @@
             <span>{{ applicationName ?? 'Pathary' }}</span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAppContent" aria-controls="navbarAppContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAppContent" aria-controls="navbarAppContent" aria-expanded="false" aria-label="{{ t('nav.toggle_navigation') }}">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarAppContent">
             <form class="d-flex mx-auto my-2 my-lg-0" role="search" style="max-width: 400px; width: 100%;" action="{{ applicationUrl }}/search" method="get">
-                <input class="form-control" type="search" name="q" placeholder="Search movies..." aria-label="Search">
+                <input class="form-control" type="search" name="q" placeholder="{{ t('nav.search_placeholder') }}" aria-label="{{ t('nav.search') }}">
             </form>
 
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                 <li class="nav-item me-2">
-                    <div class="form-check form-switch mb-0" title="Toggle dark mode">
+                    {% include 'partials/language_switcher.twig' %}
+                </li>
+                <li class="nav-item me-2">
+                    <div class="form-check form-switch mb-0" title="{{ t('nav.toggle_dark_mode') }}">
                         <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle" style="cursor: pointer;">
-                        <label class="form-check-label visually-hidden" for="darkModeToggle">Dark mode</label>
+                        <label class="form-check-label visually-hidden" for="darkModeToggle">{{ t('nav.dark_mode') }}</label>
                         <span id="themeIcon" style="font-size: 1.1rem;">🌙</span>
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ applicationUrl }}/movies">All Movies</a>
+                    <a class="nav-link" href="{{ applicationUrl }}/movies">{{ t('nav.all_movies') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ applicationUrl }}/profile">Profile</a>
+                    <a class="nav-link" href="{{ applicationUrl }}/profile">{{ t('nav.profile') }}</a>
                 </li>
                 {% if currentUserIsAdmin %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ applicationUrl }}/admin"><i class="bi bi-shield-lock me-1"></i>Admin</a>
+                    <a class="nav-link" href="{{ applicationUrl }}/admin"><i class="bi bi-shield-lock me-1"></i>{{ t('nav.admin') }}</a>
                 </li>
                 {% endif %}
                 <li class="nav-item">
-                    <button class="nav-link btn btn-link" onclick="logoutAndRedirect()" style="cursor: pointer;">Logout</button>
+                    <button class="nav-link btn btn-link" onclick="logoutAndRedirect()" style="cursor: pointer;">{{ t('nav.logout') }}</button>
                 </li>
             </ul>
         </div>
