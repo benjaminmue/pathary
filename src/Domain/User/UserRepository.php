@@ -632,6 +632,29 @@ class UserRepository
         );
     }
 
+    public function findLanguage(int $userId) : ?string
+    {
+        $language = $this->dbConnection->fetchOne(
+            'SELECT language FROM `user` WHERE id = ?',
+            [$userId],
+        );
+
+        return $language === false || $language === null ? null : (string)$language;
+    }
+
+    public function updateLanguage(int $userId, ?string $language) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'language' => $language,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateDisplayCharacterNames(int $userId, bool $displayCharacterNames) : void
     {
         $this->dbConnection->update(

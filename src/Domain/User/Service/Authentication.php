@@ -280,6 +280,13 @@ class Authentication
         if ($deviceName === self::PATHARY_WEB_CLIENT) {
             $this->setAuthenticationCookieAndNewSession($user->getId(), $token, $authTokenExpirationDate);
 
+            // Apply the user's saved language preference to the fresh session, so
+            // the UI renders in their language across logins and devices.
+            $language = $this->userApi->findLanguage($user->getId());
+            if ($language !== null && $language !== '') {
+                $this->sessionWrapper->set('locale', $language);
+            }
+
             // Create trusted device if requested and 2FA is enabled
             if ($trustDevice === true && $this->userApi->findTotpUri($user->getId()) !== null) {
                 $deviceToken = $this->trustedDeviceService->createTrustedDevice(

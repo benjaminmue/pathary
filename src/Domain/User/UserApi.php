@@ -376,6 +376,16 @@ class UserApi
         $this->repository->updateDateFormatId($userId, $dateFormat);
     }
 
+    public function findLanguage(int $userId) : ?string
+    {
+        return $this->repository->findLanguage($userId);
+    }
+
+    public function updateLanguage(int $userId, ?string $language) : void
+    {
+        $this->repository->updateLanguage($userId, $language);
+    }
+
     public function updateDisplayCharacterNames(int $userId, bool $displayCharacterNames) : void
     {
         $this->repository->updateDisplayCharacterNames($userId, $displayCharacterNames);
