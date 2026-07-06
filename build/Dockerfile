@@ -70,8 +70,11 @@ HEALTHCHECK --timeout=10s CMD curl --silent --fail http://127.0.0.1:8080/fpm-pin
 
 FROM base AS production
 
-ARG APPLICATION_VERSION
-ENV APPLICATION_VERSION=${APPLICATION_VERSION}
+# The CI passes the git tag as the "VERSION" build-arg (docker-image.yml); expose
+# it to the app as APPLICATION_VERSION so the running instance shows the release
+# instead of "unknown".
+ARG VERSION=unknown
+ENV APPLICATION_VERSION=${VERSION}
 
 RUN composer install --no-dev
 
