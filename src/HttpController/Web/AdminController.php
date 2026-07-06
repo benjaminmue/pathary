@@ -20,7 +20,7 @@ class AdminController
     private const array TAB_REGISTRY = [
         'movies' => [
             'id' => 'movies',
-            'label' => 'Movie Management',
+            'label' => 'admin.tab_movies',
             'icon' => 'bi bi-film',
             'route' => '/admin/movies',
             'template' => 'page/admin/tabs/movies.html.twig',
@@ -28,7 +28,7 @@ class AdminController
         ],
         'users' => [
             'id' => 'users',
-            'label' => 'User Management',
+            'label' => 'admin.tab_users',
             'icon' => 'bi bi-people',
             'route' => '/admin/users',
             'template' => 'page/admin/tabs/users.html.twig',
@@ -36,7 +36,7 @@ class AdminController
         ],
         'server' => [
             'id' => 'server',
-            'label' => 'Server Management',
+            'label' => 'admin.tab_server',
             'icon' => 'bi bi-server',
             'route' => '/admin/server',
             'template' => 'page/admin/tabs/server.html.twig',
@@ -44,7 +44,7 @@ class AdminController
         ],
         'integrations' => [
             'id' => 'integrations',
-            'label' => 'Integrations',
+            'label' => 'admin.tab_integrations',
             'icon' => 'bi bi-plug',
             'route' => '/admin/integrations',
             'template' => 'page/admin/tabs/integrations.html.twig',
@@ -52,7 +52,7 @@ class AdminController
         ],
         'events' => [
             'id' => 'events',
-            'label' => 'Events',
+            'label' => 'admin.tab_events',
             'icon' => 'bi bi-activity',
             'route' => '/admin/events',
             'template' => 'page/admin/tabs/events.html.twig',

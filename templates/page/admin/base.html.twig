@@ -206,7 +206,7 @@
     <div class="pds-root" style="background: var(--pds-bg); min-height: 100%;">
         <main class="pds-admin">
             <div class="pds-admin-head">
-                <h1>{{ t('admin.panel_title') }}</h1>
+                <h1>{{ t('admin.title_short') }}</h1>
                 <p>{{ t('admin.panel_subtitle') }}</p>
             </div>
 
@@ -215,8 +215,7 @@
                     <a class="pds-admin-tab {% if activeTab == tab.id %}active{% endif %}"
                        href="{{ applicationUrl }}{{ tab.route }}"
                        aria-current="{% if activeTab == tab.id %}page{% endif %}">
-                        <i class="{{ tab.icon }}"></i>
-                        <span>{{ tab.label }}</span>
+                        <span>{{ t(tab.label) }}</span>
                     </a>
                 {% endfor %}
             </div>
