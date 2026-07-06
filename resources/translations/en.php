@@ -703,6 +703,7 @@ return [
     'profile.logout' => 'Logout',
     'profile.name_hint' => 'Only letters and numbers, 2-24 characters.',
     'profile.photo' => 'Profile Photo',
+    'profile.profile_card_subtitle' => 'Your public identity in the movie club',
     'profile.remove' => 'Remove',
     'profile.save_changes' => 'Save Changes',
     'profile.sign_out' => 'Sign Out',
