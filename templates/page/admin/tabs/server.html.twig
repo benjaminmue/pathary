@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row pds-server">
     <!-- Settings Accordion (API, Application, Email) -->
     <div class="accordion" id="serverSettingsAccordion">
     <!-- API Settings Card -->
@@ -921,123 +921,559 @@
 </div>
 
 <style>
-    /* Status badge styling */
-    #tmdbKeyStatus .badge,
-    #omdbKeyStatus .badge {
-        line-height: 1.2;
+    /* ===== Server tab — pds design language (uses --pds-* tokens from .pds-root) =====
+       CSS-only reskin. The DOM and every script/wiring detail (form ids, input
+       names/ids, onclick handlers, fetch endpoints, CSRF-token usage, data-bs-* collapse /
+       tab / modal mechanics, Twig conditionals, CSRF tokens) are preserved byte-for-byte. Bootstrap
+       component classes (.accordion/.nav-tabs/.badge/.btn/.form-control/.card/.modal)
+       are restyled in place, so any className the scripts reassign at runtime
+       (e.g. health badges, the API save button) still renders in the pds look.
+       Scoped under .pds-server so nothing leaks to other tabs or global chrome. */
+
+    .pds-server {
+        color: var(--pds-text);
+        font-family: var(--pds-font);
     }
 
-    /* Status badge gap spacing */
-    #tmdbKeyStatus .gap-2 > * {
-        margin-right: 0.5rem;
+    .pds-server .font-monospace,
+    .pds-server code {
+        font-family: var(--pds-font-mono) !important;
     }
 
-    #tmdbKeyStatus .gap-2 > *:last-child {
-        margin-right: 0;
+    .pds-server code {
+        color: var(--pds-gold);
+        background: var(--pds-surface-2);
+        border: 1px solid var(--pds-hair);
+        border-radius: 4px;
+        padding: 1px 6px;
+        font-size: 0.85em;
     }
 
-    #omdbKeyStatus .gap-2 > * {
-        margin-right: 0.5rem;
-    }
+    /* ---- Text/utility colour mapping ---- */
+    .pds-server .text-muted { color: var(--pds-muted) !important; }
+    .pds-server .text-secondary { color: var(--pds-dim) !important; }
+    .pds-server .text-primary { color: var(--pds-text) !important; }
+    .pds-server .text-success { color: var(--pds-success) !important; }
+    .pds-server .text-danger { color: var(--pds-danger) !important; }
+    .pds-server .text-warning { color: var(--pds-gold) !important; }
+    .pds-server .text-info { color: var(--pds-muted) !important; }
 
-    #omdbKeyStatus .gap-2 > *:last-child {
-        margin-right: 0;
-    }
+    .pds-server a:not(.pds-btn):not(.badge) { color: var(--pds-gold); text-decoration: none; }
+    .pds-server a:not(.pds-btn):not(.badge):hover { text-decoration: underline; }
+    .pds-server .alert-link { color: var(--pds-gold) !important; font-weight: 600; }
 
-    /* Accordion Styling - Match System Health Card */
-    #serverSettingsAccordion .accordion-item {
-        border: none;
-        box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
-        margin-bottom: 1.5rem;
-        background-color: transparent;
-    }
+    .pds-server hr { border-color: var(--pds-hair); opacity: 1; }
+    .pds-server .border-top { border-top: 1px solid var(--pds-hair) !important; }
 
-    #serverSettingsAccordion .accordion-header {
-        margin-bottom: 0;
-    }
-
-    #serverSettingsAccordion .accordion-button {
-        background-color: var(--bs-secondary-bg);
-        color: var(--bs-body-color);
-        border: none;
-        border-bottom: 2px solid var(--bs-border-color);
+    /* ---- Labels / help text ---- */
+    .pds-server .form-label {
+        font-size: 13px;
         font-weight: 600;
-        padding: 1rem 1.25rem;
+        color: var(--pds-muted);
+        margin-bottom: 6px;
     }
 
-    #serverSettingsAccordion .accordion-button:not(.collapsed) {
-        background-color: var(--bs-secondary-bg);
-        color: var(--bs-body-color);
+    .pds-server .form-text {
+        font-size: 12px;
+        color: var(--pds-dim);
+    }
+
+    /* =======================================================================
+       Collapsible settings cards (Bootstrap accordion → pds card)
+       Bootstrap collapse mechanics (data-bs-toggle / data-bs-target / .show /
+       data-bs-parent) are untouched — only the chrome is restyled.
+       ======================================================================= */
+    .pds-server #serverSettingsAccordion .accordion-item {
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r);
+        background: var(--pds-surface);
         box-shadow: none;
-        border-bottom: 2px solid var(--bs-border-color);
+        margin-bottom: var(--pds-s-lg);
+        overflow: hidden;
     }
 
-    #serverSettingsAccordion .accordion-button:focus {
+    .pds-server #serverSettingsAccordion .accordion-header { margin-bottom: 0; }
+
+    .pds-server #serverSettingsAccordion .accordion-button {
+        width: 100%;
+        background: var(--pds-surface);
+        color: var(--pds-text);
+        border: none;
+        border-bottom: 1px solid transparent;
+        font-family: var(--pds-font);
+        font-weight: 600;
+        font-size: 15px;
+        padding: 18px 22px;
         box-shadow: none;
-        border-color: var(--bs-border-color);
     }
 
-    #serverSettingsAccordion .accordion-button::after {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23adb5bd'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    .pds-server #serverSettingsAccordion .accordion-button:not(.collapsed) {
+        background: var(--pds-surface);
+        color: var(--pds-text);
+        border-bottom: 1px solid var(--pds-hair);
+        box-shadow: none;
     }
 
-    #serverSettingsAccordion .accordion-button:not(.collapsed)::after {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23adb5bd'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    .pds-server #serverSettingsAccordion .accordion-button:focus {
+        box-shadow: none;
+        border-color: transparent;
     }
 
-    #serverSettingsAccordion .accordion-body {
-        padding: 1.5rem 1.25rem;
-        background-color: var(--bs-body-bg);
+    .pds-server #serverSettingsAccordion .accordion-button:not(.collapsed):focus {
+        border-bottom-color: var(--pds-hair);
     }
 
-    /* System Health Card - Match accordion header thickness */
-    .health-card-header {
-        padding: 1rem 1.25rem !important;
+    /* Gold chevron (Bootstrap rotates it open/closed automatically) */
+    .pds-server #serverSettingsAccordion .accordion-button::after,
+    .pds-server #serverSettingsAccordion .accordion-button:not(.collapsed)::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23FBBC09'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        width: 1rem;
+        height: 1rem;
+        background-size: 1rem;
     }
 
-    /* Health Box Styling */
-    .health-box {
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
+    .pds-server #serverSettingsAccordion .accordion-button i {
+        color: var(--pds-gold);
     }
 
-    .health-box:hover:not(.health-box-disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    .pds-server #serverSettingsAccordion .accordion-body {
+        padding: 22px;
+        background: var(--pds-surface);
+        color: var(--pds-text);
     }
 
-    .health-box-disabled {
-        opacity: 0.6;
+    /* Intro / helper paragraphs inside bodies */
+    .pds-server .accordion-body > p.text-muted { font-size: 13px; }
+
+    /* =======================================================================
+       Inputs, selects, input-groups
+       ======================================================================= */
+    .pds-server .form-control,
+    .pds-server .form-select {
+        font-family: var(--pds-font);
+        font-size: 14px;
+        color: var(--pds-text);
+        background-color: var(--pds-bg);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        padding: 10px 14px;
+        box-shadow: none;
     }
 
-    .health-box-disabled .card-body {
-        background-color: var(--bs-secondary-bg);
+    .pds-server .form-control.font-monospace { font-family: var(--pds-font-mono); }
+
+    .pds-server .form-control:focus,
+    .pds-server .form-select:focus {
+        background-color: var(--pds-bg);
+        color: var(--pds-text);
+        border-color: var(--pds-gold);
+        box-shadow: none;
     }
 
-    .health-icon {
-        line-height: 1;
+    .pds-server .form-control::placeholder { color: var(--pds-dim); }
+
+    .pds-server .form-control[readonly],
+    .pds-server .form-control:disabled {
+        background-color: var(--pds-surface-2);
+        color: var(--pds-muted);
+        opacity: 1;
     }
 
-    .health-icon i {
-        transition: color 0.3s ease;
+    .pds-server .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23A9B0BA'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
     }
 
-    /* Dark mode adjustments */
-    [data-bs-theme="dark"] .health-box-disabled {
-        opacity: 0.5;
+    /* input-group: keep the trailing eye/copy/save buttons flush */
+    .pds-server .input-group .form-control { position: relative; }
+    .pds-server .input-group > .btn {
+        border: 1px solid var(--pds-border);
+        border-left: none;
     }
 
-    [data-bs-theme="dark"] .health-box {
-        border-color: var(--bs-border-color);
+    /* Checkbox / switch */
+    .pds-server .form-check-input {
+        background-color: var(--pds-bg);
+        border-color: var(--pds-border);
+    }
+    .pds-server .form-check-input:checked {
+        background-color: var(--pds-gold);
+        border-color: var(--pds-gold);
+    }
+    .pds-server .form-check-input:focus {
+        border-color: var(--pds-gold);
+        box-shadow: none;
+    }
+    .pds-server .form-check-label { color: var(--pds-text); font-size: 14px; }
+
+    /* =======================================================================
+       Buttons (restyle Bootstrap variants in place)
+       ======================================================================= */
+    .pds-server .btn {
+        font-family: var(--pds-font);
+        font-weight: 600;
+        border-radius: var(--pds-r-sm);
+        box-shadow: none;
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 991.98px) {
-        .health-box .btn-sm {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
+    .pds-server .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+    /* Primary → gold */
+    .pds-server .btn-primary,
+    .pds-server .btn-primary:hover,
+    .pds-server .btn-primary:focus,
+    .pds-server .btn-primary:active {
+        background-color: var(--pds-gold) !important;
+        border-color: var(--pds-gold) !important;
+        color: #12140F !important;
+        box-shadow: none !important;
+    }
+    .pds-server .btn-primary:hover { filter: brightness(1.06); }
+
+    /* Success (Saved / Use OAuth / Connect) → pds success */
+    .pds-server .btn-success,
+    .pds-server .btn-success:hover,
+    .pds-server .btn-success:focus,
+    .pds-server .btn-success:active {
+        background-color: var(--pds-success) !important;
+        border-color: var(--pds-success) !important;
+        color: #0E1710 !important;
+        box-shadow: none !important;
+    }
+    .pds-server .btn-success:hover { filter: brightness(1.06); }
+
+    /* Warning (Generate encryption key) → treat as gold CTA */
+    .pds-server .btn-warning,
+    .pds-server .btn-warning:hover,
+    .pds-server .btn-warning:focus,
+    .pds-server .btn-warning:active {
+        background-color: var(--pds-gold) !important;
+        border-color: var(--pds-gold) !important;
+        color: #12140F !important;
+        box-shadow: none !important;
+    }
+    .pds-server .btn-warning:hover { filter: brightness(1.06); }
+
+    /* Ghost family: outline-secondary / outline-info / outline-primary /
+       outline-warning / secondary */
+    .pds-server .btn-outline-secondary,
+    .pds-server .btn-outline-info,
+    .pds-server .btn-outline-primary,
+    .pds-server .btn-outline-warning,
+    .pds-server .btn-secondary {
+        background: none !important;
+        border: 1px solid var(--pds-border) !important;
+        color: var(--pds-muted) !important;
+        box-shadow: none !important;
+    }
+    .pds-server .btn-outline-secondary:hover,
+    .pds-server .btn-outline-info:hover,
+    .pds-server .btn-outline-primary:hover,
+    .pds-server .btn-outline-warning:hover,
+    .pds-server .btn-secondary:hover {
+        border-color: var(--pds-gold) !important;
+        color: var(--pds-gold) !important;
+        background: none !important;
+    }
+
+    /* Danger (Remove key / Delete config) → danger-on-hover */
+    .pds-server .btn-outline-danger {
+        background: none !important;
+        border: 1px solid var(--pds-danger) !important;
+        color: var(--pds-danger) !important;
+        box-shadow: none !important;
+    }
+    .pds-server .btn-outline-danger:hover {
+        background: rgba(192, 57, 43, 0.10) !important;
+        color: var(--pds-danger) !important;
+        border-color: var(--pds-danger) !important;
+    }
+
+    .pds-server .btn:disabled { opacity: 0.55; }
+
+    /* =======================================================================
+       Badges → pills
+       ======================================================================= */
+    .pds-server .badge {
+        font-family: var(--pds-font-mono);
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 0.03em;
+        line-height: 1.4;
+        border-radius: 999px;
+        padding: 3px 10px;
+        border: 1px solid transparent;
+    }
+    .pds-server .badge.fs-6 { font-size: 12px; }
+
+    /* Configured / connected → gold pill */
+    .pds-server .badge.bg-success {
+        background-color: var(--pds-gold) !important;
+        color: #12140F !important;
+    }
+    /* Not-configured / unknown / disabled → muted bordered pill */
+    .pds-server .badge.bg-secondary {
+        background-color: transparent !important;
+        color: var(--pds-muted) !important;
+        border-color: var(--pds-border) !important;
+    }
+    /* Not-connected / degraded → amber */
+    .pds-server .badge.bg-warning {
+        background-color: rgba(251, 188, 9, 0.16) !important;
+        color: var(--pds-gold) !important;
+        border-color: rgba(251, 188, 9, 0.4) !important;
+    }
+    /* Not-configured (danger) / down → red */
+    .pds-server .badge.bg-danger {
+        background-color: rgba(192, 57, 43, 0.14) !important;
+        color: var(--pds-danger) !important;
+        border-color: rgba(192, 57, 43, 0.4) !important;
+    }
+    .pds-server .badge.bg-info {
+        background-color: var(--pds-surface-2) !important;
+        color: var(--pds-muted) !important;
+        border-color: var(--pds-border) !important;
+    }
+
+    /* Status-note lines rendered by JS under the API key status areas */
+    #tmdbKeyStatus .badge,
+    #omdbKeyStatus .badge { line-height: 1.4; }
+    #tmdbKeyStatus .gap-2 > *,
+    #omdbKeyStatus .gap-2 > * { margin-right: 0.5rem; }
+    #tmdbKeyStatus .gap-2 > *:last-child,
+    #omdbKeyStatus .gap-2 > *:last-child { margin-right: 0; }
+    .pds-server #tmdbKeyStatus .text-muted.small,
+    .pds-server #omdbKeyStatus .text-muted.small {
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+    }
+
+    /* =======================================================================
+       Sub-tab toggle (SMTP-Passwort | OAuth 2.0) → gold underline
+       Bootstrap tab mechanics (data-bs-toggle="tab") untouched.
+       ======================================================================= */
+    .pds-server .nav-tabs {
+        border-bottom: 1px solid var(--pds-border);
+        gap: var(--pds-s-lg);
+    }
+    .pds-server .nav-tabs .nav-item { margin-bottom: -1px; }
+    .pds-server .nav-tabs .nav-link {
+        font-family: var(--pds-font);
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--pds-muted);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        border-radius: 0;
+        padding: 10px 2px 12px;
+    }
+    .pds-server .nav-tabs .nav-link:hover {
+        color: var(--pds-text);
+        border-color: transparent transparent transparent;
+        border-bottom: 2px solid transparent;
+    }
+    .pds-server .nav-tabs .nav-link.active {
+        font-weight: 600;
+        color: var(--pds-text);
+        background: none;
+        border: none;
+        border-bottom: 2px solid var(--pds-gold);
+    }
+    .pds-server .nav-tabs .nav-link i { color: inherit; }
+
+    /* =======================================================================
+       Alerts → pds notices
+       ======================================================================= */
+    .pds-server .alert {
+        border-radius: var(--pds-r-sm);
+        border: 1px solid var(--pds-border);
+        font-size: 13px;
+    }
+    .pds-server .alert .alert-heading {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--pds-text);
+    }
+    /* Gold-tinted: legacy / password mode indicator + encryption key required */
+    .pds-server .alert-warning {
+        background: rgba(251, 188, 9, 0.08);
+        border-color: rgba(251, 188, 9, 0.35);
+        color: var(--pds-text);
+    }
+    /* OAuth-active mode indicator */
+    .pds-server .alert-success {
+        background: rgba(76, 175, 110, 0.10);
+        border-color: rgba(76, 175, 110, 0.35);
+        color: var(--pds-text);
+    }
+    /* Neutral informational notices */
+    .pds-server .alert-info {
+        background: var(--pds-surface-2);
+        border-color: var(--pds-border);
+        color: var(--pds-text);
+    }
+    .pds-server .alert-danger {
+        background: rgba(192, 57, 43, 0.10);
+        border-color: rgba(192, 57, 43, 0.35);
+        color: var(--pds-text);
+    }
+
+    /* PowerShell / code sample blocks */
+    .pds-server .bg-dark.text-light {
+        background: var(--pds-nav) !important;
+        color: var(--pds-text) !important;
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        font-family: var(--pds-font-mono);
+    }
+    .pds-server .bg-dark.text-light .text-success { color: var(--pds-success) !important; }
+
+    /* =======================================================================
+       System Health card (kept as a static pds card; each check as a row)
+       Health JS reassigns badge/icon classes at runtime, so these are styled
+       via Bootstrap classes + element ids only — never via added classes.
+       ======================================================================= */
+    .pds-server .card.admin-card {
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r);
+        overflow: hidden;
+    }
+    .pds-server .card.admin-card > .card-header.health-card-header {
+        background: var(--pds-surface);
+        color: var(--pds-text);
+        border-bottom: 1px solid var(--pds-hair);
+        padding: 18px 22px !important;
+        font-weight: 600;
+        font-size: 15px;
+    }
+    .pds-server .card.admin-card > .card-header.health-card-header i { color: var(--pds-gold); }
+    .pds-server .card.admin-card > .card-header.health-card-header #health-last-run {
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+    }
+    .pds-server .card.admin-card > .card-body { background: var(--pds-surface); padding: 12px 22px 22px; }
+
+    /* Stack the health checks as full-width rows */
+    .pds-server .card.admin-card .row.g-3 { --bs-gutter-y: 0; --bs-gutter-x: 0; }
+    .pds-server .card.admin-card .row.g-3 > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+        border-bottom: 1px solid var(--pds-hair);
+    }
+    .pds-server .card.admin-card .row.g-3 > [class*="col-"]:last-child { border-bottom: none; }
+
+    .pds-server .health-box {
+        background: transparent;
+        border: none !important;
+        border-radius: 0;
+        transition: none;
+        box-shadow: none;
+    }
+    .pds-server .health-box:hover { transform: none; box-shadow: none; }
+    .pds-server .health-box-disabled { opacity: 0.55; }
+
+    .pds-server .health-box .card-body {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: left !important;
+        gap: 16px;
+        padding: 14px 4px;
+        background: transparent;
+    }
+    /* Drop the large decorative status icon in row layout (status pill conveys it) */
+    .pds-server .health-box .health-icon { display: none !important; }
+
+    .pds-server .health-box .card-title {
+        flex: 0 0 140px;
+        margin: 0 !important;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--pds-text);
+    }
+    .pds-server .health-box .badge {
+        margin: 0 !important;
+        flex: 0 0 auto;
+        align-self: center;
+    }
+    /* Status message = flexible muted detail */
+    .pds-server .health-box p[id^="health-message-"] {
+        flex: 1 1 auto;
+        margin: 0 !important;
+        color: var(--pds-muted);
+        font-size: 13px;
+    }
+    /* Latency / checked meta = mono, right aligned */
+    .pds-server .health-box p[id^="health-meta-"] {
+        flex: 0 0 auto;
+        margin: 0 !important;
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+        color: var(--pds-dim);
+        text-align: right;
+        white-space: nowrap;
+    }
+    /* Button cluster pinned right */
+    .pds-server .health-box .mt-auto {
+        margin-top: 0 !important;
+        margin-left: auto;
+        flex: 0 0 auto;
+        display: inline-flex;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .pds-server #runHealthCheckBtn { margin-top: 4px; }
+
+    @media (max-width: 767.98px) {
+        .pds-server .health-box .card-body {
+            flex-wrap: wrap;
         }
+        .pds-server .health-box .card-title { flex-basis: 100%; }
+        .pds-server .health-box .mt-auto { margin-left: 0; }
     }
+
+    /* =======================================================================
+       Test-email modal (Bootstrap modal mechanics kept; pds card look)
+       ======================================================================= */
+    .pds-server #testEmailModal .modal-content {
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r);
+        color: var(--pds-text);
+        overflow: hidden;
+    }
+    .pds-server #testEmailModal .modal-header {
+        border-bottom: 1px solid var(--pds-hair);
+        padding: 20px 24px;
+    }
+    .pds-server #testEmailModal .modal-title { font-size: 15px; font-weight: 600; color: var(--pds-text); }
+    .pds-server #testEmailModal .modal-title i { color: var(--pds-gold); }
+    .pds-server #testEmailModal .modal-body { padding: 20px 24px; }
+    .pds-server #testEmailModal .modal-footer {
+        border-top: 1px solid var(--pds-hair);
+        padding: 16px 24px;
+        gap: var(--pds-s-sm);
+    }
+    .pds-server #testEmailModal .btn-close { filter: invert(0.6); opacity: 0.7; }
+
+    [data-bs-theme="light"] .pds-server #testEmailModal .btn-close,
+    [data-bs-theme="light"] .pds-server .health-box .health-icon { filter: none; }
+
+    /* Diagnostics result card blocks */
+    .pds-server #smtpDiagnosticsResults .card,
+    .pds-server #diagnosticsContent .card {
+        background: var(--pds-surface-2);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+    }
+    .pds-server #smtpDiagnosticsResults .card-header {
+        background: var(--pds-surface);
+        border-bottom: 1px solid var(--pds-hair);
+        color: var(--pds-text);
+    }
+    .pds-server #smtpDiagnosticsResults .card-header i { color: var(--pds-gold); }
 </style>
 
 <script>

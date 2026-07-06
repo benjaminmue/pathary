@@ -4,100 +4,237 @@
 
 {% block stylesheets %}
     <style>
-        .nav-tabs {
-            border-bottom: 2px solid var(--bs-border-color);
-            margin-bottom: 2rem;
+        /* ===== Admin design system tokens (--pds-*), scoped to .pds-root =====
+           Default block = dark (app default). Light overrides below via [data-bs-theme].
+           Values shared verbatim with profile/all_movies/movie_detail/search/faq. */
+        .pds-root {
+            --pds-gold: #FBBC09;
+            --pds-bg: #15171B;
+            --pds-surface: #1C1F24;
+            --pds-surface-2: #22262C;
+            --pds-border: #2A2E35;
+            --pds-hair: rgba(255, 255, 255, .06);
+            --pds-text: #F2F3F5;
+            --pds-muted: #A9B0BA;
+            --pds-dim: #7A828C;
+            --pds-nav: #101216;
+            --pds-danger: #C0392B;
+            --pds-success: #4CAF6E;
+            --pds-r: 14px;
+            --pds-r-sm: 8px;
+            --pds-s-xs: 4px;
+            --pds-s-sm: 8px;
+            --pds-s-md: 16px;
+            --pds-s-lg: 24px;
+            --pds-s-xl: 40px;
+            --pds-font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            --pds-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         }
 
-        .nav-tabs .nav-link {
-            color: var(--bs-secondary-color);
-            border: none;
-            border-bottom: 2px solid transparent;
-            padding: 1rem 0.75rem;
+        [data-bs-theme="light"] .pds-root {
+            --pds-bg: #FFFFFF;
+            --pds-surface: #FBFBFC;
+            --pds-surface-2: #F5F6F8;
+            --pds-border: #E3E6EA;
+            --pds-hair: #EEF0F3;
+            --pds-text: #15171B;
+            --pds-muted: #5B636E;
+            --pds-dim: #8A9099;
+            --pds-danger: #C0392B;
+            --pds-success: #198754;
+        }
+
+        .pds-root {
+            color: var(--pds-text);
+            font-family: var(--pds-font);
+        }
+
+        .pds-admin {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 44px 24px 72px;
+            box-sizing: border-box;
+        }
+
+        .pds-admin-head {
+            margin-bottom: 28px;
+        }
+
+        .pds-admin-head h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .pds-admin-head p {
+            font-size: 14px;
+            color: var(--pds-muted);
+            margin: 4px 0 0;
+        }
+
+        /* Tab bar */
+        .pds-admin-tabs {
+            display: flex;
+            gap: var(--pds-s-lg);
+            border-bottom: 1px solid var(--pds-border);
+            margin-bottom: 32px;
+            overflow-x: auto;
+        }
+
+        .pds-admin-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--pds-font);
+            font-size: 14px;
             font-weight: 500;
-            transition: all 0.2s;
+            color: var(--pds-muted);
+            text-decoration: none;
+            white-space: nowrap;
+            padding: 10px 2px 12px;
+            margin-bottom: -1px;
+            border-bottom: 2px solid transparent;
+            transition: color .15s ease, border-color .15s ease;
         }
 
-        .nav-tabs .nav-link:hover {
-            color: var(--bs-primary);
-            border-bottom-color: var(--bs-primary);
-            background-color: transparent;
+        .pds-admin-tab:hover {
+            color: var(--pds-text);
         }
 
-        .nav-tabs .nav-link.active {
-            color: var(--bs-primary);
-            border-bottom-color: var(--bs-primary);
-            background-color: transparent;
+        .pds-admin-tab.active {
+            font-weight: 600;
+            color: var(--pds-text);
+            border-bottom-color: var(--pds-gold);
+        }
+
+        /* Shared admin building blocks used by the tab templates */
+        .pds-admin-card {
+            background: var(--pds-surface);
+            border: 1px solid var(--pds-border);
+            border-radius: var(--pds-r);
+            overflow: hidden;
+        }
+
+        .pds-admin-card + .pds-admin-card {
+            margin-top: var(--pds-s-lg);
+        }
+
+        .pds-admin-card__pad {
+            padding: 20px 24px;
+        }
+
+        .pds-admin-card__title {
+            font-size: 15px;
             font-weight: 600;
         }
 
-        .admin-card {
-            border: none;
-            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
-            margin-bottom: 1.5rem;
+        .pds-admin-card__sub {
+            font-size: 13px;
+            color: var(--pds-muted);
+            margin-top: 2px;
         }
 
-        .admin-card .card-header {
-            background-color: var(--bs-secondary-bg);
-            border-bottom: 2px solid var(--bs-border-color);
+        .pds-input {
+            font-family: var(--pds-font);
+            font-size: 14px;
+            color: var(--pds-text);
+            background: var(--pds-bg);
+            border: 1px solid var(--pds-border);
+            border-radius: var(--pds-r-sm);
+            padding: 10px 14px;
+            outline: none;
+            transition: border-color .15s ease;
+        }
+
+        .pds-input:focus {
+            border-color: var(--pds-gold);
+        }
+
+        .pds-btn {
+            font-family: var(--pds-font);
+            font-size: 14px;
             font-weight: 600;
+            border-radius: var(--pds-r-sm);
+            padding: 9px 18px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: filter .15s ease, border-color .15s ease, color .15s ease, background .15s ease;
+        }
+
+        .pds-btn--primary {
+            background: var(--pds-gold);
+            border-color: var(--pds-gold);
+            color: #12140F;
+        }
+
+        .pds-btn--primary:hover {
+            filter: brightness(1.06);
+        }
+
+        .pds-btn--ghost {
+            background: none;
+            border-color: var(--pds-border);
+            color: var(--pds-muted);
+        }
+
+        .pds-btn--ghost:hover {
+            border-color: var(--pds-gold);
+            color: var(--pds-gold);
+        }
+
+        .pds-btn--danger {
+            background: none;
+            border-color: var(--pds-danger);
+            color: var(--pds-danger);
+        }
+
+        .pds-btn--danger:hover {
+            background: rgba(192, 57, 43, 0.08);
         }
 
         @media (max-width: 768px) {
-            .nav-tabs {
-                overflow-x: auto;
-                white-space: nowrap;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .nav-tabs .nav {
-                flex-wrap: nowrap;
-            }
-
-            .nav-tabs .nav-link {
-                padding: 0.75rem 0.5rem;
-                font-size: 0.9rem;
+            .pds-admin {
+                padding: 28px 16px 56px;
             }
         }
     </style>
 {% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <!-- Page Header -->
-        <div class="mb-4">
-            <h1 class="h3"><i class="bi bi-shield-lock me-2"></i>{{ t('admin.panel_title') }}</h1>
-            <p class="text-muted">{{ t('admin.panel_subtitle') }}</p>
-        </div>
+    <div class="pds-root" style="background: var(--pds-bg); min-height: 100%;">
+        <main class="pds-admin">
+            <div class="pds-admin-head">
+                <h1>{{ t('admin.panel_title') }}</h1>
+                <p>{{ t('admin.panel_subtitle') }}</p>
+            </div>
 
-        <!-- Tab Navigation -->
-        <ul class="nav nav-tabs mb-4" role="tablist">
-            {% for tab in tabs %}
-            <li class="nav-item" role="presentation">
-                <a class="nav-link {% if activeTab == tab.id %}active{% endif %}"
-                   href="{{ applicationUrl }}{{ tab.route }}"
-                   aria-current="{% if activeTab == tab.id %}page{% endif %}">
-                    <i class="{{ tab.icon }} me-1"></i>
-                    <span class="d-none d-sm-inline">{{ tab.label }}</span>
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
+            <div class="pds-admin-tabs" role="tablist">
+                {% for tab in tabs %}
+                    <a class="pds-admin-tab {% if activeTab == tab.id %}active{% endif %}"
+                       href="{{ applicationUrl }}{{ tab.route }}"
+                       aria-current="{% if activeTab == tab.id %}page{% endif %}">
+                        <i class="{{ tab.icon }}"></i>
+                        <span>{{ tab.label }}</span>
+                    </a>
+                {% endfor %}
+            </div>
 
-        <!-- Tab Content -->
-        <div class="tab-content">
-            {% if activeTab == 'movies' %}
-                {% include 'page/admin/tabs/movies.html.twig' %}
-            {% elseif activeTab == 'users' %}
-                {% include 'page/admin/tabs/users.html.twig' %}
-            {% elseif activeTab == 'server' %}
-                {% include 'page/admin/tabs/server.html.twig' %}
-            {% elseif activeTab == 'integrations' %}
-                {% include 'page/admin/tabs/integrations.html.twig' %}
-            {% elseif activeTab == 'events' %}
-                {% include 'page/admin/tabs/events.html.twig' %}
-            {% endif %}
-        </div>
+            <div class="tab-content">
+                {% if activeTab == 'movies' %}
+                    {% include 'page/admin/tabs/movies.html.twig' %}
+                {% elseif activeTab == 'users' %}
+                    {% include 'page/admin/tabs/users.html.twig' %}
+                {% elseif activeTab == 'server' %}
+                    {% include 'page/admin/tabs/server.html.twig' %}
+                {% elseif activeTab == 'integrations' %}
+                    {% include 'page/admin/tabs/integrations.html.twig' %}
+                {% elseif activeTab == 'events' %}
+                    {% include 'page/admin/tabs/events.html.twig' %}
+                {% endif %}
+            </div>
+        </main>
     </div>
 
     <!-- Confirmation Modal Template -->
