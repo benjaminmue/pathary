@@ -23,37 +23,24 @@ class SearchController
     public function search(Request $request) : Response
     {
         $searchTerm = trim((string)($request->getGetParameters()['q'] ?? ''));
-        $source = $request->getGetParameters()['source'] ?? '';
-        $forceTmdb = $source === 'tmdb';
 
-        if ($searchTerm === '') {
-            return Response::create(
-                StatusCode::createOk(),
-                $this->twig->render('public/search.twig', [
-                    'searchTerm' => '',
-                    'localResults' => [],
-                    'tmdbResults' => [],
-                    'showTmdbResults' => false,
-                    'forceTmdb' => false,
-                ]),
-            );
-        }
-
-        // Search local movies first (unless forcing TMDB)
         $localResults = [];
-        if ($forceTmdb === false) {
-            $localResults = $this->movieRepository->searchByTitle($searchTerm);
-            $localResults = $this->imageUrlService->replacePosterPathWithImageSrcUrl($localResults);
-        }
-
         $tmdbResults = [];
-        $showTmdbResults = false;
 
-        // Search TMDB if no local results OR if explicitly requested
-        if (count($localResults) === 0 || $forceTmdb) {
+        if ($searchTerm !== '') {
+            // Unified search: always query the library AND TMDB in one step.
+            $localResults = $this->movieRepository->searchByTitle($searchTerm);
+            $libraryTmdbIds = array_map('intval', array_column($localResults, 'tmdb_id'));
+            $localResults = $this->imageUrlService->replacePosterPathWithImageSrcUrl($localResults);
+
             $tmdbResponse = $this->tmdbApi->searchMovie($searchTerm);
             $tmdbResults = $tmdbResponse['results'] ?? [];
-            $showTmdbResults = true;
+
+            // Only surface TMDB results that are not already in the library.
+            $tmdbResults = array_filter(
+                $tmdbResults,
+                static fn(array $result) => in_array((int)($result['id'] ?? 0), $libraryTmdbIds, true) === false,
+            );
         }
 
         return Response::create(
@@ -62,8 +49,6 @@ class SearchController
                 'searchTerm' => $searchTerm,
                 'localResults' => $localResults,
                 'tmdbResults' => $tmdbResults,
-                'showTmdbResults' => $showTmdbResults,
-                'forceTmdb' => $forceTmdb,
             ]),
         );
     }
