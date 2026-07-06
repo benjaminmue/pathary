@@ -246,13 +246,15 @@
         color: #dc3545;
     }
 
-    .logout-section {
+    .logout-section,
+    .language-section {
         margin-top: 2rem;
         padding-top: 2rem;
         border-top: 1px solid var(--bs-border-color);
     }
 
-    .logout-section h3 {
+    .logout-section h3,
+    .language-section h3 {
         font-size: 1.1rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
@@ -261,14 +263,20 @@
         gap: 0.5rem;
     }
 
-    .logout-section h3 i {
+    .logout-section h3 i,
+    .language-section h3 i {
         font-size: 1rem;
     }
 
-    .logout-section p {
+    .logout-section p,
+    .language-section p {
         color: var(--bs-secondary-color);
         font-size: 0.9rem;
         margin-bottom: 1rem;
+    }
+
+    .language-section .language-toggle {
+        margin-bottom: 0.75rem;
     }
 
     .btn-logout {
@@ -398,12 +406,12 @@
                     </div>
                 </form>
 
-                <div class="form-group">
-                    <label><i class="bi bi-translate"></i> {{ t('profile.language') }}</label>
-                    <div class="mt-1">
+                <div class="language-section">
+                    <h3><i class="bi bi-translate"></i> {{ t('profile.language') }}</h3>
+                    <div class="language-toggle">
                         {% include 'partials/language_switcher.twig' %}
                     </div>
-                    <p class="form-hint">{{ t('profile.language_hint') }}</p>
+                    <p>{{ t('profile.language_hint') }}</p>
                 </div>
 
                 <div class="logout-section">
