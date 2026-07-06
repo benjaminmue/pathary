@@ -340,6 +340,9 @@ class Factory
 
         $twig->addGlobal('applicationUrl', $applicationUrl);
         $twig->addGlobal('applicationName', $container->get(ServerSettings::class)->getApplicationName() ?? 'Pathary');
+        // Cache-busting token for static assets: changes with each release so browsers
+        // never serve a stale theme.css / theme.js after an upgrade.
+        $twig->addGlobal('assetVersion', $container->get(ServerSettings::class)->getApplicationVersion() ?? 'dev');
         $twig->addGlobal('applicationTimezone', $container->get(ServerSettings::class)->getApplicationTimezone() ?? DateTime::DEFAULT_TIME_ZONE);
         $twig->addGlobal('currentUserName', $user?->getName());
         $twig->addGlobal('currentUserIsAdmin', $user?->isAdmin());
