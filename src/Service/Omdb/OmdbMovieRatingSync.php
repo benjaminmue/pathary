@@ -41,14 +41,20 @@ class OmdbMovieRatingSync
             return;
         }
 
+        // OMDb regularly answers with HTTP 200 but omits ratings for a movie
+        // (imdbRating "N/A", or no Rotten Tomatoes entry). Fall back to the
+        // stored value for every field OMDb did not return, so a partial or
+        // empty response can never wipe a previously synced rating.
+        $mergedRatings = $this->mergeWithExistingRatings($movie, $omdbRatings);
+
         // Check if ratings have changed
-        $hasChanged = $this->hasRatingsChanged($movie, $omdbRatings);
+        $hasChanged = $this->hasRatingsChanged($movie, $mergedRatings);
         if ($hasChanged === false) {
             $this->logger->debug('OMDb: Skipped updating unchanged movie ratings', [$this->generateMovieLogData($movie)]);
             return;
         }
 
-        $this->movieRepository->updateOmdbRatings($movieId, $omdbRatings);
+        $this->movieRepository->updateOmdbRatings($movieId, $mergedRatings);
 
         $this->logger->info('OMDb: Updated movie ratings', [
             array_merge(
@@ -57,13 +63,28 @@ class OmdbMovieRatingSync
                     'oldImdbRating' => $movie->getImdbRatingAverage(),
                     'oldImdbVotes' => $movie->getImdbVoteCount(),
                     'oldRtRating' => $movie->getRtRatingAverage(),
-                    'newImdbRating' => $omdbRatings->getImdbRating(),
-                    'newImdbVotes' => $omdbRatings->getImdbVotes(),
-                    'newRtRating' => $omdbRatings->getRottenTomatoesRating(),
-                    'metacritic' => $omdbRatings->getMetacriticRating(),
+                    'newImdbRating' => $mergedRatings->getImdbRating(),
+                    'newImdbVotes' => $mergedRatings->getImdbVotes(),
+                    'newRtRating' => $mergedRatings->getRottenTomatoesRating(),
+                    'metacritic' => $mergedRatings->getMetacriticRating(),
                 ],
             )
         ]);
+    }
+
+    /**
+     * Merge a freshly fetched OMDb result with the values already stored on the
+     * movie. Any rating OMDb did not return (null) keeps its stored value, which
+     * prevents a partial or empty OMDb response from overwriting good data with null.
+     */
+    private function mergeWithExistingRatings(MovieEntity $movie, OmdbRatings $freshRatings) : OmdbRatings
+    {
+        return OmdbRatings::create(
+            $freshRatings->getImdbRating() ?? $movie->getImdbRatingAverage(),
+            $freshRatings->getImdbVotes() ?? $movie->getImdbVoteCount(),
+            $freshRatings->getRottenTomatoesRating() ?? $movie->getRtRatingAverage(),
+            $freshRatings->getMetacriticRating(),
+        );
     }
 
     public function syncMultipleMovieRatings(
