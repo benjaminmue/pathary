@@ -5,11 +5,15 @@
             <span>{{ applicationName ?? 'Pathary' }}</span>
         </a>
         <div class="d-flex align-items-center gap-3">
-            <div class="form-check form-switch mb-0" title="{{ t('nav.toggle_dark_mode') }}">
-                <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle" style="cursor: pointer;">
-                <label class="form-check-label visually-hidden" for="darkModeToggle">{{ t('nav.dark_mode') }}</label>
-                <span id="themeIcon" style="font-size: 1.1rem;">🌙</span>
-            </div>
+            <label class="theme-toggle" title="{{ t('nav.toggle_dark_mode') }}">
+                <input class="theme-toggle__input" type="checkbox" role="switch" id="darkModeToggle" aria-label="{{ t('nav.dark_mode') }}">
+                <span class="theme-toggle__track">
+                    <span class="theme-toggle__knob">
+                        <i class="bi bi-moon-stars-fill theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true"></i>
+                        <i class="bi bi-sun-fill theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true"></i>
+                    </span>
+                </span>
+            </label>
             <a href="{{ applicationUrl }}/login" class="btn btn-warning" style="background-color: var(--pathe-yellow); border-color: var(--pathe-yellow); color: var(--pathe-dark);">
                 {{ t('nav.login') }}
             </a>
