@@ -5,7 +5,7 @@ namespace Movary\Service\Email;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\Google;
-use League\OAuth2\Client\Token\AccessToken;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 use Movary\Service\ServerSettings;
 use RuntimeException;
 use TheNetworg\OAuth2\Client\Provider\Azure;
@@ -126,10 +126,10 @@ class OAuthTokenService
      * Get a fresh access token (refresh if needed)
      *
      * @param string $redirectUri OAuth callback URL
-     * @return AccessToken Fresh access token for SMTP authentication
+     * @return AccessTokenInterface Fresh access token for SMTP authentication
      * @throws RuntimeException If refresh fails or configuration invalid
      */
-    public function getAccessToken(string $redirectUri) : AccessToken
+    public function getAccessToken(string $redirectUri) : AccessTokenInterface
     {
         $config = $this->configService->getConfig();
         if ($config === null) {
@@ -267,23 +267,16 @@ class OAuthTokenService
     /**
      * Extract granted scopes from access token
      *
-     * @param AccessToken $token Access token
+     * @param AccessTokenInterface $token Access token
      * @return string Space-separated scopes
      */
-    private function extractScopes(AccessToken $token) : string
+    private function extractScopes(AccessTokenInterface $token) : string
     {
         $values = $token->getValues();
 
-        // Gmail uses 'scope' (space-separated)
+        // Both Gmail and Microsoft return granted scopes under the 'scope' key
         if (isset($values['scope'])) {
             return (string)$values['scope'];
-        }
-
-        // Microsoft uses 'scope' as well, but structure may vary
-        if (isset($values['scope'])) {
-            return is_array($values['scope'])
-                ? implode(' ', $values['scope'])
-                : (string)$values['scope'];
         }
 
         // Fallback to empty string

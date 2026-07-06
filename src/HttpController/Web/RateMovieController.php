@@ -40,31 +40,7 @@ class RateMovieController
         $watchedMonth = $this->parseIntOrNull($postData['watched_month'] ?? null);
         $watchedDay = $this->parseIntOrNull($postData['watched_day'] ?? null);
 
-        // Validate date hierarchy: day requires month, month requires year
-        if ($watchedDay !== null && $watchedMonth === null) {
-            $watchedDay = null; // Invalid: day without month
-        }
-        if ($watchedMonth !== null && $watchedYear === null) {
-            $watchedMonth = null; // Invalid: month without year
-            $watchedDay = null;
-        }
-
-        // Validate ranges
-        if ($watchedYear !== null && ($watchedYear < 1900 || $watchedYear > 2100)) {
-            $watchedYear = null;
-            $watchedMonth = null;
-            $watchedDay = null;
-        }
-        if ($watchedMonth !== null && ($watchedMonth < 1 || $watchedMonth > 12)) {
-            $watchedMonth = null;
-            $watchedDay = null;
-        }
-        if ($watchedDay !== null) {
-            $maxDay = $this->getDaysInMonth($watchedYear, $watchedMonth);
-            if ($watchedDay < 1 || $watchedDay > $maxDay) {
-                $watchedDay = null;
-            }
-        }
+        [$watchedYear, $watchedMonth, $watchedDay] = $this->normalizeWatchedDate($watchedYear, $watchedMonth, $watchedDay);
 
         // Parse location
         $locationId = $this->parseIntOrNull($postData['location_id'] ?? null);
@@ -103,6 +79,42 @@ class RateMovieController
         return Response::createSeeOther('/movie/' . $movieId . '#ratings');
     }
 
+    /**
+     * Validate the watched-date hierarchy and ranges, nulling out invalid parts.
+     *
+     * @return array{0: ?int, 1: ?int, 2: ?int} year, month, day
+     */
+    private function normalizeWatchedDate(?int $watchedYear, ?int $watchedMonth, ?int $watchedDay) : array
+    {
+        // Validate date hierarchy: day requires month, month requires year
+        if ($watchedDay !== null && $watchedMonth === null) {
+            $watchedDay = null; // Invalid: day without month
+        }
+        if ($watchedMonth !== null && $watchedYear === null) {
+            $watchedMonth = null; // Invalid: month without year
+            $watchedDay = null;
+        }
+
+        // Validate ranges
+        if ($watchedYear !== null && ($watchedYear < 1900 || $watchedYear > 2100)) {
+            $watchedYear = null;
+            $watchedMonth = null;
+            $watchedDay = null;
+        }
+        if ($watchedMonth !== null && ($watchedMonth < 1 || $watchedMonth > 12)) {
+            $watchedMonth = null;
+            $watchedDay = null;
+        }
+        if ($watchedDay !== null && $watchedYear !== null && $watchedMonth !== null) {
+            $maxDay = $this->getDaysInMonth($watchedYear, $watchedMonth);
+            if ($watchedDay < 1 || $watchedDay > $maxDay) {
+                $watchedDay = null;
+            }
+        }
+
+        return [$watchedYear, $watchedMonth, $watchedDay];
+    }
+
     private function parseIntOrNull(mixed $value) : ?int
     {
         if ($value === null || $value === '' || $value === '0') {
@@ -114,6 +126,6 @@ class RateMovieController
 
     private function getDaysInMonth(int $year, int $month) : int
     {
-        return (int)date('t', mktime(0, 0, 0, $month, 1, $year));
+        return (int)(new \DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month)))->format('t');
     }
 }

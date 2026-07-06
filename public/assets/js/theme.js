@@ -74,12 +74,8 @@
             });
         }
 
-        // Listen for system preference changes (when no saved preference)
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-            if (!localStorage.getItem(STORAGE_KEY)) {
-                setTheme(e.matches ? DARK_THEME : LIGHT_THEME);
-            }
-        });
+        // Dark is the default regardless of system preference; only an explicit
+        // user toggle (saved preference) switches to light. No system-pref sync.
     }
 
     // Initialize when DOM is ready

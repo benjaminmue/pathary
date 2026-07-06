@@ -34,7 +34,12 @@ class UserApi
 
         $userId = $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name, $isAdmin);
 
-        return $this->repository->findUserById($userId);
+        $user = $this->repository->findUserById($userId);
+        if ($user === null) {
+            throw new \RuntimeException('Failed to load user after creation.');
+        }
+
+        return $user;
     }
 
     public function deleteApiToken(int $userId) : void

@@ -35,6 +35,7 @@ class HealthCheckController
     /**
      * GET /admin/health - Get cached health status
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function getHealth(Request $request) : Response
     {
         $cachedData = $this->getCachedHealth();
@@ -61,6 +62,7 @@ class HealthCheckController
     /**
      * POST /admin/health/run - Run health checks and return results
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function runHealthCheck(Request $request) : Response
     {
         // Rate limiting: prevent too frequent health checks
@@ -108,6 +110,7 @@ class HealthCheckController
     /**
      * POST /admin/health/db - Run database health check only
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function runDatabaseCheck(Request $request) : Response
     {
         $dbHealth = $this->checkDatabaseHealth();
@@ -127,6 +130,7 @@ class HealthCheckController
     /**
      * POST /admin/health/tmdb - Run TMDB health check only
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function runTmdbCheck(Request $request) : Response
     {
         $tmdbHealth = $this->checkTmdbHealth();
@@ -146,6 +150,7 @@ class HealthCheckController
     /**
      * POST /admin/health/omdb - Run OMDb health check only
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function runOmdbCheck(Request $request) : Response
     {
         $omdbHealth = $this->checkOmdbHealth();
@@ -165,6 +170,7 @@ class HealthCheckController
     /**
      * POST /admin/health/oauth - Run OAuth health check only
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function runOAuthCheck(Request $request) : Response
     {
         $oauthHealth = $this->checkOAuthHealth();
@@ -489,8 +495,8 @@ class HealthCheckController
         // Detect email authentication mode
         $emailAuthMode = $this->serverSettings->getEmailAuthMode();
 
-        // Handle NULL or empty string as "not configured"
-        if ($emailAuthMode === null || $emailAuthMode === '') {
+        // Handle empty string as "not configured"
+        if ($emailAuthMode === '') {
             return [
                 'enabled' => false,
                 'status' => 'down',
@@ -733,6 +739,7 @@ class HealthCheckController
     /**
      * Create unknown status response
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     private function createUnknownStatus(string $service, bool $enabled) : array
     {
         return [

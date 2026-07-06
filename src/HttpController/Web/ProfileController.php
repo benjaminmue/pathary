@@ -100,6 +100,10 @@ class ProfileController
         $mimeType = mime_content_type($filepath);
         $content = file_get_contents($filepath);
 
+        if ($mimeType === false || $content === false) {
+            return Response::createNotFound();
+        }
+
         return Response::create(
             StatusCode::createOk(),
             $content,
@@ -127,7 +131,12 @@ class ProfileController
         }
 
         // Additional validation: verify it's actually an image by getting image info
-        $imageInfo = @getimagesize($file['tmp_name']);
+        set_error_handler(static fn () => true);
+        try {
+            $imageInfo = getimagesize($file['tmp_name']);
+        } finally {
+            restore_error_handler();
+        }
         if ($imageInfo === false) {
             throw new RuntimeException('File does not appear to be a valid image.');
         }
@@ -148,8 +157,7 @@ class ProfileController
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
             'image/gif' => 'gif',
-            'image/webp' => 'webp',
-            default => 'jpg',
+            default => 'webp',
         };
         $filename = bin2hex(random_bytes(16)) . '.' . $extension;
         $filepath = self::PROFILE_IMAGES_DIR . '/' . $filename;

@@ -25,6 +25,7 @@ class AdminSettingsController
     /**
      * GET /api/admin/settings/tmdb - Get TMDB API key status
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function getTmdbStatus(Request $request) : Response
     {
         $isConfigured = $this->serverSettings->isTmdbApiKeyConfigured();
@@ -72,7 +73,7 @@ class AdminSettingsController
 
         // Save key with metadata
         $currentUser = $this->authenticationService->getCurrentUser();
-        $userId = $currentUser?->getId();
+        $userId = $currentUser->getId();
 
         try {
             $this->serverSettings->saveTmdbApiKeyWithMetadata($apiKey, $userId);
@@ -214,6 +215,7 @@ class AdminSettingsController
     /**
      * GET /api/admin/settings/omdb - Get OMDb API key status
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function getOmdbStatus(Request $request) : Response
     {
         $isConfigured = $this->serverSettings->isOmdbApiKeyConfigured();
@@ -261,7 +263,7 @@ class AdminSettingsController
 
         // Save key with metadata
         $currentUser = $this->authenticationService->getCurrentUser();
-        $userId = $currentUser?->getId();
+        $userId = $currentUser->getId();
 
         try {
             $this->serverSettings->saveOmdbApiKeyWithMetadata($apiKey, $userId);
@@ -420,6 +422,7 @@ class AdminSettingsController
      * DELETE /api/admin/settings/tmdb - Delete TMDB API key
      * Note: CSRF protection not needed - Bearer token auth already prevents CSRF attacks
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function deleteTmdbApiKey(Request $request) : Response
     {
         // Check if key is set in environment file (cannot be deleted)
@@ -435,7 +438,7 @@ class AdminSettingsController
         }
 
         $currentUser = $this->authenticationService->getCurrentUser();
-        $userId = $currentUser?->getId();
+        $userId = $currentUser->getId();
 
         try {
             $this->serverSettings->deleteTmdbApiKey();
@@ -470,6 +473,7 @@ class AdminSettingsController
      * DELETE /api/admin/settings/omdb - Delete OMDb API key
      * Note: CSRF protection not needed - Bearer token auth already prevents CSRF attacks
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function deleteOmdbApiKey(Request $request) : Response
     {
         // Check if key is set in environment file (cannot be deleted)
@@ -485,7 +489,7 @@ class AdminSettingsController
         }
 
         $currentUser = $this->authenticationService->getCurrentUser();
-        $userId = $currentUser?->getId();
+        $userId = $currentUser->getId();
 
         try {
             $this->serverSettings->deleteOmdbApiKey();

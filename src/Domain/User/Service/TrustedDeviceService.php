@@ -9,8 +9,8 @@ use Movary\ValueObject\DateTime;
 
 class TrustedDeviceService
 {
-    private const TRUSTED_DEVICE_EXPIRATION_DAYS = 30;
-    private const MAX_TRUSTED_DEVICES_PER_USER = 10;
+    private const int TRUSTED_DEVICE_EXPIRATION_DAYS = 30;
+    private const int MAX_TRUSTED_DEVICES_PER_USER = 10;
 
     public function __construct(
         private readonly TrustedDeviceRepository $trustedDeviceRepository,

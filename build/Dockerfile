@@ -1,6 +1,6 @@
 FROM composer:latest AS composer
 
-FROM trafex/php-nginx AS base
+FROM trafex/php-nginx:3.9.0 AS base
 
 LABEL Description="Pathary is a self hosted web app to track and rate your watched movies (fork of Movary)"
 LABEL Maintainer="Benjamin Komen (fork), Lee Peuker (original)"

@@ -9,6 +9,7 @@ use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 
 class TwoFactorAuthenticationController
 {
@@ -35,10 +36,13 @@ class TwoFactorAuthenticationController
 
     public function disableTOTP() : Response
     {
-        $this->twoFactorAuthenticationApi->deleteTotp($this->authenticationService->getCurrentUserId());
-        $this->sessionWrapper->set('twoFactorAuthenticationDisabled', true);
-
-        return Response::createOk();
+        // Two-factor authentication is mandatory for every account and cannot be
+        // disabled. (This is the legacy endpoint; the guard mirrors
+        // ProfileSecurityController::disableTotp so neither path can remove 2FA.)
+        return Response::createJson(
+            Json::encode(['error' => 'Two-factor authentication is mandatory and cannot be disabled.']),
+            StatusCode::createForbidden(),
+        );
     }
 
     public function enableTOTP(Request $request) : Response

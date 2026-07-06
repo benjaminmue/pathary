@@ -82,12 +82,23 @@ class ProfileSecurityController
             );
         }
 
-        // Check if TOTP is already enabled
+        // TOTP being already set is intentionally allowed — this same flow powers
+        // "set up on a new device": the existing secret stays valid until the new
+        // one is verified (verifyAndSaveTotp overwrites it), so 2FA is never off
+        // during a device switch. But re-enrolling replaces the second factor, so
+        // require the current password first as proof of ownership (mirrors the
+        // re-auth on changePassword) — a hijacked session alone must not be able to
+        // swap the authenticator.
         if ($this->twoFactorAuthenticationApi->findTotpUri($userId) !== null) {
-            return Response::createJson(
-                Json::encode(['error' => '2FA is already enabled.']),
-                StatusCode::createBadRequest()
-            );
+            $data = Json::decode($request->getBody());
+            $password = $data['password'] ?? '';
+
+            if ($this->userApi->isValidPassword($userId, $password) === false) {
+                return Response::createJson(
+                    Json::encode(['error' => 'Invalid password.']),
+                    StatusCode::createBadRequest(),
+                );
+            }
         }
 
         // Generate new TOTP secret
@@ -160,48 +171,18 @@ class ProfileSecurityController
         );
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function disableTotp(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
-        $user = $this->userApi->fetchUser($userId);
-
-        if ($user->hasCoreAccountChangesDisabled() === true) {
-            return Response::createJson(
-                Json::encode(['error' => 'Account changes are disabled for this user.']),
-                StatusCode::createForbidden()
-            );
-        }
-
-        $data = Json::decode($request->getBody());
-        $password = $data['password'] ?? '';
-
-        // Verify password before disabling 2FA
-        if ($this->userApi->isValidPassword($userId, $password) === false) {
-            return Response::createJson(
-                Json::encode(['error' => 'Invalid password.']),
-                StatusCode::createBadRequest()
-            );
-        }
-
-        // Disable TOTP
-        $this->twoFactorAuthenticationApi->deleteTotp($userId);
-
-        // Delete all recovery codes and trusted devices
-        $this->recoveryCodeService->deleteAllRecoveryCodes($userId);
-        $this->trustedDeviceService->revokeAllTrustedDevices($userId);
-        TrustedDeviceCookie::clear();
-
-        // Log security event
-        $this->securityAuditService->log(
-            $userId,
-            SecurityAuditService::EVENT_TOTP_DISABLED,
-            $_SERVER['REMOTE_ADDR'] ?? null,
-            $_SERVER['HTTP_USER_AGENT'] ?? null,
+        // Two-factor authentication is mandatory for every account and cannot be
+        // removed. (To switch authenticator devices, re-run the setup/enable flow.)
+        return Response::createJson(
+            Json::encode(['error' => 'Two-factor authentication is mandatory and cannot be disabled.']),
+            StatusCode::createForbidden(),
         );
-
-        return Response::createJson(Json::encode(['success' => true]));
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function regenerateRecoveryCodes(Request $request) : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();
@@ -287,6 +268,7 @@ class ProfileSecurityController
         ]));
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function revokeAllTrustedDevices(Request $request) : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();

@@ -6,8 +6,8 @@ use Movary\Domain\User\Repository\RecoveryCodeRepository;
 
 class RecoveryCodeService
 {
-    private const RECOVERY_CODE_COUNT = 10;
-    private const RECOVERY_CODE_LENGTH = 10;
+    private const int RECOVERY_CODE_COUNT = 10;
+    private const int RECOVERY_CODE_LENGTH = 10;
 
     public function __construct(
         private readonly RecoveryCodeRepository $recoveryCodeRepository,

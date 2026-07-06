@@ -39,7 +39,7 @@ class RateLimiter
         // Clean old attempts outside the window
         $attempts = array_filter(
             $attempts,
-            fn($timestamp) => $timestamp > $windowStart
+            fn(int $timestamp) => $timestamp > $windowStart
         );
 
         // Check if limit exceeded
@@ -83,7 +83,7 @@ class RateLimiter
         // Clean old attempts outside the window
         $attempts = array_filter(
             $attempts,
-            fn($timestamp) => $timestamp > $windowStart
+            fn(int $timestamp) => $timestamp > $windowStart
         );
 
         $remaining = $maxAttempts - count($attempts);

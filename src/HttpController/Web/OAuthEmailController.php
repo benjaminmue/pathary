@@ -5,10 +5,10 @@ namespace Movary\HttpController\Web;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\SecurityAuditService;
 use Movary\Service\CsrfTokenService;
+use Movary\Service\Email\OAuthConfig;
 use Movary\Service\Email\OAuthConfigService;
 use Movary\Service\Email\OAuthTokenService;
 use Movary\Service\Email\SmtpConfig;
-use Movary\Service\Email\EmailService;
 use Movary\Service\EncryptionService;
 use Movary\Service\ServerSettings;
 use Movary\Util\Json;
@@ -32,7 +32,6 @@ class OAuthEmailController
         private readonly EncryptionService $encryptionService,
         private readonly ServerSettings $serverSettings,
         private readonly CsrfTokenService $csrfTokenService,
-        private readonly EmailService $emailService,
         private readonly Authentication $authenticationService,
         private readonly SecurityAuditService $securityAuditService,
     ) {
@@ -69,12 +68,14 @@ class OAuthEmailController
         }
 
         // Extract and validate parameters
-        $provider = trim((string)($requestData['provider'] ?? ''));
-        $clientId = trim((string)($requestData['clientId'] ?? ''));
-        $clientSecret = trim((string)($requestData['clientSecret'] ?? ''));
-        $fromAddress = trim((string)($requestData['fromAddress'] ?? ''));
-        $tenantId = isset($requestData['tenantId']) ? trim((string)$requestData['tenantId']) : null;
-        $secretExpiresInMonths = isset($requestData['secretExpiresInMonths']) ? (int)$requestData['secretExpiresInMonths'] : null;
+        [
+            'provider' => $provider,
+            'clientId' => $clientId,
+            'clientSecret' => $clientSecret,
+            'fromAddress' => $fromAddress,
+            'tenantId' => $tenantId,
+            'secretExpiresInMonths' => $secretExpiresInMonths,
+        ] = $this->parseOAuthConfigParams($requestData);
 
         // Validation
         if (!in_array($provider, ['gmail', 'microsoft'], true)) {
@@ -117,20 +118,13 @@ class OAuthEmailController
             );
 
             // Log audit event
-            $userId = $this->authenticationService->getCurrentUserId();
-            $this->securityAuditService->log(
-                $userId,
-                $isUpdate ? SecurityAuditService::EVENT_OAUTH_CONFIG_UPDATED : SecurityAuditService::EVENT_OAUTH_CONFIG_CREATED,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-                [
-                    'provider' => $provider,
-                    'client_id' => $clientId,
-                    'from_address' => $fromAddress,
-                    'tenant_id' => $tenantId,
-                    'has_secret_expiry' => $secretExpiresInMonths !== null,
-                ]
-            );
+            $this->logOAuthConfigSaved($isUpdate, [
+                'provider' => $provider,
+                'client_id' => $clientId,
+                'from_address' => $fromAddress,
+                'tenant_id' => $tenantId,
+                'has_secret_expiry' => $secretExpiresInMonths !== null,
+            ]);
 
             return Response::create(
                 StatusCode::createOk(),
@@ -155,6 +149,7 @@ class OAuthEmailController
      *
      * GET /admin/server/email/oauth/authorize
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function authorize(Request $request) : Response
     {
         try {
@@ -204,17 +199,7 @@ class OAuthEmailController
             );
 
             // Log failed callback attempt
-            $userId = $this->authenticationService->getCurrentUserId();
-            $this->securityAuditService->log(
-                $userId,
-                SecurityAuditService::EVENT_OAUTH_CALLBACK_FAILED,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-                [
-                    'error' => $error,
-                    'error_description' => $errorDescription,
-                ]
-            );
+            $this->logOAuthCallbackFailed($error, $errorDescription);
 
             return Response::create(
                 StatusCode::createBadRequest(),
@@ -240,41 +225,92 @@ class OAuthEmailController
             $config = $this->oauthConfigService->getConfig();
 
             // Log successful OAuth connection
-            $userId = $this->authenticationService->getCurrentUserId();
-            $this->securityAuditService->log(
-                $userId,
-                SecurityAuditService::EVENT_OAUTH_CONNECTED,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-                [
-                    'provider' => $config?->provider,
-                    'from_address' => $config?->fromAddress,
-                    'granted_scopes' => $config?->scopes,
-                ]
-            );
+            $this->logOAuthConnected($config);
 
             // Redirect to admin panel with success message
             return Response::createSeeOther('/admin/server?oauth_success=1');
 
         } catch (RuntimeException $e) {
             // Log failed callback attempt
-            $userId = $this->authenticationService->getCurrentUserId();
-            $this->securityAuditService->log(
-                $userId,
-                SecurityAuditService::EVENT_OAUTH_CALLBACK_FAILED,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-                [
-                    'error' => 'exception',
-                    'error_description' => $e->getMessage(),
-                ]
-            );
+            $this->logOAuthCallbackFailed('exception', $e->getMessage());
 
             return Response::create(
                 StatusCode::createBadRequest(),
                 'Failed to complete OAuth authorization: ' . $e->getMessage(),
             );
         }
+    }
+
+    /**
+     * Parse the OAuth configuration parameters from a save request.
+     *
+     * @param array<string, mixed> $requestData
+     * @return array{provider: string, clientId: string, clientSecret: string, fromAddress: string, tenantId: ?string, secretExpiresInMonths: ?int}
+     */
+    private function parseOAuthConfigParams(array $requestData) : array
+    {
+        return [
+            'provider' => trim((string)($requestData['provider'] ?? '')),
+            'clientId' => trim((string)($requestData['clientId'] ?? '')),
+            'clientSecret' => trim((string)($requestData['clientSecret'] ?? '')),
+            'fromAddress' => trim((string)($requestData['fromAddress'] ?? '')),
+            'tenantId' => isset($requestData['tenantId']) ? trim((string)$requestData['tenantId']) : null,
+            'secretExpiresInMonths' => isset($requestData['secretExpiresInMonths']) ? (int)$requestData['secretExpiresInMonths'] : null,
+        ];
+    }
+
+    /**
+     * Log a successful save of the OAuth configuration.
+     *
+     * @param array<string, mixed> $metadata
+     */
+    private function logOAuthConfigSaved(bool $isUpdate, array $metadata) : void
+    {
+        $userId = $this->authenticationService->getCurrentUserId();
+        $this->securityAuditService->log(
+            $userId,
+            $isUpdate ? SecurityAuditService::EVENT_OAUTH_CONFIG_UPDATED : SecurityAuditService::EVENT_OAUTH_CONFIG_CREATED,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            $metadata,
+        );
+    }
+
+    /**
+     * Log a failed OAuth callback attempt.
+     */
+    private function logOAuthCallbackFailed(string $error, string $errorDescription) : void
+    {
+        $userId = $this->authenticationService->getCurrentUserId();
+        $this->securityAuditService->log(
+            $userId,
+            SecurityAuditService::EVENT_OAUTH_CALLBACK_FAILED,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            [
+                'error' => $error,
+                'error_description' => $errorDescription,
+            ]
+        );
+    }
+
+    /**
+     * Log a successful OAuth connection.
+     */
+    private function logOAuthConnected(?OAuthConfig $config) : void
+    {
+        $userId = $this->authenticationService->getCurrentUserId();
+        $this->securityAuditService->log(
+            $userId,
+            SecurityAuditService::EVENT_OAUTH_CONNECTED,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+            [
+                'provider' => $config?->provider,
+                'from_address' => $config?->fromAddress,
+                'granted_scopes' => $config?->scopes,
+            ]
+        );
     }
 
     /**
@@ -459,6 +495,7 @@ class OAuthEmailController
      *
      * GET /admin/server/email/oauth/status
      */
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function getStatus(Request $request) : Response
     {
         try {

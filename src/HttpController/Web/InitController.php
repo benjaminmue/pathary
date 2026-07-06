@@ -4,7 +4,6 @@ namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Exception\PasswordPolicyViolation;
 use Movary\Domain\User\Repository\RecoveryCodeRepository;
-use Movary\Domain\User\Service\RecoveryCodeService;
 use Movary\Domain\User\Service\SecurityAuditService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\Service\TwoFactorAuthenticationFactory;
@@ -27,7 +26,6 @@ class InitController
         private readonly Validator $validator,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
         private readonly TwoFactorAuthenticationFactory $twoFactorAuthenticationFactory,
-        private readonly RecoveryCodeService $recoveryCodeService,
         private readonly RecoveryCodeRepository $recoveryCodeRepository,
         private readonly SecurityAuditService $securityAuditService,
     ) {
@@ -156,6 +154,13 @@ class InitController
 
         $verificationCode = (string)($data['code'] ?? '');
 
+        if ($verificationCode === '') {
+            return Response::createJson(
+                Json::encode(['error' => 'Invalid verification code. Please try again.']),
+                StatusCode::createBadRequest()
+            );
+        }
+
         // Verify the TOTP code using OTPHP Factory
         try {
             $totp = Factory::loadFromProvisioningUri($pendingTotpUri);
@@ -241,18 +246,7 @@ class InitController
             }
 
             // Log security events
-            $this->securityAuditService->log(
-                $userId,
-                SecurityAuditService::EVENT_TOTP_ENABLED,
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-            );
-            $this->securityAuditService->log(
-                $userId,
-                'SETUP_COMPLETED',
-                $_SERVER['REMOTE_ADDR'] ?? null,
-                $_SERVER['HTTP_USER_AGENT'] ?? null,
-            );
+            $this->logSetupCompletion($userId);
 
             // Mark setup as completed
             $this->setupService->markSetupCompleted();
@@ -280,5 +274,21 @@ class InitController
                 StatusCode::createBadRequest()
             );
         }
+    }
+
+    private function logSetupCompletion(int $userId) : void
+    {
+        $this->securityAuditService->log(
+            $userId,
+            SecurityAuditService::EVENT_TOTP_ENABLED,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+        );
+        $this->securityAuditService->log(
+            $userId,
+            'SETUP_COMPLETED',
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null,
+        );
     }
 }

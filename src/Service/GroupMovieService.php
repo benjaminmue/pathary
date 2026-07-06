@@ -76,6 +76,10 @@ class GroupMovieService
             [$movieId],
         );
 
+        if ($ratingStats === false) {
+            $ratingStats = [];
+        }
+
         $lastWatchActivity = $this->dbConnection->fetchOne(
             <<<SQL
             SELECT MAX(watched_at) AS last_watch_activity
@@ -179,52 +183,13 @@ class GroupMovieService
         }
 
         // Release year filter
-        if ($yearMin !== null) {
-            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
-                $whereConditions[] = "CAST(strftime('%Y', m.release_date) AS INTEGER) >= ?";
-            } else {
-                $whereConditions[] = 'YEAR(m.release_date) >= ?';
-            }
-            $params[] = $yearMin;
-        }
-        if ($yearMax !== null) {
-            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
-                $whereConditions[] = "CAST(strftime('%Y', m.release_date) AS INTEGER) <= ?";
-            } else {
-                $whereConditions[] = 'YEAR(m.release_date) <= ?';
-            }
-            $params[] = $yearMax;
-        }
+        $this->addReleaseYearFilter($whereConditions, $params, $yearMin, '>=');
+        $this->addReleaseYearFilter($whereConditions, $params, $yearMax, '<=');
 
-        // TMDB rating filter
-        if ($tmdbMin !== null) {
-            $whereConditions[] = '(m.tmdb_vote_average IS NULL OR m.tmdb_vote_average >= ?)';
-            $params[] = $tmdbMin;
-        }
-        if ($tmdbMax !== null) {
-            $whereConditions[] = '(m.tmdb_vote_average IS NULL OR m.tmdb_vote_average <= ?)';
-            $params[] = $tmdbMax;
-        }
-
-        // IMDB rating filter
-        if ($imdbMin !== null) {
-            $whereConditions[] = '(m.imdb_rating_average IS NULL OR m.imdb_rating_average >= ?)';
-            $params[] = $imdbMin;
-        }
-        if ($imdbMax !== null) {
-            $whereConditions[] = '(m.imdb_rating_average IS NULL OR m.imdb_rating_average <= ?)';
-            $params[] = $imdbMax;
-        }
-
-        // Rotten Tomatoes rating filter
-        if ($rtMin !== null) {
-            $whereConditions[] = '(m.rt_rating_average IS NULL OR m.rt_rating_average >= ?)';
-            $params[] = $rtMin;
-        }
-        if ($rtMax !== null) {
-            $whereConditions[] = '(m.rt_rating_average IS NULL OR m.rt_rating_average <= ?)';
-            $params[] = $rtMax;
-        }
+        // External rating filters (TMDB, IMDB, Rotten Tomatoes)
+        $this->addNullableRatingRangeFilter($whereConditions, $params, 'm.tmdb_vote_average', $tmdbMin, $tmdbMax);
+        $this->addNullableRatingRangeFilter($whereConditions, $params, 'm.imdb_rating_average', $imdbMin, $imdbMax);
+        $this->addNullableRatingRangeFilter($whereConditions, $params, 'm.rt_rating_average', $rtMin, $rtMax);
 
         // Rating filter (on avg_popcorn, applied via HAVING)
         $havingConditions = [];
@@ -244,15 +209,7 @@ class GroupMovieService
         $sortOrderSql = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
 
         // Sort field mapping with NULLS LAST emulation
-        // Neither MySQL nor SQLite supports NULLS LAST natively, so we use "column IS NULL" trick
-        // This puts NULL values at the end regardless of sort direction
-        $orderByClause = match ($sortBy) {
-            'title' => "LOWER(m.title) $sortOrderSql",
-            'release_date' => "m.release_date IS NULL, m.release_date $sortOrderSql, LOWER(m.title) ASC",
-            'global_rating' => "avg_popcorn IS NULL, avg_popcorn $sortOrderSql, LOWER(m.title) ASC",
-            'own_rating' => "own_rating IS NULL, own_rating $sortOrderSql, LOWER(m.title) ASC",
-            default => "last_added_at $sortOrderSql, LOWER(m.title) ASC", // 'added'
-        };
+        $orderByClause = $this->resolveOrderByClause($sortBy, $sortOrderSql);
 
         // Add userId param for own_rating subquery - use prepared statement parameter
         array_unshift($params, $userId);
@@ -288,6 +245,67 @@ class GroupMovieService
         );
 
         return $this->imageUrlService->replacePosterPathWithImageSrcUrl($movies);
+    }
+
+    /**
+     * Append "column IS NULL OR column between min/max" WHERE conditions for an optional rating range.
+     *
+     * @param list<string> $whereConditions
+     * @param list<mixed>  $params
+     */
+    /**
+     * Append a release-year comparison filter for the given bound.
+     *
+     * @param list<string> $whereConditions
+     * @param list<mixed> $params
+     */
+    private function addReleaseYearFilter(array &$whereConditions, array &$params, ?int $year, string $operator) : void
+    {
+        if ($year === null) {
+            return;
+        }
+
+        // Neither MySQL nor SQLite share the same year-extraction syntax
+        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            $whereConditions[] = "CAST(strftime('%Y', m.release_date) AS INTEGER) {$operator} ?";
+        } else {
+            $whereConditions[] = "YEAR(m.release_date) {$operator} ?";
+        }
+        $params[] = $year;
+    }
+
+    /**
+     * Map the sort field to an ORDER BY clause with NULLS LAST emulation.
+     *
+     * Neither MySQL nor SQLite supports NULLS LAST natively, so we use the
+     * "column IS NULL" trick to keep NULL values at the end regardless of direction.
+     */
+    private function resolveOrderByClause(string $sortBy, string $sortOrderSql) : string
+    {
+        return match ($sortBy) {
+            'title' => "LOWER(m.title) $sortOrderSql",
+            'release_date' => "m.release_date IS NULL, m.release_date $sortOrderSql, LOWER(m.title) ASC",
+            'global_rating' => "avg_popcorn IS NULL, avg_popcorn $sortOrderSql, LOWER(m.title) ASC",
+            'own_rating' => "own_rating IS NULL, own_rating $sortOrderSql, LOWER(m.title) ASC",
+            default => "last_added_at $sortOrderSql, LOWER(m.title) ASC", // 'added'
+        };
+    }
+
+    private function addNullableRatingRangeFilter(
+        array &$whereConditions,
+        array &$params,
+        string $column,
+        float|int|null $min,
+        float|int|null $max,
+    ) : void {
+        if ($min !== null) {
+            $whereConditions[] = "($column IS NULL OR $column >= ?)";
+            $params[] = $min;
+        }
+        if ($max !== null) {
+            $whereConditions[] = "($column IS NULL OR $column <= ?)";
+            $params[] = $max;
+        }
     }
 
     /**
@@ -338,6 +356,10 @@ class GroupMovieService
                 WHERE muwd.watched_at IS NOT NULL AND m.release_date IS NOT NULL
                 SQL,
             );
+        }
+
+        if ($result === false) {
+            return ['min' => null, 'max' => null];
         }
 
         return [
@@ -472,7 +494,7 @@ class GroupMovieService
             ? 'RANDOM()'
             : 'RAND()';
 
-        return $this->dbConnection->fetchAllAssociative(
+        $rows = $this->dbConnection->fetchAllAssociative(
             <<<SQL
             SELECT
                 u.name AS user_name,
@@ -489,6 +511,17 @@ class GroupMovieService
             SQL,
             [$limit],
             [ParameterType::INTEGER],
+        );
+
+        return array_map(
+            static fn(array $row) : array => [
+                'user_name' => (string)$row['user_name'],
+                'movie_title' => (string)$row['movie_title'],
+                'movie_id' => (int)$row['movie_id'],
+                'comment' => (string)$row['comment'],
+                'rating_popcorn' => (int)$row['rating_popcorn'],
+            ],
+            $rows,
         );
     }
 

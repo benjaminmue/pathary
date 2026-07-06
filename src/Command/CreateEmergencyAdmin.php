@@ -10,8 +10,10 @@ use Movary\Domain\User\Service\RecoveryCodeService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\Service\TwoFactorAuthenticationFactory;
 use Movary\Domain\User\UserApi;
+use Movary\Domain\User\UserEntity;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -36,6 +38,7 @@ class CreateEmergencyAdmin extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $helper = $this->getHelper('question');
+        \assert($helper instanceof QuestionHelper);
 
         $output->writeln('<error>======================================</error>');
         $output->writeln('<error>  EMERGENCY ADMIN ACCOUNT CREATION  </error>');
@@ -57,7 +60,6 @@ class CreateEmergencyAdmin extends Command
                 false
             );
 
-            $helper = $this->getHelper('question');
             $confirmed = $helper->ask($input, $output, $confirmQuestion);
             if (!$confirmed) {
                 $output->writeln('<info>Aborted. Use the web interface to create users normally.</info>');
@@ -70,33 +72,8 @@ class CreateEmergencyAdmin extends Command
         $output->writeln('');
 
         // Collect user information
-        $emailQuestion = new Question('<question>Email address:</question> ');
-        $emailQuestion->setValidator(function ($value) {
-            if (empty($value) || !filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                throw new \RuntimeException('Invalid email address.');
-            }
-            return $value;
-        });
-        $email = $helper->ask($input, $output, $emailQuestion);
-
-        $nameQuestion = new Question('<question>Name:</question> ');
-        $nameQuestion->setValidator(function ($value) {
-            if (empty($value)) {
-                throw new \RuntimeException('Name cannot be empty.');
-            }
-            return $value;
-        });
-        $name = $helper->ask($input, $output, $nameQuestion);
-
-        $passwordQuestion = new Question('<question>Password (hidden):</question> ');
-        $passwordQuestion->setHidden(true);
-        $passwordQuestion->setValidator(function ($value) {
-            if (empty($value)) {
-                throw new \RuntimeException('Password cannot be empty.');
-            }
-            return $value;
-        });
-        $password = $helper->ask($input, $output, $passwordQuestion);
+        ['email' => $email, 'name' => $name, 'password' => $password] =
+            $this->promptForUserDetails($helper, $input, $output);
 
         $output->writeln('');
 
@@ -148,33 +125,8 @@ class CreateEmergencyAdmin extends Command
         $output->writeln('');
 
         // Verify TOTP code
-        $maxAttempts = 3;
-        $attempt = 0;
-        $verified = false;
-
-        while ($attempt < $maxAttempts && !$verified) {
-            $attempt++;
-            $codeQuestion = new Question('<question>Enter the 6-digit code from your authenticator app:</question> ');
-            $codeQuestion->setValidator(function ($value) {
-                if (!ctype_digit($value) || strlen($value) !== 6) {
-                    throw new \RuntimeException('Code must be exactly 6 digits.');
-                }
-                return (int)$value;
-            });
-            $code = $helper->ask($input, $output, $codeQuestion);
-
-            if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $code, $totpUri)) {
-                $verified = true;
-                $output->writeln('<info>✓ Code verified successfully.</info>');
-            } else {
-                if ($attempt < $maxAttempts) {
-                    $output->writeln('<error>✗ Invalid code. Please try again. (' . ($maxAttempts - $attempt) . ' attempts remaining)</error>');
-                } else {
-                    $output->writeln('<error>✗ Too many failed attempts. Deleting user and aborting.</error>');
-                    $this->userApi->deleteUser($user->getId());
-                    return Command::FAILURE;
-                }
-            }
+        if ($this->verifyTotpSetup($helper, $input, $output, $user, $totpUri) === false) {
+            return Command::FAILURE;
         }
 
         // Save TOTP
@@ -227,6 +179,88 @@ class CreateEmergencyAdmin extends Command
         $output->writeln('<info>You can now log in via the web interface.</info>');
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Prompt for and validate the emergency admin's email, name and password.
+     *
+     * @return array{email: string, name: string, password: string}
+     */
+    private function promptForUserDetails(QuestionHelper $helper, InputInterface $input, OutputInterface $output) : array
+    {
+        $emailQuestion = new Question('<question>Email address:</question> ');
+        $emailQuestion->setValidator(function (?string $value) : string {
+            if (empty($value) || !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                throw new \RuntimeException('Invalid email address.');
+            }
+            return $value;
+        });
+        $email = $helper->ask($input, $output, $emailQuestion);
+
+        $nameQuestion = new Question('<question>Name:</question> ');
+        $nameQuestion->setValidator(function (?string $value) : string {
+            if (empty($value)) {
+                throw new \RuntimeException('Name cannot be empty.');
+            }
+            return $value;
+        });
+        $name = $helper->ask($input, $output, $nameQuestion);
+
+        $passwordQuestion = new Question('<question>Password (hidden):</question> ');
+        $passwordQuestion->setHidden(true);
+        $passwordQuestion->setValidator(function (?string $value) : string {
+            if (empty($value)) {
+                throw new \RuntimeException('Password cannot be empty.');
+            }
+            return $value;
+        });
+        $password = $helper->ask($input, $output, $passwordQuestion);
+
+        return ['email' => $email, 'name' => $name, 'password' => $password];
+    }
+
+    /**
+     * Prompt for and verify the TOTP code (max 3 attempts).
+     *
+     * @return bool True when verified; false when aborted (user already deleted).
+     */
+    private function verifyTotpSetup(
+        QuestionHelper $helper,
+        InputInterface $input,
+        OutputInterface $output,
+        UserEntity $user,
+        string $totpUri,
+    ) : bool {
+        $maxAttempts = 3;
+        $attempt = 0;
+
+        while ($attempt < $maxAttempts) {
+            $attempt++;
+            $codeQuestion = new Question('<question>Enter the 6-digit code from your authenticator app:</question> ');
+            $codeQuestion->setValidator(function (?string $value) : int {
+                $value = (string)$value;
+                if (!ctype_digit($value) || strlen($value) !== 6) {
+                    throw new \RuntimeException('Code must be exactly 6 digits.');
+                }
+                return (int)$value;
+            });
+            $code = $helper->ask($input, $output, $codeQuestion);
+
+            if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $code, $totpUri)) {
+                $output->writeln('<info>✓ Code verified successfully.</info>');
+                return true;
+            }
+
+            if ($attempt < $maxAttempts) {
+                $output->writeln('<error>✗ Invalid code. Please try again. (' . ($maxAttempts - $attempt) . ' attempts remaining)</error>');
+            } else {
+                $output->writeln('<error>✗ Too many failed attempts. Deleting user and aborting.</error>');
+                $this->userApi->deleteUser($user->getId());
+                return false;
+            }
+        }
+
+        return false;
     }
 
     private function displayAsciiQrCode(OutputInterface $output, string $data) : void

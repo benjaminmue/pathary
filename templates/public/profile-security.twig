@@ -201,10 +201,13 @@
                 <span class="status-badge enabled">
                     <i class="bi bi-check-circle-fill"></i> Enabled
                 </span>
-                <button type="button" class="btn btn-sm btn-outline-danger" id="disable2FABtn">
-                    <i class="bi bi-x-circle"></i> Disable 2FA
-                </button>
+                <span class="text-body-secondary small">
+                    <i class="bi bi-shield-lock-fill"></i> Required - cannot be disabled
+                </span>
             </div>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="reconfigure2FABtn">
+                <i class="bi bi-phone"></i> Set up on a new device
+            </button>
         {% else %}
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="status-badge disabled">

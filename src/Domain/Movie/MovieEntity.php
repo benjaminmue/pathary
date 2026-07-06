@@ -44,19 +44,34 @@ class MovieEntity
             $data['overview'],
             $data['tagline'],
             $data['original_language'],
-            $data['runtime'] === null ? null : (int)$data['runtime'],
-            $data['release_date'] === null ? null : DateTime::createFromString($data['release_date']),
-            $data['tmdb_vote_average'] === null ? null : (float)$data['tmdb_vote_average'],
-            $data['tmdb_vote_count'] === null ? null : (int)$data['tmdb_vote_count'],
+            self::toIntOrNull($data['runtime']),
+            self::toDateTimeOrNull($data['release_date']),
+            self::toFloatOrNull($data['tmdb_vote_average']),
+            self::toIntOrNull($data['tmdb_vote_count']),
             $data['tmdb_poster_path'],
-            $data['imdb_rating_average'] === null ? null : (float)$data['imdb_rating_average'],
-            $data['imdb_rating_vote_count'] === null ? null : (int)$data['imdb_rating_vote_count'],
-            $data['rt_rating_average'] === null ? null : (int)$data['rt_rating_average'],
-            $data['rt_rating_vote_count'] === null ? null : (int)$data['rt_rating_vote_count'],
-            $data['updated_at_tmdb'] === null ? null : DateTime::createFromString($data['updated_at_tmdb']),
-            $data['updated_at_imdb'] === null ? null : DateTime::createFromString($data['updated_at_imdb']),
-            $data['updated_at_omdb'] === null ? null : DateTime::createFromString($data['updated_at_omdb']),
+            self::toFloatOrNull($data['imdb_rating_average']),
+            self::toIntOrNull($data['imdb_rating_vote_count']),
+            self::toIntOrNull($data['rt_rating_average']),
+            self::toIntOrNull($data['rt_rating_vote_count']),
+            self::toDateTimeOrNull($data['updated_at_tmdb']),
+            self::toDateTimeOrNull($data['updated_at_imdb']),
+            self::toDateTimeOrNull($data['updated_at_omdb']),
         );
+    }
+
+    private static function toIntOrNull(mixed $value) : ?int
+    {
+        return $value === null ? null : (int)$value;
+    }
+
+    private static function toFloatOrNull(mixed $value) : ?float
+    {
+        return $value === null ? null : (float)$value;
+    }
+
+    private static function toDateTimeOrNull(?string $value) : ?DateTime
+    {
+        return $value === null ? null : DateTime::createFromString($value);
     }
 
     public function getId() : int

@@ -98,7 +98,10 @@ class OAuthConfigService
         // Calculate secret expiry (Microsoft only)
         $secretExpiresAt = null;
         if ($provider === 'microsoft' && $secretExpiresInMonths !== null) {
-            $secretExpiresAt = date('Y-m-d H:i:s', strtotime("+{$secretExpiresInMonths} months"));
+            $expiryTimestamp = strtotime("+{$secretExpiresInMonths} months");
+            if ($expiryTimestamp !== false) {
+                $secretExpiresAt = date('Y-m-d H:i:s', $expiryTimestamp);
+            }
         }
 
         // Delete existing config (we only allow one OAuth config at a time)
@@ -372,23 +375,28 @@ class OAuthConfigService
             clientId: (string)$row['client_id'],
             clientSecretEncrypted: (string)$row['client_secret_encrypted'],
             clientSecretIv: (string)$row['client_secret_iv'],
-            tenantId: $row['tenant_id'] !== null ? (string)$row['tenant_id'] : null,
-            refreshTokenEncrypted: $row['refresh_token_encrypted'] !== null ? (string)$row['refresh_token_encrypted'] : null,
-            refreshTokenIv: $row['refresh_token_iv'] !== null ? (string)$row['refresh_token_iv'] : null,
+            tenantId: $this->nullableString($row['tenant_id']),
+            refreshTokenEncrypted: $this->nullableString($row['refresh_token_encrypted']),
+            refreshTokenIv: $this->nullableString($row['refresh_token_iv']),
             fromAddress: (string)$row['from_address'],
-            scopes: $row['scopes'] !== null ? (string)$row['scopes'] : null,
+            scopes: $this->nullableString($row['scopes']),
             tokenStatus: (string)$row['token_status'],
-            tokenError: $row['token_error'] !== null ? (string)$row['token_error'] : null,
-            clientSecretExpiresAt: $row['client_secret_expires_at'] !== null ? (string)$row['client_secret_expires_at'] : null,
-            connectedAt: $row['connected_at'] !== null ? (string)$row['connected_at'] : null,
-            lastTokenRefreshAt: $row['last_token_refresh_at'] !== null ? (string)$row['last_token_refresh_at'] : null,
-            lastFailureAt: $row['last_failure_at'] !== null ? (string)$row['last_failure_at'] : null,
-            lastErrorCode: $row['last_error_code'] !== null ? (string)$row['last_error_code'] : null,
+            tokenError: $this->nullableString($row['token_error']),
+            clientSecretExpiresAt: $this->nullableString($row['client_secret_expires_at']),
+            connectedAt: $this->nullableString($row['connected_at']),
+            lastTokenRefreshAt: $this->nullableString($row['last_token_refresh_at']),
+            lastFailureAt: $this->nullableString($row['last_failure_at']),
+            lastErrorCode: $this->nullableString($row['last_error_code']),
             reauthRequired: (bool)($row['reauth_required'] ?? false),
             alertLevel: (string)($row['alert_level'] ?? 'ok'),
-            nextNotificationAt: $row['next_notification_at'] !== null ? (string)$row['next_notification_at'] : null,
+            nextNotificationAt: $this->nullableString($row['next_notification_at']),
             createdAt: (string)$row['created_at'],
             updatedAt: (string)$row['updated_at'],
         );
+    }
+
+    private function nullableString(mixed $value) : ?string
+    {
+        return $value !== null ? (string)$value : null;
     }
 }

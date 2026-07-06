@@ -16,11 +16,12 @@ class IsAdmin implements MiddlewareInterface
     ) {
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function __invoke(Request $request) : ?Response
     {
         $currentUser = $this->authenticationService->getCurrentUser();
 
-        if ($currentUser === null || $currentUser->isAdmin() === false) {
+        if ($currentUser->isAdmin() === false) {
             return Response::create(
                 StatusCode::createForbidden(),
                 Json::encode(['error' => 'Admin access required']),

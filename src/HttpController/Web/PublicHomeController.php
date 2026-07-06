@@ -21,7 +21,7 @@ class PublicHomeController
 
         $moviesWithStats = [];
         foreach ($movies as $movie) {
-            $stats = $this->groupMovieService->getMovieGroupStats((int)$movie['movie_id']);
+            $stats = $this->groupMovieService->getMovieGroupStats($movie['movie_id']);
             $moviesWithStats[] = [
                 'movie' => $movie,
                 'stats' => $stats,
@@ -35,6 +35,7 @@ class PublicHomeController
             $this->twig->render('public/home.twig', [
                 'movies' => $moviesWithStats,
                 'globalStats' => $globalStats,
+                'showFooter' => false,
             ]),
         );
     }

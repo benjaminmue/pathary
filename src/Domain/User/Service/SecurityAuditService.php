@@ -8,52 +8,52 @@ use Movary\ValueObject\DateTime;
 class SecurityAuditService
 {
     // Event types
-    public const EVENT_TOTP_ENABLED = 'totp_enabled';
-    public const EVENT_TOTP_DISABLED = 'totp_disabled';
-    public const EVENT_PASSWORD_CHANGED = 'password_changed';
-    public const EVENT_RECOVERY_CODES_GENERATED = 'recovery_codes_generated';
-    public const EVENT_RECOVERY_CODE_USED = 'recovery_code_used';
-    public const EVENT_TRUSTED_DEVICE_ADDED = 'trusted_device_added';
-    public const EVENT_TRUSTED_DEVICE_REMOVED = 'trusted_device_removed';
-    public const EVENT_ALL_TRUSTED_DEVICES_REMOVED = 'all_trusted_devices_removed';
-    public const EVENT_LOGIN_SUCCESS = 'login_success';
-    public const EVENT_LOGIN_FAILED_PASSWORD = 'login_failed_password';
-    public const EVENT_LOGIN_FAILED_TOTP = 'login_failed_totp';
-    public const EVENT_LOGIN_FAILED_RECOVERY_CODE = 'login_failed_recovery_code';
-    public const EVENT_LOGOUT = 'logout';
-    public const EVENT_RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded';
+    public const string EVENT_TOTP_ENABLED = 'totp_enabled';
+    public const string EVENT_TOTP_DISABLED = 'totp_disabled';
+    public const string EVENT_PASSWORD_CHANGED = 'password_changed';
+    public const string EVENT_RECOVERY_CODES_GENERATED = 'recovery_codes_generated';
+    public const string EVENT_RECOVERY_CODE_USED = 'recovery_code_used';
+    public const string EVENT_TRUSTED_DEVICE_ADDED = 'trusted_device_added';
+    public const string EVENT_TRUSTED_DEVICE_REMOVED = 'trusted_device_removed';
+    public const string EVENT_ALL_TRUSTED_DEVICES_REMOVED = 'all_trusted_devices_removed';
+    public const string EVENT_LOGIN_SUCCESS = 'login_success';
+    public const string EVENT_LOGIN_FAILED_PASSWORD = 'login_failed_password';
+    public const string EVENT_LOGIN_FAILED_TOTP = 'login_failed_totp';
+    public const string EVENT_LOGIN_FAILED_RECOVERY_CODE = 'login_failed_recovery_code';
+    public const string EVENT_LOGOUT = 'logout';
+    public const string EVENT_RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded';
 
     // User Management Event types
-    public const EVENT_USER_CREATED = 'user_created';
-    public const EVENT_USER_UPDATED = 'user_updated';
-    public const EVENT_USER_DELETED = 'user_deleted';
-    public const EVENT_USER_PASSWORD_CHANGED_BY_ADMIN = 'user_password_changed_by_admin';
-    public const EVENT_USER_WELCOME_EMAIL_SENT = 'user_welcome_email_sent';
-    public const EVENT_USER_WELCOME_EMAIL_FAILED = 'user_welcome_email_failed';
+    public const string EVENT_USER_CREATED = 'user_created';
+    public const string EVENT_USER_UPDATED = 'user_updated';
+    public const string EVENT_USER_DELETED = 'user_deleted';
+    public const string EVENT_USER_PASSWORD_CHANGED_BY_ADMIN = 'user_password_changed_by_admin';
+    public const string EVENT_USER_WELCOME_EMAIL_SENT = 'user_welcome_email_sent';
+    public const string EVENT_USER_WELCOME_EMAIL_FAILED = 'user_welcome_email_failed';
 
     // OAuth Monitoring Event types
-    public const EVENT_OAUTH_TOKEN_WARN_45 = 'oauth_token_warn_45';
-    public const EVENT_OAUTH_TOKEN_WARN_30 = 'oauth_token_warn_30';
-    public const EVENT_OAUTH_TOKEN_WARN_15 = 'oauth_token_warn_15';
-    public const EVENT_OAUTH_TOKEN_WARN_DAILY = 'oauth_token_warn_daily';
-    public const EVENT_OAUTH_TOKEN_EXPIRED = 'oauth_token_expired';
-    public const EVENT_OAUTH_TOKEN_REFRESH_FAILED = 'oauth_token_refresh_failed';
-    public const EVENT_OAUTH_TOKEN_REFRESH_RECOVERED = 'oauth_token_refresh_recovered';
-    public const EVENT_OAUTH_BANNER_ACKNOWLEDGED = 'oauth_banner_acknowledged';
-    public const EVENT_OAUTH_BANNER_SHOWN = 'oauth_banner_shown';
+    public const string EVENT_OAUTH_TOKEN_WARN_45 = 'oauth_token_warn_45';
+    public const string EVENT_OAUTH_TOKEN_WARN_30 = 'oauth_token_warn_30';
+    public const string EVENT_OAUTH_TOKEN_WARN_15 = 'oauth_token_warn_15';
+    public const string EVENT_OAUTH_TOKEN_WARN_DAILY = 'oauth_token_warn_daily';
+    public const string EVENT_OAUTH_TOKEN_EXPIRED = 'oauth_token_expired';
+    public const string EVENT_OAUTH_TOKEN_REFRESH_FAILED = 'oauth_token_refresh_failed';
+    public const string EVENT_OAUTH_TOKEN_REFRESH_RECOVERED = 'oauth_token_refresh_recovered';
+    public const string EVENT_OAUTH_BANNER_ACKNOWLEDGED = 'oauth_banner_acknowledged';
+    public const string EVENT_OAUTH_BANNER_SHOWN = 'oauth_banner_shown';
 
     // OAuth Configuration Event types
-    public const EVENT_OAUTH_CONFIG_CREATED = 'oauth_config_created';
-    public const EVENT_OAUTH_CONFIG_UPDATED = 'oauth_config_updated';
-    public const EVENT_OAUTH_CONFIG_DELETED = 'oauth_config_deleted';
-    public const EVENT_OAUTH_CONNECTED = 'oauth_connected';
-    public const EVENT_OAUTH_DISCONNECTED = 'oauth_disconnected';
-    public const EVENT_OAUTH_AUTH_MODE_CHANGED = 'oauth_auth_mode_changed';
-    public const EVENT_OAUTH_ENCRYPTION_KEY_GENERATED = 'oauth_encryption_key_generated';
-    public const EVENT_OAUTH_CALLBACK_FAILED = 'oauth_callback_failed';
+    public const string EVENT_OAUTH_CONFIG_CREATED = 'oauth_config_created';
+    public const string EVENT_OAUTH_CONFIG_UPDATED = 'oauth_config_updated';
+    public const string EVENT_OAUTH_CONFIG_DELETED = 'oauth_config_deleted';
+    public const string EVENT_OAUTH_CONNECTED = 'oauth_connected';
+    public const string EVENT_OAUTH_DISCONNECTED = 'oauth_disconnected';
+    public const string EVENT_OAUTH_AUTH_MODE_CHANGED = 'oauth_auth_mode_changed';
+    public const string EVENT_OAUTH_ENCRYPTION_KEY_GENERATED = 'oauth_encryption_key_generated';
+    public const string EVENT_OAUTH_CALLBACK_FAILED = 'oauth_callback_failed';
 
     // Event type to label mapping (reduces cyclomatic complexity)
-    private const EVENT_TYPE_LABELS = [
+    private const array EVENT_TYPE_LABELS = [
         self::EVENT_TOTP_ENABLED => '2FA Enabled',
         self::EVENT_TOTP_DISABLED => '2FA Disabled',
         self::EVENT_PASSWORD_CHANGED => 'Password Changed',
