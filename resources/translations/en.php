@@ -265,7 +265,7 @@ return [
     'admin_server.save' => 'Save',
     'admin_server.save_api_settings' => 'Save API Settings',
     'admin_server.save_app_settings' => 'Save App Settings',
-    'admin_server.save_oauth_config' => 'Save OAuth Config',
+    'admin_server.save_oauth_config' => 'Save OAuth',
     'admin_server.save_smtp_settings' => 'Save SMTP Settings',
     'admin_server.saved_leave_blank' => 'Saved (leave blank to keep current)',
     'admin_server.secret_expires_help' => 'Track when secret needs renewal',

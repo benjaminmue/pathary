@@ -265,7 +265,7 @@ return [
     'admin_server.save' => 'Speichern',
     'admin_server.save_api_settings' => 'API-Einstellungen speichern',
     'admin_server.save_app_settings' => 'App-Einstellungen speichern',
-    'admin_server.save_oauth_config' => 'OAuth-Konfiguration speichern',
+    'admin_server.save_oauth_config' => 'OAuth speichern',
     'admin_server.save_smtp_settings' => 'SMTP-Einstellungen speichern',
     'admin_server.saved_leave_blank' => 'Gespeichert (leer lassen, um aktuelles zu behalten)',
     'admin_server.secret_expires_help' => 'Nachverfolgen, wann das Secret erneuert werden muss',
