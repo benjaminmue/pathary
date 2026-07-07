@@ -166,6 +166,19 @@
         .ev-filters { grid-template-columns: 1fr 1fr; }
         .ev-actions { grid-column: 1 / -1; }
     }
+
+    /* Event details modal -> pds */
+    #eventDetailsModal .modal-dialog { margin-top: 84px; }
+    #eventDetailsModal .modal-content { background: var(--pds-surface); border: 1px solid var(--pds-border); border-radius: var(--pds-r); color: var(--pds-text); }
+    #eventDetailsModal .modal-header { border-bottom: 1px solid var(--pds-hair); padding: 18px 22px; }
+    #eventDetailsModal .modal-title { font-size: 15px; font-weight: 600; }
+    #eventDetailsModal .modal-body { padding: 20px 22px; }
+    #eventDetailsModal .modal-footer { border-top: 1px solid var(--pds-hair); padding: 14px 22px; }
+    #eventDetailsModal .btn-close { filter: invert(0.6); opacity: 0.7; }
+    #eventDetailsModal .form-label { color: var(--pds-muted); font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    #eventDetailsModal p { color: var(--pds-text); font-size: 14px; margin-bottom: 0; }
+    #eventDetailsModal code { color: var(--pds-gold); background: none; }
+    .ev-raw { width: 100%; background: #F4F4F5; color: #15171B; border: 1px solid var(--pds-border); border-radius: var(--pds-r-sm); font-family: var(--pds-font-mono); font-size: 12px; line-height: 1.5; padding: 10px 12px; resize: vertical; }
 </style>
 
 <div class="pds-admin-card ev-card">
@@ -217,7 +230,7 @@
     <div class="ev-scroll">
         <div class="ev-colhead">
             <div>{{ t('admin_events.th_id') }}</div>
-            <div>{{ t('admin_events.event_type') }}</div>
+            <div>{{ t('admin_events.th_event') }}</div>
             <div>{{ t('admin_events.th_user') }}</div>
             <div>{{ t('admin_events.th_ip_address') }}</div>
             <div>{{ t('admin_events.th_timestamp') }}</div>
@@ -236,7 +249,7 @@
 </div>
 
 <!-- Event Details Modal -->
-<div class="modal fade" id="eventDetailsModal" tabindex="-1">
+<div class="modal fade pds-root" id="eventDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -252,7 +265,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('admin.close') }}</button>
+                <button type="button" class="pds-btn pds-btn--ghost" data-bs-dismiss="modal">{{ t('admin.close') }}</button>
             </div>
         </div>
     </div>
@@ -338,7 +351,7 @@
                     </div>
                     <div class="ev-cell ev-user">${userName}</div>
                     <div class="ev-cell ev-ip">${ipAddress}</div>
-                    <div class="ev-cell ev-time">${escapeHtml(event.created_at)}</div>
+                    <div class="ev-cell ev-time">${fmtEventDate(event.created_at)}</div>
                     <div class="ev-cell ev-cell--right">
                         <button class="pds-btn pds-btn--ghost ev-details" onclick="showEventDetails(${event.id})">${EV_I18N.details}</button>
                     </div>
@@ -495,7 +508,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-bold">{{ t('admin_events.th_timestamp') }}</label>
-                    <p>${escapeHtml(event.created_at)}</p>
+                    <p>${fmtEventDate(event.created_at)}</p>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-bold">{{ t('admin_events.th_ip_address') }}</label>
@@ -509,8 +522,18 @@
                     <label class="form-label fw-bold">Metadata</label>
                     <p class="small"><code>${metadata}</code></p>
                 </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">{{ t('admin_events.raw_data') }}</label>
+                    <textarea class="ev-raw" readonly rows="7">${escapeHtml(JSON.stringify(event, null, 2))}</textarea>
+                </div>
             </div>
         `;
+    }
+
+    function fmtEventDate(s) {
+        if (!s) return '';
+        const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2}:\d{2})/);
+        return m ? m[3] + '.' + m[2] + '.' + m[1] + ' ' + m[4] : escapeHtml(s);
     }
 
     function escapeHtml(text) {
