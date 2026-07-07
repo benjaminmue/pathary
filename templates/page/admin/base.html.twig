@@ -203,6 +203,17 @@
                 padding: 28px 16px 56px;
             }
         }
+
+        .pds-btn--danger-solid { background: var(--pds-danger); border-color: var(--pds-danger); color: #fff; }
+        .pds-btn--danger-solid:hover { filter: brightness(1.08); }
+
+        .pds-confirm .modal-content { background: var(--pds-surface); border: 1px solid var(--pds-border); border-radius: var(--pds-r); color: var(--pds-text); }
+        .pds-confirm .modal-header { border-bottom: 1px solid var(--pds-hair); padding: 18px 22px; }
+        .pds-confirm .modal-title { font-size: 15px; font-weight: 600; color: var(--pds-text); }
+        .pds-confirm .modal-body { padding: 20px 22px; color: var(--pds-muted); font-size: 14px; line-height: 1.5; }
+        .pds-confirm .modal-footer { border-top: 1px solid var(--pds-hair); padding: 14px 22px; gap: var(--pds-s-sm); }
+        .pds-confirm .btn-close { filter: invert(0.6); opacity: 0.7; }
+        :root[data-theme="light"] .pds-confirm .btn-close { filter: none; }
     </style>
 {% endblock %}
 
@@ -241,7 +252,7 @@
     </div>
 
     <!-- Confirmation Modal Template -->
-    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal fade pds-root pds-confirm" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -252,8 +263,8 @@
                     {{ t('admin.confirm_default_message') }}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('admin.cancel') }}</button>
-                    <button type="button" class="btn btn-danger" id="confirmModalAction">{{ t('admin.confirm') }}</button>
+                    <button type="button" class="pds-btn pds-btn--ghost" data-bs-dismiss="modal">{{ t('admin.cancel') }}</button>
+                    <button type="button" class="pds-btn pds-btn--danger-solid" id="confirmModalAction">{{ t('admin.confirm') }}</button>
                 </div>
             </div>
         </div>

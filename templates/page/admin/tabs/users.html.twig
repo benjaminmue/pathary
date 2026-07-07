@@ -248,13 +248,12 @@
                     <div class="mb-3">
                         <label for="createUserName" class="form-label">{{ t('admin_users.username') }}</label>
                         <input type="text" class="form-control pds-input" id="createUserName" required
-                               pattern="[a-zA-Z0-9]+" title="{{ t('admin_users.username_pattern_title') }}">
-                        <div class="form-text">{{ t('admin_users.username_help') }}</div>
+                               pattern="[a-zA-Z0-9]+" placeholder="{{ t('admin_users.username_help') }}" title="{{ t('admin_users.username_pattern_title') }}">
                     </div>
 
                     <div class="mb-3">
                         <label for="createUserEmail" class="form-label">{{ t('admin_users.email') }}</label>
-                        <input type="email" class="form-control pds-input" id="createUserEmail" required>
+                        <input type="email" class="form-control pds-input" id="createUserEmail" required placeholder="{{ t('admin_users.email_placeholder') }}">
                     </div>
 
                     <div class="mb-3" id="passwordFieldsContainer">
@@ -354,6 +353,7 @@
     const ROLE_USER = {{ t('admin.users.role_user')|json_encode|raw }};
     const EDIT_LABEL = {{ t('admin.users.edit')|json_encode|raw }};
     const DELETE_LABEL = {{ t('admin.users.delete')|json_encode|raw }};
+    const DELETE_CONFIRM_MSG = {{ t('admin_users.delete_confirm')|json_encode|raw }};
     const EMPTY_LABEL = {{ t('admin.users.empty')|json_encode|raw }};
     const LOAD_ERROR_LABEL = {{ t('admin.users.load_error')|json_encode|raw }};
 
@@ -601,7 +601,7 @@
         }
 
         showConfirmModal(
-            `Delete user "${userName}"? All their ratings and watch history will also be deleted. This action cannot be undone.`,
+            DELETE_CONFIRM_MSG.replace('{name}', userName),
             async () => {
                 try {
                     const response = await fetch(`{{ applicationUrl }}/api/admin/users/${userId}`, {
