@@ -1,26 +1,26 @@
 #!/bin/bash
 # Wrapper script for cron-based scheduled sync
-# Exports environment variables from container to cron context
+# Restores the container's runtime environment (cron scrubs it) and runs the sync
 
 set -e  # Exit on error
 set -u  # Exit on undefined variable
 
-# Export required environment variables (set by Docker Compose)
-export TMDB_API_KEY="${TMDB_API_KEY:-}"
-export DATABASE_MODE="${DATABASE_MODE:-sqlite}"
-export DATABASE_MYSQL_HOST="${DATABASE_MYSQL_HOST:-}"
-export DATABASE_MYSQL_PORT="${DATABASE_MYSQL_PORT:-3306}"
-export DATABASE_MYSQL_NAME="${DATABASE_MYSQL_NAME:-}"
-export DATABASE_MYSQL_USER="${DATABASE_MYSQL_USER:-}"
-export DATABASE_MYSQL_PASSWORD="${DATABASE_MYSQL_PASSWORD:-}"
-export APPLICATION_URL="${APPLICATION_URL:-http://localhost}"
-export TZ="${TZ:-UTC}"
-
-# Optional: OMDb API key for IMDb + Rotten Tomatoes ratings
-export OMDB_API_KEY="${OMDB_API_KEY:-}"
-
-# Optional: Image caching setting
-export TMDB_ENABLE_IMAGE_CACHING="${TMDB_ENABLE_IMAGE_CACHING:-0}"
+# cron runs jobs with an empty environment, so the container's runtime variables
+# (DB credentials, TMDB/OMDb keys, ENCRYPTION_KEY) are NOT available here. The
+# entrypoint snapshotted them to this file at container start; source it so the
+# sync talks to the real database instead of silently falling back to SQLite.
+# (The previous `export VAR="${VAR:-default}"` block was a no-op under cron: it
+# read from the already-empty environment and exported empty/default values.)
+CRON_ENV_FILE="${CRON_ENV_FILE:-/app/storage/.cron-env}"
+if [ -f "$CRON_ENV_FILE" ]; then
+    set -a  # auto-export everything sourced below
+    # shellcheck disable=SC1090
+    . "$CRON_ENV_FILE"
+    set +a
+else
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: $CRON_ENV_FILE missing; refusing to run with an incomplete environment (would sync the wrong database)" >&2
+    exit 1
+fi
 
 # Change to app directory
 cd /app

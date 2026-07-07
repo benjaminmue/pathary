@@ -162,6 +162,15 @@ setup_symlinks() {
 start_cron() {
     echo "[CRON] Starting cron daemon for scheduled syncs..."
 
+    # Snapshot the container environment for the cron job. cron scrubs the
+    # environment before running a job, so without this the scheduled sync would
+    # not see DATABASE_MYSQL_*, TMDB_API_KEY, OMDB_API_KEY or ENCRYPTION_KEY and
+    # would fall back to an empty SQLite database (see run-scheduled-sync.sh).
+    if [ -f "/app/build/scripts/write-cron-env.sh" ]; then
+        /bin/bash /app/build/scripts/write-cron-env.sh /app/storage/.cron-env || \
+            echo "[CRON] WARNING: could not persist cron environment"
+    fi
+
     # Start cron in the background
     cron
 
