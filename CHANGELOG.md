@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.3](https://github.com/benjaminmue/pathary/compare/v0.7.2...v0.7.3) (2026-07-07)
+
+
+### Bug Fixes
+
+* **sync:** scheduled cron sync ran against an empty SQLite DB ([5b2514f](https://github.com/benjaminmue/pathary/commit/5b2514f5721249e69351c83ce4ec2c98fbc47a51))
+* **sync:** scheduled cron sync ran against an empty SQLite DB ([2bf4851](https://github.com/benjaminmue/pathary/commit/2bf4851943abcb90fd75212d8e582a59223df204))
+
 ## [0.7.2](https://github.com/benjaminmue/pathary/compare/v0.7.1...v0.7.2) (2026-07-07)
 
 
