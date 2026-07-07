@@ -214,6 +214,8 @@
         .pds-confirm .modal-footer { border-top: 1px solid var(--pds-hair); padding: 14px 22px; gap: var(--pds-s-sm); }
         .pds-confirm .btn-close { filter: invert(0.6); opacity: 0.7; }
         :root[data-theme="light"] .pds-confirm .btn-close { filter: none; }
+        /* Keep the navbar visible: offset modals below the header */
+        .pdsu-modal .modal-dialog, .pds-confirm .modal-dialog { margin-top: 84px; }
     </style>
 {% endblock %}
 
