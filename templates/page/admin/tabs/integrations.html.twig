@@ -1,263 +1,204 @@
-<div class="card admin-card">
-    <div class="card-header">
-        <i class="bi bi-plug me-2"></i>{{ t('admin_integrations.title') }}
-    </div>
-    <div class="card-body">
-        <p class="text-muted">
-            {{ t('admin_integrations.intro') }}
+<style>
+    /* ===== Integrations tab (scoped) ===== */
+    .pint-intro {
+        font-size: 13px;
+        color: var(--pds-muted);
+        line-height: 1.6;
+        margin: 0 0 14px;
+    }
+
+    .pint-intro a {
+        color: var(--pds-gold);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .pint-intro a:hover {
+        text-decoration: underline;
+    }
+
+    .pint-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .pint-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .pint-grid > .pds-admin-card { margin-top: 0; }
+
+    .pint-card {
+        padding: 14px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: 100%;
+    }
+
+    .pint-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .pint-tile {
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+        border-radius: var(--pds-r-sm);
+        background: var(--pds-surface-2);
+        border: 1px solid var(--pds-hair);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--pds-font-mono);
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--pds-gold);
+    }
+
+    .pint-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    .pint-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--pds-text);
+        line-height: 1.2;
+    }
+
+    .pint-pill {
+        align-self: flex-start;
+        font-family: var(--pds-font-mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 999px;
+        line-height: 1.4;
+    }
+
+    .pint-pill--available {
+        color: var(--pds-muted);
+        border: 1px solid var(--pds-border);
+        background: transparent;
+    }
+
+    .pint-pill--limited {
+        color: #15171B;
+        background: var(--pds-gold);
+        border: 1px solid var(--pds-gold);
+    }
+
+    .pint-desc {
+        font-size: 13px;
+        color: var(--pds-muted);
+        line-height: 1.5;
+        margin: 0;
+        flex: 1;
+    }
+
+    .pint-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .pint-doc {
+        font-size: 13px;
+        color: var(--pds-dim);
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .pint-doc:hover {
+        color: var(--pds-gold);
+    }
+
+    .pint-help {
+        margin-top: 24px;
+        padding: 16px 20px;
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        background: var(--pds-surface-2);
+    }
+
+    .pint-help__title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--pds-text);
+        margin: 0 0 4px;
+    }
+
+    .pint-help__text {
+        font-size: 13px;
+        color: var(--pds-muted);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .pint-help__text a {
+        color: var(--pds-gold);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .pint-help__text a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+{% set integrations = [
+    { name: 'Plex',       initials: 'PX', desc: 'admin_integrations.plex_desc',       path: 'plex',       docs: 'https://docs.pathary.tv/features/plex/',                                status: 'available' },
+    { name: 'Jellyfin',   initials: 'JF', desc: 'admin_integrations.jellyfin_desc',   path: 'jellyfin',   docs: 'https://docs.pathary.tv/features/jellyfin/',                            status: 'available' },
+    { name: 'Trakt.tv',   initials: 'TR', desc: 'admin_integrations.trakt_desc',      path: 'trakt',      docs: 'https://docs.pathary.tv/features/trakt/',                               status: 'available' },
+    { name: 'Letterboxd', initials: 'LB', desc: 'admin_integrations.letterboxd_desc', path: 'letterboxd', docs: 'https://docs.pathary.tv/features/letterboxd/',                          status: 'available' },
+    { name: 'Mastodon',   initials: 'MD', desc: 'admin_integrations.mastodon_desc',   path: 'mastodon',   docs: 'https://docs.pathary.tv/',                                              status: 'available' },
+    { name: 'Kodi',       initials: 'KD', desc: 'admin_integrations.kodi_desc',       path: 'kodi',       docs: 'https://docs.pathary.tv/features/kodi/',                                status: 'available' },
+    { name: 'Netflix',    initials: 'NF', desc: 'admin_integrations.netflix_desc',    path: 'netflix',    docs: 'https://github.com/benjaminmue/pathary/wiki/Integrations-Netflix',      status: 'limited' },
+    { name: 'Radarr',     initials: 'RD', desc: 'admin_integrations.radarr_desc',     path: 'radarr',     docs: 'https://github.com/benjaminmue/pathary/wiki/Integrations-Radarr',       status: 'available' },
+] %}
+
+        <p class="pint-intro">
+            {{ t('admin_integrations.intro_lead') }}
+            <a href="https://github.com/benjaminmue/pathary/wiki" target="_blank" rel="noopener">{{ t('admin_integrations.wiki') }}</a>.
         </p>
 
-        <div class="row g-4">
-            <!-- Plex Integration -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-warning bg-opacity-10 rounded p-3">
-                                    <i class="bi bi-play-circle h2 text-warning mb-0"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="card-title mb-1">Plex</h5>
-                                <span class="badge bg-success">{{ t('admin_integrations.status_available') }}</span>
-                            </div>
-                        </div>
-                        <p class="card-text small text-muted">
-                            {{ t('admin_integrations.plex_desc') }}
-                        </p>
-                        <div class="d-flex gap-2">
-                            <a href="{{ applicationUrl }}/old/settings/integrations/plex" class="btn btn-sm btn-primary">
-                                <i class="bi bi-gear me-1"></i>{{ t('admin_integrations.configure') }}
-                            </a>
-                            <a href="https://docs.pathary.tv/features/plex/" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-book me-1"></i>{{ t('admin_integrations.docs') }}
-                            </a>
+        <div class="pint-grid">
+            {% for integration in integrations %}
+                <div class="pds-admin-card pint-card">
+                    <div class="pint-head">
+                        <div class="pint-tile">{{ integration.initials }}</div>
+                        <div class="pint-meta">
+                            <span class="pint-name">{{ integration.name }}</span>
+                            {% if integration.status == 'limited' %}
+                                <span class="pint-pill pint-pill--limited">{{ t('admin_integrations.status_limited') }}</span>
+                            {% else %}
+                                <span class="pint-pill pint-pill--available">{{ t('admin_integrations.status_available') }}</span>
+                            {% endif %}
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Jellyfin Integration -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-info bg-opacity-10 rounded p-3">
-                                    <i class="bi bi-collection-play h2 text-info mb-0"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="card-title mb-1">Jellyfin</h5>
-                                <span class="badge bg-success">{{ t('admin_integrations.status_available') }}</span>
-                            </div>
-                        </div>
-                        <p class="card-text small text-muted">
-                            {{ t('admin_integrations.jellyfin_desc') }}
-                        </p>
-                        <div class="d-flex gap-2">
-                            <a href="{{ applicationUrl }}/old/settings/integrations/jellyfin" class="btn btn-sm btn-primary">
-                                <i class="bi bi-gear me-1"></i>{{ t('admin_integrations.configure') }}
-                            </a>
-                            <a href="https://docs.pathary.tv/features/jellyfin/" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-book me-1"></i>{{ t('admin_integrations.docs') }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    <p class="pint-desc">{{ t(integration.desc) }}</p>
 
-            <!-- Trakt Integration -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-danger bg-opacity-10 rounded p-3">
-                                    <i class="bi bi-heart h2 text-danger mb-0"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="card-title mb-1">Trakt.tv</h5>
-                                <span class="badge bg-success">{{ t('admin_integrations.status_available') }}</span>
-                            </div>
-                        </div>
-                        <p class="card-text small text-muted">
-                            {{ t('admin_integrations.trakt_desc') }}
-                        </p>
-                        <div class="d-flex gap-2">
-                            <a href="{{ applicationUrl }}/old/settings/integrations/trakt" class="btn btn-sm btn-primary">
-                                <i class="bi bi-gear me-1"></i>{{ t('admin_integrations.configure') }}
-                            </a>
-                            <a href="https://docs.pathary.tv/features/trakt/" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-book me-1"></i>{{ t('admin_integrations.docs') }}
-                            </a>
-                        </div>
+                    <div class="pint-actions">
+                        <a href="{{ applicationUrl }}/old/settings/integrations/{{ integration.path }}" class="pds-btn pds-btn--ghost">
+                            {{ t('admin_integrations.configure') }}
+                        </a>
+                        <a href="{{ integration.docs }}" target="_blank" rel="noopener" class="pint-doc">
+                            {{ t('admin_integrations.docs') }} &rarr;
+                        </a>
                     </div>
                 </div>
-            </div>
-
-            <!-- Letterboxd Integration -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-secondary bg-opacity-10 rounded p-3">
-                                    <i class="bi bi-file-earmark-text h2 text-secondary mb-0"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="card-title mb-1">Letterboxd</h5>
-                                <span class="badge bg-success">{{ t('admin_integrations.status_available') }}</span>
-                            </div>
-                        </div>
-                        <p class="card-text small text-muted">
-                            {{ t('admin_integrations.letterboxd_desc') }}
-                        </p>
-                        <div class="d-flex gap-2">
-                            <a href="{{ applicationUrl }}/old/settings/integrations/letterboxd" class="btn btn-sm btn-primary">
-                                <i class="bi bi-gear me-1"></i>{{ t('admin_integrations.configure') }}
-                            </a>
-                            <a href="https://docs.pathary.tv/features/letterboxd/" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-book me-1"></i>{{ t('admin_integrations.docs') }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mastodon Integration -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-primary bg-opacity-10 rounded p-3">
-                                    <i class="bi bi-mastodon h2 text-primary mb-0"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="card-title mb-1">Mastodon</h5>
-                                <span class="badge bg-success">{{ t('admin_integrations.status_available') }}</span>
-                            </div>
-                        </div>
-                        <p class="card-text small text-muted">
-                            {{ t('admin_integrations.mastodon_desc') }}
-                        </p>
-                        <div class="d-flex gap-2">
-                            <a href="{{ applicationUrl }}/old/settings/integrations/mastodon" class="btn btn-sm btn-primary">
-                                <i class="bi bi-gear me-1"></i>{{ t('admin_integrations.configure') }}
-                            </a>
-                            <a href="https://docs.pathary.tv/" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-book me-1"></i>{{ t('admin_integrations.docs') }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Kodi Integration -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-success bg-opacity-10 rounded p-3">
-                                    <i class="bi bi-tv h2 text-success mb-0"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="card-title mb-1">Kodi</h5>
-                                <span class="badge bg-success">{{ t('admin_integrations.status_available') }}</span>
-                            </div>
-                        </div>
-                        <p class="card-text small text-muted">
-                            {{ t('admin_integrations.kodi_desc') }}
-                        </p>
-                        <div class="d-flex gap-2">
-                            <a href="{{ applicationUrl }}/old/settings/integrations/kodi" class="btn btn-sm btn-primary">
-                                <i class="bi bi-gear me-1"></i>{{ t('admin_integrations.configure') }}
-                            </a>
-                            <a href="https://docs.pathary.tv/features/kodi/" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-book me-1"></i>{{ t('admin_integrations.docs') }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Netflix Integration (Planned) -->
-            <div class="col-md-6">
-                <div class="card h-100 border-warning">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-warning bg-opacity-10 rounded p-3">
-                                    <i class="bi bi-film h2 text-warning mb-0"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="card-title mb-1">Netflix</h5>
-                                <span class="badge bg-warning">{{ t('admin_integrations.status_limited') }}</span>
-                            </div>
-                        </div>
-                        <p class="card-text small text-muted">
-                            {{ t('admin_integrations.netflix_desc') }}
-                        </p>
-                        <div class="d-flex gap-2">
-                            <a href="{{ applicationUrl }}/old/settings/integrations/netflix" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-gear me-1"></i>{{ t('admin_integrations.configure') }}
-                            </a>
-                            <a href="https://github.com/benjaminmue/pathary/wiki/Integrations-Netflix" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-book me-1"></i>{{ t('admin_integrations.docs') }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Radarr Integration -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-dark bg-opacity-10 rounded p-3">
-                                    <i class="bi bi-rss h2 text-dark mb-0"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="card-title mb-1">Radarr</h5>
-                                <span class="badge bg-success">{{ t('admin_integrations.status_available') }}</span>
-                            </div>
-                        </div>
-                        <p class="card-text small text-muted">
-                            {{ t('admin_integrations.radarr_desc') }}
-                        </p>
-                        <div class="d-flex gap-2">
-                            <a href="{{ applicationUrl }}/old/settings/integrations/radarr" class="btn btn-sm btn-primary">
-                                <i class="bi bi-gear me-1"></i>{{ t('admin_integrations.configure') }}
-                            </a>
-                            <a href="https://github.com/benjaminmue/pathary/wiki/Integrations-Radarr" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-book me-1"></i>{{ t('admin_integrations.docs') }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
 
-        <!-- Help Section -->
-        <div class="alert alert-info mt-4" role="alert">
-            <h6 class="alert-heading"><i class="bi bi-lightbulb me-2"></i>{{ t('admin_integrations.need_help') }}</h6>
-            <p class="mb-0 small">
-                {{ t('admin_integrations.help_text_part1') }}
-                <a href="https://github.com/benjaminmue/pathary/wiki" target="_blank" rel="noopener" class="alert-link">Pathary Wiki</a>.
-                {{ t('admin_integrations.help_text_part2') }}
-                <a href="https://github.com/benjaminmue/pathary/issues" target="_blank" rel="noopener" class="alert-link">GitHub Issues</a>.
-            </p>
-        </div>
-    </div>
-</div>

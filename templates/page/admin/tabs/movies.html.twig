@@ -1,180 +1,326 @@
-<div class="card admin-card">
-    <div class="card-header">
-        <i class="bi bi-film me-2"></i>{{ t('admin_movies.title') }}
-    </div>
-    <div class="card-body">
-        <p class="text-muted">
-            {{ t('admin_movies.intro') }}
-        </p>
+<style>
+    /* ===== Scoped styles for the Movies admin tab (uses --pds-* tokens from .pds-root) ===== */
+    .pds-movies-stack {
+        display: flex;
+        flex-direction: column;
+        gap: var(--pds-s-lg);
+    }
 
-        <!-- Movie Search Section -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-8">
-                <label for="movieSearch" class="form-label">{{ t('admin_movies.search_movies') }}</label>
+    .pds-search-row {
+        display: flex;
+        gap: var(--pds-s-md);
+        align-items: stretch;
+        margin-top: var(--pds-s-md);
+    }
+
+    .pds-search-row .pds-input {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Add-place row */
+    .pds-add-row {
+        display: flex;
+        gap: var(--pds-s-md);
+        align-items: stretch;
+        margin-top: var(--pds-s-md);
+    }
+
+    .pds-add-row .pds-input {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Place list */
+    .pds-place-list {
+        margin-top: var(--pds-s-md);
+    }
+
+    .pds-place-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--pds-s-md);
+        padding: 12px 0;
+        border-bottom: 1px solid var(--pds-hair);
+    }
+
+    .pds-place-row:last-child {
+        border-bottom: none;
+    }
+
+    .pds-place-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--pds-text);
+    }
+
+    .pds-place-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--pds-s-sm);
+    }
+
+    .pds-place-count {
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+        color: var(--pds-dim);
+        margin-right: 4px;
+    }
+
+    .pds-place-empty {
+        color: var(--pds-muted);
+        font-size: 13px;
+        text-align: center;
+        padding: 16px 0;
+    }
+
+    /* Small button modifier */
+    .pds-btn--sm {
+        padding: 6px 13px;
+        font-size: 13px;
+    }
+
+    /* Danger-on-hover ghost button (neutral until hovered) */
+    .pds-btn--danger-hover {
+        background: none;
+        border-color: var(--pds-border);
+        color: var(--pds-muted);
+    }
+
+    .pds-btn--danger-hover:hover {
+        border-color: var(--pds-danger);
+        color: var(--pds-danger);
+        background: rgba(192, 57, 43, 0.08);
+    }
+
+    /* Two side-by-side cards */
+    .pds-two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--pds-s-lg);
+    }
+    .pds-two-col > .pds-admin-card { height: 100%; margin-top: 0; }
+
+    @media (max-width: 768px) {
+        .pds-two-col {
+            grid-template-columns: 1fr;
+        }
+        .pds-search-row,
+        .pds-add-row {
+            flex-direction: column;
+        }
+    }
+
+    /* Search-results / movie-details sub sections */
+    .pds-movies-sub {
+        margin-top: var(--pds-s-lg);
+        padding-top: var(--pds-s-md);
+        border-top: 1px solid var(--pds-hair);
+    }
+
+    .pds-movies-sub__title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--pds-muted);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-bottom: var(--pds-s-md);
+    }
+
+    .pds-stat {
+        background: var(--pds-surface-2);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        padding: 10px 14px;
+    }
+
+    .pds-stat__label {
+        font-size: 12px;
+        color: var(--pds-muted);
+    }
+
+    .pds-stat__value {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--pds-text);
+        font-family: var(--pds-font-mono);
+    }
+
+    .pds-movie-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--pds-s-sm);
+        margin-top: var(--pds-s-md);
+    }
+</style>
+
+<div class="pds-movies-stack">
+
+    {# ===== Card 1: Filmverwaltung ===== #}
+    <div class="pds-admin-card">
+        <div class="pds-admin-card__pad">
+            <div class="pds-admin-card__title">{{ t('admin_movies.title') }}</div>
+            <div class="pds-admin-card__sub">{{ t('admin_movies.intro') }}</div>
+
+            <!-- Movie Search Section -->
+            <div class="pds-search-row">
                 <input type="text"
-                       class="form-control"
+                       class="pds-input"
                        id="movieSearch"
                        placeholder="{{ t('admin_movies.search_placeholder') }}"
                        autocomplete="off">
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button class="btn btn-primary w-100" onclick="searchMovies()">
-                    <i class="bi bi-search me-1"></i>{{ t('admin_movies.search_button') }}
+                <button class="pds-btn pds-btn--primary" onclick="searchMovies()">
+                    {{ t('admin_movies.search_button') }}
                 </button>
             </div>
-        </div>
 
-        <!-- Search Results -->
-        <div id="movieSearchResults" class="d-none">
-            <h6 class="border-bottom pb-2 mb-3">{{ t('admin_movies.search_results') }}</h6>
-            <div id="movieResultsList" class="list-group mb-3"></div>
-        </div>
+            <!-- Search Results -->
+            <div id="movieSearchResults" class="pds-movies-sub d-none">
+                <div class="pds-movies-sub__title">{{ t('admin_movies.search_results') }}</div>
+                <div id="movieResultsList" class="list-group mb-3"></div>
+            </div>
 
-        <!-- Selected Movie Details -->
-        <div id="movieDetails" class="d-none">
-            <h6 class="border-bottom pb-2 mb-3">{{ t('admin_movies.movie_details') }}</h6>
+            <!-- Selected Movie Details -->
+            <div id="movieDetails" class="pds-movies-sub d-none">
+                <div class="pds-movies-sub__title">{{ t('admin_movies.movie_details') }}</div>
 
-            <div class="row">
-                <div class="col-md-3 text-center mb-3">
-                    <img id="moviePoster" src="" alt="{{ t('admin_movies.movie_poster_alt') }}" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
-                </div>
-                <div class="col-md-9">
-                    <h4 id="movieTitle" class="mb-2"></h4>
-                    <p class="text-muted mb-3">
-                        <span id="movieYear"></span> •
-                        <span id="movieRuntime"></span> •
-                        TMDB ID: <span id="movieTmdbId"></span>
-                    </p>
-
-                    <div class="mb-3">
-                        <h6>{{ t('admin_movies.synopsis') }}</h6>
-                        <p id="movieOverview" class="text-muted small"></p>
+                <div class="row">
+                    <div class="col-md-3 text-center mb-3">
+                        <img id="moviePoster" src="" alt="{{ t('admin_movies.movie_poster_alt') }}" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
                     </div>
+                    <div class="col-md-9">
+                        <h4 id="movieTitle" class="mb-2"></h4>
+                        <p class="text-muted mb-3">
+                            <span id="movieYear"></span> •
+                            <span id="movieRuntime"></span> •
+                            TMDB ID: <span id="movieTmdbId"></span>
+                        </p>
 
-                    <div class="mb-3">
-                        <h6>{{ t('admin_movies.statistics') }}</h6>
-                        <div class="row g-2">
-                            <div class="col-md-4">
-                                <div class="card bg-body-secondary">
-                                    <div class="card-body py-2 px-3">
-                                        <div class="small text-muted">{{ t('admin_movies.total_ratings') }}</div>
-                                        <div class="h5 mb-0" id="movieRatingCount">-</div>
+                        <div class="mb-3">
+                            <div class="pds-movies-sub__title">{{ t('admin_movies.synopsis') }}</div>
+                            <p id="movieOverview" class="text-muted small"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="pds-movies-sub__title">{{ t('admin_movies.statistics') }}</div>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <div class="pds-stat">
+                                        <div class="pds-stat__label">{{ t('admin_movies.total_ratings') }}</div>
+                                        <div class="pds-stat__value" id="movieRatingCount">-</div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card bg-body-secondary">
-                                    <div class="card-body py-2 px-3">
-                                        <div class="small text-muted">{{ t('admin_movies.watch_dates') }}</div>
-                                        <div class="h5 mb-0" id="movieWatchCount">-</div>
+                                <div class="col-md-4">
+                                    <div class="pds-stat">
+                                        <div class="pds-stat__label">{{ t('admin_movies.watch_dates') }}</div>
+                                        <div class="pds-stat__value" id="movieWatchCount">-</div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card bg-body-secondary">
-                                    <div class="card-body py-2 px-3">
-                                        <div class="small text-muted">{{ t('admin_movies.avg_rating') }}</div>
-                                        <div class="h5 mb-0" id="movieAvgRating">-</div>
+                                <div class="col-md-4">
+                                    <div class="pds-stat">
+                                        <div class="pds-stat__label">{{ t('admin_movies.avg_rating') }}</div>
+                                        <div class="pds-stat__value" id="movieAvgRating">-</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Action Buttons -->
-                    <div class="btn-group mb-3" role="group">
-                        <button class="btn btn-outline-primary" onclick="syncMovieFromTMDB()">
-                            <i class="bi bi-arrow-clockwise me-1"></i>{{ t('admin_movies.sync_from_tmdb') }}
-                        </button>
-                        <button class="btn btn-outline-secondary" onclick="viewMovieRatings()">
-                            <i class="bi bi-star me-1"></i>{{ t('admin_movies.view_all_ratings') }}
-                        </button>
-                        <button class="btn btn-outline-danger" onclick="confirmDeleteMovie()">
-                            <i class="bi bi-trash me-1"></i>{{ t('admin_movies.delete_movie') }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ratings List -->
-            <div id="movieRatingsList" class="d-none mt-4">
-                <h6 class="border-bottom pb-2 mb-3">{{ t('admin_movies.user_ratings') }}</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover">
-                        <thead>
-                            <tr>
-                                <th>{{ t('admin_movies.th_user') }}</th>
-                                <th>{{ t('admin_movies.th_rating') }}</th>
-                                <th>{{ t('admin_movies.th_watched_date') }}</th>
-                                <th>{{ t('admin_movies.th_location') }}</th>
-                                <th>{{ t('admin_movies.th_actions') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ratingsTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Locations Management Section -->
-        <div class="mt-5 pt-4 border-top">
-            <h6 class="mb-3"><i class="bi bi-pin-map-fill me-2"></i>{{ t('admin_movies.watch_locations') }}</h6>
-            <p class="text-muted small mb-3">
-                {{ t('admin_movies.watch_locations_intro') }}
-            </p>
-
-            <!-- Add New Location Form -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-8">
-                    <label for="newLocationName" class="form-label">{{ t('admin_movies.location_name') }}</label>
-                    <input type="text" class="form-control" id="newLocationName" placeholder="{{ t('admin_movies.location_name_placeholder') }}">
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button class="btn btn-primary w-100" onclick="createLocation()">
-                        <i class="bi bi-plus-circle me-1"></i>{{ t('admin_movies.add_location') }}
-                    </button>
-                </div>
-            </div>
-
-            <!-- Existing Locations List -->
-            <div id="locationsList" class="list-group">
-                <!-- Populated by loadLocations() -->
-            </div>
-        </div>
-
-        <!-- Bulk Operations Section -->
-        <div class="mt-5 pt-4 border-top">
-            <h6 class="mb-3"><i class="bi bi-tools me-2"></i>{{ t('admin_movies.bulk_operations') }}</h6>
-            <div class="row g-2">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h6 class="card-title">{{ t('admin_movies.cleanup_orphaned_posters') }}</h6>
-                            <p class="card-text small text-muted">{{ t('admin_movies.cleanup_orphaned_posters_desc') }}</p>
-                            <button class="btn btn-sm btn-outline-danger" onclick="cleanupOrphanedPosters()">
-                                <i class="bi bi-trash me-1"></i>{{ t('admin_movies.run_cleanup') }}
+                        <!-- Action Buttons -->
+                        <div class="pds-movie-actions">
+                            <button class="pds-btn pds-btn--ghost pds-btn--sm" onclick="syncMovieFromTMDB()">
+                                {{ t('admin_movies.sync_from_tmdb') }}
+                            </button>
+                            <button class="pds-btn pds-btn--ghost pds-btn--sm" onclick="viewMovieRatings()">
+                                {{ t('admin_movies.view_all_ratings') }}
+                            </button>
+                            <button class="pds-btn pds-btn--danger pds-btn--sm" onclick="confirmDeleteMovie()">
+                                {{ t('admin_movies.delete_movie') }}
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h6 class="card-title">{{ t('admin_movies.refresh_all_tmdb') }}</h6>
-                            <p class="card-text small text-muted">{{ t('admin_movies.refresh_all_tmdb_desc') }}</p>
-                            <button class="btn btn-sm btn-outline-primary" onclick="refreshAllTMDB()">
-                                <i class="bi bi-arrow-clockwise me-1"></i>{{ t('admin_movies.queue_job') }}
-                            </button>
-                        </div>
+
+                <!-- Ratings List -->
+                <div id="movieRatingsList" class="d-none mt-4">
+                    <div class="pds-movies-sub__title">{{ t('admin_movies.user_ratings') }}</div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{ t('admin_movies.th_user') }}</th>
+                                    <th>{{ t('admin_movies.th_rating') }}</th>
+                                    <th>{{ t('admin_movies.th_watched_date') }}</th>
+                                    <th>{{ t('admin_movies.th_location') }}</th>
+                                    <th>{{ t('admin_movies.th_actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ratingsTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    {# ===== Card 2: Sehorte ===== #}
+    <div class="pds-admin-card">
+        <div class="pds-admin-card__pad">
+            <div class="pds-admin-card__title">{{ t('admin_movies.watch_locations') }}</div>
+            <div class="pds-admin-card__sub">{{ t('admin_movies.watch_locations_intro') }}</div>
+
+            <!-- Add New Location Form -->
+            <div class="pds-add-row">
+                <input type="text" class="pds-input" id="newLocationName" placeholder="{{ t('admin_movies.location_name_placeholder') }}">
+                <button class="pds-btn pds-btn--ghost" onclick="createLocation()">
+                    {{ t('admin_movies.add_location') }}
+                </button>
+            </div>
+
+            <!-- Existing Locations List -->
+            <div id="locationsList" class="pds-place-list">
+                <!-- Populated by loadLocations() -->
+            </div>
+        </div>
+    </div>
+
+    {# ===== Cards 3 + 4: Bulk operations, side by side ===== #}
+    <div class="pds-two-col">
+        <div class="pds-admin-card">
+            <div class="pds-admin-card__pad">
+                <div class="pds-admin-card__title">{{ t('admin_movies.cleanup_orphaned_posters') }}</div>
+                <div class="pds-admin-card__sub">{{ t('admin_movies.cleanup_orphaned_posters_desc') }}</div>
+                <div class="pds-movie-actions">
+                    <button class="pds-btn pds-btn--danger" onclick="cleanupOrphanedPosters()">
+                        {{ t('admin_movies.run_cleanup') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="pds-admin-card">
+            <div class="pds-admin-card__pad">
+                <div class="pds-admin-card__title">{{ t('admin_movies.refresh_all_tmdb') }}</div>
+                <div class="pds-admin-card__sub">{{ t('admin_movies.refresh_all_tmdb_desc') }}</div>
+                <div class="pds-movie-actions">
+                    <button class="pds-btn pds-btn--ghost" onclick="refreshAllTMDB()">
+                        {{ t('admin_movies.queue_job') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
     let currentMovieId = null;
+
+    // Localized strings for JS-generated markup
+    const MOVIES_I18N = {
+        rename: '{{ t('admin.movies.rename')|e('js') }}',
+        delete: '{{ t('admin.movies.delete')|e('js') }}',
+        noLocations: '{{ t('admin.movies.no_locations')|e('js') }}',
+    };
 
     // ========== Location Management Functions ==========
 
@@ -200,26 +346,30 @@
     function displayLocations(locations) {
         const container = document.getElementById('locationsList');
         if (locations.length === 0) {
-            container.innerHTML = '<p class="text-muted text-center py-3">No locations yet. Add one above to get started.</p>';
+            container.innerHTML = `<p class="pds-place-empty">${escapeHtml(MOVIES_I18N.noLocations)}</p>`;
             return;
         }
 
-        container.innerHTML = locations.map(location => `
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <i class="bi bi-pin-map-fill me-2"></i>
-                    <strong>${escapeHtml(location.name)}</strong>
-                </div>
-                <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-secondary btn-edit-location" data-location-id="${location.id}" data-location-name="${escapeHtml(location.name)}">
-                        <i class="bi bi-pencil"></i>
+        container.innerHTML = locations.map(location => {
+            const rawCount = (location.usageCount ?? location.usage_count);
+            const countHtml = (typeof rawCount === 'number')
+                ? `<span class="pds-place-count">${rawCount} Sichtungen</span>`
+                : '';
+            return `
+            <div class="pds-place-row">
+                <div class="pds-place-name">${escapeHtml(location.name)}</div>
+                <div class="pds-place-actions">
+                    ${countHtml}
+                    <button class="pds-btn pds-btn--ghost pds-btn--sm btn-edit-location" data-location-id="${location.id}" data-location-name="${escapeHtml(location.name)}">
+                        ${escapeHtml(MOVIES_I18N.rename)}
                     </button>
-                    <button class="btn btn-outline-danger btn-delete-location" data-location-id="${location.id}" data-location-name="${escapeHtml(location.name)}">
-                        <i class="bi bi-trash"></i>
+                    <button class="pds-btn pds-btn--danger-hover pds-btn--sm btn-delete-location" data-location-id="${location.id}" data-location-name="${escapeHtml(location.name)}">
+                        ${escapeHtml(MOVIES_I18N.delete)}
                     </button>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
 
         // Add event listeners using event delegation
         container.querySelectorAll('.btn-edit-location').forEach(btn => {
@@ -276,7 +426,7 @@
         const addButton = document.querySelector('button[onclick="createLocation()"]');
         const originalHTML = addButton.innerHTML;
 
-        addButton.innerHTML = '<i class="bi bi-check-circle me-1"></i>Update Location';
+        addButton.innerHTML = MOVIES_I18N.rename;
         addButton.onclick = async function() {
             await updateLocation(id);
             // Restore original button

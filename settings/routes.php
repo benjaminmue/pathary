@@ -416,6 +416,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     // Admin Events API (admin-only)
     $routes->add('GET', '/admin/events', [Api\AdminEventsController::class, 'getEvents'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
+    $routes->add('GET', '/admin/events/export', [Api\AdminEventsController::class, 'exportEvents'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
     $routes->add('GET', '/admin/events/{id:\d+}', [Api\AdminEventsController::class, 'getEventById'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\IsAdmin::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);

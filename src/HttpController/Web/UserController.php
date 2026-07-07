@@ -167,7 +167,15 @@ class UserController
             return Response::createForbidden();
         }
 
-        return Response::createJson(Json::encode($this->userApi->fetchAll()));
+        $users = $this->userApi->fetchAll();
+        $ratingCounts = $this->userApi->fetchRatingCountsByUserId();
+
+        foreach ($users as &$user) {
+            $user['ratingsCount'] = $ratingCounts[(int)$user['id']] ?? 0;
+        }
+        unset($user);
+
+        return Response::createJson(Json::encode($users));
     }
 
     public function updateUser(Request $request) : Response

@@ -117,6 +117,23 @@ class UserRepository
         return $this->dbConnection->fetchFirstColumn('SELECT id FROM `user` ORDER BY id');
     }
 
+    /**
+     * @return array<int, int>
+     */
+    public function fetchRatingCountsByUserId() : array
+    {
+        $rows = $this->dbConnection->fetchAllAssociative(
+            'SELECT user_id, COUNT(*) AS cnt FROM movie_user_rating GROUP BY user_id',
+        );
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int)$row['user_id']] = (int)$row['cnt'];
+        }
+
+        return $counts;
+    }
+
     public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array
     {
         return $this->dbConnection->fetchAllAssociative(

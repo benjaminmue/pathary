@@ -40,6 +40,11 @@ class Header
         return new self('Content-Type', $mimeType);
     }
 
+    public static function createContentDisposition(string $value) : self
+    {
+        return new self('Content-Disposition', $value);
+    }
+
     public static function createNoSniff() : self
     {
         return new self('X-Content-Type-Options', 'nosniff');

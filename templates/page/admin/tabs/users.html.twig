@@ -1,97 +1,294 @@
-<div class="card admin-card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-people me-2"></i>{{ t('admin_users.title') }}</span>
-        <button class="btn btn-sm btn-primary" onclick="showCreateUserModal()">
-            <i class="bi bi-plus-circle me-1"></i>{{ t('admin_users.create_user') }}
+<style>
+    /* ===== Users tab — scoped design (uses --pds-* tokens from .pds-root) ===== */
+    .pdsu-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--pds-s-md);
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--pds-hair);
+    }
+
+    .pdsu-scroll {
+        overflow-x: auto;
+    }
+
+    .pdsu-table {
+        min-width: 720px;
+    }
+
+    .pdsu-colhead,
+    .pdsu-row {
+        display: grid;
+        grid-template-columns: 56px minmax(120px, 1.3fr) minmax(150px, 1.9fr) 110px 110px 180px;
+        align-items: center;
+        gap: var(--pds-s-md);
+    }
+
+    .pdsu-colhead {
+        padding: 12px 24px;
+        border-bottom: 1px solid var(--pds-hair);
+        font-family: var(--pds-font-mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--pds-dim);
+    }
+
+    .pdsu-colhead .pdsu-c-actions,
+    .pdsu-row .pdsu-c-actions {
+        text-align: right;
+        justify-self: end;
+    }
+
+    .pdsu-row {
+        padding: 11px 24px;
+        border-bottom: 1px solid var(--pds-hair);
+        font-size: 14px;
+        color: var(--pds-text);
+    }
+
+    .pdsu-c-id {
+        font-family: var(--pds-font-mono);
+        font-size: 13px;
+        color: var(--pds-dim);
+    }
+
+    .pdsu-c-name {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .pdsu-name {
+        font-size: 14px;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .pdsu-you {
+        flex: none;
+        font-family: var(--pds-font-mono);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: #12140F;
+        background: var(--pds-gold);
+        border-radius: 999px;
+        padding: 2px 7px;
+    }
+
+    .pdsu-c-email {
+        font-size: 13px;
+        color: var(--pds-muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .pdsu-pill {
+        display: inline-block;
+        font-family: var(--pds-font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border-radius: 999px;
+        padding: 3px 10px;
+        border: 1px solid transparent;
+    }
+
+    .pdsu-pill--admin {
+        background: var(--pds-gold);
+        color: #12140F;
+    }
+
+    .pdsu-pill--user {
+        color: var(--pds-muted);
+        border-color: var(--pds-border);
+    }
+
+    .pdsu-c-ratings {
+        font-family: var(--pds-font-mono);
+        font-size: 13px;
+        color: var(--pds-muted);
+    }
+
+    .pdsu-c-actions {
+        display: inline-flex;
+        gap: var(--pds-s-sm);
+    }
+
+    .pdsu-btn-sm {
+        padding: 6px 13px;
+        font-size: 13px;
+    }
+
+    .pdsu-state {
+        padding: 28px 24px;
+        text-align: center;
+        font-size: 14px;
+        color: var(--pds-muted);
+    }
+
+    .pdsu-state--error {
+        color: var(--pds-danger);
+    }
+
+    /* ===== Modal restyle (Bootstrap mechanics kept, dark card look) ===== */
+    .pdsu-modal .modal-content {
+        background: var(--pds-surface);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r);
+        color: var(--pds-text);
+        overflow: hidden;
+    }
+
+    .pdsu-modal .modal-header {
+        border-bottom: 1px solid var(--pds-hair);
+        padding: 20px 24px;
+    }
+
+    .pdsu-modal .modal-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--pds-text);
+    }
+
+    .pdsu-modal .modal-body {
+        padding: 20px 24px;
+    }
+
+    .pdsu-modal .modal-footer {
+        border-top: 1px solid var(--pds-hair);
+        padding: 16px 24px;
+        gap: var(--pds-s-sm);
+    }
+
+    .pdsu-modal .btn-close {
+        filter: invert(0.6);
+        opacity: 0.7;
+    }
+
+    :root[data-theme="light"] .pdsu-modal .btn-close {
+        filter: none;
+    }
+
+    .pdsu-modal .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--pds-muted);
+        margin-bottom: 6px;
+    }
+
+    .pdsu-modal .form-text {
+        font-size: 12px;
+        color: var(--pds-dim);
+    }
+
+    .pdsu-modal .pds-input {
+        width: 100%;
+    }
+
+    .pdsu-modal .form-check-label {
+        font-size: 14px;
+        color: var(--pds-text);
+    }
+
+    .pdsu-modal .form-check-input:checked {
+        background-color: var(--pds-gold);
+        border-color: var(--pds-gold);
+    }
+</style>
+
+<div class="pds-admin-card">
+    <div class="pdsu-head">
+        <div>
+            <div class="pds-admin-card__title">{{ t('admin_users.title') }}</div>
+            <div class="pds-admin-card__sub">
+                {{ t('admin.users.subtitle') }} · <span id="userCountLabel">&hellip;</span>
+            </div>
+        </div>
+        <button class="pds-btn pds-btn--primary" onclick="showCreateUserModal()">
+            {{ t('admin_users.create_user') }}
         </button>
     </div>
-    <div class="card-body">
-        <p class="text-muted">
-            {{ t('admin_users.intro') }}
-        </p>
 
-        <!-- Users List -->
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>{{ t('admin_users.th_id') }}</th>
-                        <th>{{ t('admin_users.th_name') }}</th>
-                        <th>{{ t('admin_users.th_email') }}</th>
-                        <th>{{ t('admin_users.th_admin') }}</th>
-                        <th>{{ t('admin_users.th_ratings') }}</th>
-                        <th>{{ t('admin_users.th_created') }}</th>
-                        <th>{{ t('admin_users.th_actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody id="usersTableBody">
-                    <tr>
-                        <td colspan="7" class="text-center text-muted">
-                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                            {{ t('admin_users.loading_users') }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- Users List -->
+    <div class="pdsu-scroll">
+        <div class="pdsu-table">
+            <div class="pdsu-colhead">
+                <span class="pdsu-c-id">{{ t('admin_users.th_id') }}</span>
+                <span>{{ t('admin_users.th_name') }}</span>
+                <span>{{ t('admin_users.th_email') }}</span>
+                <span>{{ t('admin.users.col_role') }}</span>
+                <span>{{ t('admin_users.th_ratings') }}</span>
+                <span class="pdsu-c-actions">{{ t('admin_users.th_actions') }}</span>
+            </div>
+            <div id="usersTableBody">
+                <div class="pdsu-state">{{ t('admin_users.loading_users') }}</div>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Create User Modal -->
-<div class="modal fade" id="createUserModal" tabindex="-1">
+<div class="modal fade pdsu-modal" id="createUserModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>{{ t('admin_users.create_new_user') }}</h5>
+                <h5 class="modal-title">{{ t('admin_users.create_new_user') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="createUserForm">
                     <div class="mb-3">
                         <label for="createUserName" class="form-label">{{ t('admin_users.username') }}</label>
-                        <input type="text" class="form-control" id="createUserName" required
-                               pattern="[a-zA-Z0-9]+" title="{{ t('admin_users.username_pattern_title') }}">
-                        <div class="form-text">{{ t('admin_users.username_help') }}</div>
+                        <input type="text" class="form-control pds-input" id="createUserName" required
+                               pattern="[a-zA-Z0-9]+" placeholder="{{ t('admin_users.username_help') }}" title="{{ t('admin_users.username_pattern_title') }}">
                     </div>
 
                     <div class="mb-3">
                         <label for="createUserEmail" class="form-label">{{ t('admin_users.email') }}</label>
-                        <input type="email" class="form-control" id="createUserEmail" required>
+                        <input type="email" class="form-control pds-input" id="createUserEmail" required placeholder="{{ t('admin_users.email_placeholder') }}">
                     </div>
 
                     <div class="mb-3" id="passwordFieldsContainer">
                         <div class="mb-3">
                             <label for="createUserPassword" class="form-label">{{ t('admin_users.password') }}</label>
-                            <input type="password" class="form-control" id="createUserPassword" minlength="10">
+                            <input type="password" class="form-control pds-input" id="createUserPassword" minlength="10">
                             <div class="form-text">{{ t('admin_users.password_help') }}</div>
                         </div>
 
                         <div class="mb-3">
                             <label for="createUserPasswordConfirm" class="form-label">{{ t('admin_users.confirm_password') }}</label>
-                            <input type="password" class="form-control" id="createUserPasswordConfirm">
+                            <input type="password" class="form-control pds-input" id="createUserPasswordConfirm">
                         </div>
                     </div>
 
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="createUserIsAdmin">
                         <label class="form-check-label" for="createUserIsAdmin">
-                            <i class="bi bi-shield-check me-1"></i>{{ t('admin_users.grant_admin') }}
+                            {{ t('admin_users.grant_admin') }}
                         </label>
                     </div>
 
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="createUserSendWelcome" checked onchange="togglePasswordFields()">
                         <label class="form-check-label" for="createUserSendWelcome">
-                            <i class="bi bi-envelope me-1"></i>{{ t('admin_users.send_welcome_email') }}
+                            {{ t('admin_users.send_welcome_email') }}
                         </label>
                         <div class="form-text">{{ t('admin_users.send_welcome_help') }}</div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('admin.cancel') }}</button>
-                <button type="button" class="btn btn-primary" id="createUserBtn" onclick="createUser(this)">
-                    <i class="bi bi-check-circle me-1"></i>{{ t('admin_users.create_user') }}
+                <button type="button" class="pds-btn pds-btn--ghost" data-bs-dismiss="modal">{{ t('admin.cancel') }}</button>
+                <button type="button" class="pds-btn pds-btn--primary" id="createUserBtn" onclick="createUser(this)">
+                    {{ t('admin_users.create_user') }}
                 </button>
             </div>
         </div>
@@ -99,11 +296,11 @@
 </div>
 
 <!-- Edit User Modal -->
-<div class="modal fade" id="editUserModal" tabindex="-1">
+<div class="modal fade pdsu-modal" id="editUserModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>{{ t('admin_users.edit_user') }}</h5>
+                <h5 class="modal-title">{{ t('admin_users.edit_user') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -112,33 +309,33 @@
 
                     <div class="mb-3">
                         <label for="editUserName" class="form-label">{{ t('admin_users.username') }}</label>
-                        <input type="text" class="form-control" id="editUserName" required
+                        <input type="text" class="form-control pds-input" id="editUserName" required
                                pattern="[a-zA-Z0-9]+" title="{{ t('admin_users.username_pattern_title') }}">
                     </div>
 
                     <div class="mb-3">
                         <label for="editUserEmail" class="form-label">{{ t('admin_users.email') }}</label>
-                        <input type="email" class="form-control" id="editUserEmail" required>
+                        <input type="email" class="form-control pds-input" id="editUserEmail" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="editUserPassword" class="form-label">{{ t('admin_users.new_password') }}</label>
-                        <input type="password" class="form-control" id="editUserPassword" minlength="10">
+                        <input type="password" class="form-control pds-input" id="editUserPassword" minlength="10">
                         <div class="form-text">{{ t('admin_users.new_password_help') }}</div>
                     </div>
 
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="editUserIsAdmin">
                         <label class="form-check-label" for="editUserIsAdmin">
-                            <i class="bi bi-shield-check me-1"></i>{{ t('admin_users.admin_privileges') }}
+                            {{ t('admin_users.admin_privileges') }}
                         </label>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('admin.cancel') }}</button>
-                <button type="button" class="btn btn-primary" onclick="updateUser()">
-                    <i class="bi bi-check-circle me-1"></i>{{ t('admin.save_changes') }}
+                <button type="button" class="pds-btn pds-btn--ghost" data-bs-dismiss="modal">{{ t('admin.cancel') }}</button>
+                <button type="button" class="pds-btn pds-btn--primary" onclick="updateUser()">
+                    {{ t('admin.save_changes') }}
                 </button>
             </div>
         </div>
@@ -148,6 +345,17 @@
 <script>
     let createUserModalInstance, editUserModalInstance;
     let CSRF_TOKEN;
+
+    // Localized labels for JS-rendered rows (respect de/en switcher)
+    const USERS_WORD = {{ t('admin.users.users_word')|json_encode|raw }};
+    const YOU_BADGE = {{ t('admin.users.you_badge')|json_encode|raw }};
+    const ROLE_ADMIN = {{ t('admin.users.role_admin')|json_encode|raw }};
+    const ROLE_USER = {{ t('admin.users.role_user')|json_encode|raw }};
+    const EDIT_LABEL = {{ t('admin.users.edit')|json_encode|raw }};
+    const DELETE_LABEL = {{ t('admin.users.delete')|json_encode|raw }};
+    const DELETE_CONFIRM_MSG = {{ t('admin_users.delete_confirm')|json_encode|raw }};
+    const EMPTY_LABEL = {{ t('admin.users.empty')|json_encode|raw }};
+    const LOAD_ERROR_LABEL = {{ t('admin.users.load_error')|json_encode|raw }};
 
     // Load users on page load
     // Check if DOM is already loaded (in case DOMContentLoaded already fired)
@@ -166,6 +374,11 @@
         editUserModalInstance = new bootstrap.Modal(document.getElementById('editUserModal'));
     }
 
+    function setUserCount(count) {
+        const label = document.getElementById('userCountLabel');
+        if (label) label.textContent = count + ' ' + USERS_WORD;
+    }
+
     async function loadUsers() {
         try {
             const response = await fetch('{{ applicationUrl }}/api/admin/users', {
@@ -178,55 +391,57 @@
             renderUsersTable(users);
         } catch (error) {
             document.getElementById('usersTableBody').innerHTML = `
-                <tr><td colspan="7" class="text-center text-danger">Error loading users: ${error.message}</td></tr>
+                <div class="pdsu-state pdsu-state--error">${LOAD_ERROR_LABEL}: ${escapeHtml(error.message)}</div>
             `;
+            setUserCount(0);
         }
     }
 
     function renderUsersTable(users) {
-        const tbody = document.getElementById('usersTableBody');
+        const container = document.getElementById('usersTableBody');
+
+        setUserCount(users.length);
 
         if (users.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No users found</td></tr>';
+            container.innerHTML = `<div class="pdsu-state">${EMPTY_LABEL}</div>`;
             return;
         }
 
-        tbody.innerHTML = users.map(user => `
-            <tr>
-                <td>${user.id}</td>
-                <td>
-                    <strong>${escapeHtml(user.name)}</strong>
-                    ${user.id === {{ currentUser.id }} ? '<span class="badge bg-info ms-1">You</span>' : ''}
-                </td>
-                <td>${escapeHtml(user.email)}</td>
-                <td>
-                    ${user.isAdmin ? '<i class="bi bi-shield-check text-success"></i> Admin' : '<i class="bi bi-person text-muted"></i> User'}
-                </td>
-                <td><span class="badge bg-secondary">-</span></td>
-                <td><small class="text-muted">-</small></td>
-                <td>
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-primary btn-edit-user"
-                                data-user-id="${user.id}"
-                                data-user-name="${escapeHtml(user.name)}"
-                                data-user-email="${escapeHtml(user.email)}"
-                                data-user-admin="${user.isAdmin}"
-                                title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-outline-danger btn-delete-user"
-                                data-user-id="${user.id}"
-                                data-user-name="${escapeHtml(user.name)}"
-                                title="Delete">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
+        container.innerHTML = users.map(user => `
+            <div class="pdsu-row">
+                <span class="pdsu-c-id">${user.id}</span>
+                <span class="pdsu-c-name">
+                    <span class="pdsu-name">${escapeHtml(user.name)}</span>
+                    ${user.id === {{ currentUser.id }} ? `<span class="pdsu-you">${YOU_BADGE}</span>` : ''}
+                </span>
+                <span class="pdsu-c-email" title="${escapeHtml(user.email)}">${escapeHtml(user.email)}</span>
+                <span class="pdsu-c-role">
+                    ${user.isAdmin
+                        ? `<span class="pdsu-pill pdsu-pill--admin">${ROLE_ADMIN}</span>`
+                        : `<span class="pdsu-pill pdsu-pill--user">${ROLE_USER}</span>`}
+                </span>
+                <span class="pdsu-c-ratings">${user.ratingsCount ?? 0}</span>
+                <span class="pdsu-c-actions">
+                    <button class="pds-btn pds-btn--ghost pdsu-btn-sm btn-edit-user"
+                            data-user-id="${user.id}"
+                            data-user-name="${escapeHtml(user.name)}"
+                            data-user-email="${escapeHtml(user.email)}"
+                            data-user-admin="${user.isAdmin}"
+                            title="${EDIT_LABEL}">
+                        ${EDIT_LABEL}
+                    </button>
+                    <button class="pds-btn pds-btn--ghost pdsu-btn-sm btn-delete-user"
+                            data-user-id="${user.id}"
+                            data-user-name="${escapeHtml(user.name)}"
+                            title="${DELETE_LABEL}">
+                        ${DELETE_LABEL}
+                    </button>
+                </span>
+            </div>
         `).join('');
 
         // Add event listeners for edit buttons
-        tbody.querySelectorAll('.btn-edit-user').forEach(btn => {
+        container.querySelectorAll('.btn-edit-user').forEach(btn => {
             btn.addEventListener('click', function() {
                 const id = parseInt(this.dataset.userId);
                 const name = this.dataset.userName;
@@ -237,7 +452,7 @@
         });
 
         // Add event listeners for delete buttons
-        tbody.querySelectorAll('.btn-delete-user').forEach(btn => {
+        container.querySelectorAll('.btn-delete-user').forEach(btn => {
             btn.addEventListener('click', function() {
                 const id = parseInt(this.dataset.userId);
                 const name = this.dataset.userName;
@@ -386,7 +601,7 @@
         }
 
         showConfirmModal(
-            `Delete user "${userName}"? All their ratings and watch history will also be deleted. This action cannot be undone.`,
+            DELETE_CONFIRM_MSG.replace('{name}', userName),
             async () => {
                 try {
                     const response = await fetch(`{{ applicationUrl }}/api/admin/users/${userId}`, {

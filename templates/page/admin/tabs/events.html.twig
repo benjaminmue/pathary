@@ -1,101 +1,256 @@
-<div class="card admin-card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-activity me-2"></i>{{ t('admin_events.title') }}</span>
-        <span class="badge bg-secondary" id="totalEventsCount">{{ t('admin_events.loading') }}</span>
+<style>
+    /* ===== Events tab — scoped styling on top of the shared --pds-* tokens ===== */
+    .ev-card { display: flex; flex-direction: column; }
+
+    .ev-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: var(--pds-s-md);
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--pds-hair);
+    }
+
+    .ev-head__title { font-size: 15px; font-weight: 600; }
+
+    .ev-head__sub {
+        font-size: 13px;
+        color: var(--pds-muted);
+        margin-top: 2px;
+    }
+
+    .ev-count {
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+        color: var(--pds-dim);
+        white-space: nowrap;
+    }
+
+    /* ---- Filter bar ---- */
+    .ev-filters {
+        display: grid;
+        grid-template-columns: 1.2fr 1.6fr 1fr 1fr auto;
+        gap: var(--pds-s-sm);
+        align-items: end;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--pds-hair);
+    }
+
+    .ev-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+    .ev-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--pds-muted);
+    }
+
+    .ev-control { width: 100%; box-sizing: border-box; }
+
+    .ev-date { font-family: var(--pds-font-mono); color-scheme: dark; }
+
+    [data-bs-theme="light"] .ev-date { color-scheme: light; }
+
+    .ev-actions { display: flex; gap: var(--pds-s-sm); }
+
+    .ev-reset {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 12px;
+    }
+
+    /* ---- Table (CSS grid) ---- */
+    .ev-scroll { overflow-x: auto; }
+
+    .ev-colhead,
+    .ev-row {
+        display: grid;
+        grid-template-columns: 48px 1.6fr 1fr 1.1fr 1.3fr 88px;
+        align-items: center;
+        gap: var(--pds-s-sm);
+        min-width: 720px;
+    }
+
+    .ev-colhead {
+        padding: 12px 24px;
+        border-bottom: 1px solid var(--pds-hair);
+        font-family: var(--pds-font-mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--pds-dim);
+    }
+
+    .ev-row {
+        padding: 5px 24px;
+        border-bottom: 1px solid var(--pds-hair);
+    }
+
+    .ev-cell { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .ev-cell--pill { display: flex; align-items: center; overflow: visible; }
+
+    .ev-id { font-family: var(--pds-font-mono); font-size: 12px; color: var(--pds-dim); }
+    .ev-user { font-size: 14px; font-weight: 600; }
+    .ev-ip { font-family: var(--pds-font-mono); font-size: 12px; color: var(--pds-muted); }
+    .ev-time { font-family: var(--pds-font-mono); font-size: 12px; color: var(--pds-dim); }
+    .ev-cell--right { display: flex; justify-content: flex-end; overflow: visible; }
+
+
+    .ev-muted { color: var(--pds-dim); }
+
+    .ev-empty {
+        padding: 28px 24px;
+        text-align: center;
+        color: var(--pds-muted);
+        font-size: 14px;
+    }
+
+    .ev-empty--error { color: var(--pds-danger); }
+
+    /* ---- Event kind pills ---- */
+    .ev-pill {
+        display: inline-block;
+        max-width: 100%;
+        padding: 3px 10px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--pds-font-mono);
+        line-height: 1.5;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .ev-pill--green { color: #4CAF6E; background: rgba(76, 175, 110, .10); border-color: rgba(76, 175, 110, .35); }
+    .ev-pill--red   { color: #E05C4B; background: rgba(224, 92, 75, .10); border-color: rgba(224, 92, 75, .35); }
+    .ev-pill--gold  { color: var(--pds-gold); background: rgba(251, 188, 9, .10); border-color: rgba(251, 188, 9, .35); }
+    .ev-pill--neutral { color: var(--pds-muted); background: transparent; border-color: var(--pds-border); }
+
+    /* ---- Footer / pagination ---- */
+    .ev-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--pds-s-md);
+        padding: 14px 24px;
+    }
+
+    .ev-range {
+        font-family: var(--pds-font-mono);
+        font-size: 12px;
+        color: var(--pds-dim);
+    }
+
+    .ev-pager { display: flex; gap: var(--pds-s-sm); }
+
+    .ev-pgbtn {
+        font-family: var(--pds-font);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--pds-text);
+        background: var(--pds-surface-2);
+        border: 1px solid var(--pds-border);
+        border-radius: var(--pds-r-sm);
+        padding: 7px 14px;
+        cursor: pointer;
+        transition: border-color .15s ease, color .15s ease;
+    }
+
+    .ev-pgbtn:hover:not(:disabled) { border-color: var(--pds-gold); color: var(--pds-gold); }
+    .ev-pgbtn:disabled { opacity: .5; cursor: default; }
+
+    @media (max-width: 768px) {
+        .ev-filters { grid-template-columns: 1fr 1fr; }
+        .ev-actions { grid-column: 1 / -1; }
+    }
+
+    /* Event details modal -> pds */
+    #eventDetailsModal .modal-dialog { margin-top: 84px; }
+    #eventDetailsModal .modal-content { background: var(--pds-surface); border: 1px solid var(--pds-border); border-radius: var(--pds-r); color: var(--pds-text); }
+    #eventDetailsModal .modal-header { border-bottom: 1px solid var(--pds-hair); padding: 18px 22px; }
+    #eventDetailsModal .modal-title { font-size: 15px; font-weight: 600; }
+    #eventDetailsModal .modal-body { padding: 20px 22px; }
+    #eventDetailsModal .modal-footer { border-top: 1px solid var(--pds-hair); padding: 14px 22px; }
+    #eventDetailsModal .btn-close { filter: invert(0.6); opacity: 0.7; }
+    #eventDetailsModal .form-label { color: var(--pds-muted); font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    #eventDetailsModal p { color: var(--pds-text); font-size: 14px; margin-bottom: 0; }
+    #eventDetailsModal code { color: var(--pds-gold); background: none; }
+    .ev-export i { margin-right: 6px; font-size: 13px; }
+    .ev-raw { width: 100%; background: #F4F4F5; color: #15171B; border: 1px solid var(--pds-border); border-radius: var(--pds-r-sm); font-family: var(--pds-font-mono); font-size: 12px; line-height: 1.5; padding: 10px 12px; resize: vertical; }
+</style>
+
+<div class="pds-admin-card ev-card">
+    <!-- Header -->
+    <div class="ev-head">
+        <div>
+            <div class="ev-head__title">{{ t('admin_events.title') }}</div>
+            <div class="ev-head__sub">{{ t('admin_events.intro') }}</div>
+        </div>
+        <div class="ev-count" id="totalEventsCount">{{ t('admin_events.loading') }}</div>
     </div>
-    <div class="card-body">
-        <p class="text-muted">
-            {{ t('admin_events.intro') }}
-        </p>
 
-        <!-- Filters -->
-        <div class="card mb-3">
-            <div class="card-body">
-                <form id="eventsFilterForm" class="row g-3">
-                    <!-- Event Type Filter -->
-                    <div class="col-md-3">
-                        <label for="eventTypeFilter" class="form-label">{{ t('admin_events.event_type') }}</label>
-                        <select class="form-select" id="eventTypeFilter">
-                            <option value="">{{ t('admin_events.all_events') }}</option>
-                            {% for eventType in eventTypes %}
-                                <option value="{{ eventType }}">{{ eventType }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <!-- Search Query -->
-                    <div class="col-md-3">
-                        <label for="searchQuery" class="form-label">{{ t('admin_events.search_label') }}</label>
-                        <input type="text" class="form-control" id="searchQuery" placeholder="{{ t('admin_events.search_placeholder') }}">
-                    </div>
-
-                    <!-- Date From -->
-                    <div class="col-md-2">
-                        <label for="dateFrom" class="form-label">{{ t('admin_events.from_date') }}</label>
-                        <input type="date" class="form-control" id="dateFrom">
-                    </div>
-
-                    <!-- Date To -->
-                    <div class="col-md-2">
-                        <label for="dateTo" class="form-label">{{ t('admin_events.to_date') }}</label>
-                        <input type="date" class="form-control" id="dateTo">
-                    </div>
-
-                    <!-- Filter Actions -->
-                    <div class="col-md-2 d-flex align-items-end">
-                        <div class="btn-group w-100">
-                            <button type="button" class="btn btn-primary" onclick="applyFilters()">
-                                <i class="bi bi-funnel"></i> {{ t('admin_events.apply') }}
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary" onclick="resetFilters()">
-                                <i class="bi bi-x-circle"></i>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+    <!-- Filter bar -->
+    <form id="eventsFilterForm" class="ev-filters">
+        <div class="ev-field">
+            <label class="ev-label" for="eventTypeFilter">{{ t('admin_events.event_type') }}</label>
+            <select class="pds-input ev-control" id="eventTypeFilter">
+                <option value="">{{ t('admin_events.all_events') }}</option>
+                {% for eventType in eventTypes %}
+                    <option value="{{ eventType }}">{{ eventType }}</option>
+                {% endfor %}
+            </select>
         </div>
 
-        <!-- Events Table -->
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>{{ t('admin_events.th_id') }}</th>
-                        <th>{{ t('admin_events.event_type') }}</th>
-                        <th>{{ t('admin_events.th_user') }}</th>
-                        <th>{{ t('admin_events.th_ip_address') }}</th>
-                        <th>{{ t('admin_events.th_timestamp') }}</th>
-                        <th>{{ t('admin_events.th_actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody id="eventsTableBody">
-                    <tr>
-                        <td colspan="6" class="text-center text-muted">
-                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                            {{ t('admin_events.loading_events') }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="ev-field">
+            <label class="ev-label" for="searchQuery">{{ t('admin_events.search_label') }}</label>
+            <input type="text" class="pds-input ev-control" id="searchQuery" placeholder="{{ t('admin_events.search_placeholder') }}">
         </div>
 
-        <!-- Pagination -->
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="text-muted" id="paginationInfo">
-                {{ t('admin_events.pagination_info_initial') }}
-            </div>
-            <nav aria-label="{{ t('admin_events.pagination_aria') }}">
-                <ul class="pagination mb-0" id="paginationControls">
-                    <!-- Pagination buttons will be inserted here -->
-                </ul>
-            </nav>
+        <div class="ev-field">
+            <label class="ev-label" for="dateFrom">{{ t('admin_events.from_date') }}</label>
+            <input type="date" class="pds-input ev-control ev-date" id="dateFrom">
         </div>
+
+        <div class="ev-field">
+            <label class="ev-label" for="dateTo">{{ t('admin_events.to_date') }}</label>
+            <input type="date" class="pds-input ev-control ev-date" id="dateTo">
+        </div>
+
+        <div class="ev-actions">
+            <button type="button" class="pds-btn pds-btn--primary" onclick="applyFilters()">{{ t('admin_events.apply') }}</button>
+            <button type="button" class="pds-btn pds-btn--ghost ev-export" onclick="exportEvents()"><i class="bi bi-download"></i>{{ t('admin_events.export') }}</button>
+            <button type="button" class="pds-btn pds-btn--ghost ev-reset" onclick="resetFilters()" title="{{ t('admin_events.reset') }}" aria-label="{{ t('admin_events.reset') }}">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+    </form>
+
+    <!-- Column header + rows -->
+    <div class="ev-scroll">
+        <div class="ev-colhead">
+            <div>{{ t('admin_events.th_id') }}</div>
+            <div>{{ t('admin_events.th_event') }}</div>
+            <div>{{ t('admin_events.th_user') }}</div>
+            <div>{{ t('admin_events.th_ip_address') }}</div>
+            <div>{{ t('admin_events.th_timestamp') }}</div>
+            <div></div>
+        </div>
+        <div id="eventsTableBody">
+            <div class="ev-empty">{{ t('admin_events.loading_events') }}</div>
+        </div>
+    </div>
+
+    <!-- Footer / pagination -->
+    <div class="ev-foot">
+        <div class="ev-range" id="paginationInfo">{{ t('admin_events.pagination_info_initial') }}</div>
+        <nav class="ev-pager" id="paginationControls" aria-label="{{ t('admin_events.pagination_aria') }}"></nav>
     </div>
 </div>
 
 <!-- Event Details Modal -->
-<div class="modal fade" id="eventDetailsModal" tabindex="-1">
+<div class="modal fade pds-root" id="eventDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -111,13 +266,25 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('admin.close') }}</button>
+                <button type="button" class="pds-btn pds-btn--ghost" data-bs-dismiss="modal">{{ t('admin.close') }}</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    // Localized labels for JS-rendered fragments (fall back to key if untranslated)
+    const EV_I18N = {
+        details: {{ t('admin_events.details')|json_encode|raw }},
+        eventsCount: {{ t('admin_events.events_count')|json_encode|raw }},
+        range: {{ t('admin_events.range')|json_encode|raw }},
+        prev: {{ t('admin_events.prev')|json_encode|raw }},
+        next: {{ t('admin_events.next')|json_encode|raw }},
+        noEvents: {{ t('admin_events.no_events')|json_encode|raw }},
+        errorLoading: {{ t('admin_events.error_loading')|json_encode|raw }},
+        loadingDetails: {{ t('admin_events.loading_event_details')|json_encode|raw }},
+    };
+
     let eventDetailsModalInstance;
     const EVENTS_PER_PAGE = 50;
     let currentPage = 1;
@@ -158,7 +325,7 @@
             updateTotalCount();
         } catch (error) {
             document.getElementById('eventsTableBody').innerHTML = `
-                <tr><td colspan="6" class="text-center text-danger">Error loading events: ${error.message}</td></tr>
+                <div class="ev-empty ev-empty--error">${EV_I18N.errorLoading}: ${escapeHtml(error.message)}</div>
             `;
             console.error('Error loading events:', error);
         }
@@ -168,35 +335,42 @@
         const tbody = document.getElementById('eventsTableBody');
 
         if (events.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No events found</td></tr>';
+            tbody.innerHTML = `<div class="ev-empty">${EV_I18N.noEvents}</div>`;
             return;
         }
 
         tbody.innerHTML = events.map(event => {
-            const userName = event.user_name ? escapeHtml(event.user_name) : '<span class="text-muted">N/A</span>';
-            const ipAddress = event.ip_address ? escapeHtml(event.ip_address) : '<span class="text-muted">N/A</span>';
+            const userName = event.user_name ? escapeHtml(event.user_name) : `<span class="ev-muted">N/A</span>`;
+            const ipAddress = event.ip_address ? escapeHtml(event.ip_address) : `<span class="ev-muted">N/A</span>`;
+            const kind = getEventKind(event.event_type);
 
             return `
-                <tr>
-                    <td>${event.id}</td>
-                    <td>
-                        <span class="badge bg-${getEventTypeBadgeColor(event.event_type)}">
-                            ${getEventTypeIcon(event.event_type)} ${escapeHtml(event.event_type)}
-                        </span>
-                    </td>
-                    <td>${userName}</td>
-                    <td><code class="small">${ipAddress}</code></td>
-                    <td><small class="text-muted">${escapeHtml(event.created_at)}</small></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary" onclick="showEventDetails(${event.id})" title="View Details">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                    </td>
-                </tr>
+                <div class="ev-row">
+                    <div class="ev-cell ev-id">${event.id}</div>
+                    <div class="ev-cell ev-cell--pill">
+                        <span class="ev-pill ev-pill--${kind}">${escapeHtml(event.event_type)}</span>
+                    </div>
+                    <div class="ev-cell ev-user">${userName}</div>
+                    <div class="ev-cell ev-ip">${ipAddress}</div>
+                    <div class="ev-cell ev-time">${fmtEventDate(event.created_at)}</div>
+                    <div class="ev-cell ev-cell--right">
+                        <button class="pds-btn pds-btn--ghost ev-details" onclick="showEventDetails(${event.id})">${EV_I18N.details}</button>
+                    </div>
+                </div>
             `;
         }).join('');
     }
 
+    // Map an event type string to a visual pill kind.
+    function getEventKind(eventType) {
+        const t = String(eventType).toLowerCase();
+        if (t.includes('success')) return 'green';
+        if (t.includes('failed') || t.includes('deleted') || t.includes('danger')) return 'red';
+        if (t.includes('totp') || t.includes('trusted_device') || t.includes('security')) return 'gold';
+        return 'neutral';
+    }
+
+    // Bootstrap badge color/icon helpers — still used by the details modal.
     function getEventTypeBadgeColor(eventType) {
         if (eventType.includes('login_success')) return 'success';
         if (eventType.includes('login_failed')) return 'danger';
@@ -229,70 +403,31 @@
     }
 
     function renderPagination() {
-        const totalPages = Math.ceil(totalEvents / EVENTS_PER_PAGE);
-        const paginationControls = document.getElementById('paginationControls');
+        const totalPages = Math.max(1, Math.ceil(totalEvents / EVENTS_PER_PAGE));
+        const pager = document.getElementById('paginationControls');
 
-        if (totalPages <= 1) {
-            paginationControls.innerHTML = '';
-            return;
-        }
+        const prevDisabled = currentPage <= 1;
+        const nextDisabled = currentPage >= totalPages || totalEvents === 0;
 
-        let html = '';
-
-        // Previous button
-        html += `
-            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadEvents(${currentPage - 1}); return false;">
-                    <i class="bi bi-chevron-left"></i>
-                </a>
-            </li>
+        pager.innerHTML = `
+            <button type="button" class="ev-pgbtn" ${prevDisabled ? 'disabled' : ''}
+                    onclick="loadEvents(${currentPage - 1})">&larr; ${EV_I18N.prev}</button>
+            <button type="button" class="ev-pgbtn" ${nextDisabled ? 'disabled' : ''}
+                    onclick="loadEvents(${currentPage + 1})">${EV_I18N.next} &rarr;</button>
         `;
 
-        // Page numbers (show max 5 pages)
-        const startPage = Math.max(1, currentPage - 2);
-        const endPage = Math.min(totalPages, startPage + 4);
-
-        if (startPage > 1) {
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">1</a></li>`;
-            if (startPage > 2) {
-                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-            }
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            html += `
-                <li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="loadEvents(${i}); return false;">${i}</a>
-                </li>
-            `;
-        }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-            }
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${totalPages}); return false;">${totalPages}</a></li>`;
-        }
-
-        // Next button
-        html += `
-            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="loadEvents(${currentPage + 1}); return false;">
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-            </li>
-        `;
-
-        paginationControls.innerHTML = html;
-
-        // Update pagination info
-        const start = (currentPage - 1) * EVENTS_PER_PAGE + 1;
+        // Update range info ("1–14 von 17")
+        const start = totalEvents === 0 ? 0 : (currentPage - 1) * EVENTS_PER_PAGE + 1;
         const end = Math.min(currentPage * EVENTS_PER_PAGE, totalEvents);
-        document.getElementById('paginationInfo').textContent = `Showing ${start}-${end} of ${totalEvents} events`;
+        document.getElementById('paginationInfo').textContent = EV_I18N.range
+            .replace('{from}', start)
+            .replace('{to}', end)
+            .replace('{total}', totalEvents);
     }
 
     function updateTotalCount() {
-        document.getElementById('totalEventsCount').textContent = `${totalEvents} total events`;
+        document.getElementById('totalEventsCount').textContent =
+            EV_I18N.eventsCount.replace('{count}', totalEvents);
     }
 
     function applyFilters() {
@@ -316,6 +451,30 @@
         loadEvents(1);
     }
 
+    // Export the current filter selection (event type, search, Von/Bis range) as a JSON download.
+    function exportEvents() {
+        const eventType = document.getElementById('eventTypeFilter').value;
+        const searchQuery = document.getElementById('searchQuery').value.trim();
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+
+        const params = new URLSearchParams();
+        if (eventType) params.set('eventType', eventType);
+        if (searchQuery) params.set('searchQuery', searchQuery);
+        if (dateFrom) params.set('dateFrom', dateFrom);
+        if (dateTo) params.set('dateTo', dateTo);
+
+        const qs = params.toString();
+        const url = `{{ applicationUrl }}/api/admin/events/export${qs ? '?' + qs : ''}`;
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
     async function showEventDetails(eventId) {
         eventDetailsModalInstance.show();
 
@@ -323,7 +482,7 @@
         content.innerHTML = `
             <div class="text-center text-muted">
                 <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                Loading event details...
+                ${EV_I18N.loadingDetails}
             </div>
         `;
 
@@ -341,7 +500,7 @@
             const event = await response.json();
             renderEventDetails(event);
         } catch (error) {
-            content.innerHTML = `<div class="alert alert-danger">Error loading event details: ${error.message}</div>`;
+            content.innerHTML = `<div class="alert alert-danger">${EV_I18N.errorLoading}: ${escapeHtml(error.message)}</div>`;
             console.error('Error loading event details:', error);
         }
     }
@@ -357,11 +516,11 @@
         content.innerHTML = `
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label class="form-label fw-bold">Event ID</label>
+                    <label class="form-label fw-bold">{{ t('admin_events.th_id') }}</label>
                     <p>${event.id}</p>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label fw-bold">Event Type</label>
+                    <label class="form-label fw-bold">{{ t('admin_events.event_type') }}</label>
                     <p>
                         <span class="badge bg-${getEventTypeBadgeColor(event.event_type)}">
                             ${getEventTypeIcon(event.event_type)} ${escapeHtml(event.event_type)}
@@ -369,15 +528,15 @@
                     </p>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label fw-bold">User</label>
+                    <label class="form-label fw-bold">{{ t('admin_events.th_user') }}</label>
                     <p>${userName} ${event.user_id ? `<small class="text-muted">(ID: ${event.user_id})</small>` : ''}</p>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label fw-bold">Timestamp</label>
-                    <p>${escapeHtml(event.created_at)}</p>
+                    <label class="form-label fw-bold">{{ t('admin_events.th_timestamp') }}</label>
+                    <p>${fmtEventDate(event.created_at)}</p>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label fw-bold">IP Address</label>
+                    <label class="form-label fw-bold">{{ t('admin_events.th_ip_address') }}</label>
                     <p><code>${ipAddress}</code></p>
                 </div>
                 <div class="col-md-6">
@@ -388,8 +547,18 @@
                     <label class="form-label fw-bold">Metadata</label>
                     <p class="small"><code>${metadata}</code></p>
                 </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">{{ t('admin_events.raw_data') }}</label>
+                    <textarea class="ev-raw" readonly rows="7">${escapeHtml(JSON.stringify(event, null, 2))}</textarea>
+                </div>
             </div>
         `;
+    }
+
+    function fmtEventDate(s) {
+        if (!s) return '';
+        const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2}:\d{2})/);
+        return m ? m[3] + '.' + m[2] + '.' + m[1] + ' ' + m[4] : escapeHtml(s);
     }
 
     function escapeHtml(text) {
