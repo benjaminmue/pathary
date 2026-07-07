@@ -24,6 +24,17 @@ on:
       - 'OPEN_ISSUES.md'
       - 'security_audit_report.txt'
   workflow_dispatch:
+  # Called by release-please.yml after a release is cut. The tag that
+  # release-please pushes with GITHUB_TOKEN cannot trigger this workflow on its
+  # own (GitHub suppresses workflow runs for GITHUB_TOKEN-created events), so the
+  # release job invokes it here and passes the version tag explicitly.
+  workflow_call:
+    inputs:
+      version:
+        description: 'Explicit image tag to publish (e.g. v0.7.2)'
+        required: false
+        type: string
+        default: ''
 
 env:
   REGISTRY: ghcr.io
@@ -62,7 +73,7 @@ jobs:
           build-args: |
             BUILD_DATE=${{ github.event.head_commit.timestamp }}
             VCS_REF=${{ github.sha }}
-            VERSION=${{ github.ref_name }}
+            VERSION=${{ inputs.version || github.ref_name }}
 
   validate-migrations:
     name: Validate Migrations
@@ -184,6 +195,8 @@ jobs:
             type=ref,event=branch
             # Tag name (v1.0.0, v0.1.0-alpha.1, etc.)
             type=ref,event=tag
+            # Explicit version when called from release-please (workflow_call)
+            type=raw,value=${{ inputs.version }},enable=${{ inputs.version != '' }}
             # Short SHA
             type=sha,prefix=sha-
 
@@ -201,7 +214,7 @@ jobs:
           build-args: |
             BUILD_DATE=${{ github.event.head_commit.timestamp }}
             VCS_REF=${{ github.sha }}
-            VERSION=${{ github.ref_name }}
+            VERSION=${{ inputs.version || github.ref_name }}
 
       - name: Summary
         run: |
