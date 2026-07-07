@@ -178,6 +178,7 @@
     #eventDetailsModal .form-label { color: var(--pds-muted); font-size: 12px; font-weight: 600; margin-bottom: 4px; }
     #eventDetailsModal p { color: var(--pds-text); font-size: 14px; margin-bottom: 0; }
     #eventDetailsModal code { color: var(--pds-gold); background: none; }
+    .ev-export i { margin-right: 6px; font-size: 13px; }
     .ev-raw { width: 100%; background: #F4F4F5; color: #15171B; border: 1px solid var(--pds-border); border-radius: var(--pds-r-sm); font-family: var(--pds-font-mono); font-size: 12px; line-height: 1.5; padding: 10px 12px; resize: vertical; }
 </style>
 
@@ -220,6 +221,7 @@
 
         <div class="ev-actions">
             <button type="button" class="pds-btn pds-btn--primary" onclick="applyFilters()">{{ t('admin_events.apply') }}</button>
+            <button type="button" class="pds-btn pds-btn--ghost ev-export" onclick="exportEvents()"><i class="bi bi-download"></i>{{ t('admin_events.export') }}</button>
             <button type="button" class="pds-btn pds-btn--ghost ev-reset" onclick="resetFilters()" title="{{ t('admin_events.reset') }}" aria-label="{{ t('admin_events.reset') }}">
                 <i class="bi bi-x-circle"></i>
             </button>
@@ -448,6 +450,30 @@
         document.getElementById('eventsFilterForm').reset();
         currentFilters = {};
         loadEvents(1);
+    }
+
+    // Export the current filter selection (event type, search, Von/Bis range) as a JSON download.
+    function exportEvents() {
+        const eventType = document.getElementById('eventTypeFilter').value;
+        const searchQuery = document.getElementById('searchQuery').value.trim();
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+
+        const params = new URLSearchParams();
+        if (eventType) params.set('eventType', eventType);
+        if (searchQuery) params.set('searchQuery', searchQuery);
+        if (dateFrom) params.set('dateFrom', dateFrom);
+        if (dateTo) params.set('dateTo', dateTo);
+
+        const qs = params.toString();
+        const url = `{{ applicationUrl }}/api/admin/events/export${qs ? '?' + qs : ''}`;
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
     async function showEventDetails(eventId) {

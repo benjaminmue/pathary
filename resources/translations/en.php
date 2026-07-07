@@ -53,6 +53,7 @@ return [
     'admin_events.range' => '{from}–{to} of {total}',
     'admin_events.reset' => 'Reset',
     'admin_events.apply' => 'Apply',
+    'admin_events.export' => 'Export',
     'admin_events.event_details' => 'Event Details',
     'admin_events.event_type' => 'Event Type',
     'admin_events.raw_data' => 'Raw data',

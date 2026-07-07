@@ -80,6 +80,76 @@ class AdminEventsController
     }
 
     /**
+     * GET /api/admin/events/export - Export filtered security events as a JSON download
+     */
+    public function exportEvents(Request $request) : Response
+    {
+        $queryParams = $request->getGetParameters();
+
+        $eventType = $queryParams['eventType'] ?? null;
+        $searchQuery = $queryParams['searchQuery'] ?? null;
+        $dateFrom = $queryParams['dateFrom'] ?? null;
+        $dateTo = $queryParams['dateTo'] ?? null;
+        $userId = isset($queryParams['userId']) ? (int)$queryParams['userId'] : null;
+        $ipAddress = $queryParams['ipAddress'] ?? null;
+
+        try {
+            // Export the full filtered set, not a page. Cap at 10000 rows to stay memory-safe.
+            $total = $this->securityAuditRepository->countWithFilters(
+                $eventType,
+                $searchQuery,
+                $dateFrom,
+                $dateTo,
+                $userId,
+                $ipAddress,
+            );
+
+            $limit = max(1, min($total, 10000));
+
+            $events = $this->securityAuditRepository->findWithFilters(
+                $eventType,
+                $searchQuery,
+                $dateFrom,
+                $dateTo,
+                $userId,
+                $ipAddress,
+                $limit,
+                0,
+            );
+
+            $payload = [
+                'exported_at' => date('c'),
+                'filters' => [
+                    'eventType' => $eventType,
+                    'searchQuery' => $searchQuery,
+                    'dateFrom' => $dateFrom,
+                    'dateTo' => $dateTo,
+                ],
+                'count' => count($events),
+                'total_matching' => $total,
+                'events' => $events,
+            ];
+
+            $filename = 'pathary-events-' . date('Y-m-d') . '.json';
+
+            return Response::create(
+                StatusCode::createOk(),
+                Json::encode($payload),
+                [
+                    Header::createContentTypeJson(),
+                    Header::createContentDisposition('attachment; filename="' . $filename . '"'),
+                ],
+            );
+        } catch (\Exception $e) {
+            return Response::create(
+                StatusCode::createInternalServerError(),
+                Json::encode(['error' => 'Failed to export events']),
+                [Header::createContentTypeJson()],
+            );
+        }
+    }
+
+    /**
      * GET /api/admin/events/{id} - Get event details by ID
      */
     public function getEventById(Request $request) : Response
