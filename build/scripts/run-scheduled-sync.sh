@@ -25,12 +25,23 @@ fi
 # Change to app directory
 cd /app
 
+# Resolve the PHP binary portably. cron's default PATH is /usr/bin:/bin, which
+# excludes /usr/local/bin where the php:8.x-apache (Debian) production image
+# installs php; the alpine dev image puts it in /usr/bin. Hardcoding either path
+# breaks the other, so extend PATH to cover both and resolve via command -v.
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:${PATH:-}"
+PHP_BIN="$(command -v php || true)"
+if [ -z "$PHP_BIN" ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: php binary not found on PATH ($PATH)" >&2
+    exit 127
+fi
+
 # Log start to stdout (captured by Docker logs)
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting scheduled sync (TMDB + OMDb)"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting scheduled sync (TMDB + OMDb) using $PHP_BIN"
 
 # Run the sync command
 # Output goes to both file log (via >>) and stdout (via tee)
-/usr/bin/php bin/console.php sync:scheduled 2>&1 | tee -a storage/logs/scheduled-sync.log
+"$PHP_BIN" bin/console.php sync:scheduled 2>&1 | tee -a storage/logs/scheduled-sync.log
 
 # Capture exit code
 EXIT_CODE=${PIPESTATUS[0]}
