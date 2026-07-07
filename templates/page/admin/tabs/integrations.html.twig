@@ -158,14 +158,14 @@
 </style>
 
 {% set integrations = [
-    { name: 'Plex',       initials: 'PL', desc: 'admin_integrations.plex_desc',       path: 'plex',       docs: 'https://docs.pathary.tv/features/plex/',                                status: 'available' },
+    { name: 'Plex',       initials: 'PX', desc: 'admin_integrations.plex_desc',       path: 'plex',       docs: 'https://docs.pathary.tv/features/plex/',                                status: 'available' },
     { name: 'Jellyfin',   initials: 'JF', desc: 'admin_integrations.jellyfin_desc',   path: 'jellyfin',   docs: 'https://docs.pathary.tv/features/jellyfin/',                            status: 'available' },
     { name: 'Trakt.tv',   initials: 'TR', desc: 'admin_integrations.trakt_desc',      path: 'trakt',      docs: 'https://docs.pathary.tv/features/trakt/',                               status: 'available' },
     { name: 'Letterboxd', initials: 'LB', desc: 'admin_integrations.letterboxd_desc', path: 'letterboxd', docs: 'https://docs.pathary.tv/features/letterboxd/',                          status: 'available' },
-    { name: 'Mastodon',   initials: 'MA', desc: 'admin_integrations.mastodon_desc',   path: 'mastodon',   docs: 'https://docs.pathary.tv/',                                              status: 'available' },
-    { name: 'Kodi',       initials: 'KO', desc: 'admin_integrations.kodi_desc',       path: 'kodi',       docs: 'https://docs.pathary.tv/features/kodi/',                                status: 'available' },
+    { name: 'Mastodon',   initials: 'MD', desc: 'admin_integrations.mastodon_desc',   path: 'mastodon',   docs: 'https://docs.pathary.tv/',                                              status: 'available' },
+    { name: 'Kodi',       initials: 'KD', desc: 'admin_integrations.kodi_desc',       path: 'kodi',       docs: 'https://docs.pathary.tv/features/kodi/',                                status: 'available' },
     { name: 'Netflix',    initials: 'NF', desc: 'admin_integrations.netflix_desc',    path: 'netflix',    docs: 'https://github.com/benjaminmue/pathary/wiki/Integrations-Netflix',      status: 'limited' },
-    { name: 'Radarr',     initials: 'RA', desc: 'admin_integrations.radarr_desc',     path: 'radarr',     docs: 'https://github.com/benjaminmue/pathary/wiki/Integrations-Radarr',       status: 'available' },
+    { name: 'Radarr',     initials: 'RD', desc: 'admin_integrations.radarr_desc',     path: 'radarr',     docs: 'https://github.com/benjaminmue/pathary/wiki/Integrations-Radarr',       status: 'available' },
 ] %}
 
         <p class="pint-intro">
@@ -202,12 +202,3 @@
             {% endfor %}
         </div>
 
-        <div class="pint-help">
-            <p class="pint-help__title">{{ t('admin_integrations.need_help') }}</p>
-            <p class="pint-help__text">
-                {{ t('admin_integrations.help_text_part1') }}
-                <a href="https://github.com/benjaminmue/pathary/wiki" target="_blank" rel="noopener">Pathary Wiki</a>.
-                {{ t('admin_integrations.help_text_part2') }}
-                <a href="https://github.com/benjaminmue/pathary/issues" target="_blank" rel="noopener">GitHub Issues</a>.
-            </p>
-        </div>
