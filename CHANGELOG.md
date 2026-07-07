@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.4](https://github.com/benjaminmue/pathary/compare/v0.7.3...v0.7.4) (2026-07-07)
+
+
+### Bug Fixes
+
+* **sync:** cron used a hardcoded /usr/bin/php absent from the prod image ([94a1aa1](https://github.com/benjaminmue/pathary/commit/94a1aa1a04120e120d1d1b0a287442e6b224a459))
+* **sync:** cron used a hardcoded /usr/bin/php absent from the prod image ([f52c8c0](https://github.com/benjaminmue/pathary/commit/f52c8c0b7a7e58c0cdd1065a419e661b42c7857a))
+
 ## [0.7.3](https://github.com/benjaminmue/pathary/compare/v0.7.2...v0.7.3) (2026-07-07)
 
 
