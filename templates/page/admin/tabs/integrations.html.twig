@@ -4,7 +4,7 @@
         font-size: 13px;
         color: var(--pds-muted);
         line-height: 1.6;
-        margin: 0 0 20px;
+        margin: 0 0 14px;
     }
 
     .pint-intro a {
@@ -20,7 +20,7 @@
     .pint-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 24px;
+        gap: 14px;
     }
 
     @media (max-width: 768px) {
@@ -29,11 +29,14 @@
         }
     }
 
+    .pint-grid > .pds-admin-card { margin-top: 0; }
+
     .pint-card {
-        padding: 20px 24px;
+        padding: 14px 18px;
         display: flex;
         flex-direction: column;
         gap: 12px;
+        height: 100%;
     }
 
     .pint-head {
@@ -165,8 +168,6 @@
     { name: 'Radarr',     initials: 'RA', desc: 'admin_integrations.radarr_desc',     path: 'radarr',     docs: 'https://github.com/benjaminmue/pathary/wiki/Integrations-Radarr',       status: 'available' },
 ] %}
 
-<div class="pds-admin-card">
-    <div class="pds-admin-card__pad">
         <p class="pint-intro">
             {{ t('admin_integrations.intro_lead') }}
             <a href="https://github.com/benjaminmue/pathary/wiki" target="_blank" rel="noopener">{{ t('admin_integrations.wiki') }}</a>.
@@ -210,5 +211,3 @@
                 <a href="https://github.com/benjaminmue/pathary/issues" target="_blank" rel="noopener">GitHub Issues</a>.
             </p>
         </div>
-    </div>
-</div>

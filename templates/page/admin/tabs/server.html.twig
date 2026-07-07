@@ -68,7 +68,7 @@
                         <button type="button" class="pds-btn pds-btn--primary" id="saveApiSettingsBtn" onclick="saveApiSettings()">
                             {{ t('admin.server.save_keys') }}
                         </button>
-                        <div id="saveHelperText" class="form-text mt-2" style="display: none;">
+                        <div id="saveHelperText" class="form-text" style="display: none;">
                             <i class="bi bi-info-circle"></i> <span id="saveHelperMessage"></span>
                         </div>
                     </div>
@@ -779,7 +779,10 @@
         <div class="pds-admin-card">
             <div class="pds-health-head">
                 <span class="pds-health-head__title">{{ t('admin_server.system_health') }}</span>
-                <span class="pds-health-head__note" id="health-last-run">{{ t('admin_server.last_check') }} <span id="health-last-run-time">{{ t('admin_server.never') }}</span></span>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <span class="pds-health-head__note" id="health-last-run">{{ t('admin_server.last_check') }} <span id="health-last-run-time">{{ t('admin_server.never') }}</span></span>
+                    <button class="pds-btn pds-btn--primary pds-btn--xs" id="runHealthCheckBtn" onclick="runHealthCheck()"><i class="bi bi-arrow-clockwise me-1"></i>{{ t('admin_server.check_all_systems') }}</button>
+                </div>
             </div>
             <div class="pds-admin-card__pad">
                 <div class="pds-health-list">
@@ -856,11 +859,6 @@
                     </div>
                 </div>
 
-                <div class="mt-3">
-                    <button class="pds-btn pds-btn--primary pds-btn--xs" id="runHealthCheckBtn" onclick="runHealthCheck()">
-                        <i class="bi bi-arrow-clockwise me-1"></i>{{ t('admin_server.check_all_systems') }}
-                    </button>
-                </div>
 
                 <div id="health-check-error" class="alert alert-warning mt-3" style="display: none;"></div>
             </div>
@@ -1425,7 +1423,7 @@
     .pds-server .pds-key__row { display: flex; align-items: center; gap: 8px; }
     .pds-server .pds-key__input { flex: 1 1 auto; min-width: 0; }
     .pds-server .pds-key__eye { padding: 9px 12px; }
-    .pds-server .pds-key__save { margin-top: 16px; }
+    .pds-server .pds-key__save { margin-top: 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
     @media (max-width: 767.98px) {
         .pds-server .pds-health-row { flex-wrap: wrap; }
