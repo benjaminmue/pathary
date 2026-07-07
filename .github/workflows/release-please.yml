@@ -2,8 +2,12 @@ name: release-please
 
 # Maintains a rolling "release PR" on main: release-please reads the conventional
 # commit messages (feat/fix/BREAKING), computes the next version and updates the
-# changelog. Merging that PR creates the git tag + GitHub release, which in turn
-# triggers docker-image.yml to build and publish the versioned GHCR image.
+# changelog. Merging that PR creates the git tag + GitHub release. release-please
+# signs that tag with GITHUB_TOKEN, and GitHub does not start new workflow runs
+# for GITHUB_TOKEN-created events, so the tag push cannot trigger docker-image.yml
+# by itself. Instead the publish-release-image job below calls docker-image.yml
+# directly (workflow_call) and passes the version, so the versioned GHCR image is
+# always built when a release is cut.
 on:
   push:
     branches:
@@ -16,9 +20,26 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+  # Build and push the versioned GHCR image (e.g. v0.7.2) right after a release
+  # is created. Reuses docker-image.yml so the build/validate/push logic stays in
+  # one place.
+  publish-release-image:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/docker-image.yml
+    with:
+      version: ${{ needs.release-please.outputs.tag_name }}
