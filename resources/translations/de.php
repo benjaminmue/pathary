@@ -39,7 +39,7 @@ return [
     'admin.users.empty' => 'Keine Benutzer gefunden',
     'admin.users.load_error' => 'Fehler beim Laden der Benutzer',
     'admin.users.role_admin' => 'Admin',
-    'admin.users.role_user' => 'Benutzer',
+    'admin.users.role_user' => 'User',
     'admin.users.subtitle' => 'Konten und Berechtigungen verwalten',
     'admin.users.users_word' => 'Benutzer',
     'admin.users.you_badge' => 'DU',
