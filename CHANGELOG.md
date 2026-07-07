@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.7.2](https://github.com/benjaminmue/pathary/compare/v0.7.1...v0.7.2) (2026-07-07)
+
+
+### Features
+
+* **admin:** export security events as JSON for a chosen time range ([fa56b8f](https://github.com/benjaminmue/pathary/commit/fa56b8f6a6cc60c228acfd52bc514056907df656))
+* **admin:** real rating counts per user and view counts per location ([a8302d2](https://github.com/benjaminmue/pathary/commit/a8302d2328b0f2c1910e740901c1632d66af1b54))
+* **admin:** redesign the admin panel (shell + all 5 tabs) ([230333f](https://github.com/benjaminmue/pathary/commit/230333ffad09b83f1420d581a9502e31b3581437))
+* **admin:** redesign the admin panel (shell + all 5 tabs) to the pds design ([2ae271a](https://github.com/benjaminmue/pathary/commit/2ae271a3eef0923fe3db2f96381da1b9d897663d))
+
+
+### Bug Fixes
+
+* **admin:** real DOM+JS rebuild of the server tab to the compact design ([4f8a04a](https://github.com/benjaminmue/pathary/commit/4f8a04ac2a3758e0231cdc5f3215c79708413669))
+* **admin:** short tab labels via i18n, no tab icons, 'Admin' header ([c0d10b3](https://github.com/benjaminmue/pathary/commit/c0d10b3be35f85d3b734c0e1176323feda9b8048))
+* **admin:** stop the events 'Details' button being clipped ([ad621b5](https://github.com/benjaminmue/pathary/commit/ad621b5f7526723467bdfdd6b6f2e6472a883132))
+* **admin:** stop the right bulk-op card being offset by the sibling margin ([f41c664](https://github.com/benjaminmue/pathary/commit/f41c6643271a11f3c705df9c18292fd9e8861e40))
+* **release:** tag releases as v* instead of pathary-v* ([f4a7a1e](https://github.com/benjaminmue/pathary/commit/f4a7a1e56d225a308653dfed222998a632576c86))
+* **release:** tag releases as v* so the versioned Docker build triggers ([202d124](https://github.com/benjaminmue/pathary/commit/202d124d9882f03fb71089277036fbdcb60e00c4))
+* **ui:** dark-default login page + slimmer admin event rows ([e4b7273](https://github.com/benjaminmue/pathary/commit/e4b7273a06f6bac680b819af2da81dcb86843347))
+* **ui:** stale theme.css cache (toggle), i18n-broken security tab loader, profile spacing ([c96ce85](https://github.com/benjaminmue/pathary/commit/c96ce85ac7d8ab78880bea26de2e107f10386941))
+* **ui:** stale theme.css cache, i18n-broken security tab loader, profile top spacing ([06c1c24](https://github.com/benjaminmue/pathary/commit/06c1c24d85c4bc0ac282ffbe19451cf6bdc1cba1))
+
 ## [0.7.1](https://github.com/benjaminmue/pathary/compare/pathary-v0.7.0...pathary-v0.7.1) (2026-07-06)
 
 
