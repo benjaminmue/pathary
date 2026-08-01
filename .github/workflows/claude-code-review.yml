@@ -3,31 +3,20 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
+      # write, not read: the job posts the review back onto the PR.
+      pull-requests: write
       issues: read
       id-token: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -36,9 +25,38 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
-          plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Review this pull request. Pathary is a PHP 8.4 application (Movary
+            fork) using Twig templates, Phinx migrations and a repository layer
+            over PDO. Static analysis (phpcs, phpstan, psalm) and phpunit run in
+            a separate workflow, so do not repeat what those tools already catch.
+
+            Focus on:
+
+            1. Correctness
+               - Logic errors that produce wrong results silently
+               - Unhandled edge cases: null, empty result sets, missing API fields
+               - Error paths that swallow failures
+
+            2. Security
+               - SQL built by string concatenation instead of bound parameters
+               - Unescaped output in Twig (`|raw`) on user-controlled data
+               - Secrets or tokens in code, logs or fixtures
+
+            3. Data safety
+               - Migrations that drop or rewrite columns without a fallback
+               - Writes that can wipe previously synced values with nulls
+
+            4. Tests
+               - Missing regression test for a fixed bug
+               - New branches without a test covering both paths
+
+            Cite file:line for every finding and propose a concrete fix. Report
+            only real problems, no compliments and no summary of what the PR does.
+            If you find nothing worth changing, say so in one line.
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
-
