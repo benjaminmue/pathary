@@ -105,7 +105,7 @@ The scanner looks for these patterns:
 |---------|-------------|---------|
 | `TMDB_API_KEY` | TMDB API keys | `TMDB_API_KEY="abc123..."` |
 | `API_KEY` | Generic API keys | `API_KEY="longkey123"` |
-| `GITHUB_TOKEN` | GitHub tokens | `ghp_xxxx` or `github_pat_xxxx` |
+| `GITHUB_TOKEN` | GitHub tokens | `ghp_xxxx`, `github_pat_xxxx`, `ghs_/gho_/ghu_xxxx` |
 | `AWS_KEY` | AWS access keys | `AKIA...` |
 | `PRIVATE_KEY` | SSH/TLS keys | `BEGIN PRIVATE KEY` |
 | `PASSWORD_HARDCODED` | Hardcoded passwords | `PASSWORD="secret123"` |
