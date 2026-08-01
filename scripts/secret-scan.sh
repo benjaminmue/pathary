@@ -15,6 +15,7 @@
 #   - Added --self-test mode for verification
 #   - Improved output redaction for CI safety
 #   - Made compatible with bash 3.2+ (macOS default)
+#   - Added ghs_/gho_/ghu_ token detection incl. the new stateless JWT format
 #
 # Usage:
 #   ./scripts/secret-scan.sh [--verbose] [--self-test]
@@ -41,6 +42,12 @@ VERBOSE=0
 SELF_TEST=0
 FINDINGS=0
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# GitHub token formats, shared by the self-test and the main scan.
+# ghs_ (app installation), gho_ (OAuth) and ghu_ (user-to-server) tokens moved to a
+# stateless JWT format in 2026: ~520 characters and dots/dashes in the body, so they
+# need an open-ended match instead of the fixed 36 characters the old format had.
+GITHUB_TOKEN_REGEX='(ghp_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82}|gh[sou]_[a-zA-Z0-9._-]{36,})'
 
 # Parse arguments
 for arg in "$@"; do
@@ -70,8 +77,12 @@ report_finding() {
     echo "  File: $file:$line_num"
 
     # Aggressive redaction for safe CI output
-    # Remove everything after = or : and sanitize
-    local redacted=$(echo "$preview" | sed 's/[:=].*/:[REDACTED]/' | tr -cd '[:print:]')
+    # Remove everything after = or : and sanitize. A bare token on its own line has
+    # neither, so mask any GitHub token body separately before printing the preview.
+    local redacted=$(echo "$preview" \
+        | sed 's/[:=].*/:[REDACTED]/' \
+        | sed -E 's/(gh[psou]_|github_pat_)[A-Za-z0-9._-]+/\1[REDACTED]/g' \
+        | tr -cd '[:print:]')
     echo "  Preview: ${redacted:0:70}"
     echo ""
 }
@@ -122,6 +133,19 @@ run_self_test() {
     echo 'PASSWORD="MySecretPass123!"' > "$test_dir/test3.conf"
     echo 'SAFE_VAR="${TMDB_API_KEY}"' > "$test_dir/test4.env"
 
+    # Server-side token formats, one per line: the new stateless installation token
+    # (JWT style, ~520 chars), the classic opaque installation token, and a
+    # fine-grained PAT. Prefixes are assembled at runtime so these fixtures do not
+    # make the scanner flag its own source file.
+    local ghs_prefix="gh""s_"
+    local pat_prefix="github""_pat_"
+    local ghs_body=$(printf 'A%.0s' {1..170})
+    {
+        echo "${ghs_prefix}ey${ghs_body}.ey${ghs_body}.sig${ghs_body}"
+        echo "${ghs_prefix}16C7e42F292c6912E7710c838347Ae178B4a"
+        echo "${pat_prefix}11ABCDEFG0$(printf 'b%.0s' {1..72})"
+    } > "$test_dir/test5.txt"
+
     # Test pattern matching
     local test_findings=0
 
@@ -133,11 +157,19 @@ run_self_test() {
         return 1
     fi
 
-    if grep -qE '(ghp_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82})' -- "$test_dir/test2.txt"; then
+    if grep -qE "$GITHUB_TOKEN_REGEX" -- "$test_dir/test2.txt"; then
         test_findings=$((test_findings + 1))
         echo -e "${GREEN}✓${NC} Pattern test 2: GitHub token detection works"
     else
         echo -e "${RED}✗${NC} Pattern test 2: FAILED"
+        return 1
+    fi
+
+    if [ "$(grep -cE "$GITHUB_TOKEN_REGEX" -- "$test_dir/test5.txt")" = "3" ]; then
+        test_findings=$((test_findings + 1))
+        echo -e "${GREEN}✓${NC} Pattern test 2b: Stateless, classic and fine-grained token detection works"
+    else
+        echo -e "${RED}✗${NC} Pattern test 2b: FAILED"
         return 1
     fi
 
@@ -211,7 +243,7 @@ PATTERN_NAMES=(
 PATTERN_REGEXES=(
     'TMDB_API_KEY[[:space:]]*[:=][[:space:]]*["\047]?[a-zA-Z0-9]{10,}["\047]?'
     'API_KEY[[:space:]]*[:=][[:space:]]*["\047]?[a-zA-Z0-9]{20,}["\047]?'
-    '(ghp_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82})'
+    "$GITHUB_TOKEN_REGEX"
     'AKIA[0-9A-Z]{16}'
     'BEGIN[[:space:]]+(RSA[[:space:]]+)?PRIVATE[[:space:]]+KEY'
     '(PASSWORD|PASS)[[:space:]]*[:=][[:space:]]*["\047][^$\{\}][a-zA-Z0-9!@#$%^&*]{8,}["\047]'
