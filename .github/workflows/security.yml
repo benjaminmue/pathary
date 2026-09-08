@@ -70,4 +70,6 @@ jobs:
           php-version: "8.3"
 
       - name: composer audit
-        run: composer audit --no-interaction
+        # --locked reads composer.lock directly. Without it composer wants a
+        # completed `composer install` first and exits 1 on a bare checkout.
+        run: composer audit --locked --no-interaction
