@@ -60,7 +60,7 @@ Built for privacy and control, Pathary runs entirely on your own infrastructure 
 - **OAuth Email Authentication**
   - Gmail OAuth 2.0 integration
   - Microsoft 365 OAuth 2.0 integration
-  - AES-256-CBC encryption for client secrets and refresh tokens
+  - AES-256-GCM encryption for client secrets and refresh tokens
   - Automatic token refresh
   - No SMTP passwords required
 
@@ -216,6 +216,12 @@ proxy_set_header X-Forwarded-Proto $scheme;
 
 The `X-Forwarded-Proto` header is critical for HTTPS detection and secure cookie handling.
 
+`TRUSTED_PROXIES` lists the addresses (IPs or CIDRs, comma or space separated) of the reverse proxy in front of the production image, e.g. the IP of Nginx Proxy Manager. Only for requests arriving from one of these addresses does Apache take the client IP from `X-Forwarded-For` (REMOTE_ADDR, used by rate limiting and the security log) and set `HTTPS=on` when `X-Forwarded-Proto` is `https` (secure cookies, generated URLs). If it is unset, both headers are ignored: a client could otherwise spoof its IP or the scheme. Set it to the narrowest address possible; a proxy on the same Docker network has a fixed IP only if you assign one.
+
+```bash
+TRUSTED_PROXIES=192.168.1.10          # Nginx Proxy Manager
+```
+
 See [.env.example](.env.example) for all available configuration options.
 
 ## Documentation
@@ -262,7 +268,7 @@ See [.env.example](.env.example) for all available configuration options.
 - Security headers (CSP, X-Frame-Options, X-Content-Type-Options)
 - Rate limiting on authentication endpoints
 - HTTPS detection for reverse proxy setups
-- AES-256-CBC encryption for OAuth secrets
+- AES-256-GCM encryption for OAuth secrets ([key handling and rotation](docs/security/encryption-key.md))
 
 ## Development
 

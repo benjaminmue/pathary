@@ -35,10 +35,7 @@ async function verifyTraktCredentials() {
     document.getElementById('verifyButton').disabled = false;
 }
 
-const alertPlaceholder = document.getElementById('alerts')
-const addAlertMessage = (message, type) => {
-    alertPlaceholder.innerHTML = [`<div class="alert alert-${type} alert-dismissible" role="alert">`, `   <div>${message}</div>`, '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>', '</div>'].join('')
-}
+const addAlertMessage = (message, type) => addAlert('alerts', message, type)
 
 function toggleTableVisibility() {
     document.getElementById('importTable').classList.remove('d-none')

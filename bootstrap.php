@@ -11,6 +11,7 @@ $builder->addDefinitions(
         \Movary\Service\CsrfTokenService::class => DI\factory([Factory::class, 'createCsrfTokenService']),
         \Movary\Api\Trakt\TraktApi::class => DI\factory([Factory::class, 'createTraktApi']),
         \Movary\Service\ImageCacheService::class => DI\factory([Factory::class, 'createImageCacheService']),
+        \Movary\Service\Health\RuntimeHealthService::class => DI\factory([Factory::class, 'createRuntimeHealthService']),
         \Movary\JobQueue\JobQueueScheduler::class => DI\factory([Factory::class, 'createJobQueueScheduler']),
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Movary\Api\Omdb\OmdbClient::class => DI\factory([Factory::class, 'createOmdbClient']),

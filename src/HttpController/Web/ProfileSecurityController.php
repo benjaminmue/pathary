@@ -129,7 +129,8 @@ class ProfileSecurityController
         }
 
         $data = Json::decode($request->getBody());
-        $verificationCode = (int)($data['code'] ?? 0);
+        // Kept as a string: codes may start with "0".
+        $verificationCode = trim((string)($data['code'] ?? ''));
 
         $pendingTotpUri = $_SESSION['pending_totp_uri'] ?? null;
 
@@ -330,6 +331,9 @@ class ProfileSecurityController
         // Update password
         $this->userApi->updatePassword($userId, $newPassword);
 
+        // A changed password must end sessions an attacker may hold (this one stays).
+        $this->authenticationService->revokeOtherSessionsOfUser($userId);
+
         // Revoke all trusted devices after password change (security best practice)
         $this->trustedDeviceService->revokeAllTrustedDevices($userId);
         TrustedDeviceCookie::clear();
@@ -348,7 +352,8 @@ class ProfileSecurityController
     public function getSecurityEvents(Request $request) : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();
-        $limit = (int)($request->getGetParameters()['limit'] ?? 20);
+        // Bounded: the limit drives a database query (fetching three times as many rows).
+        $limit = max(1, min(100, (int)($request->getGetParameters()['limit'] ?? 20)));
 
         // Get events but fetch more to account for filtering
         $allEvents = $this->securityAuditService->getRecentEvents($userId, $limit * 3);

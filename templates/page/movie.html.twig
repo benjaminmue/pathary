@@ -49,12 +49,14 @@
 
         <div style="display: flex;">
             <div style="text-align: center">
-                <img id="moviePoster"
-                     src="{{ movie.posterPath }}"
-                     alt="{{ movie.title }}"
-                     class="poster-clickable"
-                     style="width: 13rem;align-self: start;"
-                     onclick="openPosterLightbox('{{ movie.posterPath|e('js') }}', '{{ movie.title|e('js') }}')">
+                <button type="button" class="poster-lightbox-trigger" data-poster-lightbox
+                        data-poster-src="{{ movie.posterPath }}" data-poster-alt="{{ movie.title }}"
+                        aria-label="{{ t('pmovie.enlarge_poster') }}">
+                    <img id="moviePoster"
+                         src="{{ movie.posterPath }}"
+                         alt="{{ movie.title }}"
+                         style="width: 13rem;align-self: start;">
+                </button>
             </div>
 
             <div style="padding-left: 1rem">
@@ -336,8 +338,8 @@
         </div>
 
         {# Poster Lightbox #}
-        <div id="posterLightbox" class="lightbox-overlay" style="display: none;">
-            <button class="lightbox-close" aria-label="{{ t('pmovie.close') }}">&times;</button>
+        <div id="posterLightbox" class="lightbox-overlay" role="dialog" aria-modal="true" aria-label="{{ t('pmovie.poster_dialog') }}" hidden>
+            <button type="button" class="lightbox-close" aria-label="{{ t('pmovie.close') }}">&times;</button>
             <img id="posterLightboxImage" src="" alt="{{ t('pmovie.movie_poster') }}" class="lightbox-image">
         </div>
     </main>

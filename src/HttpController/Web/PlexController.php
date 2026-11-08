@@ -7,18 +7,14 @@ use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ApplicationUrlService;
-use Movary\Service\Plex\PlexScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\ValueObject\Exception\ConfigNotSetException;
 use Movary\ValueObject\Exception\InvalidUrl;
-use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
-use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class PlexController
@@ -26,10 +22,8 @@ class PlexController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
-        private readonly PlexScrobbler $plexScrobbler,
         private readonly PlexApi $plexApi,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
-        private readonly LoggerInterface $logger,
         private readonly ApplicationUrlService $applicationUrlService,
     ) {
     }
@@ -55,32 +49,6 @@ class PlexController
         }
 
         return Response::createJson(Json::encode(['authenticationUrl' => $plexAuthenticationUrl]));
-    }
-
-    /**
-     * @deprecated
-     * @see \Movary\HttpController\Api\PlexController::handlePlexWebhook()
-     */
-    public function handlePlexWebhook(Request $request) : Response
-    {
-        $webhookId = $request->getRouteParameters()['id'];
-
-        $userId = $this->userApi->findUserIdByPlexWebhookId($webhookId);
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
-
-        $requestPayload = $request->getPostParameters()['payload'] ?? null;
-        if ($requestPayload === null) {
-            return Response::createOk();
-        }
-
-        $this->logger->debug('Plex: Webhook triggered with payload: ' . $requestPayload);
-        $this->logger->warning('This plex webhook url is deprecated and will stop to work soon, regenerate the url');
-
-        $this->plexScrobbler->processPlexWebhook($userId, Json::decode((string)$requestPayload));
-
-        return Response::createOk();
     }
 
     public function processPlexCallback() : Response

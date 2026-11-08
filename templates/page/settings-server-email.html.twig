@@ -121,9 +121,11 @@
                     <label for="smtpPasswordInput" class="form-label">
                         <b>{{ t('server.smtp_password') }}</b>
                     </label>
-                    <input type="text"
+                    <input type="password"
                            class="form-control"
-                           value="{{ smtpPassword }}"
+                           value=""
+                           placeholder="{{ smtpPasswordConfigured ? t('admin_server.saved_leave_blank') : '' }}"
+                           autocomplete="new-password"
                            id="smtpPasswordInput"
                            style="text-align: center;"
                             {{ smtpPasswordSetInEnv == true ? 'disabled' }}

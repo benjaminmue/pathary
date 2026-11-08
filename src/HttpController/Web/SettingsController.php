@@ -469,7 +469,9 @@ class SettingsController
                 'smtpWithAuthenticationSetInEnv' => $this->serverSettings->isSmtpWithAuthenticationSetInEnvironment(),
                 'smtpUser' => $this->serverSettings->getSmtpUser(),
                 'smtpUserSetInEnv' => $this->serverSettings->isSmtpUserSetInEnvironment(),
-                'smtpPassword' => $this->serverSettings->getSmtpPassword(),
+                // Never render the stored password into the page; the form only needs to
+                // know whether one exists (an empty field keeps it on save).
+                'smtpPasswordConfigured' => (string)$this->serverSettings->getSmtpPassword() !== '',
                 'smtpPasswordSetInEnv' => $this->serverSettings->isSmtpPasswordSetInEnvironment(),
             ]),
         );
@@ -613,7 +615,12 @@ class SettingsController
             );
         }
 
-        // For password mode, use settings from request
+        // For password mode, use settings from request. The settings pages never show the
+        // stored password, so an empty field means "use the saved one".
+        $smtpPassword = isset($requestData['smtpPassword']) === false || trim((string)$requestData['smtpPassword']) === ''
+            ? $this->serverSettings->getSmtpPassword()
+            : $requestData['smtpPassword'];
+
         return SmtpConfig::create(
             (string)$requestData['smtpHost'],
             (int)$requestData['smtpPort'],
@@ -621,7 +628,7 @@ class SettingsController
             (string)$requestData['smtpEncryption'],
             (bool)$requestData['smtpWithAuthentication'],
             isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'],
-            isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'],
+            $smtpPassword,
             isset($requestData['smtpFromDisplayName']) === false ? null : $requestData['smtpFromDisplayName'],
         );
     }
@@ -969,6 +976,10 @@ class SettingsController
         }
 
         $this->userApi->updatePassword($userId, $newPassword);
+
+        // Same rule as /profile/security/password: a changed password ends every
+        // other session an attacker may hold; this one stays.
+        $this->authenticationService->revokeOtherSessionsOfUser($userId);
 
         return Response::create(StatusCode::createOk());
     }

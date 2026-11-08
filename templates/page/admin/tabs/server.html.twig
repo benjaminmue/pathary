@@ -876,7 +876,7 @@
     }
 
     .pds-server code {
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
         background: var(--pds-surface-2);
         border: 1px solid var(--pds-hair);
         border-radius: 4px;
@@ -890,12 +890,12 @@
     .pds-server .text-primary { color: var(--pds-text) !important; }
     .pds-server .text-success { color: var(--pds-success) !important; }
     .pds-server .text-danger { color: var(--pds-danger) !important; }
-    .pds-server .text-warning { color: var(--pds-gold) !important; }
+    .pds-server .text-warning { color: var(--pds-gold-text) !important; }
     .pds-server .text-info { color: var(--pds-muted) !important; }
 
-    .pds-server a:not(.pds-btn):not(.badge) { color: var(--pds-gold); text-decoration: none; }
+    .pds-server a:not(.pds-btn):not(.badge) { color: var(--pds-gold-text); text-decoration: none; }
     .pds-server a:not(.pds-btn):not(.badge):hover { text-decoration: underline; }
-    .pds-server .alert-link { color: var(--pds-gold) !important; font-weight: 600; }
+    .pds-server .alert-link { color: var(--pds-gold-text) !important; font-weight: 600; }
 
     .pds-server hr { border-color: var(--pds-hair); opacity: 1; }
     .pds-server .border-top { border-top: 1px solid var(--pds-hair) !important; }
@@ -968,7 +968,7 @@
     }
 
     .pds-server #serverSettingsAccordion .accordion-button i {
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
     }
 
     .pds-server #serverSettingsAccordion .accordion-body {
@@ -1110,7 +1110,7 @@
     .pds-server .btn-outline-warning:hover,
     .pds-server .btn-secondary:hover {
         border-color: var(--pds-gold) !important;
-        color: var(--pds-gold) !important;
+        color: var(--pds-gold-text) !important;
         background: none !important;
     }
 
@@ -1158,7 +1158,7 @@
     /* Not-connected / degraded → amber */
     .pds-server .badge.bg-warning {
         background-color: rgba(251, 188, 9, 0.16) !important;
-        color: var(--pds-gold) !important;
+        color: var(--pds-gold-text) !important;
         border-color: rgba(251, 188, 9, 0.4) !important;
     }
     /* Not-configured (danger) / down → red */
@@ -1315,7 +1315,7 @@
     /* Degraded → amber tinted */
     .pds-server .pds-pill--warning {
         background: rgba(251, 188, 9, 0.12);
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
         border-color: rgba(251, 188, 9, 0.40);
     }
     /* Down / unhealthy → red tinted */
@@ -1347,7 +1347,7 @@
         border-bottom: 1px solid var(--pds-hair);
     }
     .pds-server .pds-health-head__title { font-size: 15px; font-weight: 600; color: var(--pds-text); }
-    .pds-server .pds-health-head__title i { color: var(--pds-gold); }
+    .pds-server .pds-health-head__title i { color: var(--pds-gold-text); }
     .pds-server .pds-health-head__note {
         font-family: var(--pds-font-mono);
         font-size: 12px;
@@ -1455,7 +1455,7 @@
         padding: 20px 24px;
     }
     .pds-server #testEmailModal .modal-title { font-size: 15px; font-weight: 600; color: var(--pds-text); }
-    .pds-server #testEmailModal .modal-title i { color: var(--pds-gold); }
+    .pds-server #testEmailModal .modal-title i { color: var(--pds-gold-text); }
     .pds-server #testEmailModal .modal-body { padding: 20px 24px; }
     .pds-server #testEmailModal .modal-footer {
         border-top: 1px solid var(--pds-hair);
@@ -1478,7 +1478,7 @@
         border-bottom: 1px solid var(--pds-hair);
         color: var(--pds-text);
     }
-    .pds-server #smtpDiagnosticsResults .card-header i { color: var(--pds-gold); }
+    .pds-server #smtpDiagnosticsResults .card-header i { color: var(--pds-gold-text); }
 </style>
 
 <script>
@@ -1584,11 +1584,7 @@
 
     async function loadTmdbStatus() {
         try {
-            const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-                },
-            });
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb');
 
             if (!response.ok) {
                 throw new Error('Failed to load TMDB status');
@@ -1696,10 +1692,10 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
                     },
                     body: JSON.stringify({
                         apiKey: tmdbApiKey,
+                        _csrf_token: getCsrfToken(),
                     }),
                 });
 
@@ -1735,10 +1731,10 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
                     },
                     body: JSON.stringify({
                         apiKey: omdbApiKey,
+                        _csrf_token: getCsrfToken(),
                     }),
                 });
 
@@ -1781,8 +1777,9 @@
             const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb/test', {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ _csrf_token: getCsrfToken() }),
             });
 
             const data = await response.json();
@@ -1802,11 +1799,7 @@
 
     async function loadOmdbStatus() {
         try {
-            const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-                },
-            });
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb');
 
             if (!response.ok) {
                 throw new Error('Failed to load OMDb status');
@@ -1856,8 +1849,9 @@
             const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb/test', {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ _csrf_token: getCsrfToken() }),
             });
 
             const data = await response.json();
@@ -1889,8 +1883,9 @@
             const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb', {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ _csrf_token: getCsrfToken() }),
             });
 
             const data = await response.json();
@@ -1927,8 +1922,9 @@
             const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb', {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ _csrf_token: getCsrfToken() }),
             });
 
             const data = await response.json();
@@ -2161,7 +2157,7 @@
             contentDiv.innerHTML = `
                 <div class="alert alert-danger">
                     <i class="bi bi-exclamation-triangle me-2"></i>
-                    Error running diagnostics: ${error.message}
+                    Error running diagnostics: ${escapeHtml(error.message)}
                 </div>
             `;
         }
@@ -2174,9 +2170,9 @@
         let html = `
             <div class="mb-3">
                 <strong>Configuration:</strong>
-                <span class="ms-2">Host: ${results.host}</span>
-                <span class="ms-2">Port: ${results.port}</span>
-                <span class="ms-2">Encryption: ${results.encryption || 'None'}</span>
+                <span class="ms-2">Host: ${escapeHtml(results.host)}</span>
+                <span class="ms-2">Port: ${escapeHtml(results.port)}</span>
+                <span class="ms-2">Encryption: ${escapeHtml(results.encryption || 'None')}</span>
             </div>
             <div class="mb-3">
                 <strong>Overall Status:</strong>
@@ -2201,13 +2197,13 @@
                     <div class="card-body py-2">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <strong>${testLabel}</strong>
-                                <div class="small text-muted">${testResult.message}</div>
-                                ${testResult.hint ? `<div class="small text-info mt-1"><i class="bi bi-lightbulb"></i> ${testResult.hint}</div>` : ''}
+                                <strong>${escapeHtml(testLabel)}</strong>
+                                <div class="small text-muted">${escapeHtml(testResult.message)}</div>
+                                ${testResult.hint ? `<div class="small text-info mt-1"><i class="bi bi-lightbulb"></i> ${escapeHtml(testResult.hint)}</div>` : ''}
                             </div>
                             <div class="text-end">
                                 ${getStatusBadge(testResult.status)}
-                                ${testResult.latency_ms ? `<div class="small text-muted">${testResult.latency_ms}ms</div>` : ''}
+                                ${testResult.latency_ms ? `<div class="small text-muted">${escapeHtml(testResult.latency_ms)}ms</div>` : ''}
                             </div>
                         </div>
                     </div>

@@ -70,12 +70,12 @@ async function deleteJellyfinWebhookRequest() {
 
 function setJellyfinWebhookUrl(webhookUrl) {
     if (webhookUrl) {
-        document.getElementById('jellyfinWebhookUrl').innerHTML = webhookUrl
+        document.getElementById('jellyfinWebhookUrl').textContent = webhookUrl
         document.getElementById('deleteJellyfinWebhookButton').classList.remove('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = false
         document.getElementById('saveButton').disabled = false
     } else {
-        document.getElementById('jellyfinWebhookUrl').innerHTML = '-'
+        document.getElementById('jellyfinWebhookUrl').textContent = '-'
         document.getElementById('deleteJellyfinWebhookButton').classList.add('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = true
         document.getElementById('saveButton').disabled = true

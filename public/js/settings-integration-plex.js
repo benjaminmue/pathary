@@ -52,13 +52,13 @@ async function deletePlexWebhookRequest() {
 
 function setPlexWebhookUrl(webhookUrl) {
     if (webhookUrl) {
-        document.getElementById('plexWebhookUrl').innerHTML = webhookUrl
+        document.getElementById('plexWebhookUrl').textContent = webhookUrl
         document.getElementById('deletePlexWebhookButton').classList.remove('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = false
         document.getElementById('scrobbleRatingsCheckbox').disabled = false
         document.getElementById('saveButton').disabled = false
     } else {
-        document.getElementById('plexWebhookUrl').innerHTML = '-'
+        document.getElementById('plexWebhookUrl').textContent = '-'
         document.getElementById('deletePlexWebhookButton').classList.add('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = true
         document.getElementById('scrobbleRatingsCheckbox').disabled = true
@@ -124,7 +124,12 @@ async function authenticateWithPlex() {
 async function removePlexAuthentication() {
     const response = await fetch(
         APPLICATION_URL + '/old/settings/plex/logout',
-        {signal: AbortSignal.timeout(4000)}
+        {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({_csrf_token: getCsrfToken()}),
+            signal: AbortSignal.timeout(4000),
+        }
     ).catch(function (error) {
         console.log(error)
 

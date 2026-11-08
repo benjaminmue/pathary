@@ -49,12 +49,18 @@ RUN chown -R application:application /app /run /var/lib/nginx /var/log/nginx
 
 # Create scheduled sync wrapper script (for cron environment variable handling)
 # Must be after main COPY to avoid being overwritten
-COPY ./build/scripts/run-scheduled-sync.sh /app/build/scripts/run-scheduled-sync.sh
-RUN chmod +x /app/build/scripts/run-scheduled-sync.sh
+COPY ./build/scripts/run-cron-job.sh /app/build/scripts/run-cron-job.sh
+RUN chmod +x /app/build/scripts/run-cron-job.sh
 
-# Configure cron for scheduled syncs (must be done as root, after user exists)
-# Install as user crontab only (not /etc/cron.d/) to avoid duplicate execution
-RUN crontab -u application /app/docker/cron/pathary-sync
+# Configure cron for scheduled jobs (must be done as root, after user exists).
+# docker/cron/pathary-sync is written in /etc/cron.d format for the production
+# image; dcron here only reads user crontabs, so drop the user field, the
+# setpriv privilege drop and the /proc/1/fd/1 redirect (the jobs already run as
+# 'application', supervisord tails storage/logs/cron.log instead).
+RUN sed -E \
+        -e 's|^([^#[:space:]]+([[:space:]]+[^[:space:]]+){4})[[:space:]]+root[[:space:]]+setpriv[[:space:]]+[^/]*|\1 |' \
+        -e 's# > /proc/1/fd/1 2>&1$##' \
+        /app/docker/cron/pathary-sync | crontab -u application -
 
 # Add composer
 COPY --from=composer /usr/bin/composer /usr/bin/composer

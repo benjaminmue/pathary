@@ -12,10 +12,14 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.9);
     z-index: 9999;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     animation: lightboxFadeIn 0.3s ease-in-out;
+}
+
+.lightbox-overlay[hidden] {
+    display: none;
 }
 
 /* Fade in animation */
@@ -71,13 +75,23 @@
 }
 
 /* Clickable poster cursor */
-.poster-clickable {
-    cursor: pointer;
+/* Poster trigger: a plain button around the poster image */
+.poster-lightbox-trigger {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    border-radius: inherit;
+    cursor: zoom-in;
     transition: opacity 0.2s ease-in-out;
 }
 
-.poster-clickable:hover {
+.poster-lightbox-trigger:hover {
     opacity: 0.9;
+}
+
+.poster-lightbox-trigger img {
+    display: block;
 }
 
 /* Mobile Responsive Adjustments */

@@ -1,99 +1,116 @@
 /**
- * Popcorn Rating Component - Interactive rating input
- * Supports click selection, hover preview (desktop), and keyboard navigation
+ * Popcorn Rating Component: accessible rating input (ARIA radiogroup).
+ *
+ * - One tab stop (roving tabindex); arrow keys, Home and End move the selection.
+ * - Click or Space/Enter selects a value; the separate clear button resets to 0.
+ * - Hover only previews visually and never changes the ARIA state.
+ *
+ * Markup: templates/components/popcorn_rating.twig (input mode).
  */
-(function() {
+(function () {
     'use strict';
 
+    var MAX_VALUE = 7;
+
     function initPopcornRating() {
-        document.querySelectorAll('[data-popcorn-rating]').forEach(function(container) {
-            var buttons = container.querySelectorAll('button[data-value]');
-            var hiddenInput = container.querySelector('.popcorn-rating__value');
-
-            if (!buttons.length || !hiddenInput) return;
-
-            // Store the selected value on the container
-            var initialValue = parseInt(hiddenInput.value, 10) || 0;
-            container.setAttribute('data-selected', initialValue);
-
-            buttons.forEach(function(button) {
-                // Click to select rating
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    var value = parseInt(this.getAttribute('data-value'), 10);
-                    var currentSelected = parseInt(container.getAttribute('data-selected'), 10) || 0;
-
-                    // Toggle off if clicking same value, otherwise set new value
-                    var newValue = (currentSelected === value) ? 0 : value;
-
-                    container.setAttribute('data-selected', newValue);
-                    hiddenInput.value = newValue;
-                    updateDisplay(buttons, newValue);
-
-                    // Dispatch change event for form integration
-                    hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
-                });
-
-                // Hover preview (desktop)
-                button.addEventListener('mouseenter', function() {
-                    var hoverValue = parseInt(this.getAttribute('data-value'), 10);
-                    updateDisplay(buttons, hoverValue);
-                });
-
-                // Keyboard support
-                button.addEventListener('keydown', function(e) {
-                    var currentSelected = parseInt(container.getAttribute('data-selected'), 10) || 0;
-                    var newValue = currentSelected;
-
-                    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
-                        e.preventDefault();
-                        newValue = Math.min(currentSelected + 1, 7);
-                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
-                        e.preventDefault();
-                        newValue = Math.max(currentSelected - 1, 0);
-                    }
-
-                    if (newValue !== currentSelected) {
-                        container.setAttribute('data-selected', newValue);
-                        hiddenInput.value = newValue;
-                        updateDisplay(buttons, newValue);
-                        focusButton(buttons, newValue || 1);
-                        hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                });
-            });
-
-            // Restore selected value when leaving the widget
-            container.addEventListener('mouseleave', function() {
-                var selectedValue = parseInt(container.getAttribute('data-selected'), 10) || 0;
-                updateDisplay(buttons, selectedValue);
-            });
-
-            // Initial display
-            updateDisplay(buttons, initialValue);
-        });
-    }
-
-    function updateDisplay(buttons, value) {
-        buttons.forEach(function(btn) {
-            var btnValue = parseInt(btn.getAttribute('data-value'), 10);
-            var isOn = btnValue <= value && value > 0;
-
-            btn.classList.toggle('popcorn-on', isOn);
-            btn.classList.toggle('popcorn-off', !isOn);
-            btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
-        });
-    }
-
-    function focusButton(buttons, value) {
-        buttons.forEach(function(btn) {
-            if (parseInt(btn.getAttribute('data-value'), 10) === value) {
-                btn.focus();
+        document.querySelectorAll('[data-popcorn-rating]').forEach(function (field) {
+            if (field.dataset.popcornReady === 'true') {
+                return;
             }
+
+            var radios = Array.prototype.slice.call(field.querySelectorAll('[role="radio"][data-value]'));
+            var hiddenInput = field.querySelector('.popcorn-rating__value');
+            var clearButton = field.querySelector('[data-popcorn-clear]');
+            var group = field.querySelector('[role="radiogroup"]');
+
+            if (!radios.length || !hiddenInput || !group) {
+                return;
+            }
+
+            field.dataset.popcornReady = 'true';
+
+            function selectedValue() {
+                return parseInt(hiddenInput.value, 10) || 0;
+            }
+
+            function select(value, moveFocus) {
+                hiddenInput.value = value;
+                updateState(radios, value);
+                if (clearButton) {
+                    clearButton.hidden = value === 0;
+                }
+                if (moveFocus) {
+                    radios[Math.max(value, 1) - 1].focus();
+                }
+                hiddenInput.dispatchEvent(new Event('change', {bubbles: true}));
+            }
+
+            radios.forEach(function (radio) {
+                var value = parseInt(radio.dataset.value, 10);
+
+                radio.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    select(value, false);
+                });
+
+                radio.addEventListener('mouseenter', function () {
+                    paint(radios, value);
+                });
+
+                radio.addEventListener('keydown', function (event) {
+                    var current = selectedValue() || value;
+                    var next = null;
+
+                    if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+                        next = Math.min(current + 1, MAX_VALUE);
+                    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+                        next = Math.max(current - 1, 1);
+                    } else if (event.key === 'Home') {
+                        next = 1;
+                    } else if (event.key === 'End') {
+                        next = MAX_VALUE;
+                    }
+
+                    if (next !== null) {
+                        event.preventDefault();
+                        select(next, true);
+                    }
+                });
+            });
+
+            group.addEventListener('mouseleave', function () {
+                paint(radios, selectedValue());
+            });
+
+            if (clearButton) {
+                clearButton.addEventListener('click', function () {
+                    select(0, true);
+                });
+            }
+
+            updateState(radios, selectedValue());
         });
     }
 
-    // Initialize on DOM ready
+    // Visual state only (filled/empty emoji); used for the hover preview too.
+    function paint(radios, value) {
+        radios.forEach(function (radio) {
+            var isOn = parseInt(radio.dataset.value, 10) <= value;
+            radio.classList.toggle('popcorn-on', isOn);
+            radio.classList.toggle('popcorn-off', !isOn);
+        });
+    }
+
+    // Visual plus ARIA state: only the selected radio is checked and focusable.
+    function updateState(radios, value) {
+        paint(radios, value);
+        radios.forEach(function (radio) {
+            var radioValue = parseInt(radio.dataset.value, 10);
+            radio.setAttribute('aria-checked', radioValue === value ? 'true' : 'false');
+            radio.tabIndex = radioValue === Math.max(value, 1) ? 0 : -1;
+        });
+    }
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initPopcornRating);
     } else {

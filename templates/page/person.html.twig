@@ -90,7 +90,7 @@
         <h6 style="margin-bottom: 0.1rem; margin-top: 1rem; font-weight: bold;">{{ t('person.biography') }}</h6>
         {% if person.biography is not null %}
             <p id="biographyParagraph" style="margin-bottom: 1rem">{{ person.biography|nl2br }}</p>
-            <div class="text-primary d-none" style="cursor: pointer; top: 0;" id="expandContainer">
+            <div class="text-primary d-none" style="cursor: pointer; top: 0;" id="expandContainer" data-show-more="{{ t('person.read_more') }}" data-show-less="{{ t('person.read_less') }}">
                 <span style="padding: 0;float: right;" onclick="toggleBiography()"><i class="bi bi-chevron-down"></i></span>
                 <span style="float: right; margin-right: 0.5em;" onclick="toggleBiography()">{{ t('person.read_more') }}&#8230;</span>
                 <br>

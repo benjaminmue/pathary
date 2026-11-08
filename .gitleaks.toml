@@ -25,3 +25,12 @@ description = """Inherited upstream history. Pathary's history begins with Lee P
 commits = [
   "a1c371fdd31a26d8e658ba77954a4b8774590e43",
 ]
+
+[[allowlists]]
+description = "False positive in commit b22745de: generic-api-key matched the environment variable name in a ternary of EncryptionServiceTest (putenv of 'ENCRYPTION_KEY' or 'ENCRYPTION_KEY=' plus a variable). No key literal. The test was rewritten in the next commit; pinned to this commit and file so nothing else is excused."
+commits = [
+  "b22745de8f088445b16272db34b58d9a76d80a55",
+]
+paths = [
+  '''tests/unit/Service/EncryptionServiceTest\.php''',
+]

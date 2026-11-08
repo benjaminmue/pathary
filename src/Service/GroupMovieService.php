@@ -2,6 +2,7 @@
 
 namespace Movary\Service;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
@@ -64,39 +65,76 @@ class GroupMovieService
      */
     public function getMovieGroupStats(int $movieId) : array
     {
-        $ratingStats = $this->dbConnection->fetchAssociative(
+        return $this->getMovieGroupStatsForMovies([$movieId])[$movieId];
+    }
+
+    /**
+     * Aggregate statistics for several movies with two grouped queries instead
+     * of two queries per movie.
+     *
+     * @param list<int> $movieIds
+     * @return array<int, array{
+     *     avg_popcorn: ?float,
+     *     rating_count: int,
+     *     last_activity_at: ?string
+     * }> keyed by movie id, one entry for every requested id
+     */
+    public function getMovieGroupStatsForMovies(array $movieIds) : array
+    {
+        if ($movieIds === []) {
+            return [];
+        }
+
+        $ratingStatsByMovieId = [];
+        $ratingRows = $this->dbConnection->fetchAllAssociative(
             <<<SQL
             SELECT
+                movie_id,
                 AVG(rating_popcorn) AS avg_popcorn,
                 COUNT(rating_popcorn) AS rating_count,
                 MAX(updated_at) AS last_rating_activity
             FROM movie_user_rating
-            WHERE movie_id = ? AND rating_popcorn IS NOT NULL
+            WHERE movie_id IN (?) AND rating_popcorn IS NOT NULL
+            GROUP BY movie_id
             SQL,
-            [$movieId],
+            [$movieIds],
+            [ArrayParameterType::INTEGER],
         );
-
-        if ($ratingStats === false) {
-            $ratingStats = [];
+        foreach ($ratingRows as $row) {
+            $ratingStatsByMovieId[(int)$row['movie_id']] = $row;
         }
 
-        $lastWatchActivity = $this->dbConnection->fetchOne(
+        $lastWatchActivityByMovieId = [];
+        $watchRows = $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT MAX(watched_at) AS last_watch_activity
+            SELECT movie_id, MAX(watched_at) AS last_watch_activity
             FROM movie_user_watch_dates
-            WHERE movie_id = ?
+            WHERE movie_id IN (?)
+            GROUP BY movie_id
             SQL,
-            [$movieId],
+            [$movieIds],
+            [ArrayParameterType::INTEGER],
         );
+        foreach ($watchRows as $row) {
+            $lastWatchActivityByMovieId[(int)$row['movie_id']] = $row['last_watch_activity'];
+        }
 
-        $lastRatingActivity = $ratingStats['last_rating_activity'] ?? null;
-        $lastActivityAt = $this->getLatestTimestamp($lastRatingActivity, $lastWatchActivity ?: null);
+        $stats = [];
+        foreach ($movieIds as $movieId) {
+            $ratingStats = $ratingStatsByMovieId[$movieId] ?? null;
+            $lastWatchActivity = $lastWatchActivityByMovieId[$movieId] ?? null;
 
-        return [
-            'avg_popcorn' => $ratingStats['avg_popcorn'] !== null ? round((float)$ratingStats['avg_popcorn'], 1) : null,
-            'rating_count' => (int)($ratingStats['rating_count'] ?? 0),
-            'last_activity_at' => $lastActivityAt,
-        ];
+            $stats[$movieId] = [
+                'avg_popcorn' => isset($ratingStats['avg_popcorn']) === true ? round((float)$ratingStats['avg_popcorn'], 1) : null,
+                'rating_count' => (int)($ratingStats['rating_count'] ?? 0),
+                'last_activity_at' => $this->getLatestTimestamp(
+                    $ratingStats['last_rating_activity'] ?? null,
+                    $lastWatchActivity !== null ? (string)$lastWatchActivity : null,
+                ),
+            ];
+        }
+
+        return $stats;
     }
 
     /**

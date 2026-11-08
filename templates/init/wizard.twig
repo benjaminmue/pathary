@@ -130,81 +130,10 @@
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
         }
-        /* Popcorn Background Animation (Snowflake-style) */
-        .popcorn-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        /* Each popcorn particle */
-        .popcorn {
-            position: absolute;
-            top: -50px;
-            user-select: none;
-            pointer-events: none;
-            animation: fall linear infinite, sway ease-in-out infinite;
-            will-change: transform;
-        }
-
-        @keyframes fall {
-            0% {
-                transform: translateY(-100px);
-            }
-            100% {
-                transform: translateY(calc(100vh + 100px));
-            }
-        }
-
-        @keyframes sway {
-            0%, 100% {
-                margin-left: 0;
-            }
-            25% {
-                margin-left: 25px;
-            }
-            75% {
-                margin-left: -25px;
-            }
-        }
-
-        /* Respect reduced motion preference */
-        @media (prefers-reduced-motion: reduce) {
-            .popcorn {
-                animation: none !important;
-                display: none;
-            }
-
-            .popcorn-bg::before {
-                content: '🍿';
-                position: absolute;
-                top: 20%;
-                left: 15%;
-                font-size: 24px;
-                opacity: 0.08;
-                filter: blur(2px);
-            }
-
-            .popcorn-bg::after {
-                content: '🍿';
-                position: absolute;
-                bottom: 25%;
-                right: 20%;
-                font-size: 28px;
-                opacity: 0.06;
-                filter: blur(3px);
-            }
-        }
     </style>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/init-wizard-bg.js"></script>
     <script src="{{ applicationUrl }}/js/qrcode.min.js"></script>
     <script src="{{ applicationUrl }}/js/init-wizard.js"></script>
 {% endblock %}

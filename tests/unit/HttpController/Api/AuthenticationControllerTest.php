@@ -12,6 +12,7 @@ use Movary\Service\Exception\LoginRateLimitExceeded;
 use Movary\Service\LoginRateLimiterService;
 use Movary\ValueObject\Http\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -59,6 +60,65 @@ class AuthenticationControllerTest extends TestCase
         self::assertStringNotContainsString('freshly-created-token', (string)$response->getBody());
     }
 
+    public function testWebLoginWithoutTwoFactorKeepsSessionAndRedirectsToEnrollment() : void
+    {
+        $this->authenticationService->method('login')->willReturn([
+            'user' => $this->createUser(37),
+            'token' => 'freshly-created-token',
+        ]);
+        $this->twoFactorAuthenticationApi->method('findTotpUri')->with(37)->willReturn(null);
+
+        // An invited user must be able to log in to enroll 2FA, so the web session survives.
+        $this->authenticationService->expects(self::never())->method('deleteToken');
+
+        $response = $this->subject->createToken($this->createTokenRequest(Authentication::PATHARY_WEB_CLIENT));
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        $body = json_decode((string)$response->getBody(), true);
+        self::assertSame(['twoFactorSetupRequired' => true, 'redirectPath' => '/profile/security'], $body);
+    }
+
+    /**
+     * @return iterable<string, array{mixed, ?string}>
+     */
+    public static function totpCodeProvider() : iterable
+    {
+        yield 'string with leading zero' => ['012345', '012345'];
+        yield 'numeric JSON value is padded' => [12345, '012345'];
+        yield 'surrounding whitespace' => [' 123456 ', '123456'];
+        yield 'empty string' => ['', null];
+        yield 'missing' => [null, null];
+    }
+
+    #[DataProvider('totpCodeProvider')]
+    public function testTotpCodeIsPassedOnAsSixDigitString(mixed $sentCode, ?string $expectedCode) : void
+    {
+        $this->authenticationService->expects(self::once())->method('login')
+            ->with('user@example.com', 'secret', false, 'test-client', 'test-agent', $expectedCode)
+            ->willThrowException(InvalidCredentials::create());
+
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn((string)json_encode(['email' => 'user@example.com', 'password' => 'secret', 'totpCode' => $sentCode]));
+        $request->method('getHeaders')->willReturn(['X-Movary-Client' => 'test-client']);
+        $request->method('getUserAgent')->willReturn('test-agent');
+
+        $this->subject->createToken($request);
+    }
+
+    public function testMissingOrNonStringCredentialsAreRejected() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getBody')->willReturn((string)json_encode(['email' => ['array'], 'password' => 'secret']));
+        $request->method('getHeaders')->willReturn(['X-Movary-Client' => 'test-client']);
+
+        $this->authenticationService->expects(self::never())->method('login');
+
+        $response = $this->subject->createToken($request);
+
+        self::assertSame(400, $response->getStatusCode()->getCode());
+        self::assertStringContainsString('MissingCredentials', (string)$response->getBody());
+    }
+
     public function testCreateTokenIssuesTokenForUserWithTwoFactor() : void
     {
         $this->authenticationService->method('login')->willReturn([
@@ -93,7 +153,7 @@ class AuthenticationControllerTest extends TestCase
         $this->authenticationService->method('login')->willThrowException(InvalidCredentials::create());
 
         // A wrong password must be recorded so repeated failures trip the limiter.
-        $this->loginRateLimiter->expects(self::once())->method('logAttempt')->with(self::anything(), false);
+        $this->loginRateLimiter->expects(self::once())->method('logAttempt')->with(self::anything(), 'user@example.com', false);
 
         $response = $this->subject->createToken($this->createTokenRequest());
 
@@ -108,7 +168,7 @@ class AuthenticationControllerTest extends TestCase
         ]);
         $this->twoFactorAuthenticationApi->method('findTotpUri')->willReturn('otpauth://totp/Pathary:zsmith?secret=ABC');
 
-        $this->loginRateLimiter->expects(self::once())->method('logAttempt')->with(self::anything(), true);
+        $this->loginRateLimiter->expects(self::once())->method('logAttempt')->with(self::anything(), 'user@example.com', true);
 
         $response = $this->subject->createToken($this->createTokenRequest());
 
@@ -125,14 +185,14 @@ class AuthenticationControllerTest extends TestCase
         return $user;
     }
 
-    private function createTokenRequest() : Request&MockObject
+    private function createTokenRequest(string $client = 'test-client') : Request&MockObject
     {
         $request = $this->createMock(Request::class);
         $request->method('getBody')->willReturn((string)json_encode([
             'email' => 'user@example.com',
             'password' => 'secret',
         ]));
-        $request->method('getHeaders')->willReturn(['X-Movary-Client' => 'test-client']);
+        $request->method('getHeaders')->willReturn(['X-Movary-Client' => $client]);
         $request->method('getUserAgent')->willReturn('test-agent');
 
         return $request;

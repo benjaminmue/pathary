@@ -510,7 +510,7 @@ function processCsvFileUploadError(statusCode) {
     } else if (statusCode === 415) {
         text = 'Error: Input file is the wrong type. Upload the correct CSV file from Netflix.';
     } else {
-        text = 'Error: Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.';
+        text = 'Error: Please check your browser console log (F12 -> Console) and the Pathary application logs.';
     }
 
     setDefaultTable()
@@ -520,7 +520,7 @@ function processCsvFileUploadError(statusCode) {
 function setImportAlertError() {
     setAlert(
         'importAlert',
-        'Error: Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.',
+        'Error: Please check your browser console log (F12 -> Console) and the Pathary application logs.',
         'danger'
     )
 }
@@ -531,7 +531,7 @@ function setAlert(alertElementId, alertText, alertType) {
     alertElement.className = ''
     alertElement.classList.add('alert')
     alertElement.classList.add('alert-' + alertType)
-    alertElement.innerHTML = alertText
+    alertElement.textContent = alertText
 }
 
 function hideAlert(alertElementId) {

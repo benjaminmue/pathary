@@ -137,18 +137,18 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: var(--accent-purple);
-        border-color: var(--accent-purple);
-        color: #fff;
+        background: transparent;
+        border: 1px solid var(--bs-border-color);
+        color: var(--bs-body-color);
         font-weight: 600;
         padding: 0.75rem 1.5rem;
         font-size: 1rem;
     }
 
     .btn-view-existing:hover {
-        background: #5a24a0;
-        border-color: #5a24a0;
-        color: #fff;
+        background: transparent;
+        border-color: var(--gold);
+        color: var(--bs-body-color);
     }
 
     .existing-notice {
@@ -156,15 +156,15 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.75rem 1rem;
-        background: rgba(111, 45, 189, 0.1);
-        border: 1px solid rgba(111, 45, 189, 0.3);
+        background: var(--bs-secondary-bg);
+        border: 1px solid var(--bs-border-color);
         border-radius: 8px;
         color: var(--bs-body-color);
         font-size: 0.9rem;
     }
 
     .existing-notice i {
-        color: var(--accent-purple);
+        color: var(--gold-ink);
     }
 
     .tmdb-badge {
@@ -188,7 +188,7 @@
     }
 
     .back-link:hover {
-        color: var(--pathe-yellow);
+        color: var(--gold-ink);
     }
 </style>
 {% endblock %}

@@ -229,34 +229,31 @@ function refreshTmdbData() {
     })
 }
 
-async function addToWatchlistRequest() {
-    const response = await fetch(APPLICATION_URL + '/old/movies/' + getMovieId() + '/add-watchlist')
+// State-changing movie actions are POST requests carrying the CSRF token.
+async function postMovieAction(action) {
+    const response = await fetch(APPLICATION_URL + '/old/movies/' + getMovieId() + '/' + action, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({_csrf_token: getCsrfToken()}),
+    })
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     return true
+}
+
+async function addToWatchlistRequest() {
+    return postMovieAction('add-watchlist')
 }
 
 async function removeFromWatchlistRequest() {
-    const response = await fetch(APPLICATION_URL + '/old/movies/' + getMovieId() + '/remove-watchlist')
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    return true
+    return postMovieAction('remove-watchlist')
 }
 
 async function refreshTmdbDataRequest() {
-    const response = await fetch(APPLICATION_URL + '/old/movies/' + getMovieId() + '/refresh-tmdb')
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    return true
+    return postMovieAction('refresh-tmdb')
 }
 
 function disableMoreModalButtons(disable = true) {
@@ -281,13 +278,7 @@ function refreshImdbRating() {
 }
 
 async function refreshImdbRatingRequest() {
-    const response = await fetch(APPLICATION_URL + '/old/movies/' + getMovieId() + '/refresh-imdb')
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    return true
+    return postMovieAction('refresh-imdb')
 }
 
 //endregion refreshImdbRating

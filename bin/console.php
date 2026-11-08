@@ -34,4 +34,13 @@ $application->add($container->get(Movary\Command\JellyfinImport::class));
 $application->add($container->get(Movary\Command\MastodonPostPlay::class));
 $application->add($container->get(Movary\Command\MastodonPostWatchlist::class));
 
+// Built only when invoked: OAuthMonitor pulls in the Twig environment, which
+// reads server_setting while being constructed and would break every console
+// call (including database:migration:migrate) on an empty database.
+$application->setCommandLoader(new Symfony\Component\Console\CommandLoader\FactoryCommandLoader([
+    'oauth:monitor' => fn() => $container->get(Movary\Command\OAuthMonitor::class),
+    'maintenance:prune' => fn() => $container->get(Movary\Command\MaintenancePrune::class),
+    'selftest' => fn() => $container->get(Movary\Command\SelfTest::class),
+]));
+
 $application->run();

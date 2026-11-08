@@ -3,6 +3,7 @@
 /** @var DI\Container $container */
 
 use Movary\HttpController\Web\ErrorController;
+use Movary\Util\RequestContext;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -17,8 +18,14 @@ $securityHeaders = [
     'X-Frame-Options' => 'SAMEORIGIN',
     'Referrer-Policy' => 'strict-origin-when-cross-origin',
     'Permissions-Policy' => 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
-    'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' https://image.tmdb.org data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-ancestors 'self';",
+    'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://image.tmdb.org data:; font-src 'self'; connect-src 'self'; frame-ancestors 'self';",
 ];
+
+// HSTS only for https deployments: browsers ignore it on plain http, and plain-http
+// installs (e.g. LAN-only) must not be told to upgrade to an https they do not serve.
+if (RequestContext::isHttps() === true) {
+    $securityHeaders['Strict-Transport-Security'] = 'max-age=31536000';
+}
 
 try {
     $dispatcher = FastRoute\simpleDispatcher(

@@ -29,13 +29,13 @@ export ENCRYPTION_KEY="dGVzdC1lbmNyeXB0aW9uLWtleQ=="  # fake base64; was missing
 # Guard against the hardcoded PHP path regression: the php:8.x-apache production
 # image has php at /usr/local/bin/php, not /usr/bin/php, so the wrapper must
 # resolve it via command -v, never hardcode /usr/bin/php.
-WRAPPER="$DIR/run-scheduled-sync.sh"
+WRAPPER="$DIR/run-cron-job.sh"
 if grep -qE '(^|[^-])/usr/bin/php\b' "$WRAPPER"; then
-    echo "FAIL: run-scheduled-sync.sh hardcodes /usr/bin/php (breaks the Debian prod image)"
+    echo "FAIL: run-cron-job.sh hardcodes /usr/bin/php (breaks the Debian prod image)"
     exit 1
 fi
 if ! grep -q 'command -v php' "$WRAPPER"; then
-    echo "FAIL: run-scheduled-sync.sh does not resolve php via 'command -v php'"
+    echo "FAIL: run-cron-job.sh does not resolve php via 'command -v php'"
     exit 1
 fi
 

@@ -180,6 +180,15 @@ class Factory
         return new GuzzleHttp\Client(['timeout' => 4]);
     }
 
+    public static function createRuntimeHealthService(ContainerInterface $container, Config $config) : Service\Health\RuntimeHealthService
+    {
+        return new Service\Health\RuntimeHealthService(
+            $container->get(DBAL\Connection::class),
+            self::createDirectoryAppRoot() . 'db/migrations/' . self::getDatabaseMode($config),
+            self::createDirectoryStorage(),
+        );
+    }
+
     public static function createImageCacheService(ContainerInterface $container) : ImageCacheService
     {
         return new ImageCacheService(
@@ -310,7 +319,17 @@ class Factory
     // phpcs:ignore Generic.Metrics.CyclomaticComplexity
     public static function createTwigEnvironment(ContainerInterface $container) : Twig\Environment
     {
-        $twig = new Twig\Environment($container->get(Twig\Loader\LoaderInterface::class));
+        $twig = new Twig\Environment(
+            $container->get(Twig\Loader\LoaderInterface::class),
+            [
+                // Compiled templates are cached across requests. The container
+                // entrypoint empties this directory on start, so a new image never
+                // serves templates compiled from the previous one; auto_reload
+                // recompiles a template whose source changed (bind-mounted dev setups).
+                'cache' => self::createDirectoryStorage() . 'cache/twig',
+                'auto_reload' => true,
+            ],
+        );
 
         $currentRequest = $container->get(Request::class);
         $routeUsername = $currentRequest->getRouteParameters()['username'] ?? null;

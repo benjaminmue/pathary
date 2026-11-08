@@ -28,7 +28,11 @@ class TwoFactorAuthenticationApi
         $this->userApi->updateTotpUri($userId, $uri);
     }
 
-    public function verifyTotpUri(int $userId, int $verificationCode, ?string $uri = null) : bool
+    /**
+     * The code is a string on purpose: TOTP codes may start with "0", which an int
+     * cast would drop (about one login in ten would fail).
+     */
+    public function verifyTotpUri(int $userId, string $verificationCode, ?string $uri = null) : bool
     {
         if ($uri === null) {
             $uri = $this->userApi->findTotpUri($userId);
@@ -38,8 +42,13 @@ class TwoFactorAuthenticationApi
             throw new RuntimeException('Could not find totp uri for user with id: ' . $userId);
         }
 
+        $verificationCode = trim($verificationCode);
+        if ($verificationCode === '') {
+            return false;
+        }
+
         $totp = $this->twoFactorAuthenticationFactory->createOtpFromProvisioningUri($uri);
 
-        return $totp->verify((string)$verificationCode);
+        return $totp->verify($verificationCode);
     }
 }

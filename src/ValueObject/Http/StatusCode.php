@@ -30,6 +30,11 @@ class StatusCode
         return new self(500, 'Internal Server Error');
     }
 
+    public static function createServiceUnavailable() : self
+    {
+        return new self(503, 'Service Unavailable');
+    }
+
     public static function createMethodNoContent() : self
     {
         return new self(204, 'No content');

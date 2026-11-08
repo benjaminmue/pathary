@@ -67,12 +67,12 @@ async function deleteEmbyWebhookRequest() {
 
 function setEmbyWebhookUrl(webhookUrl) {
     if (webhookUrl) {
-        document.getElementById('embyWebhookUrl').innerHTML = webhookUrl
+        document.getElementById('embyWebhookUrl').textContent = webhookUrl
         document.getElementById('deleteEmbyWebhookButton').classList.remove('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = false
         document.getElementById('saveButton').disabled = false
     } else {
-        document.getElementById('embyWebhookUrl').innerHTML = '-'
+        document.getElementById('embyWebhookUrl').textContent = '-'
         document.getElementById('deleteEmbyWebhookButton').classList.add('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = true
         document.getElementById('saveButton').disabled = true

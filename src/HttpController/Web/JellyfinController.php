@@ -10,7 +10,6 @@ use Movary\Api\Jellyfin\Exception\JellyfinServerUrlMissing;
 use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
-use Movary\Service\Jellyfin\JellyfinScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\ValueObject\Exception\InvalidUrl;
@@ -24,7 +23,6 @@ class JellyfinController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
-        private readonly JellyfinScrobbler $jellyfinScrobbler,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly LoggerInterface $logger,
         private readonly JellyfinApi $jellyfinApi,
@@ -62,29 +60,6 @@ class JellyfinController
     public function deleteJellyfinWebhookUrl() : Response
     {
         $this->userApi->deleteJellyfinWebhookId($this->authenticationService->getCurrentUserId());
-
-        return Response::createOk();
-    }
-
-    /**
-     * @deprecated
-     * @see \Movary\HttpController\Api\JellyfinController::handleJellyfinWebhook()
-     */
-    public function handleJellyfinWebhook(Request $request) : Response
-    {
-        $webhookId = $request->getRouteParameters()['id'];
-
-        $userId = $this->userApi->findUserIdByJellyfinWebhookId($webhookId);
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
-
-        $requestPayload = $request->getBody();
-
-        $this->logger->debug('Jellyfin: Webhook triggered with payload: ' . $requestPayload);
-        $this->logger->warning('This jellyfin webhook url is deprecated and will stop to work soon, regenerate the url');
-
-        $this->jellyfinScrobbler->processJellyfinWebhook($userId, Json::decode($requestPayload));
 
         return Response::createOk();
     }

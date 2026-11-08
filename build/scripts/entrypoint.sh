@@ -33,7 +33,7 @@ echo "INFO: Cron daemon will be started by supervisord (daily sync at 2:00 AM)"
 
 # Snapshot the container environment so the cron scheduled sync can restore it.
 # cron scrubs the environment before running a job; without this the sync would
-# fall back to SQLite and never touch the real database (see run-scheduled-sync.sh).
+# fall back to SQLite and never touch the real database (see run-cron-job.sh).
 if [ -f /app/build/scripts/write-cron-env.sh ]; then
   /bin/bash /app/build/scripts/write-cron-env.sh /app/storage/.cron-env || echo "WARNING: could not persist cron environment"
   # dev cron runs as the 'application' user, so make the snapshot readable by it.
