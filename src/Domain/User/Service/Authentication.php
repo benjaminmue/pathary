@@ -24,7 +24,8 @@ class Authentication
 
     private const string AUTHENTICATION_COOKIE_NAME = 'id';
 
-    private const int MAX_EXPIRATION_AGE_IN_DAYS = 3650; // 10 years for persistent login
+    // "Remember me" lifetime. Bounded so a stolen cookie does not stay valid for years.
+    private const int MAX_EXPIRATION_AGE_IN_DAYS = 90;
 
     public function __construct(
         private readonly UserRepository $repository,
@@ -51,6 +52,17 @@ class Authentication
     public function deleteToken(string $token) : void
     {
         $this->repository->deleteAuthToken($token);
+    }
+
+    /**
+     * Log a user out everywhere after a credential change. The session that made the
+     * change survives (when it belongs to that user), every other one is revoked.
+     */
+    public function revokeOtherSessionsOfUser(int $userId) : void
+    {
+        $currentToken = (string)filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+
+        $this->repository->deleteAuthTokensOfUser($userId, $currentToken === '' ? null : $currentToken);
     }
 
     public function findUserAndVerifyAuthentication(

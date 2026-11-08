@@ -330,6 +330,9 @@ class ProfileSecurityController
         // Update password
         $this->userApi->updatePassword($userId, $newPassword);
 
+        // A changed password must end sessions an attacker may hold (this one stays).
+        $this->authenticationService->revokeOtherSessionsOfUser($userId);
+
         // Revoke all trusted devices after password change (security best practice)
         $this->trustedDeviceService->revokeAllTrustedDevices($userId);
         TrustedDeviceCookie::clear();

@@ -4,6 +4,7 @@ namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Exception\PasswordPolicyViolation;
 use Movary\Domain\User\Exception\PasswordTooShort;
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserInvitationService;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ApplicationUrlService;
@@ -28,6 +29,7 @@ class SetPasswordController
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly PasswordSetupRateLimiterService $passwordSetupRateLimiter,
         private readonly CsrfTokenService $csrfTokenService,
+        private readonly Authentication $authenticationService,
     ) {
     }
 
@@ -147,6 +149,9 @@ class SetPasswordController
 
             // Mark invitation token as used
             $this->invitationService->markTokenAsUsed($token);
+
+            // Setting a new password ends every existing session of the account.
+            $this->authenticationService->revokeOtherSessionsOfUser($userId);
 
             // Log successful password setup
             $this->logPasswordAttempt($token, true);
