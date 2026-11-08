@@ -4,11 +4,6 @@
     {{ t('settings_app.title') }}
 {% endblock %}
 
-{% block scripts %}
-    <script src="{{ applicationUrl }}/js/marked-5.0.2.min.js"></script>
-    <script src="{{ applicationUrl }}/js/settings-app.js"></script>
-{% endblock %}
-
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
@@ -32,7 +27,7 @@
                         {% endif %}
 
                         <a
-                                href="https://github.com/leepeuker/movary/releases"
+                                href="https://github.com/benjaminmue/pathary/releases"
                                 class="badge rounded-pill {{ badgeStyle }}"
                                 target="_blank"
                                 style="text-decoration-line:none">
@@ -50,7 +45,7 @@
                 <h5 style="margin-bottom: 1rem;">{{ t('settings_app.getting_support') }}</h5>
                 <p>
                     <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">{{ t('settings_app.github') }}</span>
-                    <a class="fw-light" href="https://github.com/leepeuker/movary/discussions/categories/support" target="_blank">leepeuker/movary</a>
+                    <a class="fw-light" href="https://github.com/benjaminmue/pathary/issues" target="_blank" rel="noopener noreferrer">benjaminmue/pathary</a>
                 </p>
                 <p>
                     <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">{{ t('settings_app.discord') }}</span>
@@ -61,16 +56,10 @@
 
                 <h5 style="margin-bottom: 1rem;">{{ t('settings_app.latest_releases') }}</h5>
 
-                <div class="spinner-border" role="status" id="loadingSpinner" style="margin-top: .5rem">
-                    <span class="visually-hidden">{{ t('settings.loading') }}</span>
-                </div>
-
-                <ul class="list-group" id="latestReleases"></ul>
-
-                <div id="alertReleasesDiv"></div>
+                <p>
+                    <a href="https://github.com/benjaminmue/pathary/releases" target="_blank" rel="noopener noreferrer">{{ t('settings_app.view_releases') }}</a>
+                </p>
             </div>
-
-            {{ include('component/modal-app-release.html.twig') }}
         </div>
     </main>
 {% endblock %}

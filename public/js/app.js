@@ -21,6 +21,13 @@ if ('serviceWorker' in navigator) {
 }
 
 const PASSWORD_MIN_LENGTH = 10
+
+// UI strings rendered by base.html.twig in the current locale (see #appI18n).
+const APP_I18N = JSON.parse(document.getElementById('appI18n')?.textContent || '{}')
+
+function appText(key) {
+    return APP_I18N[key] ?? key
+}
 let currentModalVersion = 1;
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -140,7 +147,7 @@ async function searchTmdbWithLogModalSearchInput() {
 
     let targetModalVersion = currentModalVersion
 
-    const data = await fetch(APPLICATION_URL + '/api/movies/search?search=' + document.getElementById('logPlayModalSearchInput').value, {
+    const data = await fetch(APPLICATION_URL + '/api/movies/search?search=' + encodeURIComponent(document.getElementById('logPlayModalSearchInput').value), {
         signal: AbortSignal.timeout(4000),
         method: 'GET',
         headers: {
@@ -155,7 +162,7 @@ async function searchTmdbWithLogModalSearchInput() {
             }
 
             setLogPlayModalSearchSpinner(false)
-            displayLogModalTmdbSearchError('Something went wrong. Please try again.')
+            displayLogModalTmdbSearchError(appText('generic_error'))
 
             return null;
         }
@@ -171,9 +178,9 @@ async function searchTmdbWithLogModalSearchInput() {
         }
 
         if (error instanceof DOMException) {
-            displayLogModalTmdbSearchError('Search request timed out. Please try again.')
+            displayLogModalTmdbSearchError(appText('search_timeout'))
         } else {
-            displayLogModalTmdbSearchError('Something went wrong. Please try again.')
+            displayLogModalTmdbSearchError(appText('generic_error'))
         }
 
         return null
@@ -186,7 +193,7 @@ async function searchTmdbWithLogModalSearchInput() {
 }
 
 function displayLogModalTmdbSearchError(message) {
-    document.getElementById('logPlayModalSearchErrorAlert').innerHTML = message
+    document.getElementById('logPlayModalSearchErrorAlert').textContent = message
     document.getElementById('logPlayModalSearchErrorAlert').classList.remove('d-none')
 }
 
@@ -214,19 +221,8 @@ function loadLogModalSearchResults(data) {
             releaseYear = item.releaseDate.substring(0, 4)
         }
 
-        backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
-        posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
-        isWatchedEl = item.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : '';
-        isOnWatchlistEl = item.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : '';
-        listElement.innerHTML = `
-            <img src="${posterPath}" alt="Poster for ${item.title}" style="margin-right: .5rem; width: 3rem">
-            <p style="margin: 0;">
-                <b>${item.title}</b> (${releaseYear})${isWatchedEl}${isOnWatchlistEl}
-                <br>
-                <span style="opacity: 0.75; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-height: 2lh;">
-                    ${item.overview}
-                </span>
-            </p>`
+        const posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
+        listElement.append(createSearchResultContent(item, posterPath, releaseYear))
 
         listElement.dataset.tmdbId = item.ids.tmdb
         if (item.ids.movary)
@@ -249,6 +245,53 @@ function loadLogModalSearchResults(data) {
     });
 }
 
+function createStatusIcon(iconClass, title) {
+    const icon = document.createElement('i')
+    icon.className = 'bi ' + iconClass
+    icon.dataset.bsToggle = 'tooltip'
+    icon.dataset.bsTitle = title
+
+    return icon
+}
+
+function createWatchStatusIcons(isWatched, isOnWatchlist) {
+    const icons = []
+    if (isWatched) {
+        icons.push(createStatusIcon('bi-eye-fill', appText('watched')))
+    }
+    if (isOnWatchlist) {
+        icons.push(createStatusIcon('bi-bookmark-fill', appText('on_watchlist')))
+    }
+
+    return icons
+}
+
+function createSearchResultContent(item, posterPath, releaseYear) {
+    const fragment = document.createDocumentFragment()
+
+    const poster = document.createElement('img')
+    poster.src = posterPath
+    poster.alt = appText('poster_for').replace('{title}', item.title)
+    poster.style.marginRight = '.5rem'
+    poster.style.width = '3rem'
+
+    const text = document.createElement('p')
+    text.style.margin = '0'
+
+    const title = document.createElement('b')
+    title.textContent = item.title
+    text.append(title, ' (' + releaseYear + ')', ...createWatchStatusIcons(item.isWatched, item.isOnWatchlist), document.createElement('br'))
+
+    const overview = document.createElement('span')
+    overview.className = 'log-search-overview'
+    overview.textContent = item.overview ?? ''
+    text.append(overview)
+
+    fragment.append(poster, text)
+
+    return fragment
+}
+
 function resetLogModalSearchResults() {
     let searchResultList = document.getElementById('logPlayModalSearchResultList');
     searchResultList.style.marginTop = ''
@@ -265,7 +308,7 @@ function backToLogModalSearchResults() {
     document.getElementById('logPlayModalSearchDiv').classList.remove('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.remove('d-none')
     document.getElementById('logPlayModalFooter').classList.add('d-none')
-    document.getElementById('logPlayModalTitle').innerHTML = 'Add movie'
+    document.getElementById('logPlayModalTitle').textContent = appText('add_movie')
 
     removeAlert('logPlayModalAlert')
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
@@ -277,15 +320,19 @@ async function selectLogModalTmdbItemForLogging(event) {
     const item = event.target.closest(".list-group-item")
 
     // icons indicating watched/on watchlist, linking to movary page if it exists (which it should)
-    let isWatchedEl = item.dataset.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : ''
-    let isOnWatchlistEl = item.dataset.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : ''
+    let statusIcons = createWatchStatusIcons(item.dataset.isWatched, item.dataset.isOnWatchlist)
     if (item.dataset.movaryId) {
-        movaryUrl = APPLICATION_URL + "/old/users/" + document.getElementById('currentUserName').value + "/movies/" + item.dataset.movaryId
-        isWatchedEl = '<a href="' + movaryUrl + '">' + isWatchedEl + '</a>';
-        isOnWatchlistEl = '<a href="' + movaryUrl + '">' + isOnWatchlistEl + '</a>';
+        const movaryUrl = APPLICATION_URL + "/old/users/" + encodeURIComponent(document.getElementById('currentUserName').value) + "/movies/" + encodeURIComponent(item.dataset.movaryId)
+        statusIcons = statusIcons.map(icon => {
+            const link = document.createElement('a')
+            link.href = movaryUrl
+            link.append(icon)
+
+            return link
+        })
     }
-        
-    document.getElementById("logPlayModalTitle").innerHTML = item.dataset.title + " (" + item.dataset.releaseYear + ")" + isWatchedEl + isOnWatchlistEl;
+
+    document.getElementById("logPlayModalTitle").replaceChildren(item.dataset.title + " (" + item.dataset.releaseYear + ")", ...statusIcons);
     document.querySelectorAll("#logPlayModalTitle i.bi").forEach(tooltipTriggerEl => {
         new bootstrap.Tooltip(tooltipTriggerEl)
     });
@@ -349,10 +396,10 @@ function addToWatchlist(context) {
             return
         }
 
-        addAlert('logPlayModalAlert', 'Could not add to watchlist. Please try again.', 'danger')
+        addAlert('logPlayModalAlert', appText('watchlist_add_failed'), 'danger')
     }).catch(function (error) {
         console.log(error)
-        addAlert('logPlayModalAlert', 'Could not add to watchlist. Please try again.', 'danger')
+        addAlert('logPlayModalAlert', appText('watchlist_add_failed'), 'danger')
     })
 }
 
@@ -396,10 +443,10 @@ function logMovie(context) {
             return
         }
 
-        addAlert('logPlayModalAlert', 'Could not add play. Please try again.', 'danger')
+        addAlert('logPlayModalAlert', appText('play_add_failed'), 'danger')
     }).catch(function (error) {
         console.log(error)
-        addAlert('logPlayModalAlert', 'Could not add play. Please try again.', 'danger')
+        addAlert('logPlayModalAlert', appText('play_add_failed'), 'danger')
     })
 }
 
@@ -412,7 +459,7 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear
     setRatingStars('logPlayModal', rating)
 
     document.getElementById('logPlayModalTmdbIdInput').value = tmdbId
-    document.getElementById('logPlayModalTitle').innerHTML = movieTitle + ' (' + releaseYear + ')'
+    document.getElementById('logPlayModalTitle').textContent = movieTitle + ' (' + releaseYear + ')'
 
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
@@ -547,21 +594,31 @@ function toggleThemeSwitch() {
     setTheme('light')
 }
 
+/**
+ * Render a Bootstrap alert. The message is inserted as text; pass a DOM node
+ * when the alert needs markup such as a link.
+ */
 function addAlert(parentDivId, message, color, withCloseButton = true, marginBottom = 1) {
-    let closeButton = ''
+    const alert = document.createElement('div')
+    alert.className = 'alert alert-' + color + ' alert-dismissible'
+    alert.setAttribute('role', 'alert')
+    alert.style.marginBottom = marginBottom + 'rem'
+    alert.append(message)
+
     if (withCloseButton === true) {
-        closeButton = '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
+        const closeButton = document.createElement('button')
+        closeButton.type = 'button'
+        closeButton.className = 'btn-close'
+        closeButton.dataset.bsDismiss = 'alert'
+        closeButton.setAttribute('aria-label', appText('close'))
+        alert.append(closeButton)
     }
 
-    document.getElementById(parentDivId).innerHTML =
-        '<div class="alert alert-' + color + ' alert-dismissible" role="alert" style="margin-bottom: ' + marginBottom + 'rem">'
-        + message +
-        closeButton +
-        '</div>'
+    document.getElementById(parentDivId).replaceChildren(alert)
 }
 
 function removeAlert(parentDivId) {
-    document.getElementById(parentDivId).innerHTML = ''
+    document.getElementById(parentDivId).replaceChildren()
 }
 
 async function logout() {
@@ -596,7 +653,7 @@ async function loadLogPlayModalLocationOptions() {
     try {
         locations = await fetchLocations();
     } catch (error) {
-        addAlert('logPlayModalAlert', 'Could not load locations', 'danger', false);
+        addAlert('logPlayModalAlert', appText('locations_load_failed'), 'danger', false);
 
         return;
     }

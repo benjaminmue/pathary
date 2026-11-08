@@ -56,8 +56,11 @@ async function reloadTable(featureIsEnabled = true) {
     locations.forEach((location) => {
         let row = document.createElement('tr');
         row.dataset.id = location.id
-        row.innerHTML += '<td>' + location.name + '</td>';
-        row.innerHTML += '<td class="d-none">' + location.isCinema + '</td>';
+        const nameCell = row.insertCell()
+        nameCell.textContent = location.name
+        const isCinemaCell = row.insertCell()
+        isCinemaCell.className = 'd-none'
+        isCinemaCell.textContent = String(location.isCinema)
         row.style.cursor = 'pointer'
 
         table.getElementsByTagName('tbody')[0].appendChild(row);
@@ -69,8 +72,7 @@ async function reloadTable(featureIsEnabled = true) {
 function setLocationsAlert(message, type = 'success') {
     const locationAlerts = document.getElementById('locationAlerts');
     locationAlerts.classList.remove('d-none')
-    locationAlerts.innerHTML = ''
-    locationAlerts.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+    addAlert('locationAlerts', message, type)
     locationAlerts.style.textAlign = 'center'
 }
 
@@ -82,8 +84,8 @@ function registerTableRowClickEvent() {
 
             prepareEditLocationsModal(
                 this.dataset.id,
-                this.cells[0].innerHTML,
-                this.cells[1].innerHTML === 'true'
+                this.cells[0].textContent,
+                this.cells[1].textContent === 'true'
             )
 
             locationModal.show()
@@ -162,7 +164,7 @@ document.getElementById('createLocationButton').addEventListener('click', async 
 })
 
 function setLocationModalAlertServerError(message = "Server error, please try again.") {
-    document.getElementById('locationModalAlerts').innerHTML = '<div class="alert alert-danger alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+    addAlert('locationModalAlerts', message, 'danger')
 }
 
 

@@ -69,7 +69,12 @@ async function testCredentials() {
     if (!response.ok) {
         addAlert('alerts', 'Server error: ' + json["error"], 'danger');
     } else {
-        addAlert('alerts', `Success! See the test post here: <a href="${json["url"]}">${json["url"]}</a>`, 'success');
+        const message = document.createElement('span');
+        const postLink = document.createElement('a');
+        postLink.href = json["url"];
+        postLink.textContent = json["url"];
+        message.append('Success! See the test post here: ', postLink);
+        addAlert('alerts', message, 'success');
     }
 
     console.groupEnd();
