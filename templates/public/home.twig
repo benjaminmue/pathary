@@ -13,16 +13,18 @@
         <div class="sc-pop" role="img" aria-label="{{ t('home.popcorn_aria') }}">
             {% for i in 1..7 %}<span class="k{{ i > 5 ? ' off' }}" aria-hidden="true">🍿</span>{% endfor %}
         </div>
-        {% if loggedIn %}
         <div class="sc-hero__actions">
-            <a href="{{ applicationUrl }}/movies" class="sc-btn sc-btn--ghost">{{ t('home.browse_library') }}</a>
+            {% if loggedIn %}
+                <a href="{{ applicationUrl }}/movies" class="sc-btn sc-btn--ghost">{{ t('home.browse_library') }}</a>
+            {% else %}
+                <a href="{{ applicationUrl }}/login" class="sc-btn sc-btn--primary">{{ t('home.login_cta') }}</a>
+            {% endif %}
         </div>
-        {% endif %}
     </section>
 
     {# 3. Poster-Carousel - 20 neueste, nur Poster, einmal dupliziert für nahtlose Schleife #}
     {% if movies|length > 0 %}
-    <div class="sc-carousel">
+    <div class="sc-carousel" id="posterCarousel">
         <div class="sc-carousel__track">
             {% for pass in 1..2 %}
                 {% for item in movies %}
@@ -30,11 +32,21 @@
                     <a href="{{ applicationUrl }}/movie/{{ movie.movie_id }}" class="sc-carousel__item"{{ pass == 2 ? ' aria-hidden="true" tabindex="-1"' }}>
                         {% if movie.poster_path %}
                             <img src="{{ movie.poster_path }}" alt="{{ pass == 1 ? movie.title : '' }}" loading="lazy">
+                        {% elseif pass == 1 %}
+                            <span class="visually-hidden">{{ movie.title }}</span>
                         {% endif %}
                     </a>
                 {% endfor %}
             {% endfor %}
         </div>
+    </div>
+    {# WCAG 2.2.2: moving content needs a way to pause it. #}
+    <div class="sc-carousel__controls">
+        <button type="button" class="sc-carousel__toggle" aria-controls="posterCarousel" aria-pressed="false"
+                data-label-pause="{{ t('home.carousel_pause') }}" data-label-play="{{ t('home.carousel_play') }}">
+            <i class="bi bi-pause-fill" aria-hidden="true"></i>
+            <span class="sc-carousel__toggle-label">{{ t('home.carousel_pause') }}</span>
+        </button>
     </div>
     {% endif %}
 
@@ -61,6 +73,16 @@
     {% endif %}
 
     <div class="sc-main">
+
+        {% if movies|length == 0 %}
+        <div class="sc-empty">
+            <h2>{{ t('home.empty_heading') }}</h2>
+            <p>{{ loggedIn ? t('home.empty_text_user') : t('home.empty_text_anon') }}</p>
+            {% if loggedIn %}
+                <a href="{{ applicationUrl }}/search" class="sc-btn sc-btn--primary">{{ t('home.empty_action') }}</a>
+            {% endif %}
+        </div>
+        {% endif %}
 
         {# 5. Was wir zuletzt geschaut haben - 12 neueste #}
         {% if movies|length > 0 %}
@@ -162,11 +184,13 @@
     {# 8. Footer-CTA #}
     <div class="sc-cta">
         <div class="sc-cta__title">{{ t('home.cta_title') }} 🍿</div>
-        {% if loggedIn %}
         <div>
-            <a href="{{ applicationUrl }}/movies" class="sc-btn sc-btn--primary">{{ t('home.browse_library') }}</a>
+            {% if loggedIn %}
+                <a href="{{ applicationUrl }}/movies" class="sc-btn sc-btn--primary">{{ t('home.browse_library') }}</a>
+            {% else %}
+                <a href="{{ applicationUrl }}/login" class="sc-btn sc-btn--primary">{{ t('home.login_cta') }}</a>
+            {% endif %}
         </div>
-        {% endif %}
         <div class="sc-cta__links">
             <a href="https://github.com/benjaminmue/pathary" target="_blank" rel="noopener noreferrer">GitHub</a>
             <a href="https://benjaminmue.github.io/pathary/" target="_blank" rel="noopener noreferrer">Wiki</a>
@@ -175,4 +199,23 @@
     </div>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        const toggle = document.querySelector('.sc-carousel__toggle');
+        const carousel = document.getElementById('posterCarousel');
+        if (!toggle || !carousel) {
+            return;
+        }
+
+        toggle.addEventListener('click', function () {
+            const paused = carousel.classList.toggle('is-paused');
+            toggle.setAttribute('aria-pressed', paused ? 'true' : 'false');
+            toggle.querySelector('.sc-carousel__toggle-label').textContent = paused ? toggle.dataset.labelPlay : toggle.dataset.labelPause;
+            toggle.querySelector('.bi').className = 'bi ' + (paused ? 'bi-play-fill' : 'bi-pause-fill');
+        });
+    })();
+</script>
 {% endblock %}

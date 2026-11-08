@@ -1,10 +1,7 @@
-<style>
-    /* Light mode: force dark navbar */
-    [data-bs-theme="light"] .navbar {
-        background-color: var(--pathe-dark) !important;
-    }
-</style>
-<nav class="navbar navbar-expand-lg navbar-dark bg-body-tertiary">
+{% set navMovies = requestUrlPath starts with '/movies' %}
+{% set navProfile = requestUrlPath starts with '/profile' %}
+{% set navAdmin = requestUrlPath starts with '/admin' %}
+<nav class="navbar navbar-expand-lg navbar-dark app-navbar" aria-label="{{ t('nav.main') }}">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center gap-2" href="{{ applicationUrl }}/">
             <img src="{{ applicationUrl }}/images/pathary-logo.svg" alt="" height="32" class="navbar-logo">
@@ -16,7 +13,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarAppContent">
-            <form class="d-flex mx-auto my-2 my-lg-0" role="search" style="max-width: 400px; width: 100%;" action="{{ applicationUrl }}/search" method="get">
+            <form class="d-flex mx-auto my-2 my-lg-0 app-navbar__search" role="search" action="{{ applicationUrl }}/search" method="get">
                 <input class="form-control" type="search" name="q" placeholder="{{ t('nav.search_placeholder') }}" aria-label="{{ t('nav.search') }}">
             </form>
 
@@ -33,18 +30,18 @@
                     </label>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ applicationUrl }}/movies">{{ t('nav.all_movies') }}</a>
+                    <a class="nav-link{{ navMovies ? ' active' }}" href="{{ applicationUrl }}/movies"{% if navMovies %} aria-current="page"{% endif %}>{{ t('nav.all_movies') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ applicationUrl }}/profile">{{ t('nav.profile') }}</a>
+                    <a class="nav-link{{ navProfile ? ' active' }}" href="{{ applicationUrl }}/profile"{% if navProfile %} aria-current="page"{% endif %}>{{ t('nav.profile') }}</a>
                 </li>
                 {% if currentUserIsAdmin %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ applicationUrl }}/admin"><i class="bi bi-shield-lock me-1"></i>{{ t('nav.admin') }}</a>
+                    <a class="nav-link{{ navAdmin ? ' active' }}" href="{{ applicationUrl }}/admin"{% if navAdmin %} aria-current="page"{% endif %}><i class="bi bi-shield-lock me-1" aria-hidden="true"></i>{{ t('nav.admin') }}</a>
                 </li>
                 {% endif %}
                 <li class="nav-item">
-                    <button class="nav-link btn btn-link" onclick="logoutAndRedirect()" style="cursor: pointer;">{{ t('nav.logout') }}</button>
+                    <button type="button" class="nav-link btn btn-link" onclick="logoutAndRedirect()">{{ t('nav.logout') }}</button>
                 </li>
             </ul>
         </div>
