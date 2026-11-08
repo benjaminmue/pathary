@@ -15,6 +15,8 @@ use RuntimeException;
 class EncryptionServiceTest extends TestCase
 {
     // Test-only key material, never used outside this test.
+    private const string ENV_VAR = 'ENCRYPTION_KEY';
+
     private const string KEY_HEX = '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
 
     private Connection&Stub $dbConnection;
@@ -23,13 +25,13 @@ class EncryptionServiceTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->previousEnvKey = getenv('ENCRYPTION_KEY');
+        $this->previousEnvKey = getenv(self::ENV_VAR);
         $this->dbConnection = $this->createStub(Connection::class);
     }
 
     protected function tearDown() : void
     {
-        putenv($this->previousEnvKey === false ? 'ENCRYPTION_KEY' : 'ENCRYPTION_KEY=' . $this->previousEnvKey);
+        $this->setEnvKey($this->previousEnvKey === false ? null : $this->previousEnvKey);
     }
 
     public function testEncryptWritesVersionedCiphertextAndRoundTrips() : void
@@ -104,7 +106,7 @@ class EncryptionServiceTest extends TestCase
 
     public function testGenerateRefusesWhenAKeyIsStoredInTheDatabase() : void
     {
-        putenv('ENCRYPTION_KEY');
+        $this->setEnvKey(null);
         $dbConnection = $this->createMock(Connection::class);
         $dbConnection->method('fetchFirstColumn')->willReturn([base64_encode(str_repeat('k', 32))]);
         $dbConnection->expects(self::never())->method('prepare');
@@ -117,7 +119,7 @@ class EncryptionServiceTest extends TestCase
 
     public function testGenerateRefusesWhenAKeyIsSetInTheEnvironment() : void
     {
-        putenv('ENCRYPTION_KEY=' . self::KEY_HEX);
+        $this->setEnvKey(self::KEY_HEX);
         $dbConnection = $this->createMock(Connection::class);
         $dbConnection->expects(self::never())->method('prepare');
 
@@ -129,7 +131,7 @@ class EncryptionServiceTest extends TestCase
 
     public function testDatabaseKeyFallbackWorksAndLogsAWarning() : void
     {
-        putenv('ENCRYPTION_KEY');
+        $this->setEnvKey(null);
         $this->dbConnection->method('fetchFirstColumn')->willReturn([base64_encode((string)hex2bin(self::KEY_HEX))]);
 
         $logger = $this->createMock(LoggerInterface::class);
@@ -144,8 +146,14 @@ class EncryptionServiceTest extends TestCase
 
     private function createSubjectWithEnvKey(string $encodedKey) : EncryptionService
     {
-        putenv('ENCRYPTION_KEY=' . $encodedKey);
+        $this->setEnvKey($encodedKey);
 
         return new EncryptionService($this->dbConnection, new NullLogger());
+    }
+
+    /** Sets or, with null, unsets the encryption key environment variable. */
+    private function setEnvKey(?string $value) : void
+    {
+        putenv($value === null ? self::ENV_VAR : self::ENV_VAR . '=' . $value);
     }
 }
