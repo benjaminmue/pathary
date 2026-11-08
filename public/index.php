@@ -18,7 +18,7 @@ $securityHeaders = [
     'X-Frame-Options' => 'SAMEORIGIN',
     'Referrer-Policy' => 'strict-origin-when-cross-origin',
     'Permissions-Policy' => 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
-    'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' https://image.tmdb.org data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-ancestors 'self';",
+    'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://image.tmdb.org data:; font-src 'self'; connect-src 'self'; frame-ancestors 'self';",
 ];
 
 // HSTS only for https deployments: browsers ignore it on plain http, and plain-http
