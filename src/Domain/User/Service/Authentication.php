@@ -11,6 +11,7 @@ use Movary\Domain\User\Repository\TrustedDeviceRepository;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
+use Movary\Util\RequestContext;
 use Movary\Util\SessionWrapper;
 use Movary\Util\TrustedDeviceCookie;
 use Movary\ValueObject\DateTime;
@@ -23,7 +24,8 @@ class Authentication
 
     private const string AUTHENTICATION_COOKIE_NAME = 'id';
 
-    private const int MAX_EXPIRATION_AGE_IN_DAYS = 3650; // 10 years for persistent login
+    // "Remember me" lifetime. Bounded so a stolen cookie does not stay valid for years.
+    private const int MAX_EXPIRATION_AGE_IN_DAYS = 90;
 
     public function __construct(
         private readonly UserRepository $repository,
@@ -52,10 +54,21 @@ class Authentication
         $this->repository->deleteAuthToken($token);
     }
 
+    /**
+     * Log a user out everywhere after a credential change. The session that made the
+     * change survives (when it belongs to that user), every other one is revoked.
+     */
+    public function revokeOtherSessionsOfUser(int $userId) : void
+    {
+        $currentToken = (string)filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+
+        $this->repository->deleteAuthTokensOfUser($userId, $currentToken === '' ? null : $currentToken);
+    }
+
     public function findUserAndVerifyAuthentication(
         string $email,
         string $password,
-        ?int $userTotpCode = null,
+        ?string $userTotpCode = null,
         ?string $recoveryCode = null,
         ?string $trustedDeviceToken = null,
     ) : UserEntity {
@@ -106,7 +119,7 @@ class Authentication
         return $trustedDevice !== null;
     }
 
-    private function verifyTwoFactorAuthentication(UserEntity $user, ?int $userTotpCode, ?string $recoveryCode) : UserEntity
+    private function verifyTwoFactorAuthentication(UserEntity $user, ?string $userTotpCode, ?string $recoveryCode) : UserEntity
     {
         if ($userTotpCode === null && $recoveryCode === null) {
             throw MissingTotpCode::create();
@@ -201,21 +214,7 @@ class Authentication
         }
 
         if (empty($token) === false) {
-            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-
-            $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-
-            setcookie(
-                self::AUTHENTICATION_COOKIE_NAME,
-                '',
-                [
-                    'expires' => 1,
-                    'path' => '/',
-                    'secure' => $isSecure,
-                    'httponly' => true,
-                    'samesite' => 'Lax',
-                ],
-            );
+            $this->clearAuthenticationCookie();
         }
 
         return false;
@@ -256,7 +255,7 @@ class Authentication
         bool $rememberMe,
         string $deviceName,
         string $userAgent,
-        ?int $userTotpInput = null,
+        ?string $userTotpInput = null,
         ?string $recoveryCode = null,
         bool $trustDevice = false,
     ) : array {
@@ -323,22 +322,7 @@ class Authentication
 
         if ($token !== '') {
             $this->deleteToken($token);
-            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-
-            $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-
-            // Clear cookie with same options used when setting it
-            setcookie(
-                self::AUTHENTICATION_COOKIE_NAME,
-                '',
-                [
-                    'expires' => 1, // Past timestamp to delete
-                    'path' => '/',
-                    'secure' => $isSecure,
-                    'httponly' => true,
-                    'samesite' => 'Lax',
-                ],
-            );
+            $this->clearAuthenticationCookie();
         }
 
         // Do NOT clear trusted device cookie - it should persist across logout/login
@@ -365,21 +349,32 @@ class Authentication
         // Regenerate session ID to prevent session fixation
         $this->sessionWrapper->regenerateId();
 
-        $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        $this->writeAuthenticationCookie($token, (int)$expirationDate->format('U'));
 
+        $this->sessionWrapper->set('userId', $userId);
+    }
+
+    private function clearAuthenticationCookie() : void
+    {
+        unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
+
+        // A past timestamp deletes the cookie; the other options must match the ones it was set with.
+        $this->writeAuthenticationCookie('', 1);
+    }
+
+    private function writeAuthenticationCookie(string $value, int $expires) : void
+    {
         setcookie(
             self::AUTHENTICATION_COOKIE_NAME,
-            $token,
+            $value,
             [
-                'expires' => (int)$expirationDate->format('U'),
+                'expires' => $expires,
                 'path' => '/',
-                'secure' => $isSecure,
+                'secure' => RequestContext::isHttps(),
                 'httponly' => true,
                 'samesite' => 'Lax',
             ],
         );
-
-        $this->sessionWrapper->set('userId', $userId);
     }
 
     private function isUserPageVisibleForUser(UserEntity $targetUser, ?int $requestUserId) : bool

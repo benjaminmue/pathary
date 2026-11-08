@@ -11,6 +11,19 @@
 {% endblock %}
 
 {% block scripts %}
+    <script>
+        // Messages for client-side errors, rendered in the user's language.
+        window.LOGIN_I18N = {
+            invalidCredentials: {{ t('login.error_invalid_credentials')|json_encode|raw }},
+            invalidTotp: {{ t('login.error_totp_invalid')|json_encode|raw }},
+            invalidRecoveryCode: {{ t('login.error_recovery_invalid')|json_encode|raw }},
+            missingCredentials: {{ t('login.error_missing_credentials')|json_encode|raw }},
+            rateLimited: {{ t('login.error_rate_limited')|json_encode|raw }},
+            unexpected: {{ t('login.error_unexpected')|json_encode|raw }},
+            emailInvalid: {{ t('login.email_invalid_title')|json_encode|raw }},
+            emailLineBreaks: {{ t('login.email_no_line_breaks')|json_encode|raw }}
+        };
+    </script>
     <script src="{{ applicationUrl }}/js/login-bg.js"></script>
     <script src="{{ applicationUrl }}/js/login.js"></script>
 {% endblock %}
@@ -30,7 +43,9 @@
 
         <!-- Login Card -->
         <div class="login-card">
-            <div id="loginForm">
+            {# Real forms so password managers recognise them and Enter submits natively.
+               login.js intercepts the submit and posts JSON to the token API. #}
+            <form id="loginForm" method="post" action="{{ applicationUrl }}/login">
                 <h1 class="text-center">{{ applicationName ?? 'Pathary' }}</h1>
 
                 <div class="form-floating">
@@ -38,10 +53,10 @@
                            value="{{ defaultEmail }}"
                            class="form-control"
                            id="email"
+                           name="email"
                            placeholder="name@example.com"
-                           onkeydown="submitCredentialsOnEnter(event)"
                            oninput="validateEmailInput(event)"
-                           autocomplete="email"
+                           autocomplete="username"
                            pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
                            title="{{ t('login.email_invalid_title') }}"
                            required>
@@ -56,8 +71,8 @@
                            value="{{ defaultPassword }}"
                            class="form-control"
                            id="password"
+                           name="password"
                            placeholder="{{ t('login.password') }}"
-                           onkeydown="submitCredentialsOnEnter(event)"
                            autocomplete="current-password"
                            required>
                     <label for="password">{{ t('login.password') }}</label>
@@ -67,6 +82,7 @@
                     <input type="checkbox"
                            class="form-check-input"
                            id="rememberMe"
+                           name="rememberMe"
                            value="true"
                            {{ defaultRememberMe == 'true' ? 'checked' : '' }}>
                     <label class="form-check-label" for="rememberMe">{{ t('login.remember_me') }}</label>
@@ -81,12 +97,12 @@
                     <input type="hidden" value="{{ redirect }}" name="redirect">
                 {% endif %}
 
-                <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">
+                <button class="w-100 btn btn-lg btn-primary mb-3" type="submit">
                     {{ t('login.sign_in') }}
                 </button>
-            </div>
+            </form>
 
-            <div id="totpForm" class="d-none">
+            <form id="totpForm" class="d-none" method="post" action="{{ applicationUrl }}/login">
                 <h1 class="text-center">{{ t('login.verification') }}</h1>
 
                 <!-- Mode Switch -->
@@ -112,7 +128,7 @@
                            inputmode="numeric"
                            pattern="[0-9]*"
                            id="totpCode"
-                           onkeydown="submitCredentialsOnEnter(event)"
+                           name="totpCode"
                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                            required>
 
@@ -140,13 +156,13 @@
                            maxlength="12"
                            autocomplete="off"
                            id="recoveryCode"
-                           onkeydown="submitCredentialsOnEnter(event)"
+                           name="recoveryCode"
                            oninput="formatRecoveryCodeInput(event)">
                 </div>
 
                 <div id="totpErrors"></div>
 
-                <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">
+                <button class="w-100 btn btn-lg btn-primary mb-3" type="submit">
                     {{ t('login.continue') }}
                 </button>
 
@@ -163,7 +179,7 @@
                 <div class="text-center">
                     <a href="{{ applicationUrl }}/login">{{ t('login.back_to_login') }}</a>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 

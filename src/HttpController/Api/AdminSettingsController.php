@@ -47,7 +47,7 @@ class AdminSettingsController
 
     /**
      * POST /api/admin/settings/tmdb - Save TMDB API key
-     * Note: CSRF protection not needed - Bearer token auth already prevents CSRF attacks
+     * Authenticated via session cookie; CSRF is enforced by the CsrfProtection route middleware.
      */
     public function saveTmdbApiKey(Request $request) : Response
     {
@@ -112,7 +112,7 @@ class AdminSettingsController
 
     /**
      * POST /api/admin/settings/tmdb/test - Test TMDB API connection
-     * Note: CSRF protection not needed - Bearer token auth already prevents CSRF attacks
+     * Authenticated via session cookie; CSRF is enforced by the CsrfProtection route middleware.
      */
     public function testTmdbConnection(Request $request) : Response
     {
@@ -237,7 +237,7 @@ class AdminSettingsController
 
     /**
      * POST /api/admin/settings/omdb - Save OMDb API key
-     * Note: CSRF protection not needed - Bearer token auth already prevents CSRF attacks
+     * Authenticated via session cookie; CSRF is enforced by the CsrfProtection route middleware.
      */
     public function saveOmdbApiKey(Request $request) : Response
     {
@@ -300,7 +300,7 @@ class AdminSettingsController
 
     /**
      * POST /api/admin/settings/omdb/test - Test OMDb API connection
-     * Note: CSRF protection not needed - Bearer token auth already prevents CSRF attacks
+     * Authenticated via session cookie; CSRF is enforced by the CsrfProtection route middleware.
      */
     public function testOmdbConnection(Request $request) : Response
     {
@@ -420,7 +420,7 @@ class AdminSettingsController
 
     /**
      * DELETE /api/admin/settings/tmdb - Delete TMDB API key
-     * Note: CSRF protection not needed - Bearer token auth already prevents CSRF attacks
+     * Authenticated via session cookie; CSRF is enforced by the CsrfProtection route middleware.
      */
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function deleteTmdbApiKey(Request $request) : Response
@@ -471,7 +471,7 @@ class AdminSettingsController
 
     /**
      * DELETE /api/admin/settings/omdb - Delete OMDb API key
-     * Note: CSRF protection not needed - Bearer token auth already prevents CSRF attacks
+     * Authenticated via session cookie; CSRF is enforced by the CsrfProtection route middleware.
      */
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function deleteOmdbApiKey(Request $request) : Response

@@ -1,11 +1,81 @@
 const PATHARY_CLIENT_IDENTIFIER = 'Pathary Web';
 
+// Localised messages injected by login.html.twig; English fallbacks keep the page usable without them.
+const LOGIN_MESSAGES = Object.assign({
+    invalidCredentials: 'Email or password is incorrect.',
+    invalidTotp: 'Two-factor authentication code is wrong.',
+    invalidRecoveryCode: 'Recovery code invalid or already used.',
+    missingCredentials: 'Please enter your email and password.',
+    rateLimited: 'Too many failed login attempts. Please wait 15 minutes and try again.',
+    unexpected: 'Unexpected server error. Please try again.',
+    emailInvalid: 'Please enter a valid email address.',
+    emailLineBreaks: 'Email address cannot contain line breaks.',
+}, window.LOGIN_I18N || {});
+
+document.addEventListener('DOMContentLoaded', function () {
+    for (const formId of ['loginForm', 'totpForm']) {
+        const form = document.getElementById(formId);
+        if (form) {
+            form.addEventListener('submit', handleLoginSubmit);
+        }
+    }
+});
+
+let loginRequestInFlight = false;
+
+// Both forms submit natively (button or Enter); the request itself is sent as JSON.
+async function handleLoginSubmit(event) {
+    event.preventDefault();
+
+    // Guard against double submits (double click, Enter held down).
+    if (loginRequestInFlight === true) {
+        return;
+    }
+
+    const form = event.currentTarget;
+    setFormBusy(form, true);
+    loginRequestInFlight = true;
+
+    let isNavigating = false;
+    try {
+        isNavigating = await submitCredentials();
+    } catch (error) {
+        console.error(error);
+        showLoginError(LOGIN_MESSAGES.unexpected);
+    }
+
+    // Stay busy while the browser leaves the page after a successful login.
+    if (isNavigating === false) {
+        loginRequestInFlight = false;
+        setFormBusy(form, false);
+    }
+}
+
+function setFormBusy(form, isBusy) {
+    form.setAttribute('aria-busy', isBusy ? 'true' : 'false');
+    form.querySelectorAll('button[type="submit"]').forEach(function (button) {
+        button.disabled = isBusy;
+    });
+}
+
+// Show an error in the form that is currently visible.
+function showLoginError(message) {
+    const totpFormVisible = document.getElementById('totpForm').classList.contains('d-none') === false;
+    const containerId = totpFormVisible ? 'totpErrors' : 'loginErrors';
+
+    addAlert(containerId, message, 'danger', false);
+}
+
 // Switch between authenticator and recovery code modes
 function switchVerificationMode(mode) {
     const authenticatorContent = document.getElementById('authenticatorModeContent');
     const recoveryContent = document.getElementById('recoveryModeContent');
     const totpInput = document.getElementById('totpCode');
     const recoveryInput = document.getElementById('recoveryCode');
+
+    // Only the visible input may be required, otherwise native validation blocks the submit.
+    totpInput.required = mode === 'totp';
+    recoveryInput.required = mode !== 'totp';
 
     if (mode === 'totp') {
         authenticatorContent.classList.remove('d-none');
@@ -26,15 +96,23 @@ function switchVerificationMode(mode) {
     }
 }
 
+/**
+ * @returns {Promise<boolean>} true when the browser is navigating away after a successful login
+ */
 async function submitCredentials() {
     const urlParams = new URLSearchParams(window.location.search);
     const safeRedirect = getSafeRedirect(urlParams.get('redirect'), APPLICATION_URL);
 
     const response = await loginRequest();
+    const data = await response.json().catch(() => ({}));
 
     if (response.status === 200) {
-        window.location.href = safeRedirect
-        return;
+        // Users without 2FA (e.g. freshly invited) get a session that is confined to
+        // the enrollment page until they set it up.
+        window.location.href = data['twoFactorSetupRequired'] === true
+            ? APPLICATION_URL + data['redirectPath']
+            : safeRedirect;
+        return true;
     }
 
     const forbiddenPageAlert = document.getElementById('forbiddenPageAlert');
@@ -42,38 +120,29 @@ async function submitCredentials() {
         forbiddenPageAlert.classList.add('d-none');
     }
 
-    if (response.status === 400) {
-        const error = await response.json();
-
-        if (error['error'] === 'MissingTotpCode') {
+    switch (data['error']) {
+        case 'MissingTotpCode':
             document.getElementById('loginForm').classList.add('d-none');
             document.getElementById('totpForm').classList.remove('d-none');
-            return
-        }
-
-        addAlert('loginErrors', error['message'], 'danger', false);
-        return;
+            document.getElementById('totpCode').focus();
+            break;
+        case 'MissingCredentials':
+            showLoginError(LOGIN_MESSAGES.missingCredentials);
+            break;
+        case 'InvalidTotpCode':
+            showLoginError(getVerificationMode() === 'recovery' ? LOGIN_MESSAGES.invalidRecoveryCode : LOGIN_MESSAGES.invalidTotp);
+            break;
+        case 'InvalidCredentials':
+            showLoginError(LOGIN_MESSAGES.invalidCredentials);
+            break;
+        case 'RateLimitExceeded':
+            showLoginError(LOGIN_MESSAGES.rateLimited);
+            break;
+        default:
+            showLoginError(LOGIN_MESSAGES.unexpected);
     }
 
-    if (response.status === 401) {
-        const error = await response.json();
-
-        if (error['error'] === 'InvalidTotpCode') {
-            const mode = getVerificationMode();
-            const errorMessage = mode === 'recovery'
-                ? 'Recovery code invalid or already used'
-                : 'Two-factor authentication code wrong';
-            addAlert('totpErrors', errorMessage, 'danger', false);
-            return
-        }
-
-        if (error['error'] === 'InvalidCredentials') {
-            addAlert('loginErrors', error['message'], 'danger', false);
-            return
-        }
-    }
-
-    addAlert('loginErrors', 'Unexpected server error', 'danger', false);
+    return false;
 }
 
 function getVerificationMode() {
@@ -116,12 +185,6 @@ function loginRequest() {
         credentials: 'include',
         body: JSON.stringify(requestBody)
     });
-}
-
-function submitCredentialsOnEnter(event) {
-    if (event.keyCode === 13) {
-        submitCredentials()
-    }
 }
 
 function getSafeRedirect(redirectGetParameter, baseUrl) {
@@ -210,7 +273,7 @@ function validateEmailInput(event) {
 
     // Check for header injection characters (CR/LF) - security check
     if (value.includes('\r') || value.includes('\n')) {
-        input.setCustomValidity('Email address cannot contain line breaks');
+        input.setCustomValidity(LOGIN_MESSAGES.emailLineBreaks);
         input.classList.add('is-invalid');
         input.classList.remove('is-valid');
         return;
@@ -230,7 +293,7 @@ function validateEmailInput(event) {
         input.classList.add('is-valid');
     } else {
         // Invalid email
-        input.setCustomValidity('Please enter a valid email address');
+        input.setCustomValidity(LOGIN_MESSAGES.emailInvalid);
         input.classList.add('is-invalid');
         input.classList.remove('is-valid');
     }

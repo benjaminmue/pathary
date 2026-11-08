@@ -45,12 +45,25 @@ class LanguageController
         }
 
         $path = parse_url($referer, PHP_URL_PATH);
-        if (is_string($path) === false || str_starts_with($path, '/') === false) {
+        $query = parse_url($referer, PHP_URL_QUERY);
+        if (is_string($path) === false) {
             return '/';
         }
 
-        $query = parse_url($referer, PHP_URL_QUERY);
+        $target = $path . (is_string($query) === true && $query !== '' ? '?' . $query : '');
 
-        return $path . (is_string($query) === true && $query !== '' ? '?' . $query : '');
+        return $this->isSameOriginPath($target) === true ? $target : '/';
+    }
+
+    /**
+     * Browsers treat "//host" and "/\host" as protocol-relative URLs, so a path is only
+     * safe as a redirect target if it starts with a single "/" and has no backslash.
+     * (parse_url() already replaced control characters such as tabs with "_".)
+     */
+    private function isSameOriginPath(string $path) : bool
+    {
+        return str_starts_with($path, '/') === true
+            && str_starts_with($path, '//') === false
+            && str_contains($path, '\\') === false;
     }
 }

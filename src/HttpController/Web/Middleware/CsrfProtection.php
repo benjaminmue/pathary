@@ -15,9 +15,10 @@ class CsrfProtection implements MiddlewareInterface
 
     public function __invoke(Request $request) : ?Response
     {
-        // Only check POST, PUT, DELETE requests
-        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        if (!in_array($method, ['POST', 'PUT', 'DELETE'], true)) {
+        // Safe methods must not change state, so only they skip the check. Listing the
+        // unsafe ones instead would silently let new verbs (e.g. PATCH) through.
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        if (in_array($method, ['GET', 'HEAD', 'OPTIONS'], true) === true) {
             return null;
         }
 
@@ -39,8 +40,8 @@ class CsrfProtection implements MiddlewareInterface
             }
         }
 
-        // Validate token
-        if (!$this->csrfTokenService->validateToken($token)) {
+        // Validate token (a non-string value from JSON, e.g. true or an array, is simply invalid)
+        if (is_string($token) === false || $this->csrfTokenService->validateToken($token) === false) {
             return Response::createForbidden();
         }
 

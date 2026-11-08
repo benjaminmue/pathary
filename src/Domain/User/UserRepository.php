@@ -28,14 +28,12 @@ class UserRepository
 
     public function createAuthToken(int $userId, string $token, string $deviceName, string $userAgent, DateTime $expirationDate) : void
     {
-        $tokenHash = hash('sha256', $token);
-
+        // Only the hash is stored, so a database leak does not hand out live sessions.
         $this->dbConnection->insert(
             'user_auth_token',
             [
                 'user_id' => $userId,
-                'token' => $token,
-                'token_hash' => $tokenHash,
+                'token_hash' => $this->hashAuthToken($token),
                 'expiration_date' => (string)$expirationDate,
                 'device_name' => $deviceName,
                 'user_agent' => $userAgent,
@@ -79,12 +77,23 @@ class UserRepository
 
     public function deleteAuthToken(string $token) : void
     {
-        $tokenHash = hash('sha256', $token);
+        $this->dbConnection->delete('user_auth_token', ['token_hash' => $this->hashAuthToken($token)]);
+    }
 
-        // Delete by token_hash or plaintext token for backwards compatibility
+    /**
+     * Revoke every session of a user, optionally sparing one (the session that triggered the revocation).
+     */
+    public function deleteAuthTokensOfUser(int $userId, ?string $exceptToken = null) : void
+    {
+        if ($exceptToken === null) {
+            $this->dbConnection->delete('user_auth_token', ['user_id' => $userId]);
+
+            return;
+        }
+
         $this->dbConnection->executeStatement(
-            'DELETE FROM `user_auth_token` WHERE `token_hash` = ? OR `token` = ?',
-            [$tokenHash, $token],
+            'DELETE FROM `user_auth_token` WHERE `user_id` = ? AND `token_hash` <> ?',
+            [$userId, $this->hashAuthToken($exceptToken)],
         );
     }
 
@@ -229,12 +238,9 @@ class UserRepository
 
     public function findAuthTokenExpirationDate(string $token) : ?DateTime
     {
-        $tokenHash = hash('sha256', $token);
-
-        // Try to find by token_hash first (new method), fallback to plaintext token for backwards compatibility
         $expirationDate = $this->dbConnection->fetchOne(
-            'SELECT `expiration_date` FROM `user_auth_token` WHERE `token_hash` = ? OR `token` = ?',
-            [$tokenHash, $token],
+            'SELECT `expiration_date` FROM `user_auth_token` WHERE `token_hash` = ?',
+            [$this->hashAuthToken($token)],
         );
 
         if ($expirationDate === false) {
@@ -398,8 +404,8 @@ class UserRepository
             FROM user
             LEFT JOIN user_api_token ON user.id = user_api_token.user_id
             LEFT JOIN user_auth_token ON user.id = user_auth_token.user_id
-            WHERE user_api_token.token = ? OR user_auth_token.token = ?',
-            [$apiToken, $apiToken],
+            WHERE user_api_token.token = ? OR user_auth_token.token_hash = ?',
+            [$apiToken, $this->hashAuthToken($apiToken)],
         );
 
         if (empty($data) === true) {
@@ -427,12 +433,9 @@ class UserRepository
 
     public function findUserIdByAuthToken(string $token) : ?int
     {
-        $tokenHash = hash('sha256', $token);
-
-        // Try to find by token_hash first (new method), fallback to plaintext token for backwards compatibility
         $result = $this->dbConnection->fetchAssociative(
-            'SELECT `id`, `user_id` FROM `user_auth_token` WHERE `token_hash` = ? OR `token` = ?',
-            [$tokenHash, $token],
+            'SELECT `id`, `user_id` FROM `user_auth_token` WHERE `token_hash` = ?',
+            [$this->hashAuthToken($token)],
         );
 
         if ($result === false) {
@@ -444,12 +447,6 @@ class UserRepository
             'user_auth_token',
             ['last_used_at' => (string)DateTime::create()],
             ['id' => $result['id']],
-        );
-
-        // If token_hash was not set, update it now (migration for old tokens)
-        $this->dbConnection->executeStatement(
-            'UPDATE `user_auth_token` SET `token_hash` = ? WHERE `id` = ? AND `token_hash` IS NULL',
-            [$tokenHash, $result['id']],
         );
 
         return (int)$result['user_id'];
@@ -1136,5 +1133,10 @@ class UserRepository
         }
 
         return $email;
+    }
+
+    private function hashAuthToken(string $token) : string
+    {
+        return hash('sha256', $token);
     }
 }

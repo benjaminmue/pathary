@@ -11,6 +11,7 @@ use Movary\Domain\User\UserApi;
 use Movary\Service\Exception\LoginRateLimitExceeded;
 use Movary\Service\LoginRateLimiterService;
 use Movary\Util\Json;
+use Movary\Util\RequestContext;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -37,17 +38,18 @@ class AuthenticationController
         }
 
         $requestClient = $headers['X-Movary-Client'];
-        $totpCode = empty($tokenRequestBody['totpCode']) === true ? null : (int)$tokenRequestBody['totpCode'];
+        $totpCode = $this->readTotpCode($tokenRequestBody['totpCode'] ?? null);
         $recoveryCode = empty($tokenRequestBody['recoveryCode']) === true ? null : trim($tokenRequestBody['recoveryCode']);
         $rememberMe = $tokenRequestBody['rememberMe'] ?? false;
         $trustDevice = $tokenRequestBody['trustDevice'] ?? false;
 
-        // Persistent, IP-based brute-force protection. This endpoint is the only
-        // login choke point (the web login form posts here too) and runs before
-        // authentication, so a session-based limiter would be trivially bypassed.
-        $clientIp = $this->getClientIp();
+        // Persistent brute-force protection per IP and per account. This endpoint is
+        // the only login choke point (the web login form posts here too) and runs
+        // before authentication, so a session-based limiter would be trivially bypassed.
+        $clientIp = RequestContext::clientIp();
+        $email = $tokenRequestBody['email'];
         try {
-            $this->loginRateLimiter->ensureNotRateLimited($clientIp);
+            $this->loginRateLimiter->ensureNotRateLimited($clientIp, $email);
         } catch (LoginRateLimitExceeded $e) {
             return Response::createJson(
                 Json::encode([
@@ -60,7 +62,7 @@ class AuthenticationController
 
         try {
             $userAndAuthToken = $this->authenticationService->login(
-                $tokenRequestBody['email'],
+                $email,
                 $tokenRequestBody['password'],
                 (bool)$rememberMe,
                 $requestClient,
@@ -78,7 +80,7 @@ class AuthenticationController
                 [Header::createContentTypeJson()],
             );
         } catch (InvalidTotpCode) {
-            $this->loginRateLimiter->logAttempt($clientIp, false);
+            $this->loginRateLimiter->logAttempt($clientIp, $email, false);
 
             return Response::createUnauthorized(
                 Json::encode([
@@ -88,7 +90,7 @@ class AuthenticationController
                 [Header::createContentTypeJson()],
             );
         } catch (InvalidCredentials $e) {
-            $this->loginRateLimiter->logAttempt($clientIp, false);
+            $this->loginRateLimiter->logAttempt($clientIp, $email, false);
 
             return Response::createUnauthorized(
                 Json::encode([
@@ -100,25 +102,12 @@ class AuthenticationController
         }
 
         // Credentials (and TOTP, if configured) were valid.
-        $this->loginRateLimiter->logAttempt($clientIp, true);
+        $this->loginRateLimiter->logAttempt($clientIp, $email, true);
 
         $user = $userAndAuthToken['user'];
 
-        // Two-factor authentication is mandatory. The API cannot run the TOTP
-        // enrollment flow (that needs the web QR setup), so a user who has not
-        // set up 2FA yet must not receive an API token. Revoke the token that
-        // was just created and point them at the web setup. (Users who already
-        // have 2FA were verified by login() above.)
         if ($this->twoFactorAuthenticationApi->findTotpUri($user->getId()) === null) {
-            $this->authenticationService->deleteToken($userAndAuthToken['token']);
-
-            return Response::createJson(
-                Json::encode([
-                    'error' => 'TwoFactorSetupRequired',
-                    'message' => 'Two-factor authentication is mandatory. Log in via the web interface to set it up before using the API.',
-                ]),
-                StatusCode::createForbidden(),
-            );
+            return $this->respondToMissingTwoFactorEnrollment($requestClient, $userAndAuthToken['token']);
         }
 
         return Response::createJson(
@@ -134,12 +123,61 @@ class AuthenticationController
     }
 
     /**
+     * Two-factor authentication is mandatory. (Users who already have 2FA were verified
+     * by login().) A user who has not enrolled yet, e.g. a freshly invited one, can only
+     * do so in the web interface:
+     * - web client: keep the cookie session that login() created and send the user to
+     *   the enrollment page; UserIsAuthenticated confines the session to
+     *   /profile/security until 2FA is set up.
+     * - API clients cannot run the QR enrollment, so the token just created is revoked
+     *   and the client is pointed at the web setup.
+     */
+    private function respondToMissingTwoFactorEnrollment(string $requestClient, string $token) : Response
+    {
+        if ($requestClient === Authentication::PATHARY_WEB_CLIENT) {
+            return Response::createJson(
+                Json::encode([
+                    'twoFactorSetupRequired' => true,
+                    'redirectPath' => '/profile/security',
+                ]),
+            );
+        }
+
+        $this->authenticationService->deleteToken($token);
+
+        return Response::createJson(
+            Json::encode([
+                'error' => 'TwoFactorSetupRequired',
+                'message' => 'Two-factor authentication is mandatory. Log in via the web interface to set it up before using the API.',
+            ]),
+            StatusCode::createForbidden(),
+        );
+    }
+
+    /**
+     * TOTP codes stay strings so a leading "0" survives. Numeric JSON values from API
+     * clients are padded back to six digits for the same reason.
+     */
+    private function readTotpCode(mixed $totpCode) : ?string
+    {
+        if (is_int($totpCode) === true) {
+            return str_pad((string)$totpCode, 6, '0', STR_PAD_LEFT);
+        }
+
+        if (is_string($totpCode) === false || trim($totpCode) === '') {
+            return null;
+        }
+
+        return trim($totpCode);
+    }
+
+    /**
      * @param array<string, mixed> $tokenRequestBody
      * @param array<string, mixed> $headers
      */
     private function validateTokenRequest(array $tokenRequestBody, array $headers) : ?Response
     {
-        if (isset($tokenRequestBody['email']) === false || isset($tokenRequestBody['password']) === false) {
+        if (is_string($tokenRequestBody['email'] ?? null) === false || is_string($tokenRequestBody['password'] ?? null) === false) {
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'MissingCredentials',
@@ -160,19 +198,6 @@ class AuthenticationController
         }
 
         return null;
-    }
-
-    private function getClientIp() : string
-    {
-        // Prefer the real client IP behind a reverse proxy (e.g. NPM), otherwise
-        // fall back to the direct connection address.
-        if (empty($_SERVER['HTTP_X_FORWARDED_FOR']) === false) {
-            $forwardedIps = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-
-            return trim($forwardedIps[0]);
-        }
-
-        return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     }
 
     public function destroyToken(Request $request) : Response

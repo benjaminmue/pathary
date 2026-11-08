@@ -1584,11 +1584,7 @@
 
     async function loadTmdbStatus() {
         try {
-            const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-                },
-            });
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb');
 
             if (!response.ok) {
                 throw new Error('Failed to load TMDB status');
@@ -1696,10 +1692,10 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
                     },
                     body: JSON.stringify({
                         apiKey: tmdbApiKey,
+                        _csrf_token: getCsrfToken(),
                     }),
                 });
 
@@ -1735,10 +1731,10 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
                     },
                     body: JSON.stringify({
                         apiKey: omdbApiKey,
+                        _csrf_token: getCsrfToken(),
                     }),
                 });
 
@@ -1781,8 +1777,9 @@
             const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb/test', {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ _csrf_token: getCsrfToken() }),
             });
 
             const data = await response.json();
@@ -1802,11 +1799,7 @@
 
     async function loadOmdbStatus() {
         try {
-            const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-                },
-            });
+            const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb');
 
             if (!response.ok) {
                 throw new Error('Failed to load OMDb status');
@@ -1856,8 +1849,9 @@
             const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb/test', {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ _csrf_token: getCsrfToken() }),
             });
 
             const data = await response.json();
@@ -1889,8 +1883,9 @@
             const response = await fetch('{{ applicationUrl }}/api/admin/settings/tmdb', {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ _csrf_token: getCsrfToken() }),
             });
 
             const data = await response.json();
@@ -1927,8 +1922,9 @@
             const response = await fetch('{{ applicationUrl }}/api/admin/settings/omdb', {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ _csrf_token: getCsrfToken() }),
             });
 
             const data = await response.json();
