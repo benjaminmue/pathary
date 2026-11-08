@@ -3,7 +3,7 @@
 # =============================================================================
 # Stage 1: Build dependencies with Composer
 # =============================================================================
-FROM php:8.4-cli-alpine AS builder
+FROM php:8.4.27-cli-alpine AS builder
 
 # Install build dependencies for PHP extensions
 RUN apk add --no-cache \
@@ -53,7 +53,7 @@ RUN composer dump-autoload --optimize --no-dev
 # =============================================================================
 # Stage 2: Production image with Apache
 # =============================================================================
-FROM php:8.4-apache AS production
+FROM php:8.4.27-apache AS production
 
 # Set build arguments and labels
 ARG BUILD_DATE
@@ -62,8 +62,8 @@ ARG VERSION=latest
 
 LABEL org.opencontainers.image.title="Pathary" \
       org.opencontainers.image.description="Self-hosted group movie tracking web application (fork of Movary)" \
-      org.opencontainers.image.url="https://github.com/benjaminkomen/movary" \
-      org.opencontainers.image.source="https://github.com/benjaminkomen/movary" \
+      org.opencontainers.image.url="https://github.com/benjaminmue/pathary" \
+      org.opencontainers.image.source="https://github.com/benjaminmue/pathary" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.revision="${VCS_REF}"
@@ -140,7 +140,14 @@ RUN { \
     echo 'memory_limit=256M'; \
     echo 'max_execution_time=120'; \
     echo 'expose_php=Off'; \
+    # Not used by Pathary; disabled as hardening after CVE-2026-109618/-109619.
+    echo 'session.upload_progress.enabled=0'; \
 } > /usr/local/etc/php/conf.d/pathary.ini
+
+# Refuse to build on a PHP release older than the CVE-2026-109618/-109619 fix,
+# e.g. from a stale cache or a reverted base image tag.
+RUN php -r 'exit(version_compare(PHP_VERSION, "8.4.27", ">=") ? 0 : 1);' \
+    || { echo "PHP $(php -r 'echo PHP_VERSION;') is older than 8.4.27" >&2; exit 1; }
 
 # Set working directory
 WORKDIR /app

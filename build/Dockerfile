@@ -10,7 +10,10 @@ ARG GROUP_ID=3000
 
 USER root
 
-RUN apk add --no-cache \
+# Upgrade first: the base image ships an older php84 core, while apk adds
+# extensions from the current repository. Mixed versions fail to load
+# (simplexml: "_safe_femalloc: symbol not found").
+RUN apk upgrade --no-cache && apk add --no-cache \
     bash \
     php84-pdo \
     php84-pdo_mysql \
