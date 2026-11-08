@@ -24,6 +24,11 @@ updates:
       time: "06:00"
       timezone: Europe/Zurich
     open-pull-requests-limit: 5
+    # Stay on PHP 8.4: patch releases (security fixes) come through, a move to
+    # 8.5 is a deliberate migration (vimeo/psalm 6.x does not support 8.5 yet).
+    ignore:
+      - dependency-name: php
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
 
   - package-ecosystem: docker
     directory: /build
@@ -33,6 +38,11 @@ updates:
       time: "06:00"
       timezone: Europe/Zurich
     open-pull-requests-limit: 5
+    # trafex/php-nginx 3.11 and later ship PHP 8.5; 3.10 is the last 8.4 line.
+    # The test image must run the same PHP minor as production.
+    ignore:
+      - dependency-name: trafex/php-nginx
+        versions: [">=3.11.0"]
 
   - package-ecosystem: github-actions
     directory: /
