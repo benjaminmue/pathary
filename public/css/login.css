@@ -232,3 +232,15 @@ body.bg-dark,
     margin: 0;
     width: 100%;
 }
+
+/* TOTP / recovery code mode switch: gold accent instead of Bootstrap blue */
+.login-card .btn-group .btn-outline-primary {
+    --bs-btn-color: #C3C9D1;
+    --bs-btn-border-color: #2A2E35;
+    --bs-btn-hover-color: #F2F3F5;
+    --bs-btn-hover-bg: transparent;
+    --bs-btn-hover-border-color: #FBBC09;
+    --bs-btn-active-color: #101216;
+    --bs-btn-active-bg: #FBBC09;
+    --bs-btn-active-border-color: #FBBC09;
+}
