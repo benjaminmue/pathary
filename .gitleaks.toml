@@ -1,0 +1,27 @@
+# gitleaks configuration. Default ruleset plus allowlists for findings that
+# were inspected and cleared. Anything not listed here fails the build.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "REST test fixtures, the secret-scanning docs and scanner (they contain the sample patterns on purpose), and vendored upstream READMEs."
+paths = [
+  '''tests/rest/.*''',
+  '''docs/security/.*''',
+  '''build/scripts/test-cron-env\.sh''',
+  '''scripts/secret-scan\.sh''',
+  '''vendor/.*''',
+]
+
+[[allowlists]]
+description = "Documentation examples: auth headers in curl samples, no live token."
+paths = [
+  '''docs/wiki/.*''',
+]
+
+[[allowlists]]
+description = """Inherited upstream history. Pathary's history begins with Lee Peuker's Movary initial commit of 2021-01-24, which contained settings/config.ini with Trakt API credentials; he removed the file two commits later (87f745ad). The keys are his, not this project's, they have been public upstream since 2021, and nobody here can rotate them. Pinned by fingerprint so only this one historic blob is excused: a Trakt key committed anywhere else still fails the build."""
+commits = [
+  "a1c371fdd31a26d8e658ba77954a4b8774590e43",
+]
