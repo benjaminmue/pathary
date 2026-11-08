@@ -47,11 +47,6 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ##########
     $routes->add('GET', '/person/{id:\d+}[-{nameSlugSuffix:[^/]*}]', [Web\PersonController::class, 'renderPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\PersonSlugRedirector::class]);
 
-    #######
-    # Dev #
-    #######
-    $routes->add('GET', '/dev/popcorn', [Web\DevController::class, 'renderPopcornTestPage']);
-
     #########
     # Admin #
     #########
@@ -110,13 +105,6 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
     // placeholder image generator
     $routes->add('GET', '/images/placeholder/{imageNameBase64Encoded:.+}', [Web\PlaceholderImageController::class, 'renderPlaceholderImage']);
-
-    #####################
-    # Webhook listeners # !!! Deprecated use new api routes
-    #####################
-    $routes->add('POST', '/old/plex/{id:.+}', [Web\PlexController::class, 'handlePlexWebhook'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/jellyfin/{id:.+}', [Web\JellyfinController::class, 'handleJellyfinWebhook'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/old/emby/{id:.+}', [Web\EmbyController::class, 'handleEmbyWebhook'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
 
     #############
     # Job Queue #
