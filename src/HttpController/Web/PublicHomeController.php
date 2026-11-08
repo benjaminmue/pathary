@@ -19,12 +19,15 @@ class PublicHomeController
     {
         $movies = $this->groupMovieService->getLatestAddedMovies(20);
 
+        $statsByMovieId = $this->groupMovieService->getMovieGroupStatsForMovies(
+            array_column($movies, 'movie_id'),
+        );
+
         $moviesWithStats = [];
         foreach ($movies as $movie) {
-            $stats = $this->groupMovieService->getMovieGroupStats($movie['movie_id']);
             $moviesWithStats[] = [
                 'movie' => $movie,
-                'stats' => $stats,
+                'stats' => $statsByMovieId[$movie['movie_id']],
             ];
         }
 
