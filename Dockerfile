@@ -3,7 +3,7 @@
 # =============================================================================
 # Stage 1: Build dependencies with Composer
 # =============================================================================
-FROM php:8.4.27-cli-alpine AS builder
+FROM php:8.5.11-cli-alpine AS builder
 
 # Install build dependencies for PHP extensions
 RUN apk add --no-cache \
@@ -53,7 +53,7 @@ RUN composer dump-autoload --optimize --no-dev
 # =============================================================================
 # Stage 2: Production image with Apache
 # =============================================================================
-FROM php:8.4.27-apache AS production
+FROM php:8.5.11-apache AS production
 
 # Set build arguments and labels
 ARG BUILD_DATE
