@@ -3,20 +3,80 @@
    Neutral cool greys, Geist typography, gold accent. Applied app-wide via the
    Bootstrap CSS variables so every component (cards, buttons, forms, tables,
    modals, navbar) follows the same language. Dark theme = the showcase palette.
+
+   This file is the single token layer. Text colours are chosen to reach at
+   least 4.5:1 against the surfaces they sit on (WCAG 2.2 AA); the values are
+   checked by tests/unit/Frontend/DesignTokenContrastTest.php.
    ========================================================================== */
 
+@font-face {
+    font-family: "Geist";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../../fonts/Geist-Variable.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Geist Mono";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../../fonts/GeistMono-Variable.woff2") format("woff2");
+}
+
 :root {
-    /* Brand: --pathe-dark is now NEUTRAL cool (was warm #231F20 → read brown). */
+    /* Brand: --pathe-dark is neutral cool (the old warm #231F20 read brown). */
     --pathe-dark: #101216;
     --pathe-yellow: #FBBC09;
-    --accent-purple: #6F2DBD;
 
-    /* Geist everywhere (woff2 @font-face ships in global.css). */
+    /* Gold as a fill, border or icon. */
+    --gold: #FBBC09;
+    --gold-soft: #FFD05C;
+    /* Gold used as text. #FBBC09 on white is only 1.7:1, so light mode swaps in
+       a darker ink (#8F6408, 5.3:1 on white). */
+    --gold-ink: #FBBC09;
+    --focus-ring: var(--gold-ink);
+
+    /* Geist everywhere. */
     --bs-body-font-family: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-    /* Gold is the single accent — align Bootstrap's warning to the exact tone. */
+    /* Gold is the single accent: align Bootstrap's warning to the exact tone. */
     --bs-warning: #FBBC09;
     --bs-warning-rgb: 251, 188, 9;
+}
+
+[data-bs-theme="light"] {
+    --gold-ink: #8F6408;
+}
+
+/* Gold text utilities follow the ink token so they stay readable in light mode. */
+.text-warning {
+    color: var(--gold-ink) !important;
+}
+
+/* One focus indicator for the whole app: a 2px gold ring on keyboard focus.
+   !important so that no component-level `outline: none` can hide it. */
+:focus-visible {
+    outline: 2px solid var(--focus-ring) !important;
+    outline-offset: 2px !important;
+}
+
+/* Bootstrap draws its own blue focus glow on top; the ring above replaces it. */
+.btn:focus-visible,
+.btn-close:focus,
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus,
+.page-link:focus,
+.nav-link:focus-visible,
+.accordion-button:focus {
+    box-shadow: none;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--bs-border-color);
 }
 
 body {
@@ -29,10 +89,6 @@ code, kbd, pre, samp, .font-monospace {
 
 /* Dark theme → neutral cool showcase palette (drives all Bootstrap surfaces). */
 [data-bs-theme="dark"] {
-    --pathe-dark: #101216;
-    --pathe-yellow: #FBBC09;
-    --accent-purple: #6F2DBD;
-
     --bs-body-bg: #15171B;
     --bs-body-bg-rgb: 21, 23, 27;
     --bs-body-color: #E7E9EC;
@@ -60,6 +116,93 @@ code, kbd, pre, samp, .font-monospace {
     --bs-emphasis-color: #F2F3F5;
 }
 
+/* Nav bar and footer stay dark in both themes (DESIGN.md). A page can tint the
+   nav through --nav-bg (the showcase home does). */
+.app-navbar {
+    background-color: var(--nav-bg, var(--pathe-dark));
+}
+
+.app-navbar__search {
+    width: 100%;
+    max-width: 400px;
+}
+
+.app-footer {
+    background-color: var(--pathe-dark);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.app-footer a,
+.app-footer a:visited {
+    color: #ADB5BD;
+}
+
+.app-footer a:hover,
+.app-footer a:active {
+    color: #DEE2E6;
+}
+
+/* Gold primary button (Bootstrap's warning variant tuned to the brand gold). */
+.btn-warning {
+    --bs-btn-color: var(--pathe-dark);
+    --bs-btn-bg: var(--gold);
+    --bs-btn-border-color: var(--gold);
+    --bs-btn-hover-color: var(--pathe-dark);
+    --bs-btn-hover-bg: var(--gold-soft);
+    --bs-btn-hover-border-color: var(--gold-soft);
+    --bs-btn-active-color: var(--pathe-dark);
+    --bs-btn-active-bg: var(--gold-soft);
+    --bs-btn-active-border-color: var(--gold-soft);
+}
+
+/* ==========================================================================
+   Page design system tokens (--pds-*), scoped to .pds-root.
+   Used by the movie detail, all movies, search, FAQ, profile and admin pages.
+   ========================================================================== */
+.pds-root {
+    --pds-gold: var(--gold);           /* fills, borders, icons */
+    --pds-gold-text: var(--gold-ink);  /* gold text */
+    --pds-bg: #15171B;
+    --pds-surface: #1C1F24;
+    --pds-surface-2: #22262C;
+    --pds-border: #2A2E35;
+    --pds-hair: rgba(255, 255, 255, .06);
+    --pds-text: #F2F3F5;
+    --pds-muted: #A9B0BA;
+    --pds-dim: #8A919B;
+    --pds-nav: #101216;
+    --pds-danger: #E5654B;
+    --pds-danger-fill: #C0392B;        /* solid danger buttons with white text */
+    --pds-success: #4FB477;
+    --pds-r: 14px;
+    --pds-r-sm: 8px;
+    --pds-s-xs: 4px;
+    --pds-s-sm: 8px;
+    --pds-s-md: 16px;
+    --pds-s-lg: 24px;
+    --pds-s-xl: 40px;
+    --pds-font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --pds-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+[data-bs-theme="light"] .pds-root {
+    --pds-bg: #FFFFFF;
+    --pds-surface: #FBFBFC;
+    --pds-surface-2: #F5F6F8;
+    --pds-border: #E3E6EA;
+    --pds-hair: #EEF0F3;
+    --pds-text: #15171B;
+    --pds-muted: #5B636E;
+    --pds-dim: #676E78;
+    --pds-danger: #C0392B;
+    --pds-success: #198754;
+}
+
+.pds-root {
+    color: var(--pds-text);
+    font-family: var(--pds-font);
+}
+
 /* ==========================================================================
    Popcorn Rating Component (Emoji Version)
    ========================================================================== */
@@ -85,6 +228,7 @@ code, kbd, pre, samp, .font-monospace {
     transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
     -webkit-user-select: none;
     user-select: none;
+    border-radius: 4px;
 }
 
 /* Emoji states */
@@ -109,24 +253,32 @@ code, kbd, pre, samp, .font-monospace {
     transform: scale(1.2);
 }
 
-.popcorn-rating--input .popcorn-rating__item:focus {
-    outline: 2px solid var(--accent-purple);
-    outline-offset: 2px;
-    border-radius: 4px;
-}
-
-.popcorn-rating--input .popcorn-rating__item:focus:not(:focus-visible) {
-    outline: none;
-}
-
-.popcorn-rating--input .popcorn-rating__item:focus-visible {
-    outline: 2px solid var(--accent-purple);
-    outline-offset: 2px;
-    border-radius: 4px;
-}
-
 .popcorn-rating--input .popcorn-rating__item:active {
     transform: scale(0.95);
+}
+
+/* Input wrapper: the radiogroup plus its explicit clear button */
+.popcorn-rating-field {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.popcorn-rating__clear {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--bs-secondary-color);
+    font-size: 0.8rem;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.popcorn-rating__clear:hover {
+    color: var(--bs-body-color);
+    border-color: var(--gold);
 }
 
 /* Small display variant (for rating cards) */
@@ -210,6 +362,6 @@ code, kbd, pre, samp, .font-monospace {
 }
 
 .theme-toggle__input:focus-visible ~ .theme-toggle__track {
-    outline: 2px solid #FBBC09;
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
 }

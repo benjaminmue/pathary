@@ -33,17 +33,23 @@ Clean modern sans throughout — no serif.
 - **Body / UI:** **Geist** 400/500.
 - **Data / numbers / metadata:** **Geist Mono** (tabular by nature) — year, runtime, ratings, counts.
 - **Code / admin:** **Geist Mono**.
-- **Loading:** Google Fonts — `Geist:wght@400;500;600;700` + `Geist+Mono:wght@400;500`. Self-host later for privacy/perf.
+- **Loading:** self-hosted variable fonts (`public/fonts/Geist-Variable.woff2`, `GeistMono-Variable.woff2`), declared in `theme.css` and preloaded by `templates/partials/head_assets.twig`. Icons: Bootstrap Icons 1.11.3, self-hosted. No CDNs.
 - **Scale (rem):** h1 1.9 · h2 1.45 · h3 0.9 (uppercase, tracked) · body 0.95 · small 0.8 · micro 0.72.
 - Base letter-spacing `-0.006em`; headings tighter.
 
 ## Color
 Dark-first. Neutral **cool** greys (slight blue undertone) — never warm.
 
-**Brand token (kept from `theme.css`):**
-- `--pathe-yellow` **#FBBC09** — the single accent. CTAs, active states, rating numbers, section rule, links.
-- On light surfaces use a darker gold for text: **#B9820A** (`--gold-ink`); on dark, #FBBC09 / #FFD05C.
-- `--accent-purple` **#6F2DBD** — demoted to **focus-ring only** (keyboard focus). Never a visible fill.
+All tokens live in one layer: `public/assets/css/theme.css` (`:root`, `.pds-root`) plus the showcase
+tokens in `public/css/global.css`. `tests/unit/Frontend/DesignTokenContrastTest.php` reads them and fails
+the build when a text token drops below 4.5:1 on its surfaces (WCAG 2.2 AA).
+
+**Brand tokens:**
+- `--gold` **#FBBC09**: the single accent for fills, borders, icons, CTAs, active states, section rule.
+- `--gold-ink`: gold used as **text**, #FBBC09 on dark and **#8F6408** on light (5.3:1 on white; #FBBC09 on
+  white is only 1.7:1). Page tokens expose it as `--pds-gold-text`, the showcase as `--sc-gold-text`.
+- **Focus:** one global `:focus-visible` ring, `2px solid var(--focus-ring)` with 2px offset. The ring is
+  `--gold-ink`, so gold on dark and dark gold on light. The old purple ring (#6F2DBD) is retired.
 
 **Dark (default) — cool neutral ramp:**
 | Role | Hex |
@@ -56,7 +62,7 @@ Dark-first. Neutral **cool** greys (slight blue undertone) — never warm.
 | hairline | `#262B31` |
 | text | `#E7E9EC` |
 | muted | `#9CA3AC` |
-| dim | `#697079` |
+| dim | `#8A919B` (4.7:1 on surface-2) |
 
 **Light — cool neutral:**
 | Role | Hex |
@@ -67,10 +73,11 @@ Dark-first. Neutral **cool** greys (slight blue undertone) — never warm.
 | border | `#E4E7EB` |
 | text | `#191C20` |
 | muted | `#5D646D` |
-| dim | `#8B929B` |
+| dim | `#676E78` (4.7:1 on surface-2) |
 
 **Semantic:** success `#5AA57A` · warning `#C98A34` (held apart from brand gold) · error `#C7443F` · info `#5A97A3`.
-Nav bar and footer stay dark in **both** themes (matches the live app).
+Nav bar, footer, the home CTA band and the movie detail hero stay dark in **both** themes; inside them
+use the dark-theme text and gold values.
 
 **Dark mode strategy:** redesign surfaces (don't just invert). Keep neutrals cool; gold stays #FBBC09.
 
@@ -105,3 +112,5 @@ Nav bar and footer stay dark in **both** themes (matches the live app).
 | 2026-07-05 | **Gold #FBBC09 as sole accent**, purple → focus-ring only | Committing to one accent; posters carry all other colour. |
 | 2026-07-05 | Real poster art is the colour; never fake posters | Live app's strength is the wall of real TMDB art. |
 | 2026-07-05 | Dark-first, nav/footer dark in both themes | Matches live app; media browsing expects dark. |
+| 2026-11-08 | Light-mode text gold #8F6408, dim greys raised, gold focus ring | WCAG 2.2 AA: gold text on white was 1.7:1, dim text 3.0-3.7:1. Purple focus ring dropped for one gold ring. |
+| 2026-11-08 | No blur, glow or gradient decoration | Falling blurred popcorn, blurred poster backdrop and gradient placeholders replaced by flat surfaces. |
