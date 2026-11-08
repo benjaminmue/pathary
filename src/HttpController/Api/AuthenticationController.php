@@ -43,12 +43,13 @@ class AuthenticationController
         $rememberMe = $tokenRequestBody['rememberMe'] ?? false;
         $trustDevice = $tokenRequestBody['trustDevice'] ?? false;
 
-        // Persistent, IP-based brute-force protection. This endpoint is the only
-        // login choke point (the web login form posts here too) and runs before
-        // authentication, so a session-based limiter would be trivially bypassed.
+        // Persistent brute-force protection per IP and per account. This endpoint is
+        // the only login choke point (the web login form posts here too) and runs
+        // before authentication, so a session-based limiter would be trivially bypassed.
         $clientIp = RequestContext::clientIp();
+        $email = $tokenRequestBody['email'];
         try {
-            $this->loginRateLimiter->ensureNotRateLimited($clientIp);
+            $this->loginRateLimiter->ensureNotRateLimited($clientIp, $email);
         } catch (LoginRateLimitExceeded $e) {
             return Response::createJson(
                 Json::encode([
@@ -61,7 +62,7 @@ class AuthenticationController
 
         try {
             $userAndAuthToken = $this->authenticationService->login(
-                $tokenRequestBody['email'],
+                $email,
                 $tokenRequestBody['password'],
                 (bool)$rememberMe,
                 $requestClient,
@@ -79,7 +80,7 @@ class AuthenticationController
                 [Header::createContentTypeJson()],
             );
         } catch (InvalidTotpCode) {
-            $this->loginRateLimiter->logAttempt($clientIp, false);
+            $this->loginRateLimiter->logAttempt($clientIp, $email, false);
 
             return Response::createUnauthorized(
                 Json::encode([
@@ -89,7 +90,7 @@ class AuthenticationController
                 [Header::createContentTypeJson()],
             );
         } catch (InvalidCredentials $e) {
-            $this->loginRateLimiter->logAttempt($clientIp, false);
+            $this->loginRateLimiter->logAttempt($clientIp, $email, false);
 
             return Response::createUnauthorized(
                 Json::encode([
@@ -101,7 +102,7 @@ class AuthenticationController
         }
 
         // Credentials (and TOTP, if configured) were valid.
-        $this->loginRateLimiter->logAttempt($clientIp, true);
+        $this->loginRateLimiter->logAttempt($clientIp, $email, true);
 
         $user = $userAndAuthToken['user'];
 
@@ -140,7 +141,7 @@ class AuthenticationController
      */
     private function validateTokenRequest(array $tokenRequestBody, array $headers) : ?Response
     {
-        if (isset($tokenRequestBody['email']) === false || isset($tokenRequestBody['password']) === false) {
+        if (is_string($tokenRequestBody['email'] ?? null) === false || is_string($tokenRequestBody['password'] ?? null) === false) {
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'MissingCredentials',

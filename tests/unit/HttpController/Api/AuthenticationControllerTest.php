@@ -93,7 +93,7 @@ class AuthenticationControllerTest extends TestCase
         $this->authenticationService->method('login')->willThrowException(InvalidCredentials::create());
 
         // A wrong password must be recorded so repeated failures trip the limiter.
-        $this->loginRateLimiter->expects(self::once())->method('logAttempt')->with(self::anything(), false);
+        $this->loginRateLimiter->expects(self::once())->method('logAttempt')->with(self::anything(), 'user@example.com', false);
 
         $response = $this->subject->createToken($this->createTokenRequest());
 
@@ -108,7 +108,7 @@ class AuthenticationControllerTest extends TestCase
         ]);
         $this->twoFactorAuthenticationApi->method('findTotpUri')->willReturn('otpauth://totp/Pathary:zsmith?secret=ABC');
 
-        $this->loginRateLimiter->expects(self::once())->method('logAttempt')->with(self::anything(), true);
+        $this->loginRateLimiter->expects(self::once())->method('logAttempt')->with(self::anything(), 'user@example.com', true);
 
         $response = $this->subject->createToken($this->createTokenRequest());
 
