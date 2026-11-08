@@ -103,7 +103,6 @@ Middleware runs before controllers to perform checks.
 | `RateLimited` | Rate limiting for sensitive operations |
 | `MovieSlugRedirector` | Redirects to correct movie slug URL |
 | `PersonSlugRedirector` | Redirects to correct person slug URL |
-| `OAuthLazyMonitoring` | OAuth connection monitoring |
 
 #### API Middleware (`src/HttpController/Api/Middleware/`)
 

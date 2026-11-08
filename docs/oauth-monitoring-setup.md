@@ -6,12 +6,11 @@ This guide explains the automated OAuth token monitoring system for Email OAuth 
 
 The OAuth monitoring system automatically checks the health of your Email OAuth connection (Gmail or Microsoft 365) and alerts administrators when action is needed. This prevents email sending failures due to expired or revoked OAuth tokens.
 
-**No configuration required** - monitoring runs automatically when users visit the site.
+**No configuration required** - the Docker image runs the check from cron every 6 hours.
 
 ## Features
 
-- **Automatic Health Checks**: Runs on page loads without requiring cron jobs or scheduled tasks
-- **Smart Throttling**: Checks run at most every 6 hours to avoid overhead
+- **Scheduled Health Checks**: `oauth:monitor` runs from the container's cron every 6 hours, never on a web request
 - **Multi-Tier Alerts**: Warnings at 45, 30, and 15 days before recommended refresh
 - **Admin Notifications**: Email alerts to all administrators
 - **Admin Popup Banner**: Visual alerts when admins login (dismissible for 3 hours)
@@ -20,30 +19,19 @@ The OAuth monitoring system automatically checks the health of your Email OAuth 
 
 ## How It Works
 
-### Lazy Monitoring
+### Scheduled Monitoring
 
-Pathary uses a "lazy monitoring" approach where OAuth health checks are triggered automatically when any user visits the site:
+The production image ships a cron entry (`docker/cron/pathary-sync`) that runs
+`php bin/console.php oauth:monitor` as `www-data` at minute 15 of every sixth
+hour. The command refreshes the OAuth token once to prove the connection still
+works, updates the alert level and sends notifications when due. Output goes to
+the container log (`docker logs`) and `storage/logs/cron.log`.
 
-1. **On Page Load**: Every web request checks if monitoring should run
-2. **Time-Based Throttling**: Monitoring only runs if at least 6 hours have passed since the last check
-3. **Database Locking**: Concurrent requests are prevented via database locks
-4. **Non-Blocking**: Monitoring runs in the background and doesn't slow down page loads
+Web requests never trigger monitoring, so no visitor waits for an outbound
+token refresh and the check runs even when nobody uses the site.
 
-This approach means:
-- ✅ No cron jobs to configure
-- ✅ No external schedulers needed
-- ✅ Works in any hosting environment (Unraid, VPS, Docker, etc.)
-- ✅ Monitoring happens automatically as long as someone uses the site
-- ⚠️ Requires occasional site visits (at least once every 6 hours for timely alerts)
-
-### Monitoring Interval
-
-The system runs health checks **at most every 6 hours**. This interval balances:
-- Timely detection of OAuth issues
-- Minimal overhead on page loads
-- Reduced API calls to OAuth providers
-
-If you need more frequent checks, you can visit any page in Pathary to trigger a check (if 6+ hours have elapsed).
+Without the Docker image (bare-metal installs), schedule the same command
+yourself, e.g. `15 */6 * * * cd /path/to/pathary && php bin/console.php oauth:monitor`.
 
 ## Alert Schedule
 
@@ -79,25 +67,19 @@ This adds:
 
 To verify it's working:
 
-1. **Check the logs** after visiting a page:
+1. **Run the check once by hand**:
    ```bash
-   docker compose logs app | grep -i "oauth monitoring"
-
-   # You should see entries like:
-   # [INFO] Triggering lazy OAuth monitoring
-   # [INFO] Lazy OAuth monitoring completed
+   docker exec <container> php bin/console.php oauth:monitor
+   # OAuth monitoring: alert level ok - ...
    ```
 
 2. **Visit Admin → Events**:
    - Login as admin
    - Go to Admin → Events
    - Filter by event type containing "oauth"
-   - You should see monitoring events logged after 6+ hours of site activity
+   - You should see a monitoring event after each cron run
 
-3. **Check last run time** in the database (optional):
-   ```bash
-   docker compose exec db mysql -u movary -p -e "USE movary; SELECT * FROM server_setting WHERE \`key\` = 'oauth_monitoring_last_run_at';"
-   ```
+
 
 ## Monitoring Behavior
 
@@ -179,9 +161,8 @@ Events include metadata:
 **Solutions**:
 1. Ensure database migration was run: `docker compose exec app php vendor/bin/phinx migrate -c ./settings/phinx.php`
 2. Verify OAuth is configured: Admin → Email Settings → OAuth tab
-3. Check if anyone has visited the site in the last 6 hours (monitoring needs page loads)
-4. Check application logs: `docker compose logs app | grep -i oauth`
-5. Visit a page and wait a moment, then check logs again
+3. Check that cron runs the job: `docker logs <container> | grep -i "oauth:monitor"`
+4. Run it by hand: `docker exec <container> php bin/console.php oauth:monitor`
 
 ### No Alerts Received
 
@@ -204,22 +185,6 @@ Events include metadata:
 3. Check browser console for JavaScript errors (F12 → Console)
 4. Clear browser cache and reload page
 5. Verify banner was not recently acknowledged: Check `oauth_admin_banner_ack` table
-
-### Monitoring Running Too Frequently
-
-**Problem**: Monitoring appears to run on every page load
-
-**Solutions**:
-1. Check database for last run time:
-   ```bash
-   docker compose exec db mysql -u movary -p -e "USE movary; SELECT * FROM server_setting WHERE \`key\` = 'oauth_monitoring_last_run_at';"
-   ```
-2. Verify 6-hour interval is being enforced in logs
-3. Check for database lock issues:
-   ```bash
-   docker compose exec db mysql -u movary -p -e "USE movary; SELECT * FROM server_setting WHERE \`key\` = 'oauth_monitoring_lock';"
-   ```
-   - If a lock is stuck, delete it: `DELETE FROM server_setting WHERE \`key\` = 'oauth_monitoring_lock';`
 
 ### False Alerts
 
@@ -255,26 +220,16 @@ The monitoring system logs:
 
 - Monitoring events follow the same retention as other security audit logs
 - Banner acknowledgements are kept until replaced (one per admin user)
-- Recommendation: Implement periodic cleanup of old audit logs (90 days)
+- `maintenance:prune` (daily cron) deletes security audit events older than 90 days
 
 ## Advanced Configuration
 
 ### Adjusting Monitoring Interval
 
-Edit `src/Service/Email/OAuthLazyMonitoringService.php`:
+Change the schedule of the `oauth:monitor` line in `docker/cron/pathary-sync`
+and rebuild the image.
 
-```php
-// Run monitoring at most every X hours
-private const MIN_INTERVAL_SECONDS = 21600; // 6 hours (default)
-
-// Change to 3 hours:
-private const MIN_INTERVAL_SECONDS = 10800;
-
-// Change to 12 hours:
-private const MIN_INTERVAL_SECONDS = 43200;
-```
-
-**Warning**: More frequent checks increase database queries and OAuth provider API calls.
+**Warning**: More frequent checks increase OAuth provider API calls.
 
 ### Adjusting Alert Thresholds
 
@@ -293,13 +248,9 @@ private const MAX_DAYS_WITHOUT_REFRESH = 60; // Token age limit
 
 ### Manual Health Check (For Testing)
 
-You can force an immediate monitoring run by resetting the last run time:
-
 ```bash
-docker compose exec db mysql -u movary -p -e "USE movary; DELETE FROM server_setting WHERE \`key\` = 'oauth_monitoring_last_run_at';"
+docker exec <container> php bin/console.php oauth:monitor
 ```
-
-Then visit any page in Pathary to trigger monitoring immediately.
 
 ### Disabling Features
 
@@ -311,7 +262,7 @@ Then visit any page in Pathary to trigger monitoring immediately.
 
 ## Best Practices
 
-1. **Visit the site regularly**: Monitoring requires page loads, so ensure at least one admin checks the site daily
+1. **Keep cron running**: Monitoring runs from the container's cron; check `docker logs` for the `oauth:monitor` runs
 2. **Test email delivery**: Before relying on email alerts, send a test email from Admin → Email Settings
 3. **Document your OAuth setup**: Keep records of client ID, tenant ID, and expiry dates
 4. **Monitor the monitoring**: Check Admin → Events periodically to ensure monitoring runs

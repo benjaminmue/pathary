@@ -1,5 +1,7 @@
 # OAuth Token Monitoring Implementation Summary
 
+> **Superseded:** the page-load ("lazy") trigger described below was replaced by the `oauth:monitor` console command, run from the container's cron every 6 hours. `OAuthLazyMonitoring` and `OAuthLazyMonitoringService` no longer exist. See [oauth-monitoring-setup.md](oauth-monitoring-setup.md).
+
 This document summarizes the complete OAuth token monitoring and alerting system implemented for Pathary Issue #20.
 
 ## Implementation Overview
