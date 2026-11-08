@@ -21,6 +21,11 @@ final class InitialSchema extends AbstractMigration
 
     public function down(): void
     {
-        // Drop all tables (implement if needed)
+        // Rolling back the baseline would drop every table, including all user
+        // data. There is no state to roll back to, so refuse instead of
+        // silently wiping the database (e.g. after one rollback too many).
+        throw new \Phinx\Migration\IrreversibleMigrationException(
+            'The initial schema cannot be rolled back. Restore a database backup instead.',
+        );
     }
 }

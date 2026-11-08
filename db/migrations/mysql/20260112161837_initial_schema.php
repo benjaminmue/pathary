@@ -31,47 +31,11 @@ final class InitialSchema extends AbstractMigration
 
     public function down(): void
     {
-        // Drop all tables
-        $tables = [
-            'watchlist',
-            'user_trusted_devices',
-            'user_security_audit_log',
-            'user_recovery_codes',
-            'user_person_settings',
-            'user_jellyfin_cache',
-            'user_invitation',
-            'user_auth_token',
-            'user_api_token',
-            'user',
-            'server_setting_metadata',
-            'server_setting',
-            'phinxlog',
-            'person',
-            'password_setup_attempts',
-            'oauth_email_config',
-            'oauth_admin_banner_ack',
-            'movie_user_watch_dates',
-            'movie_user_rating',
-            'movie_production_countries',
-            'movie_production_company',
-            'movie_genre',
-            'movie_crew',
-            'movie_cast',
-            'movie',
-            'location',
-            'job_queue',
-            'genre',
-            'email_send_log',
-            'country',
-            'company',
-            'cache_trakt_user_movie_watched',
-            'cache_trakt_user_movie_rating',
-            'cache_tmdb_languages',
-            'cache_letterboxd_diary',
-        ];
-
-        foreach ($tables as $table) {
-            $this->execute("DROP TABLE IF EXISTS `{$table}`");
-        }
+        // Rolling back the baseline would drop every table, including all user
+        // data. There is no state to roll back to, so refuse instead of
+        // silently wiping the database (e.g. after one rollback too many).
+        throw new \Phinx\Migration\IrreversibleMigrationException(
+            'The initial schema cannot be rolled back. Restore a database backup instead.',
+        );
     }
 }
