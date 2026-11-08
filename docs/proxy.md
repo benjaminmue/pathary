@@ -6,6 +6,7 @@ Pathary works behind reverse proxies like Nginx, Traefik, Caddy, or HAProxy. Thi
 
 1. Set `APPLICATION_URL` to your public URL (e.g., `https://<your_domain>`)
 2. Configure your reverse proxy to forward required headers
+3. Set `TRUSTED_PROXIES` to the address of the proxy (production image)
 3. Ensure WebSocket/long-polling is not blocked (if using real-time features)
 
 ## Environment Variables
@@ -13,6 +14,9 @@ Pathary works behind reverse proxies like Nginx, Traefik, Caddy, or HAProxy. Thi
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `APPLICATION_URL` | Yes | Your public-facing URL (e.g., `https://<your_domain>`). Must match the URL users access in their browser. |
+| `TRUSTED_PROXIES` | Behind a proxy | IPs/CIDRs of the reverse proxy, comma or space separated (e.g. `192.168.1.10` or `172.18.0.0/16`). Unset: `X-Forwarded-For`/`-Proto` are ignored. |
+
+`TRUSTED_PROXIES` lists the addresses (IPs or CIDRs, comma or space separated) of the reverse proxy in front of the production image, e.g. the IP of Nginx Proxy Manager. Only for requests arriving from one of these addresses does Apache take the client IP from `X-Forwarded-For` (REMOTE_ADDR, used by rate limiting and the security log) and set `HTTPS=on` when `X-Forwarded-Proto` is `https` (secure cookies, generated URLs). If it is unset, both headers are ignored: a client could otherwise spoof its IP or the scheme. Set it to the narrowest address possible; a proxy on the same Docker network has a fixed IP only if you assign one.
 
 ## Nginx Configuration
 

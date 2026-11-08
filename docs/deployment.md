@@ -49,6 +49,14 @@ services:
       DATABASE_MYSQL_USER: "<database_user>"
       DATABASE_MYSQL_PASSWORD: ${DATABASE_MYSQL_PASSWORD}
 
+      # Encrypts OAuth secrets and the stored SMTP password (openssl rand -base64 32)
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+
+      # Address of the reverse proxy. With the port bound to 127.0.0.1 a proxy on
+      # the host connects from the gateway of this compose network; check with
+      # `docker network inspect <project>_default` and use the narrowest range.
+      TRUSTED_PROXIES: "172.16.0.0/12"
+
       # Production logging
       LOG_LEVEL: "warning"
       LOG_ENABLE_FILE_LOGGING: "1"
@@ -61,7 +69,7 @@ services:
       mysql:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -94,6 +102,7 @@ volumes:
 TMDB_API_KEY=<tmdb_api_key>
 DATABASE_MYSQL_PASSWORD=<database_password>
 MYSQL_ROOT_PASSWORD=<mysql_root_password>
+ENCRYPTION_KEY=<openssl rand -base64 32>
 ```
 
 !!! warning "Security"
@@ -179,6 +188,9 @@ Your reverse proxy **must** forward these headers for Pathary to work correctly:
 
 !!! warning "HTTPS Detection"
     Pathary detects HTTPS via `X-Forwarded-Proto: https` header. Without this header, redirects and cookie security flags will fail.
+
+!!! warning "TRUSTED_PROXIES"
+    The production image honours `X-Forwarded-For` and `X-Forwarded-Proto` only from the addresses in `TRUSTED_PROXIES` (IPs/CIDRs, comma or space separated, e.g. the IP of Nginx Proxy Manager). Without it every request is treated as plain HTTP from the proxy's IP, so set it whenever a proxy terminates TLS.
 
 ### Nginx
 

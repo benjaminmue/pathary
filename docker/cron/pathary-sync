@@ -1,6 +1,16 @@
-# Pathary Scheduled Sync
-# Runs daily at 2:00 AM to sync TMDB metadata and OMDb ratings
-# Only syncs movies not updated in 7+ days (max 1000 per day)
+# Pathary scheduled jobs (/etc/cron.d format: the sixth field is the user).
+#
+# Every job runs as www-data, the web server user, so files it creates in
+# /app/storage stay writable for the app. cron starts the line as root only so
+# that the shell can open /proc/1/fd/1 (the container's stdout, visible in
+# `docker logs`), which a non-root process may not open; setpriv then drops to
+# www-data before anything of the job runs.
 
-# Run scheduled sync daily at 2:00 AM via wrapper script
-0 2 * * * /bin/bash /app/build/scripts/run-scheduled-sync.sh
+# Daily TMDB metadata and OMDb ratings sync (movies not updated in 7+ days, max 1000 per run)
+0 2 * * * root setpriv --reuid=www-data --regid=www-data --init-groups /bin/bash /app/build/scripts/run-cron-job.sh sync:scheduled > /proc/1/fd/1 2>&1
+
+# Daily retention cleanup: rate-limit attempts, expired sessions, old security audit events
+30 3 * * * root setpriv --reuid=www-data --regid=www-data --init-groups /bin/bash /app/build/scripts/run-cron-job.sh maintenance:prune > /proc/1/fd/1 2>&1
+
+# OAuth email token health check every 6 hours (refreshes the token, sends expiry alerts)
+15 */6 * * * root setpriv --reuid=www-data --regid=www-data --init-groups /bin/bash /app/build/scripts/run-cron-job.sh oauth:monitor > /proc/1/fd/1 2>&1

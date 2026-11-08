@@ -10,7 +10,7 @@
 # real database, so IMDb / Rotten Tomatoes ratings are never updated.
 #
 # The entrypoint calls this at container start to snapshot the environment into
-# a shell-sourceable file; run-scheduled-sync.sh sources it before invoking the
+# a shell-sourceable file; run-cron-job.sh sources it before invoking the
 # console command. We dump *every* exported variable (not a hand-maintained
 # allowlist, which previously drifted and forgot ENCRYPTION_KEY) with %q quoting
 # so values containing spaces, quotes or '!' survive re-sourcing intact.

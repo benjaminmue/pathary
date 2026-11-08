@@ -105,8 +105,10 @@ ENV APACHE_DOCUMENT_ROOT=/app/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Enable Apache modules
-RUN a2enmod rewrite headers
+# Enable Apache modules. remoteip restores the client address behind a reverse
+# proxy; its trusted proxy list is rendered from TRUSTED_PROXIES at container
+# start (docker/entrypoint.sh), so nothing is trusted by default.
+RUN a2enmod rewrite headers remoteip
 
 # Configure Apache for .htaccess and security
 RUN { \
@@ -155,16 +157,18 @@ WORKDIR /app
 # Copy application from builder stage
 COPY --from=builder /build /app
 
-# Create writable directories and set permissions
-RUN mkdir -p /app/storage/logs /app/storage/app/public /app/storage/profile-images \
-    && chown -R www-data:www-data /app \
-    && chmod -R 755 /app \
+# Code stays root-owned and read-only for the web server, so a compromised PHP
+# process cannot rewrite the application. Only storage/ (logs, uploads, image
+# cache, Twig cache, cron environment) is writable for www-data.
+RUN mkdir -p /app/storage/logs /app/storage/app/public /app/storage/profile-images /app/storage/cache \
+    && chown -R root:root /app \
+    && chmod -R u=rwX,go=rX /app \
+    && chown -R www-data:www-data /app/storage \
     && chmod -R 775 /app/storage
 
-# Copy cron configuration
+# Scheduled jobs: a single /etc/cron.d entry that runs them as www-data.
 COPY docker/cron/pathary-sync /etc/cron.d/pathary-sync
-RUN chmod 0644 /etc/cron.d/pathary-sync && \
-    crontab /etc/cron.d/pathary-sync
+RUN chmod 0644 /etc/cron.d/pathary-sync
 
 # Copy entrypoint script
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -173,9 +177,10 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Expose port 80
 EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost/ -o /dev/null -s -w "%{http_code}" | grep -q "200\|302" || exit 1
+# Health check: /healthz verifies database, migrations and storage without a
+# session and without rendering the home page.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD curl -fsS -o /dev/null http://localhost/healthz || exit 1
 
 # Set entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

@@ -5,8 +5,10 @@
 Pathary automatically syncs TMDB metadata and OMDb ratings daily **inside the Docker container** - no external cron setup required!
 
 **How it works:**
-- Cron daemon runs inside the container
+- Cron daemon runs inside the container, jobs are defined in `/etc/cron.d/pathary-sync` and run as `www-data`
 - Syncs daily at 2 AM (container timezone)
+- Also runs `maintenance:prune` daily at 3:30 AM and `oauth:monitor` every 6 hours
+- Job output appears in `docker logs` and in `/app/storage/logs/cron.log`
 - Only syncs movies not updated in 7+ days
 - Maximum 1,000 movies per day
 - Skips OMDb sync if no API key configured
@@ -18,7 +20,7 @@ The automated sync is **enabled by default** when you run the Docker container. 
 When the container starts, you'll see:
 ```
 [CRON] Starting cron daemon for scheduled syncs...
-[CRON] Cron daemon started (daily sync at 2 AM)
+[CRON] Cron daemon started (jobs in /etc/cron.d/pathary-sync)
 ```
 
 That's it! Your movies will automatically sync daily.
@@ -29,14 +31,14 @@ That's it! Your movies will automatically sync daily.
 
 View the sync log file:
 ```bash
-docker compose exec app tail -f /app/storage/logs/scheduled-sync.log
+docker compose exec app tail -f /app/storage/logs/cron.log
 ```
 
 ### Manually Trigger a Sync
 
 Test the sync command manually:
 ```bash
-docker compose exec app php bin/console.php sync:scheduled
+docker compose exec -u www-data app php bin/console.php sync:scheduled
 ```
 
 **Example output:**
@@ -64,14 +66,10 @@ Visit **Admin → System Health** to see:
 
 The default sync time is 2 AM (container timezone). To change it:
 
-1. Create a custom cron file:
-```bash
-# docker/cron/custom-pathary-sync
-0 4 * * * www-data cd /app && /usr/local/bin/php /app/bin/console.php sync:scheduled >> /app/storage/logs/scheduled-sync.log 2>&1
-```
-
-2. Update your Dockerfile to copy the custom file instead
-3. Rebuild the container
+1. Change the schedule of the `sync:scheduled` line in `docker/cron/pathary-sync`
+   (keep the `root setpriv --reuid=www-data ...` part: it runs the job as
+   www-data and sends the output to the container log)
+2. Rebuild the image
 
 ## Disabling Automated Sync
 
@@ -81,11 +79,12 @@ To disable the automated sync completely:
 
 Comment out these lines in the Dockerfile:
 ```dockerfile
-# Copy cron configuration
 # COPY docker/cron/pathary-sync /etc/cron.d/pathary-sync
-# RUN chmod 0644 /etc/cron.d/pathary-sync && \
-#     crontab /etc/cron.d/pathary-sync
+# RUN chmod 0644 /etc/cron.d/pathary-sync
 ```
+
+This also disables `maintenance:prune` and `oauth:monitor`; schedule them
+elsewhere.
 
 **Option 2: Remove cron startup from entrypoint**
 
@@ -147,7 +146,7 @@ docker compose exec app cat /etc/cron.d/pathary-sync
 
 **Check the log file:**
 ```bash
-docker compose exec app cat /app/storage/logs/scheduled-sync.log
+docker compose exec app cat /app/storage/logs/cron.log
 ```
 
 **Common issues:**
@@ -169,7 +168,7 @@ To enable OMDb sync:
 
 **Check log file exists:**
 ```bash
-docker compose exec app ls -la /app/storage/logs/scheduled-sync.log
+docker compose exec app ls -la /app/storage/logs/cron.log
 ```
 
 **Check permissions:**
@@ -200,11 +199,10 @@ If you need different sync behavior, create a custom cron file:
 To spread the load throughout the day:
 
 ```bash
-# Sync 500 movies at 2 AM
-0 2 * * * www-data cd /app && /usr/local/bin/php /app/bin/console.php sync:scheduled >> /app/storage/logs/scheduled-sync-morning.log 2>&1
-
-# Sync another 500 movies at 2 PM
-0 14 * * * www-data cd /app && /usr/local/bin/php /app/bin/console.php sync:scheduled >> /app/storage/logs/scheduled-sync-afternoon.log 2>&1
+# Sync at 2 AM and 2 PM. run-cron-job.sh restores the container environment
+# (database credentials), which cron does not pass on.
+0 2 * * * root setpriv --reuid=www-data --regid=www-data --init-groups /bin/bash /app/build/scripts/run-cron-job.sh sync:scheduled > /proc/1/fd/1 2>&1
+0 14 * * * root setpriv --reuid=www-data --regid=www-data --init-groups /bin/bash /app/build/scripts/run-cron-job.sh sync:scheduled > /proc/1/fd/1 2>&1
 ```
 
 Note: You'll need to modify the command to accept `--threshold` parameter for this to work.
@@ -215,7 +213,7 @@ To prevent log files from growing too large, add logrotate:
 
 ```bash
 # /etc/logrotate.d/pathary (on host)
-/var/lib/docker/volumes/pathary_storage/_data/logs/scheduled-sync.log {
+/var/lib/docker/volumes/pathary_storage/_data/logs/cron.log {
     daily
     rotate 7
     compress
