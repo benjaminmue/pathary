@@ -6,36 +6,47 @@
     - mode: "display" or "input" (default: "display")
     - name: string (form input name, required for input mode)
     - readonly: bool (default: false)
+    - labelId: id of the visible label for the input (optional)
+
+    Input mode is an ARIA radiogroup: one tab stop, arrow keys move the
+    selection, and an explicit button clears the rating (public/assets/js/popcorn.js).
 #}
 
 {% set currentValue = valueInt ?? 0 %}
 {% set isInput = mode|default('display') == 'input' %}
 {% set isReadonly = readonly|default(false) %}
 
-<div class="popcorn-rating {% if isInput and not isReadonly %}popcorn-rating--input{% endif %}"
-     {% if isInput %}data-popcorn-rating{% endif %}
-     role="{% if isInput and not isReadonly %}group{% else %}img{% endif %}"
-     aria-label="Rating: {{ currentValue }} out of 7">
-
-    {% if isInput %}
+{% if isInput and not isReadonly %}
+    <div class="popcorn-rating-field" data-popcorn-rating>
         <input type="hidden"
                name="{{ name }}"
                value="{{ currentValue }}"
                class="popcorn-rating__value">
-    {% endif %}
 
-    {% for i in 1..7 %}
-        {% set isOn = i <= currentValue %}
+        <div class="popcorn-rating popcorn-rating--input"
+             role="radiogroup"
+             {% if labelId is defined and labelId %}aria-labelledby="{{ labelId }}"{% else %}aria-label="{{ t('popcorn.group_label') }}"{% endif %}>
+            {% for i in 1..7 %}
+                {% set isFocusable = currentValue == i or (currentValue == 0 and i == 1) %}
+                <button type="button"
+                        role="radio"
+                        class="popcorn-rating__item {{ i <= currentValue ? 'popcorn-on' : 'popcorn-off' }}"
+                        data-value="{{ i }}"
+                        aria-checked="{{ currentValue == i ? 'true' : 'false' }}"
+                        aria-label="{{ t('popcorn.value_label', {value: i}) }}"
+                        tabindex="{{ isFocusable ? '0' : '-1' }}">🍿</button>
+            {% endfor %}
+        </div>
 
-        {% if isInput and not isReadonly %}
-            <button type="button"
-                    class="popcorn-rating__item {{ isOn ? 'popcorn-on' : 'popcorn-off' }}"
-                    data-value="{{ i }}"
-                    aria-label="Rate {{ i }} out of 7"
-                    aria-pressed="{{ isOn ? 'true' : 'false' }}">🍿</button>
-        {% else %}
-            <span class="popcorn-rating__item {{ isOn ? 'popcorn-on' : 'popcorn-off' }}"
+        <button type="button" class="popcorn-rating__clear" data-popcorn-clear {% if currentValue == 0 %}hidden{% endif %}>
+            {{ t('popcorn.clear') }}
+        </button>
+    </div>
+{% else %}
+    <div class="popcorn-rating" role="img" aria-label="{{ t('popcorn.display_label', {value: currentValue}) }}">
+        {% for i in 1..7 %}
+            <span class="popcorn-rating__item {{ i <= currentValue ? 'popcorn-on' : 'popcorn-off' }}"
                   aria-hidden="true">🍿</span>
-        {% endif %}
-    {% endfor %}
-</div>
+        {% endfor %}
+    </div>
+{% endif %}

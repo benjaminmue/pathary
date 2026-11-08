@@ -4,49 +4,8 @@
 
 {% block stylesheets %}
 <style>
-    /* ===== Profile design system tokens (--pds-*), scoped to .pds-root =====
-       Default block = dark (app default). Light overrides below via [data-bs-theme].
-       Shared verbatim with the security-tab fragment which nests inside .pds-root. */
-    .pds-root {
-        --pds-gold: #FBBC09;
-        --pds-bg: #15171B;
-        --pds-surface: #1C1F24;
-        --pds-surface-2: #22262C;
-        --pds-border: #2A2E35;
-        --pds-hair: rgba(255, 255, 255, .06);
-        --pds-text: #F2F3F5;
-        --pds-muted: #A9B0BA;
-        --pds-dim: #7A828C;
-        --pds-nav: #101216;
-        --pds-danger: #E5654B;
-        --pds-success: #4FB477;
-        --pds-r: 14px;
-        --pds-r-sm: 8px;
-        --pds-s-sm: 8px;
-        --pds-s-md: 16px;
-        --pds-s-lg: 24px;
-        --pds-font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-        --pds-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
+    /* --pds-* tokens live in public/assets/css/theme.css. */
 
-    [data-bs-theme="light"] .pds-root {
-        --pds-bg: #FFFFFF;
-        --pds-surface: #FBFBFC;
-        --pds-surface-2: #F5F6F8;
-        --pds-border: #E3E6EA;
-        --pds-hair: #EEF0F3;
-        --pds-text: #15171B;
-        --pds-muted: #5B636E;
-        --pds-dim: #8A9099;
-        --pds-nav: #101216;
-        --pds-danger: #C0392B;
-        --pds-success: #198754;
-    }
-
-    .pds-root {
-        color: var(--pds-text);
-        font-family: var(--pds-font);
-    }
 
     .pds-wrap {
         max-width: 860px;
@@ -79,7 +38,7 @@
         justify-content: center;
         font-size: 30px;
         font-weight: 700;
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
         overflow: hidden;
     }
 
@@ -242,7 +201,7 @@
         justify-content: center;
         font-size: 36px;
         font-weight: 700;
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
         overflow: hidden;
     }
 
@@ -289,7 +248,6 @@
         border: 1px solid var(--pds-border);
         border-radius: var(--pds-r-sm);
         padding: 10px 12px;
-        outline: none;
         font-family: inherit;
         box-sizing: border-box;
         transition: border-color .15s, box-shadow .15s;
@@ -651,7 +609,7 @@ console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
 console.log('jQuery available:', typeof $ !== 'undefined');
 </script>
 <script src="{{ applicationUrl }}/js/qrcode.min.js"></script>
-<script src="{{ applicationUrl }}/js/profile-security.js"></script>
+<script src="{{ applicationUrl }}/js/profile-security.js?v={{ assetVersion }}"></script>
 <script>
 // Initialize security tab loader and URL handling
 document.addEventListener('DOMContentLoaded', function() {

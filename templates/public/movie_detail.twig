@@ -1,77 +1,30 @@
 {% extends 'layouts/public_base.twig' %}
 
 {% block title %}{{ movie.title }}{% endblock %}
+{% block description %}{% set text = movie.overview ?: t('meta.description') %}{{ text|length > 200 ? text|slice(0, 197) ~ '...' : text }}{% endblock %}
+{% block og_type %}video.movie{% endblock %}
+{% block og_image %}{{ movie.posterPath ?: applicationUrl ~ '/images/pathary-logo-512x512.png' }}{% endblock %}
 
 {% block stylesheets %}
-<link href="{{ applicationUrl }}/css/lightbox.css" rel="stylesheet">
+<link href="{{ applicationUrl }}/css/lightbox.css?v={{ assetVersion }}" rel="stylesheet">
 <style>
-    /* ===== Movie detail design system tokens (--pds-*), scoped to .pds-root ===== */
-    .pds-root {
-        --pds-gold: #FBBC09;
-        --pds-bg: #15171B;
-        --pds-surface: #1C1F24;
-        --pds-surface-2: #22262C;
-        --pds-border: #2A2E35;
-        --pds-hair: rgba(255, 255, 255, .06);
-        --pds-text: #F2F3F5;
-        --pds-muted: #A9B0BA;
-        --pds-dim: #7A828C;
-        --pds-nav: #101216;
-        --pds-danger: #E5654B;
-        --pds-success: #4FB477;
-        --pds-r: 14px;
-        --pds-r-sm: 8px;
-        --pds-s-xs: 4px;
-        --pds-s-sm: 8px;
-        --pds-s-md: 16px;
-        --pds-s-lg: 24px;
-        --pds-s-xl: 40px;
-        --pds-font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-        --pds-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-
-    [data-bs-theme="light"] .pds-root {
-        --pds-bg: #FFFFFF;
-        --pds-surface: #FBFBFC;
-        --pds-surface-2: #F5F6F8;
-        --pds-border: #E3E6EA;
-        --pds-hair: #EEF0F3;
-        --pds-text: #15171B;
-        --pds-muted: #5B636E;
-        --pds-dim: #8A9099;
-        --pds-danger: #C0392B;
-        --pds-success: #198754;
-    }
-
-    .pds-root {
-        color: var(--pds-text);
-        font-family: var(--pds-font);
-    }
+    /* --pds-* tokens live in public/assets/css/theme.css. */
 
     .pds-mono {
         font-family: var(--pds-font-mono);
     }
 
     /* ===== Hero ===== */
+    /* A flat dark band in both themes (like the nav): the poster carries the colour.
+       Tokens are pinned to their dark values so gold and dim text stay readable. */
     .pds-hero {
+        --pds-gold-text: var(--gold);
+        --pds-dim: #8A919B;
         position: relative;
         overflow: hidden;
+        background: #1C1F24;
         border-bottom: 1px solid var(--pds-hair);
         margin-bottom: var(--pds-s-xl);
-    }
-
-    .pds-hero-backdrop {
-        position: absolute;
-        inset: 0;
-        background-size: cover;
-        background-position: center;
-        filter: blur(40px) brightness(.35) saturate(1.1);
-        transform: scale(1.2);
-        z-index: 0;
-    }
-
-    [data-bs-theme="light"] .pds-hero-backdrop {
-        filter: blur(40px) brightness(.6) saturate(1.1);
     }
 
     .pds-hero-inner {
@@ -93,7 +46,7 @@
     }
 
     .pds-back-link:hover {
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
     }
 
     .pds-hero-body {
@@ -112,12 +65,21 @@
         overflow: hidden;
     }
 
+    .pds-hero-poster .poster-lightbox-trigger {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* The poster clips overflow, so draw the focus ring inside it. */
+    .pds-hero-poster .poster-lightbox-trigger:focus-visible {
+        outline-offset: -3px !important;
+    }
+
     .pds-hero-poster img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
-        cursor: zoom-in;
     }
 
     .pds-hero-poster-placeholder {
@@ -128,7 +90,7 @@
         justify-content: center;
         text-align: center;
         padding: 1rem;
-        background: linear-gradient(135deg, #2a2d33 0%, #3a3a3a 100%);
+        background: #23272D;
         color: #cbd0d7;
         font-size: 14px;
     }
@@ -189,7 +151,7 @@
     .pds-tagline {
         font-size: 15px;
         font-style: italic;
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
         margin: 0;
     }
 
@@ -225,7 +187,7 @@
     }
 
     .pds-rating-help:hover {
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
     }
 
     .pds-ext-row {
@@ -256,7 +218,7 @@
         font-family: var(--pds-font-mono);
         font-size: 16px;
         font-weight: 700;
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
     }
 
     .pds-ext-unit {
@@ -391,7 +353,7 @@
         font-family: var(--pds-font-mono);
         font-size: 18px;
         font-weight: 700;
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
     }
 
     .pds-cast-nophoto-hint {
@@ -432,7 +394,7 @@
     }
 
     .pds-scroll-btn:hover {
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
         border-color: var(--pds-gold);
     }
 
@@ -491,7 +453,15 @@
         flex-direction: column;
     }
 
+    fieldset.rating-form-col {
+        border: 0;
+        margin: 0;
+        padding: 0;
+        min-width: 0;
+    }
+
     .rating-form-col label,
+    .rating-form-label,
     .rating-form-group label {
         display: block;
         font-weight: 600;
@@ -516,9 +486,7 @@
 
     .pds-root select:focus,
     .pds-root textarea:focus {
-        outline: none;
         border-color: var(--pds-gold);
-        box-shadow: 0 0 0 3px rgba(251, 188, 9, .15);
     }
 
     .pds-root select:disabled {
@@ -579,10 +547,32 @@
         background: rgba(192, 57, 43, .08);
     }
 
-    #no-locations-message {
-        margin-top: var(--pds-s-sm);
+    .pds-btn-secondary {
+        background: transparent;
+        border-color: var(--pds-border);
+        color: var(--pds-text);
+    }
+
+    .pds-btn-secondary:hover {
+        border-color: var(--pds-gold);
+    }
+
+    .pds-field-hint,
+    .pds-field-error {
+        margin: var(--pds-s-sm) 0 0;
         font-size: 13px;
+    }
+
+    .pds-field-hint {
         color: var(--pds-muted);
+    }
+
+    .pds-field-hint a {
+        color: var(--pds-gold-text);
+    }
+
+    .pds-field-error {
+        color: var(--pds-danger);
     }
 
     /* ===== Reviews grid ===== */
@@ -696,8 +686,8 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ applicationUrl }}/assets/js/popcorn.js"></script>
-<script src="{{ applicationUrl }}/js/lightbox.js"></script>
+<script src="{{ applicationUrl }}/assets/js/popcorn.js?v={{ assetVersion }}"></script>
+<script src="{{ applicationUrl }}/js/lightbox.js?v={{ assetVersion }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -705,9 +695,6 @@
 
     {# ===== HERO ===== #}
     <div class="pds-hero">
-        {% if movie.posterPath %}
-            <div class="pds-hero-backdrop" style="background-image: url('{{ movie.posterPath }}');"></div>
-        {% endif %}
         <div class="pds-hero-inner">
             <a href="{{ applicationUrl }}/" class="pds-back-link">
                 <i class="bi bi-arrow-left"></i> {{ t('movie.back_to_home') }}
@@ -716,11 +703,13 @@
             <div class="pds-hero-body">
                 <div class="pds-hero-poster">
                     {% if movie.posterPath %}
-                        <img id="moviePoster"
-                             src="{{ movie.posterPath }}"
-                             alt="{{ movie.title }}"
-                             class="poster-clickable"
-                             onclick="openPosterLightbox('{{ movie.posterPath|e('js') }}', '{{ movie.title|e('js') }}')">
+                        <button type="button" class="poster-lightbox-trigger" data-poster-lightbox
+                                data-poster-src="{{ movie.posterPath }}" data-poster-alt="{{ movie.title }}"
+                                aria-label="{{ t('movie.enlarge_poster') }}">
+                            <img id="moviePoster"
+                                 src="{{ movie.posterPath }}"
+                                 alt="{{ movie.title }}">
+                        </button>
                     {% else %}
                         <div class="pds-hero-poster-placeholder">{{ movie.title }}</div>
                     {% endif %}
@@ -814,7 +803,7 @@
         </div>
     </div>
 
-    <main class="pds-main">
+    <div class="pds-main">
 
         {# ===== TMDB FACTS ===== #}
         {% set factStatus = tmdbFacts.status is defined ? tmdbFacts.status : null %}
@@ -889,18 +878,17 @@
                 <div class="pds-section-head">
                     <div style="display: flex; align-items: baseline; gap: var(--pds-s-md);">
                         <h2 class="pds-section-title">{{ t('movie.cast') }}</h2>
-                        <span class="pds-section-count">{{ cast|length }} {{ t('movie.out_of') }} {{ cast|length }}</span>
                     </div>
                     <div class="pds-scroll-btns">
-                        <button type="button" class="pds-scroll-btn" data-cast-scroll="-1" aria-label="{{ t('movie.cast') }}">
-                            <i class="bi bi-chevron-left"></i>
+                        <button type="button" class="pds-scroll-btn" data-cast-scroll="-1" aria-label="{{ t('movie.cast_scroll_prev') }}" aria-controls="castScroll">
+                            <i class="bi bi-chevron-left" aria-hidden="true"></i>
                         </button>
-                        <button type="button" class="pds-scroll-btn" data-cast-scroll="1" aria-label="{{ t('movie.cast') }}">
-                            <i class="bi bi-chevron-right"></i>
+                        <button type="button" class="pds-scroll-btn" data-cast-scroll="1" aria-label="{{ t('movie.cast_scroll_next') }}" aria-controls="castScroll">
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
-                <div class="pds-cast-scroll" id="castScroll">
+                <div class="pds-cast-scroll" id="castScroll" role="region" aria-label="{{ t('movie.cast') }}" tabindex="0">
                     {% for member in cast %}
                         <div class="pds-cast-card">
                             <div class="pds-cast-photo">
@@ -943,32 +931,33 @@
                     <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate" method="post" id="ratingForm">
                         <div class="rating-form-row">
                             <div class="rating-form-col">
-                                <label>{{ t('movie.rating') }}</label>
+                                <span class="rating-form-label" id="ratingLabel">{{ t('movie.rating') }}</span>
                                 {% include 'components/popcorn_rating.twig' with {
                                     valueInt: userRating.rating_popcorn ?? 0,
                                     mode: 'input',
                                     name: 'rating_popcorn',
-                                    readonly: false
+                                    readonly: false,
+                                    labelId: 'ratingLabel'
                                 } %}
                             </div>
 
-                            <div class="rating-form-col">
-                                <label>{{ t('movie.watched_date') }}</label>
+                            <fieldset class="rating-form-col">
+                                <legend class="rating-form-label">{{ t('movie.watched_date') }}</legend>
                                 <div class="date-dropdowns">
-                                    <select name="watched_day" id="watched_day" class="day-select">
+                                    <select name="watched_day" id="watched_day" class="day-select" aria-label="{{ t('movie.day') }}">
                                         <option value="">{{ t('movie.day') }}</option>
                                         {% for d in 1..31 %}
                                             <option value="{{ d }}" {{ (userRating.watched_day ?? '') == d ? 'selected' : '' }}>{{ d }}</option>
                                         {% endfor %}
                                     </select>
-                                    <select name="watched_month" id="watched_month" class="month-select">
+                                    <select name="watched_month" id="watched_month" class="month-select" aria-label="{{ t('movie.month') }}">
                                         <option value="">{{ t('movie.month') }}</option>
                                         {% set months = [t('movie.month_jan'), t('movie.month_feb'), t('movie.month_mar'), t('movie.month_apr'), t('movie.month_may'), t('movie.month_jun'), t('movie.month_jul'), t('movie.month_aug'), t('movie.month_sep'), t('movie.month_oct'), t('movie.month_nov'), t('movie.month_dec')] %}
                                         {% for m in 1..12 %}
                                             <option value="{{ m }}" {{ (userRating.watched_month ?? '') == m ? 'selected' : '' }}>{{ months[m - 1] }}</option>
                                         {% endfor %}
                                     </select>
-                                    <select name="watched_year" id="watched_year" class="year-select">
+                                    <select name="watched_year" id="watched_year" class="year-select" aria-label="{{ t('movie.year') }}">
                                         <option value="">{{ t('movie.year') }}</option>
                                         {% set currentYear = "now"|date("Y") + 1 %}
                                         {% for y in currentYear..1950 %}
@@ -976,16 +965,23 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                            </div>
+                            </fieldset>
 
                             <div class="rating-form-col">
-                                <label>{{ t('movie.location') }}</label>
-                                <select name="location_id" id="location_id">
+                                <label for="location_id">{{ t('movie.location') }}</label>
+                                <select name="location_id" id="location_id" aria-describedby="location-status">
                                     <option value="">{{ t('movie.select_location') }}</option>
                                     <!-- Populated dynamically from database -->
                                 </select>
-                                <div id="no-locations-message" class="alert alert-info" style="display: none;">
-                                    {{ t('movie.no_locations_pre') }}<a href="{{ applicationUrl }}/admin/movies" class="alert-link">{{ t('movie.admin_movies_link') }}</a>{{ t('movie.no_locations_post') }}
+                                <div id="location-status" aria-live="polite">
+                                    <p id="no-locations-message" class="pds-field-hint" hidden>
+                                        {% if currentUserIsAdmin %}
+                                            {{ t('movie.no_locations_pre') }}<a href="{{ applicationUrl }}/admin/movies">{{ t('movie.admin_movies_link') }}</a>{{ t('movie.no_locations_post') }}
+                                        {% else %}
+                                            {{ t('movie.no_locations_user') }}
+                                        {% endif %}
+                                    </p>
+                                    <p id="locations-error-message" class="pds-field-error" hidden>{{ t('movie.locations_load_failed') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -1000,10 +996,10 @@
                 </div>
                 <div class="pds-card-foot">
                     {% if userRating and (userRating.rating_popcorn or userRating.comment or userRating.watched_year or userRating.location_id) %}
-                        <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate/delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete your rating? This action cannot be undone.');">
+                        <form action="{{ applicationUrl }}/movie/{{ movie.id }}/rate/delete" method="post" id="deleteRatingForm" class="d-inline">
                             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="pds-btn pds-btn-danger">
-                                <i class="bi bi-trash"></i> {{ t('movie.delete_rating') }}
+                            <button type="button" class="pds-btn pds-btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRatingModal">
+                                <i class="bi bi-trash" aria-hidden="true"></i> {{ t('movie.delete_rating') }}
                             </button>
                         </form>
                     {% endif %}
@@ -1012,6 +1008,24 @@
                     </button>
                 </div>
             </section>
+
+            {% if userRating %}
+                <div class="modal fade" id="deleteRatingModal" tabindex="-1" aria-labelledby="deleteRatingModalTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title fs-5" id="deleteRatingModalTitle">{{ t('movie.delete_rating') }}</h2>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('common.close') }}"></button>
+                            </div>
+                            <div class="modal-body">{{ t('movie.delete_rating_confirm') }}</div>
+                            <div class="modal-footer">
+                                <button type="button" class="pds-btn pds-btn-secondary" data-bs-dismiss="modal">{{ t('common.cancel') }}</button>
+                                <button type="submit" form="deleteRatingForm" class="pds-btn pds-btn-danger">{{ t('movie.delete_rating') }}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
 
             <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -1071,11 +1085,17 @@
                 // Load locations from database
                 async function loadLocations() {
                     const noLocationsMessage = document.getElementById('no-locations-message');
+                    const errorMessage = document.getElementById('locations-error-message');
+
+                    function showLoadError() {
+                        errorMessage.hidden = false;
+                        locationSelect.setAttribute('aria-invalid', 'true');
+                    }
 
                     try {
                         const response = await fetch('{{ applicationUrl }}/old/settings/locations');
                         if (!response.ok) {
-                            console.error('Failed to load locations');
+                            showLoadError();
                             return;
                         }
 
@@ -1089,10 +1109,10 @@
 
                         // Show message if no locations available
                         if (locations.length === 0) {
-                            noLocationsMessage.style.display = 'block';
+                            noLocationsMessage.hidden = false;
                             locationSelect.disabled = true;
                         } else {
-                            noLocationsMessage.style.display = 'none';
+                            noLocationsMessage.hidden = true;
                             locationSelect.disabled = false;
 
                             // Populate with locations from database
@@ -1107,7 +1127,7 @@
                             });
                         }
                     } catch (error) {
-                        console.error('Error loading locations:', error);
+                        showLoadError();
                     }
                 }
 
@@ -1187,11 +1207,11 @@
                 </div>
             {% endif %}
         </section>
-    </main>
+    </div>
 
     {# Poster Lightbox #}
-    <div id="posterLightbox" class="lightbox-overlay" style="display: none;">
-        <button class="lightbox-close" aria-label="{{ t('movie.close') }}">&times;</button>
+    <div id="posterLightbox" class="lightbox-overlay" role="dialog" aria-modal="true" aria-label="{{ t('movie.poster_dialog') }}" hidden>
+        <button type="button" class="lightbox-close" aria-label="{{ t('movie.close') }}">&times;</button>
         <img id="posterLightboxImage" src="" alt="{{ t('movie.poster_alt') }}" class="lightbox-image">
     </div>
 

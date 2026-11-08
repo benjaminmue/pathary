@@ -4,43 +4,8 @@
 
 {% block stylesheets %}
 <style>
-    /* ===== Search design system tokens (--pds-*), scoped to .pds-root =====
-       Default block = dark (app default). Light overrides below via [data-bs-theme].
-       Values shared verbatim with profile/all_movies/movie_detail/faq. */
-    .pds-root {
-        --pds-gold: #FBBC09;
-        --pds-bg: #15171B;
-        --pds-surface: #1C1F24;
-        --pds-surface-2: #22262C;
-        --pds-border: #2A2E35;
-        --pds-hair: rgba(255, 255, 255, .06);
-        --pds-text: #F2F3F5;
-        --pds-muted: #A9B0BA;
-        --pds-dim: #7A828C;
-        --pds-r: 14px;
-        --pds-r-sm: 8px;
-        --pds-s-sm: 8px;
-        --pds-s-md: 16px;
-        --pds-s-lg: 24px;
-        --pds-font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-        --pds-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
+    /* --pds-* tokens live in public/assets/css/theme.css. */
 
-    [data-bs-theme="light"] .pds-root {
-        --pds-bg: #FFFFFF;
-        --pds-surface: #FBFBFC;
-        --pds-surface-2: #F5F6F8;
-        --pds-border: #E3E6EA;
-        --pds-hair: #EEF0F3;
-        --pds-text: #15171B;
-        --pds-muted: #5B636E;
-        --pds-dim: #8A9099;
-    }
-
-    .pds-root {
-        color: var(--pds-text);
-        font-family: var(--pds-font);
-    }
 
     .search-main {
         width: 100%;
@@ -95,7 +60,6 @@
         border: 1px solid var(--pds-border);
         border-radius: var(--pds-r-sm);
         padding: 13px 40px 13px 16px;
-        outline: none;
         transition: border-color 0.15s ease;
     }
 
@@ -265,7 +229,7 @@
         font-family: var(--pds-font-mono);
         font-size: 34px;
         font-weight: 700;
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
         opacity: 0.85;
     }
 
@@ -331,7 +295,7 @@
         font-family: var(--pds-font);
         font-size: 12px;
         font-weight: 600;
-        color: var(--pds-gold);
+        color: var(--pds-gold-text);
         background: none;
         border: 1px solid var(--pds-gold);
         border-radius: var(--pds-r-sm);
@@ -369,14 +333,16 @@
 
 {% block body %}
 <div class="pds-root" style="background: var(--pds-bg); min-height: 100%;">
-    <main class="search-main">
+    <div class="search-main">
 
         <div class="search-hero">
             <h1>{{ t('search.heading') }}</h1>
             <div class="search-hero__sub">{{ t('search.subtitle') }}</div>
             <form class="search-form" action="{{ applicationUrl }}/search" method="get">
                 <div class="search-field">
+                    <label for="searchQuery" class="visually-hidden">{{ t('nav.search') }}</label>
                     <input type="search"
+                           id="searchQuery"
                            name="q"
                            value="{{ searchTerm }}"
                            placeholder="{{ t('search.placeholder') }}"
@@ -486,6 +452,6 @@
                 <p>{{ t('search.empty_hint') }}</p>
             </div>
         {% endif %}
-    </main>
+    </div>
 </div>
 {% endblock %}

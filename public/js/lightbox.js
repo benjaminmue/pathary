@@ -1,102 +1,106 @@
 /**
- * Poster Lightbox JavaScript
- * Handles opening/closing lightbox for movie posters
+ * Poster lightbox: an accessible modal dialog for the full-size poster.
+ *
+ * Markup contract:
+ *   <button type="button" data-poster-lightbox data-poster-src="..." data-poster-alt="...">...</button>
+ *   <div id="posterLightbox" class="lightbox-overlay" role="dialog" aria-modal="true" aria-label="..." hidden>
+ *       <button type="button" class="lightbox-close" aria-label="...">&times;</button>
+ *       <img id="posterLightboxImage" class="lightbox-image" src="" alt="">
+ *   </div>
+ *
+ * Escape and the close button close the dialog, focus stays on the close
+ * button while it is open (its only control) and returns to the trigger.
  */
-
-(function() {
+(function () {
     'use strict';
 
-    /**
-     * Initialize lightbox functionality
-     * Called when DOM is ready
-     */
-    function initLightbox() {
-        const lightbox = document.getElementById('posterLightbox');
-        const lightboxImage = document.getElementById('posterLightboxImage');
-        const closeButton = document.querySelector('.lightbox-close');
+    let returnFocusTo = null;
 
-        if (!lightbox || !lightboxImage || !closeButton) {
-            console.warn('Lightbox elements not found - lightbox disabled');
+    function elements() {
+        const lightbox = document.getElementById('posterLightbox');
+
+        return {
+            lightbox: lightbox,
+            image: document.getElementById('posterLightboxImage'),
+            closeButton: lightbox ? lightbox.querySelector('.lightbox-close') : null,
+        };
+    }
+
+    function isOpen(lightbox) {
+        return lightbox !== null && lightbox.hidden === false;
+    }
+
+    function openPosterLightbox(posterPath, altText, trigger) {
+        const {lightbox, image, closeButton} = elements();
+        if (!posterPath || !lightbox || !image || !closeButton) {
             return;
         }
 
-        // Close button click
+        // w780 is sharp enough for a full-screen view without loading the original.
+        image.src = posterPath.replace(/\/w\d+\//, '/w780/');
+        image.alt = altText || '';
+
+        returnFocusTo = trigger || document.activeElement;
+        lightbox.hidden = false;
+        document.body.style.overflow = 'hidden';
+        closeButton.focus();
+    }
+
+    function closePosterLightbox() {
+        const {lightbox} = elements();
+        if (!isOpen(lightbox)) {
+            return;
+        }
+
+        lightbox.hidden = true;
+        document.body.style.overflow = '';
+
+        if (returnFocusTo && typeof returnFocusTo.focus === 'function') {
+            returnFocusTo.focus();
+        }
+        returnFocusTo = null;
+    }
+
+    function init() {
+        const {lightbox, image, closeButton} = elements();
+        if (!lightbox || !image || !closeButton) {
+            return;
+        }
+
+        document.querySelectorAll('[data-poster-lightbox]').forEach(function (trigger) {
+            trigger.addEventListener('click', function () {
+                openPosterLightbox(trigger.dataset.posterSrc, trigger.dataset.posterAlt, trigger);
+            });
+        });
+
         closeButton.addEventListener('click', closePosterLightbox);
 
-        // Click outside image to close
-        lightbox.addEventListener('click', function(e) {
-            if (e.target === lightbox) {
+        // A click on the backdrop (not the image) closes the dialog.
+        lightbox.addEventListener('click', function (event) {
+            if (event.target === lightbox) {
                 closePosterLightbox();
             }
         });
 
-        // Escape key to close
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && lightbox.style.display === 'flex') {
-                closePosterLightbox();
+        document.addEventListener('keydown', function (event) {
+            if (!isOpen(lightbox)) {
+                return;
             }
-        });
 
-        // Prevent clicks on image from closing lightbox
-        lightboxImage.addEventListener('click', function(e) {
-            e.stopPropagation();
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                closePosterLightbox();
+            } else if (event.key === 'Tab') {
+                // The close button is the only focusable element: trap focus on it.
+                event.preventDefault();
+                closeButton.focus();
+            }
         });
     }
 
-    /**
-     * Open lightbox with poster image
-     * @param {string} posterPath - TMDB poster path (e.g., /w342/abc123.jpg)
-     * @param {string} altText - Alt text for image (movie title)
-     */
-    window.openPosterLightbox = function(posterPath, altText) {
-        if (!posterPath) {
-            return; // Don't open lightbox for movies without posters
-        }
-
-        const lightbox = document.getElementById('posterLightbox');
-        const lightboxImage = document.getElementById('posterLightboxImage');
-
-        if (!lightbox || !lightboxImage) {
-            console.error('Lightbox elements not found');
-            return;
-        }
-
-        // Convert poster path to w780 size for good quality without being too large
-        const fullSizePoster = posterPath.replace(/\/w\d+\//, '/w780/');
-
-        // Set image source and alt text
-        lightboxImage.src = fullSizePoster;
-        lightboxImage.alt = altText || 'Movie Poster';
-
-        // Show lightbox
-        lightbox.style.display = 'flex';
-
-        // Prevent body scroll
-        document.body.style.overflow = 'hidden';
-    };
-
-    /**
-     * Close lightbox
-     */
-    window.closePosterLightbox = function() {
-        const lightbox = document.getElementById('posterLightbox');
-
-        if (!lightbox) {
-            return;
-        }
-
-        // Hide lightbox
-        lightbox.style.display = 'none';
-
-        // Restore body scroll
-        document.body.style.overflow = '';
-    };
-
-    // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initLightbox);
+        document.addEventListener('DOMContentLoaded', init);
     } else {
-        initLightbox();
+        init();
     }
-
 })();
