@@ -351,7 +351,8 @@ class ProfileSecurityController
     public function getSecurityEvents(Request $request) : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();
-        $limit = (int)($request->getGetParameters()['limit'] ?? 20);
+        // Bounded: the limit drives a database query (fetching three times as many rows).
+        $limit = max(1, min(100, (int)($request->getGetParameters()['limit'] ?? 20)));
 
         // Get events but fetch more to account for filtering
         $allEvents = $this->securityAuditService->getRecentEvents($userId, $limit * 3);
