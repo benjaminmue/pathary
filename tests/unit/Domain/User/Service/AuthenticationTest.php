@@ -8,9 +8,12 @@ use Movary\Domain\User\Service\SecurityAuditService;
 use Movary\Domain\User\Service\TrustedDeviceService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
+use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
 use Movary\Util\SessionWrapper;
+use Movary\ValueObject\Http\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -35,11 +38,49 @@ class AuthenticationTest extends TestCase
         self::assertSame(90, $maxAgeInDays);
     }
 
-    private function createSubject(UserRepository&MockObject $repository) : Authentication
+    /**
+     * Privacy levels: 0 = only the owner, 1 = any logged-in user, 2 = public.
+     *
+     * @return iterable<string, array{int, ?int, bool}>
+     */
+    public static function visibilityProvider() : iterable
+    {
+        yield 'private page, owner' => [0, 7, true];
+        yield 'private page, other user' => [0, 8, false];
+        yield 'private page, anonymous' => [0, null, false];
+        yield 'users-only page, other user' => [1, 8, true];
+        yield 'users-only page, anonymous' => [1, null, false];
+        yield 'public page, anonymous' => [2, null, true];
+    }
+
+    #[DataProvider('visibilityProvider')]
+    public function testUserPageVisibilityForApiRequests(int $privacyLevel, ?int $requestingUserId, bool $isVisible) : void
+    {
+        $targetUser = $this->createStub(UserEntity::class);
+        $targetUser->method('getId')->willReturn(7);
+        $targetUser->method('getPrivacyLevel')->willReturn($privacyLevel);
+
+        $requestingUser = $this->createStub(UserEntity::class);
+        $requestingUser->method('getId')->willReturn((int)$requestingUserId);
+
+        // API token sent in the X-Movary-Token header; valid only for a requesting user.
+        $userApi = $this->createStub(UserApi::class);
+        $userApi->method('findUserIdByApiToken')->willReturn($requestingUserId);
+        $userApi->method('findByToken')->willReturn($requestingUserId === null ? null : $requestingUser);
+
+        $request = $this->createStub(Request::class);
+        $request->method('getHeaders')->willReturn(['X-Movary-Token' => 'api-token']);
+
+        $subject = $this->createSubject($this->createStub(UserRepository::class), $userApi);
+
+        self::assertSame($isVisible, $subject->isUserPageVisibleForApiRequest($request, $targetUser));
+    }
+
+    private function createSubject(UserRepository $repository, ?UserApi $userApi = null) : Authentication
     {
         return new Authentication(
             $repository,
-            $this->createStub(UserApi::class),
+            $userApi ?? $this->createStub(UserApi::class),
             $this->createStub(SessionWrapper::class),
             $this->createStub(TwoFactorAuthenticationApi::class),
             $this->createStub(RecoveryCodeService::class),
