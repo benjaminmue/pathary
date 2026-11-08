@@ -5,31 +5,22 @@ namespace Movary\HttpController\Web\Middleware;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\SecurityAuditService;
 use Movary\Service\RateLimiter;
+use Movary\Util\Json;
 use Movary\Util\RequestContext;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
+use RuntimeException;
 
 /**
- * Rate limiting middleware to prevent abuse of sensitive endpoints
+ * Rate limiting middleware for sensitive endpoints. Returns HTTP 429 when the limit
+ * of the route's policy is exceeded.
  *
- * Tracks requests per user or IP address with configurable limits
- * Returns HTTP 429 when rate limit is exceeded
+ * Routes declare their bucket explicitly by using one of the concrete subclasses
+ * (e.g. RateLimitedPasswordChange); see RateLimitPolicy for the limits.
  */
-class RateLimited implements MiddlewareInterface
+abstract class RateLimited implements MiddlewareInterface
 {
-    // Default rate limits (can be overridden via environment variables)
-    private const int DEFAULT_PASSWORD_CHANGE_MAX = 5;
-    private const int DEFAULT_PASSWORD_CHANGE_WINDOW = 300; // 5 minutes
-
-    private const int DEFAULT_USER_CREATE_MAX = 10;
-    private const int DEFAULT_USER_CREATE_WINDOW = 60; // 1 minute
-
-    private const int DEFAULT_OAUTH_CALLBACK_MAX = 10;
-    private const int DEFAULT_OAUTH_CALLBACK_WINDOW = 600; // 10 minutes
-
-    private const int DEFAULT_TEST_EMAIL_MAX = 5;
-    private const int DEFAULT_TEST_EMAIL_WINDOW = 300; // 5 minutes
-
     public function __construct(
         private readonly RateLimiter $rateLimiter,
         private readonly Authentication $authenticationService,
@@ -37,189 +28,82 @@ class RateLimited implements MiddlewareInterface
     ) {
     }
 
-    /**
-     * Apply rate limiting to the request
-     *
-     * Usage in routes.php:
-     * - For password endpoints: will use user ID as key
-     * - For OAuth endpoints: will use IP address as key
-     *
-     * The middleware automatically detects the endpoint type from the path
-     *
-     * Returns null to allow request to proceed, or Response to block with HTTP 429
-     */
+    abstract protected function policy() : RateLimitPolicy;
+
     public function __invoke(Request $request) : ?Response
     {
-        $path = $request->getPath();
+        $policy = $this->policy();
+        $userId = $this->findUserId();
+        $limitKey = $policy->isPerUser() === true
+            ? $policy->value . '_user_' . $userId
+            : $policy->value . '_ip_' . RequestContext::clientIp();
 
-        // Determine rate limit configuration based on endpoint
-        [$limitKey, $maxAttempts, $windowSeconds, $limitType] = $this->getRateLimitConfig($path);
-
-        // Check rate limit
-        if (!$this->rateLimiter->isAllowed($limitKey, $maxAttempts, $windowSeconds)) {
-            // Get time until reset for Retry-After header
-            $retryAfter = $this->rateLimiter->getTimeUntilReset($limitKey, $windowSeconds);
-
-            // Log rate limit violation
-            $this->logRateLimitViolation($path, $limitKey, $limitType);
-
-            // Return 429 Too Many Requests
-            return $this->createRateLimitExceededResponse($retryAfter, $maxAttempts, $windowSeconds);
+        if ($this->rateLimiter->isAllowed($limitKey, $policy->maxAttempts(), $policy->windowSeconds()) === true) {
+            return null;
         }
 
-        // Rate limit not exceeded, proceed to next middleware/controller
-        return null;
+        $this->logRateLimitViolation($request->getPath(), $limitKey, $policy, $userId);
+
+        return $this->createRateLimitExceededResponse(
+            $this->rateLimiter->getTimeUntilReset($limitKey, $policy->windowSeconds()),
+            $policy,
+        );
     }
 
     /**
-     * Get rate limit configuration for the current request
-     *
-     * @return array [key, maxAttempts, windowSeconds, limitType]
+     * Returns 0 for anonymous requests.
      */
-    private function getRateLimitConfig(string $path): array
+    private function findUserId() : int
     {
-        // Password change endpoint (user-based)
-        if (str_contains($path, '/password')) {
-            $userId = $this->getUserId();
-            return [
-                "password_change_user_{$userId}",
-                $this->getEnvInt('RATE_LIMIT_PASSWORD_CHANGE_MAX', self::DEFAULT_PASSWORD_CHANGE_MAX),
-                $this->getEnvInt('RATE_LIMIT_PASSWORD_CHANGE_WINDOW', self::DEFAULT_PASSWORD_CHANGE_WINDOW),
-                'user'
-            ];
-        }
-
-        // User creation endpoint (user-based for admin)
-        if (str_contains($path, '/users')) {
-            $userId = $this->getUserId();
-            return [
-                "user_create_admin_{$userId}",
-                $this->getEnvInt('RATE_LIMIT_USER_CREATE_MAX', self::DEFAULT_USER_CREATE_MAX),
-                $this->getEnvInt('RATE_LIMIT_USER_CREATE_WINDOW', self::DEFAULT_USER_CREATE_WINDOW),
-                'user'
-            ];
-        }
-
-        // OAuth callback endpoint (IP-based for security)
-        if (str_contains($path, '/oauth/callback')) {
-            $ip = RequestContext::clientIp();
-            return [
-                "oauth_callback_ip_{$ip}",
-                $this->getEnvInt('RATE_LIMIT_OAUTH_CALLBACK_MAX', self::DEFAULT_OAUTH_CALLBACK_MAX),
-                $this->getEnvInt('RATE_LIMIT_OAUTH_CALLBACK_WINDOW', self::DEFAULT_OAUTH_CALLBACK_WINDOW),
-                'ip'
-            ];
-        }
-
-        // Test email endpoint (user-based)
-        if (str_contains($path, '/email-test')) {
-            $userId = $this->getUserId();
-            return [
-                "test_email_user_{$userId}",
-                $this->getEnvInt('RATE_LIMIT_TEST_EMAIL_MAX', self::DEFAULT_TEST_EMAIL_MAX),
-                $this->getEnvInt('RATE_LIMIT_TEST_EMAIL_WINDOW', self::DEFAULT_TEST_EMAIL_WINDOW),
-                'user'
-            ];
-        }
-
-        // OAuth authorize endpoint (user-based)
-        if (str_contains($path, '/oauth/authorize')) {
-            $userId = $this->getUserId();
-            return [
-                "oauth_authorize_user_{$userId}",
-                $this->getEnvInt('RATE_LIMIT_OAUTH_CALLBACK_MAX', self::DEFAULT_OAUTH_CALLBACK_MAX),
-                $this->getEnvInt('RATE_LIMIT_OAUTH_CALLBACK_WINDOW', self::DEFAULT_OAUTH_CALLBACK_WINDOW),
-                'user'
-            ];
-        }
-
-        // Default fallback (should not be reached in normal operation)
-        $ip = RequestContext::clientIp();
-        return [
-            "default_ip_{$ip}",
-            10,
-            300,
-            'ip'
-        ];
-    }
-
-    /**
-     * Get current authenticated user ID
-     * Returns 0 if user is not authenticated (fallback)
-     */
-    private function getUserId(): int
-    {
-        try {
-            if ($this->authenticationService->isUserAuthenticatedWithCookie()) {
-                return $this->authenticationService->getCurrentUserId();
-            }
-        } catch (\Exception $e) {
-            // User not authenticated, fall through to return fallback ID
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false) {
             return 0;
         }
 
-        return 0;
+        try {
+            return $this->authenticationService->getCurrentUserId();
+        } catch (RuntimeException) {
+            // Stale or broken session: treat as anonymous.
+            return 0;
+        }
     }
 
-    /**
-     * Get integer value from environment variable with fallback
-     */
-    private function getEnvInt(string $key, int $default): int
+    private function logRateLimitViolation(string $path, string $limitKey, RateLimitPolicy $policy, int $userId) : void
     {
-        $value = getenv($key);
-        if ($value === false) {
-            return $default;
+        // The audit log is per user; anonymous violations have no user to attach to.
+        if ($userId === 0) {
+            return;
         }
 
-        return (int)$value;
-    }
-
-    /**
-     * Log rate limit violation to security audit log
-     */
-    private function logRateLimitViolation(string $path, string $limitKey, string $limitType): void
-    {
         try {
-            $userId = $this->getUserId();
-            if ($userId > 0) {
-                $ipAddress = RequestContext::clientIp();
-                $this->securityAuditService->log(
-                    $userId,
-                    'rate_limit_exceeded',
-                    $ipAddress !== 'unknown' ? $ipAddress : null,
-                    null, // userAgent
-                    [
-                        'path' => $path,
-                        'limit_key' => $limitKey,
-                        'limit_type' => $limitType,
-                    ]
-                );
-            }
+            $ipAddress = RequestContext::clientIp();
+            $this->securityAuditService->log(
+                $userId,
+                SecurityAuditService::EVENT_RATE_LIMIT_EXCEEDED,
+                $ipAddress !== 'unknown' ? $ipAddress : null,
+                null,
+                [
+                    'path' => $path,
+                    'limit_key' => $limitKey,
+                    'limit_type' => $policy->isPerUser() === true ? 'user' : 'ip',
+                ],
+            );
         } catch (\Exception $e) {
-            // Silently fail logging to avoid breaking the request
-            // Log to PHP error log instead of breaking the response
+            // Logging must never turn a 429 into a 500.
             error_log('Failed to log rate limit event: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Create HTTP 429 response with Retry-After header
-     */
-    private function createRateLimitExceededResponse(int $retryAfter, int $maxAttempts, int $windowSeconds): Response
+    private function createRateLimitExceededResponse(int $retryAfter, RateLimitPolicy $policy) : Response
     {
-        $minutes = ceil($windowSeconds / 60);
+        $minutes = (int)ceil($policy->windowSeconds() / 60);
         $message = sprintf(
             'Rate limit exceeded. You can make %d requests per %d minute%s. Please try again in %d seconds.',
-            $maxAttempts,
+            $policy->maxAttempts(),
             $minutes,
             $minutes > 1 ? 's' : '',
-            $retryAfter
+            $retryAfter,
         );
 
-        // Return JSON response for better client-side handling
-        return Response::createJson(
-            \Movary\Util\Json::encode(['error' => $message]),
-            \Movary\ValueObject\Http\StatusCode::createTooManyRequests(),
-        );
+        return Response::createJson(Json::encode(['error' => $message]), StatusCode::createTooManyRequests());
     }
 }

@@ -81,7 +81,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     # Profile Security  #
     #####################
     $routes->add('GET', '/profile/security', [Web\ProfileSecurityController::class, 'show'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/profile/security/password', [Web\ProfileSecurityController::class, 'changePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimited::class]);
+    $routes->add('POST', '/profile/security/password', [Web\ProfileSecurityController::class, 'changePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimitedPasswordChange::class]);
     $routes->add('POST', '/profile/security/totp/enable', [Web\ProfileSecurityController::class, 'enableTotp'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/profile/security/totp/verify', [Web\ProfileSecurityController::class, 'verifyAndSaveTotp'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/profile/security/totp/disable', [Web\ProfileSecurityController::class, 'disableTotp'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\CsrfProtection::class]);
@@ -106,7 +106,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\RedirectToInitIfNeeded::class, Web\Middleware\UserIsUnauthenticated::class]);
     $routes->add('GET', '/setup-password', [Web\SetPasswordController::class, 'renderPage'], [Web\Middleware\UserIsUnauthenticated::class]);
-    $routes->add('POST', '/setup-password', [Web\SetPasswordController::class, 'setPassword'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimited::class]);
+    $routes->add('POST', '/setup-password', [Web\SetPasswordController::class, 'setPassword'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimitedPasswordSetup::class]);
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
     // placeholder image generator
     $routes->add('GET', '/images/placeholder/{imageNameBase64Encoded:.+}', [Web\PlaceholderImageController::class, 'renderPlaceholderImage']);
@@ -224,7 +224,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,
         Web\Middleware\CsrfProtection::class,
-        Web\Middleware\RateLimited::class
+        Web\Middleware\RateLimitedUserCreate::class
     ]);
     $routes->add('PUT', '/api/admin/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [
         Web\Middleware\UserIsAuthenticated::class,
@@ -251,7 +251,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,
         Web\Middleware\CsrfProtection::class,
-        Web\Middleware\RateLimited::class
+        Web\Middleware\RateLimitedTestEmail::class
     ]);
     $routes->add('POST', '/api/admin/server/email/diagnose', [Web\SettingsController::class, 'diagnoseSMTP'], [
         Web\Middleware\UserIsAuthenticated::class,
@@ -260,7 +260,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ]);
 
     $routes->add('POST', '/old/settings/account', [Web\SettingsController::class, 'updateGeneral'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
-    $routes->add('POST', '/old/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimited::class]);
+    $routes->add('POST', '/old/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class, Web\Middleware\RateLimitedPasswordChange::class]);
     $routes->add('POST', '/old/settings/account/security/create-totp-uri', [
         Web\TwoFactorAuthenticationController::class,
         'createTotpUri'
