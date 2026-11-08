@@ -36,6 +36,15 @@ on:
         type: string
         default: ''
 
+# Pushes to main build and push :latest. Without this, three quick merges start
+# three builds and whichever finishes last owns :latest, even if it is the
+# oldest commit (happened on 2026-11-08). A newer push to the same ref cancels
+# the older build; release builds (workflow_call with an explicit version)
+# get their own group and are never cancelled by a branch push.
+concurrency:
+  group: docker-image-${{ github.ref }}-${{ inputs.version || 'branch' }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
 env:
   REGISTRY: ghcr.io
   # Override repository name to use 'pathary' branding
