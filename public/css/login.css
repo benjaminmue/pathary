@@ -37,80 +37,6 @@ body.bg-dark,
 }
 
 /* ==========================================================================
-   Popcorn Background Animation (Snowflake-style)
-   ========================================================================== */
-
-.popcorn-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 0;
-}
-
-/* Each popcorn particle */
-.popcorn {
-    position: absolute;
-    top: -50px;
-    user-select: none;
-    pointer-events: none;
-    animation: fall linear infinite, sway ease-in-out infinite;
-    will-change: transform;
-}
-
-@keyframes fall {
-    0% {
-        transform: translateY(-100px);
-    }
-    100% {
-        transform: translateY(calc(100vh + 100px));
-    }
-}
-
-@keyframes sway {
-    0%, 100% {
-        margin-left: 0;
-    }
-    25% {
-        margin-left: 25px;
-    }
-    75% {
-        margin-left: -25px;
-    }
-}
-
-/* Respect reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-    .popcorn {
-        animation: none !important;
-        display: none;
-    }
-
-    .popcorn-bg::before {
-        content: '🍿';
-        position: absolute;
-        top: 20%;
-        left: 15%;
-        font-size: 24px;
-        opacity: 0.08;
-        filter: blur(2px);
-    }
-
-    .popcorn-bg::after {
-        content: '🍿';
-        position: absolute;
-        bottom: 25%;
-        right: 20%;
-        font-size: 28px;
-        opacity: 0.06;
-        filter: blur(3px);
-    }
-}
-
-/* ==========================================================================
    Login Form Layout
    ========================================================================== */
 
@@ -137,9 +63,8 @@ body.bg-dark,
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    background: linear-gradient(145deg, #22262C, #1C1F24);
+    background: #1C1F24;
     border: 1px solid #2A2E35;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 /* Logo container with shadow border effect */
@@ -150,26 +75,6 @@ body.bg-dark,
     justify-content: center;
     width: 170px;
     height: 170px;
-}
-
-/* Shadow border behind the SVG using pseudo-element */
-.login-logo-container::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 160px;
-    height: 160px;
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.08);
-    filter: blur(4px);
-    z-index: 0;
-}
-
-[data-bs-theme="dark"] .login-logo-container::before {
-    background: rgba(0, 0, 0, 0.25);
-    filter: blur(5px);
 }
 
 .login-logo {
