@@ -60,7 +60,7 @@ Built for privacy and control, Pathary runs entirely on your own infrastructure 
 - **OAuth Email Authentication**
   - Gmail OAuth 2.0 integration
   - Microsoft 365 OAuth 2.0 integration
-  - AES-256-CBC encryption for client secrets and refresh tokens
+  - AES-256-GCM encryption for client secrets and refresh tokens
   - Automatic token refresh
   - No SMTP passwords required
 
@@ -262,7 +262,7 @@ See [.env.example](.env.example) for all available configuration options.
 - Security headers (CSP, X-Frame-Options, X-Content-Type-Options)
 - Rate limiting on authentication endpoints
 - HTTPS detection for reverse proxy setups
-- AES-256-CBC encryption for OAuth secrets
+- AES-256-GCM encryption for OAuth secrets ([key handling and rotation](docs/security/encryption-key.md))
 
 ## Development
 

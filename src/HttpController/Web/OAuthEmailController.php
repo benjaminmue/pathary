@@ -443,12 +443,13 @@ class OAuthEmailController
         }
 
         try {
-            // Check if key already exists in environment
-            if ($this->encryptionService->getEncryptionKeySource() === 'environment') {
+            // Never replace an existing key (environment or database): every
+            // secret encrypted with it would become unreadable.
+            if ($this->encryptionService->getEncryptionKeySource() !== 'not_configured') {
                 return Response::create(
                     StatusCode::createBadRequest(),
                     Json::encode([
-                        'error' => 'Encryption key already set in environment. Cannot generate new key.',
+                        'error' => 'An encryption key is already configured. Cannot generate a new key.',
                         'warning' => 'Generating a new key would invalidate existing encrypted data.',
                     ]),
                     [Header::createContentTypeJson()],

@@ -123,6 +123,7 @@ nav:
       - Authentication and Sessions: security/authentication-and-sessions.md
       - Two-Factor Authentication: security/two-factor-authentication.md
       - Password Policy: security/password-policy-and-security.md
+      - Encryption Key: security/encryption-key.md
       - OAuth Email Setup: oauth-email-setup.md
 
   - Operations:

@@ -3,22 +3,33 @@
 namespace Movary\Service;
 
 use Doctrine\DBAL\Connection;
-use Movary\ValueObject\Exception\ConfigNotSetException;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 /**
  * Encryption service for securing sensitive data (OAuth tokens, client secrets)
  *
- * Uses AES-256-CBC with random IVs for maximum security.
- * Key management supports environment variable (production) or database fallback (development).
+ * New values are encrypted with AES-256-GCM (authenticated: tampering is
+ * detected on decrypt) and marked with a "v2:" prefix on the ciphertext.
+ * Values written before that used AES-256-CBC without a MAC; they carry no
+ * prefix and are still decrypted, and get re-encrypted as v2 whenever they are
+ * saved again (e.g. reconnecting OAuth).
+ *
+ * The key comes from ENCRYPTION_KEY (preferred) or, for installs that used
+ * "Generate Encryption Key" in the admin panel, from server_setting. A key in
+ * the database sits next to the data it protects, so using it logs a warning;
+ * move it to ENCRYPTION_KEY (docs/security/encryption-key.md).
  *
  * @security CRITICAL - Handles sensitive OAuth credentials
  */
 class EncryptionService
 {
-    private const string CIPHER_ALGORITHM = 'AES-256-CBC';
+    private const string LEGACY_CIPHER_ALGORITHM = 'aes-256-cbc';
+    private const string CIPHER_ALGORITHM = 'aes-256-gcm';
+    private const string CIPHERTEXT_V2_PREFIX = 'v2:';
     private const int KEY_LENGTH = 32; // 256 bits
-    private const int IV_LENGTH = 16;  // 128 bits for AES
+    private const int NONCE_LENGTH = 12; // 96 bits, the GCM standard nonce size
+    private const int TAG_LENGTH = 16;
     private const string DB_KEY_NAME = 'encryptionKey';
     private const string ENV_KEY_NAME = 'ENCRYPTION_KEY';
 
@@ -26,14 +37,15 @@ class EncryptionService
 
     public function __construct(
         private readonly Connection $dbConnection,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
     /**
-     * Encrypt a plaintext value using AES-256-CBC
+     * Encrypt a plaintext value with AES-256-GCM
      *
      * @param string $plaintext The value to encrypt
-     * @return array{encrypted: string, iv: string} Base64-encoded encrypted value and IV
+     * @return array{encrypted: string, iv: string} "v2:"-prefixed base64 ciphertext+tag and base64 nonce
      * @throws RuntimeException If encryption fails or key is missing
      */
     public function encrypt(string $plaintext) : array
@@ -43,33 +55,27 @@ class EncryptionService
         }
 
         $key = $this->getEncryptionKey();
-        $iv = $this->generateIV();
+        $nonce = $this->generateRandomBytes(self::NONCE_LENGTH);
 
-        $encrypted = openssl_encrypt(
-            $plaintext,
-            self::CIPHER_ALGORITHM,
-            $key,
-            OPENSSL_RAW_DATA,
-            $iv
-        );
-
+        $tag = '';
+        $encrypted = openssl_encrypt($plaintext, self::CIPHER_ALGORITHM, $key, OPENSSL_RAW_DATA, $nonce, $tag, '', self::TAG_LENGTH);
         if ($encrypted === false) {
             throw new RuntimeException('Encryption failed: ' . openssl_error_string());
         }
 
         return [
-            'encrypted' => base64_encode($encrypted),
-            'iv' => base64_encode($iv),
+            'encrypted' => self::CIPHERTEXT_V2_PREFIX . base64_encode($encrypted . $tag),
+            'iv' => base64_encode($nonce),
         ];
     }
 
     /**
-     * Decrypt a previously encrypted value using AES-256-CBC
+     * Decrypt a value produced by encrypt(), current (v2, GCM) or legacy (CBC)
      *
-     * @param string $encryptedBase64 Base64-encoded encrypted value
-     * @param string $ivBase64 Base64-encoded initialization vector
+     * @param string $encryptedBase64 Ciphertext as returned in "encrypted"
+     * @param string $ivBase64 Nonce/IV as returned in "iv"
      * @return string Decrypted plaintext
-     * @throws RuntimeException If decryption fails or key is missing
+     * @throws RuntimeException If decryption or authentication fails, or the key is missing
      */
     public function decrypt(string $encryptedBase64, string $ivBase64) : string
     {
@@ -77,24 +83,31 @@ class EncryptionService
             throw new RuntimeException('Cannot decrypt: encrypted value or IV is empty');
         }
 
-        $key = $this->getEncryptionKey();
-        $encrypted = base64_decode($encryptedBase64, true);
+        $isV2 = str_starts_with($encryptedBase64, self::CIPHERTEXT_V2_PREFIX);
+        $encrypted = base64_decode($isV2 === true ? substr($encryptedBase64, strlen(self::CIPHERTEXT_V2_PREFIX)) : $encryptedBase64, true);
         $iv = base64_decode($ivBase64, true);
 
         if ($encrypted === false || $iv === false) {
             throw new RuntimeException('Invalid base64 encoding in encrypted data or IV');
         }
 
-        $decrypted = openssl_decrypt(
-            $encrypted,
-            self::CIPHER_ALGORITHM,
-            $key,
-            OPENSSL_RAW_DATA,
-            $iv
-        );
+        $key = $this->getEncryptionKey();
+
+        if ($isV2 === true) {
+            if (strlen($encrypted) < self::TAG_LENGTH || strlen($iv) !== self::NONCE_LENGTH) {
+                throw new RuntimeException('Decryption failed: malformed ciphertext');
+            }
+
+            $tag = substr($encrypted, -self::TAG_LENGTH);
+            $ciphertext = substr($encrypted, 0, -self::TAG_LENGTH);
+            $decrypted = openssl_decrypt($ciphertext, self::CIPHER_ALGORITHM, $key, OPENSSL_RAW_DATA, $iv, $tag);
+        } else {
+            $decrypted = openssl_decrypt($encrypted, self::LEGACY_CIPHER_ALGORITHM, $key, OPENSSL_RAW_DATA, $iv);
+        }
 
         if ($decrypted === false) {
-            throw new RuntimeException('Decryption failed: ' . openssl_error_string());
+            // Deliberately vague: wrong key and tampered data look the same.
+            throw new RuntimeException('Decryption failed: wrong key or corrupted data');
         }
 
         return $decrypted;
@@ -134,21 +147,23 @@ class EncryptionService
     }
 
     /**
-     * Generate and store a new encryption key in database (development only)
+     * Generate and store a new encryption key in the database, for installs
+     * without ENCRYPTION_KEY
      *
      * @return string The generated key (base64 encoded)
-     * @throws RuntimeException If key already exists in environment (safety check)
+     * @throws RuntimeException If any key is already configured: replacing it
+     *     would make every stored secret undecryptable
      */
     public function generateAndStoreKey() : string
     {
-        if ($this->isKeyInEnvironment()) {
+        if ($this->isKeyInEnvironment() === true || $this->isKeyInDatabase() === true) {
             throw new RuntimeException(
-                'Encryption key already set in environment. ' .
-                'Cannot generate new key - this would invalidate existing encrypted data.'
+                'An encryption key is already configured. ' .
+                'Generating a new key would make existing encrypted data unreadable; see docs/security/encryption-key.md to rotate it.'
             );
         }
 
-        $key = $this->generateSecureKey();
+        $key = $this->generateRandomBytes(self::KEY_LENGTH);
         $this->storeKeyInDatabase($key);
 
         // Clear cached key to force reload
@@ -160,22 +175,11 @@ class EncryptionService
     /**
      * Validate encryption key format and strength
      *
-     * @param string $keyBase64 Base64-encoded encryption key
-     * @return bool True if valid
+     * @param string $encodedKey 32 random bytes, base64 (openssl rand -base64 32) or hex (openssl rand -hex 32)
      */
-    public function validateKey(string $keyBase64) : bool
+    public function validateKey(string $encodedKey) : bool
     {
-        $key = base64_decode($keyBase64, true);
-
-        if ($key === false) {
-            return false;
-        }
-
-        if (strlen($key) !== self::KEY_LENGTH) {
-            return false;
-        }
-
-        return true;
+        return $this->decodeKey($encodedKey) !== null;
     }
 
     /**
@@ -191,34 +195,33 @@ class EncryptionService
             return $this->encryptionKey;
         }
 
-        // Try environment first (production)
-        $keyBase64 = getenv(self::ENV_KEY_NAME);
-        if ($keyBase64 !== false && trim($keyBase64) !== '') {
-            $key = base64_decode($keyBase64, true);
-
-            if ($key === false || strlen($key) !== self::KEY_LENGTH) {
+        $encodedKey = getenv(self::ENV_KEY_NAME);
+        if ($encodedKey !== false && trim($encodedKey) !== '') {
+            $key = $this->decodeKey($encodedKey);
+            if ($key === null) {
                 throw new RuntimeException(
                     'Invalid encryption key in environment. ' .
-                    'Key must be 32 bytes (256 bits) base64-encoded. ' .
+                    'ENCRYPTION_KEY must be 32 random bytes, base64 or hex encoded. ' .
                     'Generate with: openssl rand -base64 32'
                 );
             }
 
-            $this->encryptionKey = $key;
-            return $key;
+            return $this->encryptionKey = $key;
         }
 
-        // Fallback to database (development)
         $keyFromDb = $this->fetchKeyFromDatabase();
         if ($keyFromDb !== null) {
-            $key = base64_decode($keyFromDb, true);
-
-            if ($key === false || strlen($key) !== self::KEY_LENGTH) {
+            $key = $this->decodeKey($keyFromDb);
+            if ($key === null) {
                 throw new RuntimeException('Corrupted encryption key in database');
             }
 
-            $this->encryptionKey = $key;
-            return $key;
+            $this->logger->warning(
+                'Encryption key is read from the database, next to the data it protects. ' .
+                'Copy it into the ENCRYPTION_KEY environment variable (docs/security/encryption-key.md).',
+            );
+
+            return $this->encryptionKey = $key;
         }
 
         throw new RuntimeException(
@@ -226,6 +229,21 @@ class EncryptionService
             'Set ENCRYPTION_KEY environment variable or generate a key via admin panel. ' .
             'Generate with: openssl rand -base64 32'
         );
+    }
+
+    /**
+     * Accepts hex first: a 64 character hex string is also valid base64, but
+     * would decode to 48 bytes there and be rejected.
+     *
+     * @return string|null Binary key, null if the value is not 32 bytes in either encoding
+     */
+    private function decodeKey(string $encodedKey) : ?string
+    {
+        $encodedKey = trim($encodedKey);
+
+        $key = preg_match('/^[0-9a-f]{64}$/i', $encodedKey) === 1 ? hex2bin($encodedKey) : base64_decode($encodedKey, true);
+
+        return $key !== false && strlen($key) === self::KEY_LENGTH ? $key : null;
     }
 
     /**
@@ -277,32 +295,15 @@ class EncryptionService
     }
 
     /**
-     * Generate a cryptographically secure encryption key
-     *
-     * @return string Binary key (32 bytes)
+     * @param int<1, max> $length
      * @throws RuntimeException If random_bytes fails
      */
-    private function generateSecureKey() : string
+    private function generateRandomBytes(int $length) : string
     {
         try {
-            return random_bytes(self::KEY_LENGTH);
+            return random_bytes($length);
         } catch (\Exception $e) {
-            throw new RuntimeException('Failed to generate secure random key: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Generate a cryptographically secure initialization vector
-     *
-     * @return string Binary IV (16 bytes)
-     * @throws RuntimeException If random_bytes fails
-     */
-    private function generateIV() : string
-    {
-        try {
-            return random_bytes(self::IV_LENGTH);
-        } catch (\Exception $e) {
-            throw new RuntimeException('Failed to generate secure random IV: ' . $e->getMessage());
+            throw new RuntimeException('Failed to generate secure random bytes: ' . $e->getMessage());
         }
     }
 }

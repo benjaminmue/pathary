@@ -21,10 +21,10 @@ Create a dedicated `oauth_email_config` table instead of using `server_setting` 
 | `id` | INTEGER | INT(10) UNSIGNED | NO | Primary key, auto-increment |
 | `provider` | TEXT | VARCHAR(50) | NO | OAuth provider: 'gmail' or 'microsoft' |
 | `client_id` | TEXT | VARCHAR(255) | NO | Public OAuth client identifier |
-| `client_secret_encrypted` | TEXT | TEXT | NO | Encrypted client secret (AES-256-CBC + base64) |
+| `client_secret_encrypted` | TEXT | TEXT | NO | Encrypted client secret (AES-256-GCM, see below) |
 | `client_secret_iv` | TEXT | VARCHAR(255) | NO | Initialization vector for client_secret decryption |
 | `tenant_id` | TEXT | VARCHAR(255) | YES | Microsoft only: Azure AD tenant ID |
-| `refresh_token_encrypted` | TEXT | TEXT | YES | Encrypted refresh token (AES-256-CBC + base64) |
+| `refresh_token_encrypted` | TEXT | TEXT | YES | Encrypted refresh token (AES-256-GCM, see below) |
 | `refresh_token_iv` | TEXT | VARCHAR(255) | YES | Initialization vector for refresh_token decryption |
 | `from_address` | TEXT | VARCHAR(255) | NO | Email address to send from (must match OAuth account) |
 | `scopes` | TEXT | VARCHAR(500) | YES | OAuth scopes granted (space-separated) |
@@ -58,14 +58,15 @@ Add to `server_setting` table:
 ## Encryption Strategy
 
 ### Encryption Algorithm
-- **Algorithm:** AES-256-CBC
-- **Key Source:** `ENCRYPTION_KEY` environment variable (32 bytes)
-- **IV Storage:** Separate column for each encrypted field
-- **Format:** `base64_encode(openssl_encrypt($plaintext, 'AES-256-CBC', $key, 0, $iv))`
+- **Algorithm:** AES-256-GCM (values written before were AES-256-CBC and are still readable)
+- **Key Source:** `ENCRYPTION_KEY` environment variable (32 bytes, base64 or hex)
+- **Nonce Storage:** Separate `*_iv` column for each encrypted field
+- **Format:** `'v2:' . base64_encode($ciphertext . $tag)`, nonce `base64_encode($nonce)` (12 bytes)
+- **Key handling and rotation:** [security/encryption-key.md](security/encryption-key.md)
 
 ### Key Management
 1. **Production:** Admin must set `ENCRYPTION_KEY` in `.env` or environment
-2. **Development:** Generate random key on first use, store in database
+2. **Fallback:** "Generate Encryption Key" stores a key in the database when none exists; using it logs a warning
 3. **Migration:** Warn if key not set, prevent OAuth configuration until set
 
 ### Encrypted Fields
