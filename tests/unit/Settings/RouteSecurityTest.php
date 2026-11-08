@@ -45,12 +45,6 @@ class RouteSecurityTest extends TestCase
         'POST /api/webhook/jellyfin/{id:.+}' => 'webhook',
         'POST /api/webhook/emby/{id:.+}' => 'webhook',
         'POST /api/webhook/kodi/{id:.+}' => 'webhook',
-
-        // Deprecated webhook listeners behind admin login; media servers cannot send
-        // the session cookie, so these never succeed from a browser-less caller anyway.
-        'POST /old/plex/{id:.+}' => 'deprecated webhook',
-        'POST /old/jellyfin/{id:.+}' => 'deprecated webhook',
-        'POST /old/emby/{id:.+}' => 'deprecated webhook',
     ];
 
     /** @var list<array{method: string, path: string, middleware: list<string>}>|null */
