@@ -59,6 +59,38 @@ class AuthenticationControllerTest extends TestCase
         self::assertStringNotContainsString('freshly-created-token', (string)$response->getBody());
     }
 
+    public function testWebLoginWithoutTwoFactorKeepsSessionAndRedirectsToEnrollment() : void
+    {
+        $this->authenticationService->method('login')->willReturn([
+            'user' => $this->createUser(37),
+            'token' => 'freshly-created-token',
+        ]);
+        $this->twoFactorAuthenticationApi->method('findTotpUri')->with(37)->willReturn(null);
+
+        // An invited user must be able to log in to enroll 2FA, so the web session survives.
+        $this->authenticationService->expects(self::never())->method('deleteToken');
+
+        $response = $this->subject->createToken($this->createTokenRequest(Authentication::PATHARY_WEB_CLIENT));
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        $body = json_decode((string)$response->getBody(), true);
+        self::assertSame(['twoFactorSetupRequired' => true, 'redirectPath' => '/profile/security'], $body);
+    }
+
+    public function testMissingOrNonStringCredentialsAreRejected() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getBody')->willReturn((string)json_encode(['email' => ['array'], 'password' => 'secret']));
+        $request->method('getHeaders')->willReturn(['X-Movary-Client' => 'test-client']);
+
+        $this->authenticationService->expects(self::never())->method('login');
+
+        $response = $this->subject->createToken($request);
+
+        self::assertSame(400, $response->getStatusCode()->getCode());
+        self::assertStringContainsString('MissingCredentials', (string)$response->getBody());
+    }
+
     public function testCreateTokenIssuesTokenForUserWithTwoFactor() : void
     {
         $this->authenticationService->method('login')->willReturn([
@@ -125,14 +157,14 @@ class AuthenticationControllerTest extends TestCase
         return $user;
     }
 
-    private function createTokenRequest() : Request&MockObject
+    private function createTokenRequest(string $client = 'test-client') : Request&MockObject
     {
         $request = $this->createMock(Request::class);
         $request->method('getBody')->willReturn((string)json_encode([
             'email' => 'user@example.com',
             'password' => 'secret',
         ]));
-        $request->method('getHeaders')->willReturn(['X-Movary-Client' => 'test-client']);
+        $request->method('getHeaders')->willReturn(['X-Movary-Client' => $client]);
         $request->method('getUserAgent')->willReturn('test-agent');
 
         return $request;

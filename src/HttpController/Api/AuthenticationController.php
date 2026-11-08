@@ -106,21 +106,8 @@ class AuthenticationController
 
         $user = $userAndAuthToken['user'];
 
-        // Two-factor authentication is mandatory. The API cannot run the TOTP
-        // enrollment flow (that needs the web QR setup), so a user who has not
-        // set up 2FA yet must not receive an API token. Revoke the token that
-        // was just created and point them at the web setup. (Users who already
-        // have 2FA were verified by login() above.)
         if ($this->twoFactorAuthenticationApi->findTotpUri($user->getId()) === null) {
-            $this->authenticationService->deleteToken($userAndAuthToken['token']);
-
-            return Response::createJson(
-                Json::encode([
-                    'error' => 'TwoFactorSetupRequired',
-                    'message' => 'Two-factor authentication is mandatory. Log in via the web interface to set it up before using the API.',
-                ]),
-                StatusCode::createForbidden(),
-            );
+            return $this->respondToMissingTwoFactorEnrollment($requestClient, $userAndAuthToken['token']);
         }
 
         return Response::createJson(
@@ -132,6 +119,38 @@ class AuthenticationController
                     'isAdmin' => $user->isAdmin(),
                 ]
             ]),
+        );
+    }
+
+    /**
+     * Two-factor authentication is mandatory. (Users who already have 2FA were verified
+     * by login().) A user who has not enrolled yet, e.g. a freshly invited one, can only
+     * do so in the web interface:
+     * - web client: keep the cookie session that login() created and send the user to
+     *   the enrollment page; UserIsAuthenticated confines the session to
+     *   /profile/security until 2FA is set up.
+     * - API clients cannot run the QR enrollment, so the token just created is revoked
+     *   and the client is pointed at the web setup.
+     */
+    private function respondToMissingTwoFactorEnrollment(string $requestClient, string $token) : Response
+    {
+        if ($requestClient === Authentication::PATHARY_WEB_CLIENT) {
+            return Response::createJson(
+                Json::encode([
+                    'twoFactorSetupRequired' => true,
+                    'redirectPath' => '/profile/security',
+                ]),
+            );
+        }
+
+        $this->authenticationService->deleteToken($token);
+
+        return Response::createJson(
+            Json::encode([
+                'error' => 'TwoFactorSetupRequired',
+                'message' => 'Two-factor authentication is mandatory. Log in via the web interface to set it up before using the API.',
+            ]),
+            StatusCode::createForbidden(),
         );
     }
 
