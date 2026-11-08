@@ -180,6 +180,15 @@ class Factory
         return new GuzzleHttp\Client(['timeout' => 4]);
     }
 
+    public static function createRuntimeHealthService(ContainerInterface $container, Config $config) : Service\Health\RuntimeHealthService
+    {
+        return new Service\Health\RuntimeHealthService(
+            $container->get(DBAL\Connection::class),
+            self::createDirectoryAppRoot() . 'db/migrations/' . self::getDatabaseMode($config),
+            self::createDirectoryStorage(),
+        );
+    }
+
     public static function createImageCacheService(ContainerInterface $container) : ImageCacheService
     {
         return new ImageCacheService(

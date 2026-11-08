@@ -9,6 +9,10 @@ use Movary\Service\Router\RouterService;
 return function (FastRoute\RouteCollector $routeCollector) {
     $routerService = new RouterService();
 
+    // Registered outside the web group on purpose: probes must not start a
+    // session or hit any auth/setup middleware.
+    $routeCollector->addRoute('GET', '/healthz', ['handler' => [Web\HealthzController::class, 'check'], 'middleware' => []]);
+
     $routeCollector->addGroup('', fn($routeCollector) => addWebRoutes($routerService, $routeCollector));
     $routeCollector->addGroup('/api', fn($routeCollector) => addApiRoutes($routerService, $routeCollector));
 };
