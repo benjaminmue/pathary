@@ -166,27 +166,35 @@ check_fresh_install_redirects_to_init() {
     pass "GET /init returned 200"
 }
 
-# Prints a 6-digit TOTP code for an otpauth:// URI, computed with the app's own
-# OTP library so period/digits/algorithm always match. Waits for the next time
-# step when the code starts with 0: the token endpoint casts the code to int and
-# would drop the leading zero.
+# Prints the current 6-digit TOTP code for an otpauth:// URI, computed with the
+# app's own OTP library so period/digits/algorithm always match. Codes with a
+# leading zero are sent as-is: they must verify (regression test for the former
+# int cast in the token endpoint).
 totp_code() {
-    local uri="$1" code
-    while true; do
-        code=$(docker exec "$APP" php -r 'require "/app/vendor/autoload.php"; echo OTPHP\Factory::loadFromProvisioningUri($argv[1])->now();' "$uri")
-        case "$code" in
-            0*) sleep 5 ;;
-            *) printf '%s' "$code"; return 0 ;;
-        esac
-    done
+    docker exec "$APP" php -r 'require "/app/vendor/autoload.php"; echo OTPHP\Factory::loadFromProvisioningUri($argv[1])->now();' "$1"
 }
 
+# The wizard is CSRF-protected: every step carries the token from the
+# csrf-token meta tag of /init, like public/js/init-wizard.js does.
+INIT_CSRF=""
+
 init_post() {
-    http -X POST -H 'Content-Type: application/json' --data "$1" "$BASE_URL/init/create-admin"
+    http -X POST -H 'Content-Type: application/json' \
+        --data "$(printf '%s' "$1" | jq -c --arg c "$INIT_CSRF" '. + {_csrf_token: $c}')" \
+        "$BASE_URL/init/create-admin"
 }
 
 run_init_wizard() {
     local response totp_uri
+    INIT_CSRF=$(http "$BASE_URL/init" | sed -n 's/.*<meta name="csrf-token" content="\([^"]*\)".*/\1/p' | head -n1)
+    [ -n "$INIT_CSRF" ] || fail "/init carries no csrf-token meta tag"
+
+    # Without the token the wizard must refuse to create an account.
+    [ "$(http -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' \
+        --data '{"step":"create_account"}' "$BASE_URL/init/create-admin")" = "403" ] \
+        || fail "init wizard accepted a request without CSRF token"
+    pass "init wizard rejects requests without CSRF token"
+
     response=$(init_post "$(jq -nc --arg e "$ADMIN_EMAIL" --arg n "$ADMIN_NAME" --arg p "$ADMIN_PASSWORD" \
         '{step: "create_account", email: $e, name: $n, password: $p, passwordConfirmation: $p}')")
     [ "$(printf '%s' "$response" | jq -r '.success // empty')" = "true" ] || fail "init create_account: $response"
