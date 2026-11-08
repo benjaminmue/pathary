@@ -56,12 +56,10 @@ class SessionWrapper
     public function start() : void
     {
         if (session_status() === PHP_SESSION_NONE) {
-            $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-
             session_set_cookie_params([
                 'lifetime' => 0,
                 'path' => '/',
-                'secure' => $isSecure,
+                'secure' => RequestContext::isHttps(),
                 'httponly' => true,
                 'samesite' => 'Lax',
             ]);

@@ -11,6 +11,7 @@ use Movary\Domain\User\Repository\TrustedDeviceRepository;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
+use Movary\Util\RequestContext;
 use Movary\Util\SessionWrapper;
 use Movary\Util\TrustedDeviceCookie;
 use Movary\ValueObject\DateTime;
@@ -201,21 +202,7 @@ class Authentication
         }
 
         if (empty($token) === false) {
-            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-
-            $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-
-            setcookie(
-                self::AUTHENTICATION_COOKIE_NAME,
-                '',
-                [
-                    'expires' => 1,
-                    'path' => '/',
-                    'secure' => $isSecure,
-                    'httponly' => true,
-                    'samesite' => 'Lax',
-                ],
-            );
+            $this->clearAuthenticationCookie();
         }
 
         return false;
@@ -323,22 +310,7 @@ class Authentication
 
         if ($token !== '') {
             $this->deleteToken($token);
-            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-
-            $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-
-            // Clear cookie with same options used when setting it
-            setcookie(
-                self::AUTHENTICATION_COOKIE_NAME,
-                '',
-                [
-                    'expires' => 1, // Past timestamp to delete
-                    'path' => '/',
-                    'secure' => $isSecure,
-                    'httponly' => true,
-                    'samesite' => 'Lax',
-                ],
-            );
+            $this->clearAuthenticationCookie();
         }
 
         // Do NOT clear trusted device cookie - it should persist across logout/login
@@ -365,21 +337,32 @@ class Authentication
         // Regenerate session ID to prevent session fixation
         $this->sessionWrapper->regenerateId();
 
-        $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        $this->writeAuthenticationCookie($token, (int)$expirationDate->format('U'));
 
+        $this->sessionWrapper->set('userId', $userId);
+    }
+
+    private function clearAuthenticationCookie() : void
+    {
+        unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
+
+        // A past timestamp deletes the cookie; the other options must match the ones it was set with.
+        $this->writeAuthenticationCookie('', 1);
+    }
+
+    private function writeAuthenticationCookie(string $value, int $expires) : void
+    {
         setcookie(
             self::AUTHENTICATION_COOKIE_NAME,
-            $token,
+            $value,
             [
-                'expires' => (int)$expirationDate->format('U'),
+                'expires' => $expires,
                 'path' => '/',
-                'secure' => $isSecure,
+                'secure' => RequestContext::isHttps(),
                 'httponly' => true,
                 'samesite' => 'Lax',
             ],
         );
-
-        $this->sessionWrapper->set('userId', $userId);
     }
 
     private function isUserPageVisibleForUser(UserEntity $targetUser, ?int $requestUserId) : bool

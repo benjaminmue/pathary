@@ -11,6 +11,7 @@ use Movary\Domain\User\UserApi;
 use Movary\Service\Exception\LoginRateLimitExceeded;
 use Movary\Service\LoginRateLimiterService;
 use Movary\Util\Json;
+use Movary\Util\RequestContext;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -45,7 +46,7 @@ class AuthenticationController
         // Persistent, IP-based brute-force protection. This endpoint is the only
         // login choke point (the web login form posts here too) and runs before
         // authentication, so a session-based limiter would be trivially bypassed.
-        $clientIp = $this->getClientIp();
+        $clientIp = RequestContext::clientIp();
         try {
             $this->loginRateLimiter->ensureNotRateLimited($clientIp);
         } catch (LoginRateLimitExceeded $e) {
@@ -160,19 +161,6 @@ class AuthenticationController
         }
 
         return null;
-    }
-
-    private function getClientIp() : string
-    {
-        // Prefer the real client IP behind a reverse proxy (e.g. NPM), otherwise
-        // fall back to the direct connection address.
-        if (empty($_SERVER['HTTP_X_FORWARDED_FOR']) === false) {
-            $forwardedIps = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-
-            return trim($forwardedIps[0]);
-        }
-
-        return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     }
 
     public function destroyToken(Request $request) : Response

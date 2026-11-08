@@ -5,6 +5,7 @@ namespace Movary\HttpController\Web\Middleware;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\SecurityAuditService;
 use Movary\Service\RateLimiter;
+use Movary\Util\RequestContext;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
@@ -101,7 +102,7 @@ class RateLimited implements MiddlewareInterface
 
         // OAuth callback endpoint (IP-based for security)
         if (str_contains($path, '/oauth/callback')) {
-            $ip = $this->getClientIp();
+            $ip = RequestContext::clientIp();
             return [
                 "oauth_callback_ip_{$ip}",
                 $this->getEnvInt('RATE_LIMIT_OAUTH_CALLBACK_MAX', self::DEFAULT_OAUTH_CALLBACK_MAX),
@@ -133,7 +134,7 @@ class RateLimited implements MiddlewareInterface
         }
 
         // Default fallback (should not be reached in normal operation)
-        $ip = $this->getClientIp();
+        $ip = RequestContext::clientIp();
         return [
             "default_ip_{$ip}",
             10,
@@ -161,22 +162,6 @@ class RateLimited implements MiddlewareInterface
     }
 
     /**
-     * Get client IP address with proxy support
-     * Checks X-Forwarded-For header for reverse proxy scenarios
-     */
-    private function getClientIp(): string
-    {
-        // Check for X-Forwarded-For header (reverse proxy)
-        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            return trim($ips[0]); // First IP is the original client
-        }
-
-        // Fallback to REMOTE_ADDR
-        return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    }
-
-    /**
      * Get integer value from environment variable with fallback
      */
     private function getEnvInt(string $key, int $default): int
@@ -197,7 +182,7 @@ class RateLimited implements MiddlewareInterface
         try {
             $userId = $this->getUserId();
             if ($userId > 0) {
-                $ipAddress = $this->getClientIp();
+                $ipAddress = RequestContext::clientIp();
                 $this->securityAuditService->log(
                     $userId,
                     'rate_limit_exceeded',
