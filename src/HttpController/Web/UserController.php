@@ -2,6 +2,8 @@
 
 namespace Movary\HttpController\Web;
 
+use Doctrine\DBAL\Connection;
+use JsonException;
 use Movary\Domain\User\Exception\EmailNotUnique;
 use Movary\Domain\User\Exception\PasswordPolicyViolation;
 use Movary\Domain\User\Exception\PasswordTooShort;
@@ -29,6 +31,7 @@ class UserController
         private readonly UserInvitationService $invitationService,
         private readonly SecurityAuditService $securityAuditService,
         private readonly LoggerInterface $logger,
+        private readonly Connection $dbConnection,
     ) {
     }
 
@@ -138,7 +141,15 @@ class UserController
         }
 
         // Get user info before deletion for audit logging
-        $targetUser = $this->userApi->fetchUser($userId);
+        $targetUser = $this->userApi->findUserById($userId);
+        if ($targetUser === null) {
+            return Response::createNotFound();
+        }
+
+        if ($this->wouldRemoveLastAdmin($targetUser, false) === true) {
+            return Response::createBadRequest('The last admin cannot be deleted.');
+        }
+
         $targetEmail = $this->userApi->findUserEmail($userId);
 
         // Log user deletion event before deleting
@@ -188,43 +199,30 @@ class UserController
             return Response::createForbidden();
         }
 
-        $requestUserData = Json::decode($request->getBody());
+        $requestUserData = $this->parseUserUpdatePayload($request->getBody());
+        if ($requestUserData === null) {
+            return Response::createBadRequest('Invalid user data: name, email and isAdmin are required, password must be a string or null.');
+        }
 
         // Get user before update to track changes
-        $targetUser = $this->userApi->fetchUser($userId);
+        $targetUser = $this->userApi->findUserById($userId);
+        if ($targetUser === null) {
+            return Response::createNotFound();
+        }
+
+        if ($this->wouldRemoveLastAdmin($targetUser, $requestUserData['isAdmin']) === true) {
+            return Response::createBadRequest('The last admin cannot lose admin rights.');
+        }
 
         $targetEmail = $this->userApi->findUserEmail($userId);
-
-        $changedFields = [];
-        $passwordChanged = false;
-        $adminStatusChanged = false;
         $previousAdminStatus = $targetUser->isAdmin();
 
         try {
-            // Track name changes
-            if ($requestUserData['name'] !== $targetUser->getName()) {
-                $this->userApi->updateName($userId, $requestUserData['name']);
-                $changedFields[] = 'name';
-            }
-
-            // Track email changes
-            if ($requestUserData['email'] !== $targetEmail) {
-                $this->userApi->updateEmail($userId, $requestUserData['email']);
-                $changedFields[] = 'email';
-            }
-
-            // Track admin status changes
-            if ($requestUserData['isAdmin'] !== $targetUser->isAdmin()) {
-                $this->userApi->updateIsAdmin($userId, $requestUserData['isAdmin']);
-                $changedFields[] = 'is_admin';
-                $adminStatusChanged = true;
-            }
-
-            // Track password changes
-            if ($requestUserData['password'] !== null) {
-                $this->userApi->updatePassword($userId, $requestUserData['password']);
-                $passwordChanged = true;
-            }
+            // All-or-nothing: a failing field (e.g. duplicate email) must not leave the
+            // fields before it changed.
+            ['changedFields' => $changedFields, 'passwordChanged' => $passwordChanged] = $this->dbConnection->transactional(
+                fn() => $this->applyUserUpdate($userId, $targetUser, $targetEmail, $requestUserData),
+            );
         } catch (EmailNotUnique) {
             // Log specific error for debugging, but return generic message to prevent user enumeration
             $this->logger->info('User update failed: email already exists', [
@@ -257,17 +255,98 @@ class UserController
             return Response::createBadRequest($e->getMessage());
         }
 
+        if ($passwordChanged === true) {
+            // A reset password must end the sessions of whoever knew the old one.
+            $this->authenticationService->revokeOtherSessionsOfUser($userId);
+        }
+
         $this->logUserUpdate(
             $currentUser,
             $userId,
             $requestUserData,
             $changedFields,
             $passwordChanged,
-            $adminStatusChanged,
+            in_array('is_admin', $changedFields, true),
             $previousAdminStatus,
         );
 
         return Response::createOk();
+    }
+
+    /**
+     * @param array{name: string, email: string, isAdmin: bool, password: ?string} $requestUserData
+     * @return array{changedFields: list<string>, passwordChanged: bool}
+     */
+    private function applyUserUpdate(int $userId, UserEntity $targetUser, ?string $targetEmail, array $requestUserData) : array
+    {
+        $changedFields = [];
+
+        if ($requestUserData['name'] !== $targetUser->getName()) {
+            $this->userApi->updateName($userId, $requestUserData['name']);
+            $changedFields[] = 'name';
+        }
+
+        if ($requestUserData['email'] !== $targetEmail) {
+            $this->userApi->updateEmail($userId, $requestUserData['email']);
+            $changedFields[] = 'email';
+        }
+
+        if ($requestUserData['isAdmin'] !== $targetUser->isAdmin()) {
+            $this->userApi->updateIsAdmin($userId, $requestUserData['isAdmin']);
+            $changedFields[] = 'is_admin';
+        }
+
+        if ($requestUserData['password'] !== null) {
+            $this->userApi->updatePassword($userId, $requestUserData['password']);
+        }
+
+        return ['changedFields' => $changedFields, 'passwordChanged' => $requestUserData['password'] !== null];
+    }
+
+    /**
+     * Validates the JSON body of a user update. Returns null for anything malformed so
+     * the caller answers 400 instead of failing with a TypeError (500).
+     *
+     * @return array{name: string, email: string, isAdmin: bool, password: ?string}|null
+     */
+    private function parseUserUpdatePayload(string $body) : ?array
+    {
+        try {
+            $data = Json::decode($body);
+        } catch (JsonException) {
+            return null;
+        }
+
+        // The password is optional; an empty one means "keep the current password".
+        $password = $data['password'] ?? null;
+        if ($password === '') {
+            $password = null;
+        }
+
+        if (is_string($data['name'] ?? null) === false
+            || is_string($data['email'] ?? null) === false
+            || is_bool($data['isAdmin'] ?? null) === false
+            || ($password !== null && is_string($password) === false)) {
+            return null;
+        }
+
+        return [
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'isAdmin' => $data['isAdmin'],
+            'password' => $password,
+        ];
+    }
+
+    /**
+     * Removing (deleting or demoting) the only remaining admin would lock everyone out
+     * of user and server management.
+     */
+    private function wouldRemoveLastAdmin(UserEntity $targetUser, bool $remainsAdmin) : bool
+    {
+        return $targetUser->isAdmin() === true
+            && $remainsAdmin === false
+            && $this->userApi->countAdminUsers() <= 1;
     }
 
     /**
