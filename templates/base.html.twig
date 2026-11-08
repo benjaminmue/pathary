@@ -1,35 +1,20 @@
 <!DOCTYPE html>
-<html id="html" data-bs-theme="{{ theme }}">
+<html id="html" lang="{{ locale() }}" data-bs-theme="{{ theme }}">
 <head>
-    <!-- Theme initialization (runs before page render to prevent flash) -->
-    <script>
-        (function() {
-            const saved = localStorage.getItem('theme');
-            const theme = saved || 'dark'; // dark is the default; light only if the user toggled it
-            document.documentElement.setAttribute('data-bs-theme', theme);
-        })();
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include 'partials/head_assets.twig' %}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="canonical" href="{{ applicationUrl }}{{ canonicalPath }}{{ canonicalExtra }}" />
 
     <title>{% apply trim %}{% block title %}Pathary{% endblock %}{% endapply %} | {{ applicationName }}</title>
-    <link rel="shortcut icon" href="{{ applicationUrl }}/images/favicon.ico" type="image/x-icon">
 
     <meta property="og:title" content="{{ block('title')|trim }} | {{ applicationName }}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ applicationUrl }}{{ canonicalPath }}{{ canonicalExtra }}" />
     <meta property="og:image" content="{% block ogImage %}{{ applicationUrl }}/images/pathary-logo-512x512.png{% endblock %}" />
-    <meta property="og:description" content="Self hosted web app to track and rate your watched movies" />
+    <meta property="og:description" content="{{ t('meta.description') }}" />
 
-    <link href="{{ applicationUrl }}/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="manifest" href="{{ applicationUrl }}/manifest.json">
-
-    <meta name="theme-color" content="white">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ applicationUrl }}/css/datepicker-1.2.0.min.css">
-    <link rel="stylesheet" href="{{ applicationUrl }}/css/global.css">
+    <link rel="stylesheet" href="{{ applicationUrl }}/css/global.css?v={{ assetVersion }}">
 {% block stylesheets %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -47,11 +32,24 @@
 {% include 'partials/footer.twig' %}
 {% endif %}
 
+{# UI strings for app.js, read through appText(key). #}
+<script type="application/json" id="appI18n">{{ {
+    add_movie: t('app_js.add_movie'),
+    close: t('common.close'),
+    generic_error: t('app_js.generic_error'),
+    locations_load_failed: t('app_js.locations_load_failed'),
+    on_watchlist: t('app_js.on_watchlist'),
+    play_add_failed: t('app_js.play_add_failed'),
+    poster_for: t('app_js.poster_for'),
+    search_timeout: t('app_js.search_timeout'),
+    watched: t('app_js.watched'),
+    watchlist_add_failed: t('app_js.watchlist_add_failed'),
+}|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP'))|raw }}</script>
 <script>window.APPLICATION_URL = "{{ applicationUrl  }}";</script>
 <script src="{{ applicationUrl }}/js/jquery-3.3.1.js"></script>
 <script src="{{ applicationUrl }}/js/bootstrap.bundle.min.js"></script>
 <script src="{{ applicationUrl }}/js/datepicker-full-1.2.0.min.js"></script>
-<script src="{{ applicationUrl }}/js/app.js"></script>
+<script src="{{ applicationUrl }}/js/app.js?v={{ assetVersion }}"></script>
 
 {% block scripts %}{% endblock %}
 </body>
