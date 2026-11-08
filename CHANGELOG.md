@@ -1,5 +1,52 @@
 # Changelog
 
+## [0.7.5](https://github.com/benjaminmue/pathary/compare/v0.7.4...v0.7.5) (2026-11-08)
+
+
+### Features
+
+* **auth:** throttle login attempts per account in addition to per IP ([94cd451](https://github.com/benjaminmue/pathary/commit/94cd45174a48b95735afb3fee22695cce776987a))
+* **console:** add selftest command and load new commands lazily ([b13f3dc](https://github.com/benjaminmue/pathary/commit/b13f3dc6cf2894ec51d25c2d56a6b1b104d19ada))
+* **health:** add unauthenticated /healthz endpoint ([100e293](https://github.com/benjaminmue/pathary/commit/100e293e28d2644bb3dc9c4b2c40492960174e5e))
+* **security:** prune security bookkeeping and stop storing plaintext login IPs ([a0348ae](https://github.com/benjaminmue/pathary/commit/a0348ae53e2afba8dce14eca069374eec75c92a5))
+* **ui:** navigation state, home CTA and empty library state ([3e3f1cf](https://github.com/benjaminmue/pathary/commit/3e3f1cfbb03376ee3f4a224972e5fe918c2e636b))
+* **ui:** self-host Bootstrap Icons and share one layout head ([bfeb96e](https://github.com/benjaminmue/pathary/commit/bfeb96efefd6283b43f80e2fbdc2fc974ab7f064))
+
+
+### Bug Fixes
+
+* **2fa:** keep TOTP codes as strings so codes with a leading zero verify ([191bf50](https://github.com/benjaminmue/pathary/commit/191bf50f1c47324a999907d757959c43429249a6))
+* **a11y:** accessible rating input, poster dialog and form labels ([4a03feb](https://github.com/benjaminmue/pathary/commit/4a03feb683f05f8406a23ba003ad86ef412c272c))
+* **a11y:** single token layer with AA contrast and one gold focus ring ([e789f40](https://github.com/benjaminmue/pathary/commit/e789f400a6af1636718439cc3b9376638d57ccee))
+* **auth:** revoke other sessions on the legacy settings password change ([b7431d9](https://github.com/benjaminmue/pathary/commit/b7431d9067d3bfa0440e3b6d51055d7ea25133c3))
+* **auth:** store session tokens hashed only and revoke sessions on password change ([2aa8c42](https://github.com/benjaminmue/pathary/commit/2aa8c4245e701a2c500212d59a01a1ba911f48ed))
+* **auth:** treat sessions of users without 2FA as anonymous on the API ([487e72d](https://github.com/benjaminmue/pathary/commit/487e72d090da02def78154e77cc750114f1d20f2))
+* **csrf:** protect admin settings API, state-changing GETs and the setup wizard ([4ded64c](https://github.com/benjaminmue/pathary/commit/4ded64c20f80bc6e9be7ae42d561998510c674ea))
+* **db:** refuse to roll back the initial schema migration ([79ffba2](https://github.com/benjaminmue/pathary/commit/79ffba22e4aa81bb88843f8454b9dec9382f47af))
+* **deps:** close 18 security advisories across 6 packages ([9160e37](https://github.com/benjaminmue/pathary/commit/9160e3741d599a133a3b82c12a90d5b34eb53f03))
+* **deps:** update symfony/config and symfony/filesystem ([4415ce2](https://github.com/benjaminmue/pathary/commit/4415ce21b405085ee220bb89bfa872289e6c19ff))
+* **docker:** pin PHP 8.4.27 for CVE-2026-109618/-109619 ([b897254](https://github.com/benjaminmue/pathary/commit/b8972543e46015a2caf032cb01a20d50a8a591b7))
+* **docker:** pin PHP 8.4.27 for CVE-2026-109618/-109619 ([10f690e](https://github.com/benjaminmue/pathary/commit/10f690e6c8fcfc85cd245412ade293a6ea63c2ac))
+* **language:** reject protocol-relative redirect targets after a language switch ([2bc6108](https://github.com/benjaminmue/pathary/commit/2bc6108072d3c3cbc4dab323164cc2f415f873d1))
+* **login:** let users without 2FA log in to enroll, make the login a real form ([9bbb4d8](https://github.com/benjaminmue/pathary/commit/9bbb4d8910c5b96e6c9666f7df69c795cfdd6714))
+* **profile:** clamp the security events limit to 1..100 ([89fd2aa](https://github.com/benjaminmue/pathary/commit/89fd2aa1e3cce20ed56959bf2b5e3fbc57655fb1))
+* **rate-limit:** declare the rate limit bucket per route instead of by path substring ([23af18c](https://github.com/benjaminmue/pathary/commit/23af18c24ca87b5496ae62258a748be9c42d30cc))
+* resolve findings of PHPStan 2.3 ([6d6de38](https://github.com/benjaminmue/pathary/commit/6d6de3858689e80250277b35f3bfadeede5009c0))
+* review findings (auth, ops, frontend) and functional self-tests ([36c88da](https://github.com/benjaminmue/pathary/commit/36c88da62b482abba0b5fd0d1f97cffa5ff32d1d))
+* run composer audit against the lock file ([1fea550](https://github.com/benjaminmue/pathary/commit/1fea550dd143b799719b98e490e3955ebe378bcf))
+* **security:** authenticate stored secrets and never replace an existing key ([b22745d](https://github.com/benjaminmue/pathary/commit/b22745de8f088445b16272db34b58d9a76d80a55))
+* **security:** derive client IP and https only from trusted server variables ([121c9ee](https://github.com/benjaminmue/pathary/commit/121c9eea702df08c4619fb5e1cedc9ffc91c9720))
+* **security:** render untrusted text without innerHTML ([b42655f](https://github.com/benjaminmue/pathary/commit/b42655f782aed9f2e1175f803dd824a9900790b9))
+* **settings:** stop rendering the stored SMTP password into the page ([b510a6e](https://github.com/benjaminmue/pathary/commit/b510a6e2dcdad6af83dc269689d7ba69a597eb23))
+* **ui:** drop jsDelivr from the CSP and the removed login background script ([58aaa20](https://github.com/benjaminmue/pathary/commit/58aaa2084d7db44a54f8f49d3a8c47d095ab079b))
+* **users:** validate admin user updates, keep the last admin, revoke sessions on reset ([8eb2bc7](https://github.com/benjaminmue/pathary/commit/8eb2bc7d8345e1f65f5271c4f2471c8c022f9f1a))
+
+
+### Performance Improvements
+
+* batch home page movie stats and cache compiled Twig templates ([c1b866f](https://github.com/benjaminmue/pathary/commit/c1b866f5fded5876ff3635692aba1ad0ffaa17a5))
+* **oauth:** run OAuth monitoring from cron instead of every web request ([5088bb7](https://github.com/benjaminmue/pathary/commit/5088bb7f1a284bf57fd74a99357fceb68feb9619))
+
 ## [0.7.4](https://github.com/benjaminmue/pathary/compare/v0.7.3...v0.7.4) (2026-07-07)
 
 
