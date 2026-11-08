@@ -28,6 +28,7 @@ $application->add($container->get(Movary\Command\ProcessJobs::class));
 $application->add($container->get(Movary\Command\OmdbSync::class));
 $application->add($container->get(Movary\Command\ScheduledSync::class));
 $application->add($container->get(Movary\Command\OAuthMonitor::class));
+$application->add($container->get(Movary\Command\MaintenancePrune::class));
 $application->add($container->get(Movary\Command\JellyfinCacheDelete::class));
 $application->add($container->get(Movary\Command\JellyfinCacheRefresh::class));
 $application->add($container->get(Movary\Command\JellyfinExport::class));
