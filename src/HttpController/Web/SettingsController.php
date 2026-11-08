@@ -977,6 +977,10 @@ class SettingsController
 
         $this->userApi->updatePassword($userId, $newPassword);
 
+        // Same rule as /profile/security/password: a changed password ends every
+        // other session an attacker may hold; this one stays.
+        $this->authenticationService->revokeOtherSessionsOfUser($userId);
+
         return Response::create(StatusCode::createOk());
     }
 
