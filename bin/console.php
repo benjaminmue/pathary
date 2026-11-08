@@ -27,13 +27,20 @@ $application->add($container->get(Movary\Command\ProcessJobs::class));
 // $application->add($container->get(Movary\Command\ImdbSync::class));
 $application->add($container->get(Movary\Command\OmdbSync::class));
 $application->add($container->get(Movary\Command\ScheduledSync::class));
-$application->add($container->get(Movary\Command\OAuthMonitor::class));
-$application->add($container->get(Movary\Command\MaintenancePrune::class));
 $application->add($container->get(Movary\Command\JellyfinCacheDelete::class));
 $application->add($container->get(Movary\Command\JellyfinCacheRefresh::class));
 $application->add($container->get(Movary\Command\JellyfinExport::class));
 $application->add($container->get(Movary\Command\JellyfinImport::class));
 $application->add($container->get(Movary\Command\MastodonPostPlay::class));
 $application->add($container->get(Movary\Command\MastodonPostWatchlist::class));
+
+// Built only when invoked: OAuthMonitor pulls in the Twig environment, which
+// reads server_setting while being constructed and would break every console
+// call (including database:migration:migrate) on an empty database.
+$application->setCommandLoader(new Symfony\Component\Console\CommandLoader\FactoryCommandLoader([
+    'oauth:monitor' => fn() => $container->get(Movary\Command\OAuthMonitor::class),
+    'maintenance:prune' => fn() => $container->get(Movary\Command\MaintenancePrune::class),
+    'selftest' => fn() => $container->get(Movary\Command\SelfTest::class),
+]));
 
 $application->run();
