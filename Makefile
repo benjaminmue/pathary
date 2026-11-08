@@ -121,3 +121,7 @@ app_mastodon_post_watchlist:
 # Shortcuts
 php: exec_app_bash
 test: composer_test
+
+# End-to-end smoke test of the production image (see scripts/e2e.sh)
+e2e:
+	scripts/e2e.sh

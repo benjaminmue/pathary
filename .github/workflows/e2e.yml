@@ -1,0 +1,30 @@
+# End-to-end smoke test: builds the production image (root Dockerfile), starts
+# it with MySQL 8.0 and runs scripts/e2e.sh (health check, selftest, init
+# wizard, login, security headers, reverse proxy handling). Uses a dummy TMDB
+# key, so nothing external is called.
+
+name: E2E smoke test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Production image smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run scripts/e2e.sh
+        run: scripts/e2e.sh
