@@ -19,6 +19,7 @@ RUN apk upgrade --no-cache && apk add --no-cache \
     php84-pdo_mysql \
     php84-pdo_sqlite \
     php84-mbstring \
+    php84-iconv \
     php84-sqlite3 \
     php84-simplexml \
     php84-pecl-imagick \
