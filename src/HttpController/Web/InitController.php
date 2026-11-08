@@ -2,7 +2,9 @@
 
 namespace Movary\HttpController\Web;
 
+use Movary\Domain\User\Exception\InvalidEmail;
 use Movary\Domain\User\Exception\PasswordPolicyViolation;
+use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Repository\RecoveryCodeRepository;
 use Movary\Domain\User\Service\SecurityAuditService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
@@ -15,6 +17,7 @@ use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use OTPHP\Factory;
+use Psr\Log\LoggerInterface;
 use Twig\Environment;
 
 class InitController
@@ -28,6 +31,7 @@ class InitController
         private readonly TwoFactorAuthenticationFactory $twoFactorAuthenticationFactory,
         private readonly RecoveryCodeRepository $recoveryCodeRepository,
         private readonly SecurityAuditService $securityAuditService,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -38,7 +42,7 @@ class InitController
         // Clear any wizard session data to allow fresh start
         unset($_SESSION['init_user_email']);
         unset($_SESSION['init_user_name']);
-        unset($_SESSION['init_user_password']);
+        unset($_SESSION['init_user_password_hash']);
         unset($_SESSION['init_pending_totp_uri']);
         unset($_SESSION['init_recovery_codes']);
 
@@ -74,10 +78,11 @@ class InitController
 
     private function handleCreateAccount(array $data) : Response
     {
-        $email = $data['email'] ?? '';
-        $name = $data['name'] ?? '';
-        $password = $data['password'] ?? '';
-        $passwordConfirmation = $data['passwordConfirmation'] ?? '';
+        // Non-string JSON values (arrays, numbers) count as missing.
+        [$email, $name, $password, $passwordConfirmation] = array_map(
+            fn(string $field) => is_string($data[$field] ?? null) === true ? $data[$field] : '',
+            ['email', 'name', 'password', 'passwordConfirmation'],
+        );
 
         // Validate inputs
         if (empty($email) || empty($name) || empty($password)) {
@@ -94,24 +99,42 @@ class InitController
             );
         }
 
-        // Validate password policy (without creating user yet)
-        try {
-            $this->validator->ensurePasswordIsValid($password);
-        } catch (PasswordPolicyViolation $e) {
+        // Validate everything up front (without creating the user yet), so the final
+        // step only fails for unexpected reasons.
+        $validationError = $this->validateAccountData($email, $name, $password);
+        if ($validationError !== null) {
             return Response::createJson(
-                Json::encode(['error' => $e->getMessage()]),
+                Json::encode(['error' => $validationError]),
                 StatusCode::createBadRequest()
             );
         }
 
-        // Store user data in session (don't create user in DB yet)
+        // Store user data in session (don't create user in DB yet). Only the password
+        // hash is kept, so the plaintext never ends up in the session storage.
         $_SESSION['init_user_email'] = $email;
         $_SESSION['init_user_name'] = $name;
-        $_SESSION['init_user_password'] = $password;
+        $_SESSION['init_user_password_hash'] = $this->userApi->hashPassword($password);
 
         return Response::createJson(
             Json::encode(['success' => true, 'nextStep' => 'setup_totp'])
         );
+    }
+
+    private function validateAccountData(string $email, string $name, string $password) : ?string
+    {
+        try {
+            $this->validator->ensureEmailIsValid($email);
+            $this->validator->ensureNameFormatIsValid($name);
+            $this->validator->ensurePasswordIsValid($password);
+        } catch (InvalidEmail) {
+            return 'Please enter a valid email address.';
+        } catch (UsernameInvalidFormat) {
+            return 'The username may only contain letters and digits.';
+        } catch (PasswordPolicyViolation $e) {
+            return $e->getMessage();
+        }
+
+        return null;
     }
 
     private function handleSetupTotp() : Response
@@ -213,11 +236,11 @@ class InitController
     {
         $email = $_SESSION['init_user_email'] ?? null;
         $name = $_SESSION['init_user_name'] ?? null;
-        $password = $_SESSION['init_user_password'] ?? null;
+        $passwordHash = $_SESSION['init_user_password_hash'] ?? null;
         $totpUri = $_SESSION['init_pending_totp_uri'] ?? null;
         $recoveryCodes = $_SESSION['init_recovery_codes'] ?? null;
 
-        if ($email === null || $name === null || $password === null || $totpUri === null || $recoveryCodes === null) {
+        if ($email === null || $name === null || $passwordHash === null || $totpUri === null || $recoveryCodes === null) {
             return Response::createJson(
                 Json::encode(['error' => 'Session expired. Please start over.']),
                 StatusCode::createBadRequest()
@@ -226,9 +249,9 @@ class InitController
 
         try {
             // NOW create the user in the database with all data
-            $user = $this->userApi->createUser(
+            $user = $this->userApi->createUserWithPasswordHash(
                 $email,
-                $password,
+                $passwordHash,
                 $name,
                 true  // isAdmin
             );
@@ -254,7 +277,7 @@ class InitController
             // Clean up session
             unset($_SESSION['init_user_email']);
             unset($_SESSION['init_user_name']);
-            unset($_SESSION['init_user_password']);
+            unset($_SESSION['init_user_password_hash']);
             unset($_SESSION['init_pending_totp_uri']);
             unset($_SESSION['init_recovery_codes']);
 
@@ -265,13 +288,13 @@ class InitController
                 ])
             );
         } catch (\Exception $e) {
-            // Log the actual error for debugging
-            error_log('Init wizard error: ' . $e->getMessage());
-            error_log('Stack trace: ' . $e->getTraceAsString());
+            // Details go to the server log only; exception messages can expose
+            // database or path internals to an unauthenticated visitor.
+            $this->logger->error('Init wizard failed to create the admin account', ['exception' => $e]);
 
             return Response::createJson(
-                Json::encode(['error' => 'Failed to complete setup: ' . $e->getMessage()]),
-                StatusCode::createBadRequest()
+                Json::encode(['error' => 'Failed to complete setup. Please check the server log and start over.']),
+                StatusCode::createInternalServerError()
             );
         }
     }

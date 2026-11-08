@@ -67,7 +67,12 @@ function showInTopLists() {
 
 async function sendRequest(action) {
     const personId = document.getElementById('personId').value;
-    const response = await fetch(APPLICATION_URL + '/old/persons/' + personId + '/' + action)
+    // State-changing actions are POST requests carrying the CSRF token.
+    const response = await fetch(APPLICATION_URL + '/old/persons/' + personId + '/' + action, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({_csrf_token: getCsrfToken()}),
+    })
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

@@ -550,7 +550,9 @@
         showConfirmModal('Re-fetch this movie data from TMDB? This will update title, poster, runtime, and other metadata.', async () => {
             try {
                 const response = await fetch(`{{ applicationUrl }}/old/movies/${currentMovieId}/refresh-tmdb`, {
-                    method: 'GET',
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ _csrf_token: '{{ csrf }}' })
                 });
 
                 if (response.ok) {

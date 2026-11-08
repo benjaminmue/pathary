@@ -124,7 +124,12 @@ async function authenticateWithPlex() {
 async function removePlexAuthentication() {
     const response = await fetch(
         APPLICATION_URL + '/old/settings/plex/logout',
-        {signal: AbortSignal.timeout(4000)}
+        {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({_csrf_token: getCsrfToken()}),
+            signal: AbortSignal.timeout(4000),
+        }
     ).catch(function (error) {
         console.log(error)
 

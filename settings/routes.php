@@ -102,7 +102,11 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     # Setup Wizard (First-Time Installation) #
     ###########################
     $routes->add('GET', '/init', [Web\InitController::class, 'renderWizard'], [Web\Middleware\SetupNotCompleted::class]);
-    $routes->add('POST', '/init/create-admin', [Web\InitController::class, 'createAdmin'], [Web\Middleware\SetupNotCompleted::class]);
+    $routes->add('POST', '/init/create-admin', [Web\InitController::class, 'createAdmin'], [
+        Web\Middleware\SetupNotCompleted::class,
+        Web\Middleware\CsrfProtection::class,
+        Web\Middleware\RateLimitedInitialSetup::class,
+    ]);
 
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\RedirectToInitIfNeeded::class, Web\Middleware\UserIsUnauthenticated::class]);
     $routes->add('GET', '/setup-password', [Web\SetPasswordController::class, 'renderPage'], [Web\Middleware\UserIsUnauthenticated::class]);
@@ -280,7 +284,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/old/settings/integrations/letterboxd', [Web\SettingsController::class, 'renderLetterboxdPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/old/settings/letterboxd-export', [Web\SettingsController::class, 'generateLetterboxdExportData'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
     $routes->add('GET', '/old/settings/integrations/plex', [Web\SettingsController::class, 'renderPlexPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/settings/plex/logout', [Web\PlexController::class, 'removePlexAccessTokens'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/settings/plex/logout', [Web\PlexController::class, 'removePlexAccessTokens'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/old/settings/plex/server-url-save', [Web\PlexController::class, 'savePlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('POST', '/old/settings/plex/server-url-verify', [Web\PlexController::class, 'verifyPlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/settings/plex/authentication-url', [Web\PlexController::class, 'generatePlexAuthenticationUrl'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
@@ -327,18 +331,18 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ##########
     # Movies #
     ##########
-    $routes->add('GET', '/old/movies/{id:[0-9]+}/refresh-tmdb', [Web\Movie\MovieController::class, 'refreshTmdbData'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/movies/{id:[0-9]+}/refresh-imdb', [Web\Movie\MovieController::class, 'refreshImdbRating'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/movies/{id:[0-9]+}/refresh-tmdb', [Web\Movie\MovieController::class, 'refreshTmdbData'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/movies/{id:[0-9]+}/refresh-imdb', [Web\Movie\MovieController::class, 'refreshImdbRating'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
     $routes->add('GET', '/old/movies/{id:[0-9]+}/watch-providers', [Web\Movie\MovieWatchProviderController::class, 'getWatchProviders'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/movies/{id:[0-9]+}/add-watchlist', [Web\Movie\MovieWatchlistController::class, 'addToWatchlist'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/movies/{id:[0-9]+}/remove-watchlist', [Web\Movie\MovieWatchlistController::class, 'removeFromWatchlist'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/movies/{id:[0-9]+}/add-watchlist', [Web\Movie\MovieWatchlistController::class, 'addToWatchlist'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/movies/{id:[0-9]+}/remove-watchlist', [Web\Movie\MovieWatchlistController::class, 'removeFromWatchlist'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
 
     ##########
     # Person #
     ##########
-    $routes->add('GET', '/old/persons/{id:[0-9]+}/refresh-tmdb', [Web\PersonController::class, 'refreshTmdbData'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/persons/{id:[0-9]+}/hide-in-top-lists', [Web\PersonController::class, 'hideInTopLists'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/old/persons/{id:[0-9]+}/show-in-top-lists', [Web\PersonController::class, 'showInTopLists'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/old/persons/{id:[0-9]+}/refresh-tmdb', [Web\PersonController::class, 'refreshTmdbData'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/persons/{id:[0-9]+}/hide-in-top-lists', [Web\PersonController::class, 'hideInTopLists'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
+    $routes->add('POST', '/old/persons/{id:[0-9]+}/show-in-top-lists', [Web\PersonController::class, 'showInTopLists'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class, Web\Middleware\CsrfProtection::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes, true);
 }
@@ -379,22 +383,26 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
 
-    // Admin Settings API (admin-only)
+    // Admin Settings API (admin-only). These run on the browser's session cookie, so
+    // every state-changing call needs CSRF protection like the web routes.
     $routes->add('GET', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'getTmdbStatus'], [
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class
     ]);
     $routes->add('POST', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'saveTmdbApiKey'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class,
     ]);
     $routes->add('POST', '/admin/settings/tmdb/test', [Api\AdminSettingsController::class, 'testTmdbConnection'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class,
     ]);
     $routes->add('DELETE', '/admin/settings/tmdb', [Api\AdminSettingsController::class, 'deleteTmdbApiKey'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class,
     ]);
 
     $routes->add('GET', '/admin/settings/omdb', [Api\AdminSettingsController::class, 'getOmdbStatus'], [
@@ -403,15 +411,18 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ]);
     $routes->add('POST', '/admin/settings/omdb', [Api\AdminSettingsController::class, 'saveOmdbApiKey'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class,
     ]);
     $routes->add('POST', '/admin/settings/omdb/test', [Api\AdminSettingsController::class, 'testOmdbConnection'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class,
     ]);
     $routes->add('DELETE', '/admin/settings/omdb', [Api\AdminSettingsController::class, 'deleteOmdbApiKey'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\CsrfProtection::class,
     ]);
 
     // Admin Events API (admin-only)

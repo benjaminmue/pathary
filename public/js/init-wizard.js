@@ -3,6 +3,16 @@ let currentStep = 1;
 let totpUri = '';
 let recoveryCodes = [];
 
+// Every wizard step posts to the same endpoint, which requires the CSRF token
+// (rendered into the page's csrf-token meta tag, read by getCsrfToken() from app.js).
+function postWizardStep(payload) {
+    return fetch(APPLICATION_URL + '/init/create-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({ _csrf_token: getCsrfToken() }, payload))
+    });
+}
+
 // Password validation
 function validatePassword() {
     const password = document.getElementById('password').value;
@@ -136,16 +146,12 @@ async function createAccount() {
     }
 
     try {
-        const response = await fetch('/init/create-admin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                step: 'create_account',
-                email,
-                name,
-                password,
-                passwordConfirmation
-            })
+        const response = await postWizardStep({
+            step: 'create_account',
+            email,
+            name,
+            password,
+            passwordConfirmation
         });
 
         const data = await response.json();
@@ -166,11 +172,7 @@ async function createAccount() {
 // Step 2: Setup TOTP
 async function setupTotp() {
     try {
-        const response = await fetch('/init/create-admin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ step: 'setup_totp' })
-        });
+        const response = await postWizardStep({ step: 'setup_totp' });
 
         const data = await response.json();
 
@@ -224,13 +226,9 @@ async function verifyTotp() {
     }
 
     try {
-        const response = await fetch('/init/create-admin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                step: 'verify_totp',
-                code
-            })
+        const response = await postWizardStep({
+            step: 'verify_totp',
+            code
         });
 
         const data = await response.json();
@@ -387,11 +385,7 @@ async function completeSetup() {
     }
 
     try {
-        const response = await fetch('/init/create-admin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ step: 'acknowledge_codes' })
-        });
+        const response = await postWizardStep({ step: 'acknowledge_codes' });
 
         const data = await response.json();
 

@@ -26,13 +26,24 @@ class UserApi
 
     public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : UserEntity
     {
+        $this->userValidator->ensurePasswordIsValid($password);
+
+        return $this->createUserWithPasswordHash($email, $this->hashPassword($password), $name, $isAdmin);
+    }
+
+    /**
+     * For flows that must not keep the plaintext password around between requests
+     * (e.g. the setup wizard): the password was validated and hashed with
+     * hashPassword() when it was entered.
+     */
+    public function createUserWithPasswordHash(string $email, string $passwordHash, string $name, bool $isAdmin = false) : UserEntity
+    {
         $this->userValidator->ensureEmailIsValid($email);
         $this->userValidator->ensureEmailIsUnique($email);
-        $this->userValidator->ensurePasswordIsValid($password);
         $this->userValidator->ensureNameFormatIsValid($name);
         $this->userValidator->ensureNameIsUnique($name);
 
-        $userId = $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name, $isAdmin);
+        $userId = $this->repository->createUser($email, $passwordHash, $name, $isAdmin);
 
         $user = $this->repository->findUserById($userId);
         if ($user === null) {
@@ -40,6 +51,11 @@ class UserApi
         }
 
         return $user;
+    }
+
+    public function hashPassword(string $password) : string
+    {
+        return password_hash($password, PASSWORD_DEFAULT);
     }
 
     public function deleteApiToken(int $userId) : void
@@ -516,9 +532,7 @@ class UserApi
             throw new RuntimeException('There is no user with id: ' . $userId);
         }
 
-        $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
-
-        $this->repository->updatePassword($userId, $passwordHash);
+        $this->repository->updatePassword($userId, $this->hashPassword($newPassword));
     }
 
     public function updatePlexAccessToken(int $userId, ?string $plexAccessToken) : void
