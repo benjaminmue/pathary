@@ -202,7 +202,19 @@ class Authentication
             return null;
         }
 
-        return $this->userApi->findByToken($token)?->getId();
+        $userId = $this->userApi->findByToken($token)?->getId();
+        if ($userId === null) {
+            return null;
+        }
+
+        // Two-factor authentication is mandatory. A web session of a user who has not
+        // enrolled yet exists only to reach /profile/security (see UserIsAuthenticated);
+        // the API must treat it as anonymous, otherwise enrollment could be skipped.
+        if ($this->twoFactorAuthenticationApi->findTotpUri($userId) === null) {
+            return null;
+        }
+
+        return $userId;
     }
 
     public function isUserAuthenticatedWithCookie() : bool

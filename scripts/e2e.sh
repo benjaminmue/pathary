@@ -291,6 +291,31 @@ check_trusted_proxies() {
     pass "untrusted client: X-Forwarded-For/-Proto ignored"
 }
 
+# A user without 2FA (e.g. invited, or created on the CLI) may log in on the web
+# only to enrol: every page redirects to /profile/security and the API treats
+# the session as anonymous. Uses its own cookie jar.
+check_unenrolled_user_is_confined() {
+    local jar="${WORK_DIR}/cookies-nofa.txt" email="e2e-nofa@example.com" password="E2e-NoFa-Passw0rd!" csrf body code location
+    docker exec -u www-data "$APP" php bin/console.php user:create "$email" "$password" e2enofa >/dev/null \
+        || fail "user:create for the user without 2FA failed"
+
+    csrf=$(curl -sS --max-time 20 -b "$jar" -c "$jar" "$BASE_URL/login" | sed -n 's/.*<meta name="csrf-token" content="\([^"]*\)".*/\1/p' | head -n1)
+    body=$(jq -nc --arg e "$email" --arg p "$password" --arg c "$csrf" '{email: $e, password: $p, rememberMe: false, _csrf_token: $c}')
+    code=$(curl -sS --max-time 20 -b "$jar" -c "$jar" -o "${WORK_DIR}/login-nofa.json" -w '%{http_code}' -X POST \
+        -H 'Content-Type: application/json' -H 'X-Movary-Client: Pathary Web' --data "$body" "$BASE_URL/api/authentication/token")
+    [ "$code" = "200" ] && [ "$(jq -r '.twoFactorSetupRequired // empty' "${WORK_DIR}/login-nofa.json")" = "true" ] \
+        || fail "web login without 2FA did not ask for enrollment (HTTP $code)"
+    pass "web login without 2FA asks for enrollment"
+
+    location=$(curl -sS --max-time 20 -b "$jar" -o /dev/null -w '%{http_code} %{redirect_url}' "$BASE_URL/movies")
+    case "$location" in 303\ */profile/security) ;; *) fail "GET /movies without 2FA was not sent to enrollment: $location" ;; esac
+    [ "$(curl -sS --max-time 20 -b "$jar" -o /dev/null -w '%{http_code}' "$BASE_URL/profile/security")" = "200" ] \
+        || fail "enrollment page /profile/security not reachable without 2FA"
+    [ "$(curl -sS --max-time 20 -b "$jar" -o /dev/null -w '%{http_code}' "$BASE_URL/api/movies/search?search=matrix")" = "403" ] \
+        || fail "API accepted the session of a user without 2FA"
+    pass "user without 2FA is confined to enrollment, API rejects the session"
+}
+
 main() {
     for tool in docker curl jq openssl; do
         command -v "$tool" >/dev/null || { echo "missing tool: $tool" >&2; exit 1; }
@@ -304,6 +329,7 @@ main() {
     run_init_wizard
     login
     check_authenticated_page
+    check_unenrolled_user_is_confined
     check_security_headers
     check_healthz_body
     check_trusted_proxies

@@ -76,13 +76,38 @@ class AuthenticationTest extends TestCase
         self::assertSame($isVisible, $subject->isUserPageVisibleForApiRequest($request, $targetUser));
     }
 
-    private function createSubject(UserRepository $repository, ?UserApi $userApi = null) : Authentication
+    public function testApiTreatsSessionOfUserWithoutTwoFactorAsAnonymous() : void
     {
+        $user = $this->createStub(UserEntity::class);
+        $user->method('getId')->willReturn(7);
+
+        $userApi = $this->createStub(UserApi::class);
+        $userApi->method('findUserIdByApiToken')->willReturn(7);
+        $userApi->method('findByToken')->willReturn($user);
+
+        $request = $this->createStub(Request::class);
+        $request->method('getHeaders')->willReturn(['X-Movary-Token' => 'api-token']);
+
+        $enrolled = $this->createSubject($this->createStub(UserRepository::class), $userApi);
+        self::assertSame(7, $enrolled->getUserIdByToken($request));
+
+        $notEnrolled = $this->createSubject($this->createStub(UserRepository::class), $userApi, totpUri: null);
+        self::assertNull($notEnrolled->getUserIdByToken($request));
+    }
+
+    private function createSubject(
+        UserRepository $repository,
+        ?UserApi $userApi = null,
+        ?string $totpUri = 'otpauth://totp/Pathary:user?secret=JBSWY3DPEHPK3PXP',
+    ) : Authentication {
+        $twoFactorAuthenticationApi = $this->createStub(TwoFactorAuthenticationApi::class);
+        $twoFactorAuthenticationApi->method('findTotpUri')->willReturn($totpUri);
+
         return new Authentication(
             $repository,
             $userApi ?? $this->createStub(UserApi::class),
             $this->createStub(SessionWrapper::class),
-            $this->createStub(TwoFactorAuthenticationApi::class),
+            $twoFactorAuthenticationApi,
             $this->createStub(RecoveryCodeService::class),
             $this->createStub(TrustedDeviceService::class),
             $this->createStub(SecurityAuditService::class),
