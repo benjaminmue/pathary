@@ -237,12 +237,13 @@ class CreateEmergencyAdmin extends Command
         while ($attempt < $maxAttempts) {
             $attempt++;
             $codeQuestion = new Question('<question>Enter the 6-digit code from your authenticator app:</question> ');
-            $codeQuestion->setValidator(function (?string $value) : int {
+            // Returned as a string: codes may start with "0".
+            $codeQuestion->setValidator(function (?string $value) : string {
                 $value = (string)$value;
                 if (!ctype_digit($value) || strlen($value) !== 6) {
                     throw new \RuntimeException('Code must be exactly 6 digits.');
                 }
-                return (int)$value;
+                return $value;
             });
             $code = $helper->ask($input, $output, $codeQuestion);
 

@@ -26,8 +26,7 @@ class LoginRateLimiterServiceTest extends TestCase
                 ip_hash VARCHAR(64) NOT NULL,
                 account_hash VARCHAR(64) NULL,
                 attempted_at DATETIME NOT NULL,
-                success BOOLEAN NOT NULL DEFAULT 0,
-                ip_address VARCHAR(45) NULL
+                success BOOLEAN NOT NULL DEFAULT 0
             )',
         );
 

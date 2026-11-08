@@ -68,7 +68,7 @@ class Authentication
     public function findUserAndVerifyAuthentication(
         string $email,
         string $password,
-        ?int $userTotpCode = null,
+        ?string $userTotpCode = null,
         ?string $recoveryCode = null,
         ?string $trustedDeviceToken = null,
     ) : UserEntity {
@@ -119,7 +119,7 @@ class Authentication
         return $trustedDevice !== null;
     }
 
-    private function verifyTwoFactorAuthentication(UserEntity $user, ?int $userTotpCode, ?string $recoveryCode) : UserEntity
+    private function verifyTwoFactorAuthentication(UserEntity $user, ?string $userTotpCode, ?string $recoveryCode) : UserEntity
     {
         if ($userTotpCode === null && $recoveryCode === null) {
             throw MissingTotpCode::create();
@@ -255,7 +255,7 @@ class Authentication
         bool $rememberMe,
         string $deviceName,
         string $userAgent,
-        ?int $userTotpInput = null,
+        ?string $userTotpInput = null,
         ?string $recoveryCode = null,
         bool $trustDevice = false,
     ) : array {

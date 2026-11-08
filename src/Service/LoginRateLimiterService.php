@@ -50,7 +50,6 @@ class LoginRateLimiterService
             'account_hash' => $this->hashAccount($accountIdentifier),
             'attempted_at' => (new DateTime())->format('Y-m-d H:i:s'),
             'success' => $success === true ? 1 : 0,
-            'ip_address' => $ipAddress,
         ]);
     }
 

@@ -38,7 +38,7 @@ class AuthenticationController
         }
 
         $requestClient = $headers['X-Movary-Client'];
-        $totpCode = empty($tokenRequestBody['totpCode']) === true ? null : (int)$tokenRequestBody['totpCode'];
+        $totpCode = $this->readTotpCode($tokenRequestBody['totpCode'] ?? null);
         $recoveryCode = empty($tokenRequestBody['recoveryCode']) === true ? null : trim($tokenRequestBody['recoveryCode']);
         $rememberMe = $tokenRequestBody['rememberMe'] ?? false;
         $trustDevice = $tokenRequestBody['trustDevice'] ?? false;
@@ -152,6 +152,23 @@ class AuthenticationController
             ]),
             StatusCode::createForbidden(),
         );
+    }
+
+    /**
+     * TOTP codes stay strings so a leading "0" survives. Numeric JSON values from API
+     * clients are padded back to six digits for the same reason.
+     */
+    private function readTotpCode(mixed $totpCode) : ?string
+    {
+        if (is_int($totpCode) === true) {
+            return str_pad((string)$totpCode, 6, '0', STR_PAD_LEFT);
+        }
+
+        if (is_string($totpCode) === false || trim($totpCode) === '') {
+            return null;
+        }
+
+        return trim($totpCode);
     }
 
     /**

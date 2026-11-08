@@ -50,7 +50,8 @@ class TwoFactorAuthenticationController
         $userId = $this->authenticationService->getCurrentUserId();
 
         $requestData = Json::decode($request->getBody());
-        $input = (int)$requestData['input'];
+        // Kept as a string: codes may start with "0".
+        $input = trim((string)$requestData['input']);
         $uri = $requestData['uri'];
 
         $valid = $this->twoFactorAuthenticationApi->verifyTotpUri($userId, $input, $uri);

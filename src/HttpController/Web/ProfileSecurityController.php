@@ -129,7 +129,8 @@ class ProfileSecurityController
         }
 
         $data = Json::decode($request->getBody());
-        $verificationCode = (int)($data['code'] ?? 0);
+        // Kept as a string: codes may start with "0".
+        $verificationCode = trim((string)($data['code'] ?? ''));
 
         $pendingTotpUri = $_SESSION['pending_totp_uri'] ?? null;
 

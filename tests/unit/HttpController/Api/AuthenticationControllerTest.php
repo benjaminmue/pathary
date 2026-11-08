@@ -12,6 +12,7 @@ use Movary\Service\Exception\LoginRateLimitExceeded;
 use Movary\Service\LoginRateLimiterService;
 use Movary\ValueObject\Http\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -75,6 +76,33 @@ class AuthenticationControllerTest extends TestCase
         self::assertSame(200, $response->getStatusCode()->getCode());
         $body = json_decode((string)$response->getBody(), true);
         self::assertSame(['twoFactorSetupRequired' => true, 'redirectPath' => '/profile/security'], $body);
+    }
+
+    /**
+     * @return iterable<string, array{mixed, ?string}>
+     */
+    public static function totpCodeProvider() : iterable
+    {
+        yield 'string with leading zero' => ['012345', '012345'];
+        yield 'numeric JSON value is padded' => [12345, '012345'];
+        yield 'surrounding whitespace' => [' 123456 ', '123456'];
+        yield 'empty string' => ['', null];
+        yield 'missing' => [null, null];
+    }
+
+    #[DataProvider('totpCodeProvider')]
+    public function testTotpCodeIsPassedOnAsSixDigitString(mixed $sentCode, ?string $expectedCode) : void
+    {
+        $this->authenticationService->expects(self::once())->method('login')
+            ->with('user@example.com', 'secret', false, 'test-client', 'test-agent', $expectedCode)
+            ->willThrowException(InvalidCredentials::create());
+
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn((string)json_encode(['email' => 'user@example.com', 'password' => 'secret', 'totpCode' => $sentCode]));
+        $request->method('getHeaders')->willReturn(['X-Movary-Client' => 'test-client']);
+        $request->method('getUserAgent')->willReturn('test-agent');
+
+        $this->subject->createToken($request);
     }
 
     public function testMissingOrNonStringCredentialsAreRejected() : void
