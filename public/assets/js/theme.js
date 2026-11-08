@@ -24,7 +24,6 @@
         document.documentElement.setAttribute('data-bs-theme', theme);
         localStorage.setItem(STORAGE_KEY, theme);
         updateToggleState(theme);
-        updateIcon(theme);
     }
 
     /**
@@ -34,16 +33,6 @@
         const toggle = document.getElementById('darkModeToggle');
         if (toggle) {
             toggle.checked = theme === DARK_THEME;
-        }
-    }
-
-    /**
-     * Update the theme icon
-     */
-    function updateIcon(theme) {
-        const icon = document.getElementById('themeIcon');
-        if (icon) {
-            icon.textContent = theme === DARK_THEME ? '☀️' : '🌙';
         }
     }
 
@@ -66,7 +55,6 @@
             // Set initial state based on current theme
             const currentTheme = getCurrentTheme();
             updateToggleState(currentTheme);
-            updateIcon(currentTheme);
 
             // Add event listener for toggle changes
             toggle.addEventListener('change', function() {

@@ -52,13 +52,13 @@ async function deletePlexWebhookRequest() {
 
 function setPlexWebhookUrl(webhookUrl) {
     if (webhookUrl) {
-        document.getElementById('plexWebhookUrl').innerHTML = webhookUrl
+        document.getElementById('plexWebhookUrl').textContent = webhookUrl
         document.getElementById('deletePlexWebhookButton').classList.remove('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = false
         document.getElementById('scrobbleRatingsCheckbox').disabled = false
         document.getElementById('saveButton').disabled = false
     } else {
-        document.getElementById('plexWebhookUrl').innerHTML = '-'
+        document.getElementById('plexWebhookUrl').textContent = '-'
         document.getElementById('deletePlexWebhookButton').classList.add('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = true
         document.getElementById('scrobbleRatingsCheckbox').disabled = true

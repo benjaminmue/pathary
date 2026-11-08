@@ -67,12 +67,12 @@ async function deleteKodiWebhookRequest() {
 
 function setKodiWebhookUrl(webhookUrl) {
     if (webhookUrl) {
-        document.getElementById('kodiWebhookUrl').innerHTML = webhookUrl
+        document.getElementById('kodiWebhookUrl').textContent = webhookUrl
         document.getElementById('deleteKodiWebhookButton').classList.remove('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = false
         document.getElementById('saveButton').disabled = false
     } else {
-        document.getElementById('kodiWebhookUrl').innerHTML = '-'
+        document.getElementById('kodiWebhookUrl').textContent = '-'
         document.getElementById('deleteKodiWebhookButton').classList.add('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = true
         document.getElementById('saveButton').disabled = true

@@ -4,50 +4,8 @@
 
 {% block stylesheets %}
     <style>
-        /* ===== Admin design system tokens (--pds-*), scoped to .pds-root =====
-           Default block = dark (app default). Light overrides below via [data-bs-theme].
-           Values shared verbatim with profile/all_movies/movie_detail/search/faq. */
-        .pds-root {
-            --pds-gold: #FBBC09;
-            --pds-bg: #15171B;
-            --pds-surface: #1C1F24;
-            --pds-surface-2: #22262C;
-            --pds-border: #2A2E35;
-            --pds-hair: rgba(255, 255, 255, .06);
-            --pds-text: #F2F3F5;
-            --pds-muted: #A9B0BA;
-            --pds-dim: #7A828C;
-            --pds-nav: #101216;
-            --pds-danger: #C0392B;
-            --pds-success: #4CAF6E;
-            --pds-r: 14px;
-            --pds-r-sm: 8px;
-            --pds-s-xs: 4px;
-            --pds-s-sm: 8px;
-            --pds-s-md: 16px;
-            --pds-s-lg: 24px;
-            --pds-s-xl: 40px;
-            --pds-font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-            --pds-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        }
+        /* --pds-* tokens live in public/assets/css/theme.css. */
 
-        [data-bs-theme="light"] .pds-root {
-            --pds-bg: #FFFFFF;
-            --pds-surface: #FBFBFC;
-            --pds-surface-2: #F5F6F8;
-            --pds-border: #E3E6EA;
-            --pds-hair: #EEF0F3;
-            --pds-text: #15171B;
-            --pds-muted: #5B636E;
-            --pds-dim: #8A9099;
-            --pds-danger: #C0392B;
-            --pds-success: #198754;
-        }
-
-        .pds-root {
-            color: var(--pds-text);
-            font-family: var(--pds-font);
-        }
 
         .pds-admin {
             width: 100%;
@@ -144,7 +102,6 @@
             border: 1px solid var(--pds-border);
             border-radius: var(--pds-r-sm);
             padding: 10px 14px;
-            outline: none;
             transition: border-color .15s ease;
         }
 
@@ -185,7 +142,7 @@
 
         .pds-btn--ghost:hover {
             border-color: var(--pds-gold);
-            color: var(--pds-gold);
+            color: var(--pds-gold-text);
         }
 
         .pds-btn--danger {
@@ -204,7 +161,7 @@
             }
         }
 
-        .pds-btn--danger-solid { background: var(--pds-danger); border-color: var(--pds-danger); color: #fff; }
+        .pds-btn--danger-solid { background: var(--pds-danger-fill); border-color: var(--pds-danger-fill); color: #fff; }
         .pds-btn--danger-solid:hover { filter: brightness(1.08); }
 
         .pds-confirm .modal-content { background: var(--pds-surface); border: 1px solid var(--pds-border); border-radius: var(--pds-r); color: var(--pds-text); }
@@ -221,7 +178,7 @@
 
 {% block body %}
     <div class="pds-root" style="background: var(--pds-bg); min-height: 100%;">
-        <main class="pds-admin">
+        <div class="pds-admin">
             <div class="pds-admin-head">
                 <h1>{{ t('admin.title_short') }}</h1>
                 <p>{{ t('admin.panel_subtitle') }}</p>
@@ -250,7 +207,7 @@
                     {% include 'page/admin/tabs/events.html.twig' %}
                 {% endif %}
             </div>
-        </main>
+        </div>
     </div>
 
     <!-- Confirmation Modal Template -->
@@ -303,17 +260,9 @@
             const toastContainer = document.getElementById('toastContainer') || createToastContainer();
             const toastId = 'toast-' + Date.now();
 
-            const toastHtml = `
-                <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex">
-                        <div class="toast-body">${message}</div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                </div>
-            `;
-
-            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-            const toastElement = document.getElementById(toastId);
+            const toastElement = createToastElement(message, 'text-white bg-' + type, {{ t('common.close')|json_encode|raw }});
+            toastElement.id = toastId;
+            toastContainer.append(toastElement);
             const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
             toast.show();
 

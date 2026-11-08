@@ -1,35 +1,17 @@
-<style>
-    /* Light mode: force dark footer to match navbar */
-    [data-bs-theme="light"] footer.footer {
-        background-color: var(--pathe-dark) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
-
-    [data-bs-theme="light"] footer.footer a,
-    [data-bs-theme="light"] footer.footer a:link,
-    [data-bs-theme="light"] footer.footer a:visited {
-        color: #adb5bd !important;
-    }
-
-    [data-bs-theme="light"] footer.footer a:hover,
-    [data-bs-theme="light"] footer.footer a:active {
-        color: #dee2e6 !important;
-    }
-</style>
-<footer class="footer mt-auto py-3 bg-body-tertiary">
+<footer class="footer app-footer mt-auto py-3">
     <div class="container">
         <div class="d-flex flex-wrap justify-content-center gap-3 small">
-            <a href="https://github.com/benjaminmue/pathary" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-body-secondary">
-                <i class="bi bi-github me-1"></i>GitHub
+            <a href="https://github.com/benjaminmue/pathary" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                <i class="bi bi-github me-1" aria-hidden="true"></i>GitHub
             </a>
-            <a href="https://benjaminmue.github.io/pathary/" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-body-secondary">
-                <i class="bi bi-book me-1"></i>Wiki
+            <a href="https://benjaminmue.github.io/pathary/" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                <i class="bi bi-book me-1" aria-hidden="true"></i>Wiki
             </a>
-            <a href="{{ applicationUrl }}/faq" class="text-decoration-none text-body-secondary">
-                <i class="bi bi-question-circle me-1"></i>{{ t('footer.faq') }}
+            <a href="{{ applicationUrl }}/faq" class="text-decoration-none">
+                <i class="bi bi-question-circle me-1" aria-hidden="true"></i>{{ t('footer.faq') }}
             </a>
-            <a href="https://github.com/benjaminmue/pathary/issues/new" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-body-secondary">
-                <i class="bi bi-bug me-1"></i>Report Issue
+            <a href="https://github.com/benjaminmue/pathary/issues/new" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                <i class="bi bi-bug me-1" aria-hidden="true"></i>{{ t('footer.report_issue') }}
             </a>
         </div>
     </div>

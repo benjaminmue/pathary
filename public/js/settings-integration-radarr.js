@@ -51,10 +51,10 @@ async function deleteRadarrFeedId() {
 
 function setRadarrFeedUrl(webhookUrl) {
     if (webhookUrl) {
-        document.getElementById('radarrFeedUrl').innerHTML = webhookUrl
+        document.getElementById('radarrFeedUrl').textContent = webhookUrl
         document.getElementById('deleteRadarrFeedButton').classList.remove('disabled')
     } else {
-        document.getElementById('radarrFeedUrl').innerHTML = '-'
+        document.getElementById('radarrFeedUrl').textContent = '-'
         document.getElementById('deleteRadarrFeedButton').classList.add('disabled')
     }
 }

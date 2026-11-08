@@ -37,7 +37,7 @@ async function loadSecurityTab() {
         console.error('Error loading security tab:', error);
         container.innerHTML = `
             <div class="alert alert-danger">
-                <i class="bi bi-exclamation-circle"></i> Failed to load security settings. Error: ${error.message}
+                <i class="bi bi-exclamation-circle"></i> Failed to load security settings. Error: ${escapeHtml(error.message)}
             </div>
         `;
     }
@@ -330,7 +330,7 @@ function initializePasswordValidation() {
                 loadSecurityTab();
             } else if (data.error) {
                 // Show specific error message from server
-                alertDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                alertDiv.innerHTML = `<div class="alert alert-danger">${escapeHtml(data.error)}</div>`;
             } else {
                 // Fallback for unexpected response format
                 alertDiv.innerHTML = '<div class="alert alert-danger">Failed to change password. Please try again.</div>';
@@ -504,7 +504,7 @@ async function verify2FACode() {
                 loadSecurityTab();
             }, 100);
         } else {
-            alertDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            alertDiv.innerHTML = `<div class="alert alert-danger">${escapeHtml(data.error)}</div>`;
         }
     } catch (error) {
         alertDiv.innerHTML = '<div class="alert alert-danger">Failed to verify code.</div>';
@@ -1005,7 +1005,7 @@ function showCopyFeedback(feedbackDiv, type, message) {
 
     feedbackDiv.innerHTML = `
         <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-            <i class="bi ${iconClass}"></i> ${message}
+            <i class="bi ${iconClass}"></i> ${escapeHtml(message)}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     `;
@@ -1125,7 +1125,7 @@ function showAlert(message, type) {
                 <div class="notification-popup__icon ${iconTypeClass}">
                     <i class="bi ${iconClass}"></i>
                 </div>
-                <div class="notification-popup__text">${message}</div>
+                <div class="notification-popup__text">${escapeHtml(message)}</div>
             </div>
         </div>
     `;

@@ -11,10 +11,10 @@ function registerTableRowClickEvent() {
 
         rows[i].onclick = function () {
             prepareEditUserModal(
-                this.cells[0].innerHTML,
-                this.cells[1].innerHTML,
-                this.cells[2].innerHTML,
-                this.cells[3].innerHTML === '1'
+                this.cells[0].textContent,
+                this.cells[1].textContent,
+                this.cells[2].textContent,
+                this.cells[3].textContent === '1'
             )
 
             userModal.show()
@@ -155,7 +155,7 @@ document.getElementById('createUserButton').addEventListener('click', async () =
 })
 
 function setUserModalAlertServerError(message = "Server error, please try again.") {
-    document.getElementById('userModalAlerts').innerHTML = '<div class="alert alert-danger alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+    addAlert('userModalAlerts', message, 'danger')
 }
 
 document.getElementById('updateUserButton').addEventListener('click', async () => {
@@ -223,8 +223,7 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
 function setUserManagementAlert(message, type = 'success') {
     const userManagementAlerts = document.getElementById('userManagementAlerts');
     userManagementAlerts.classList.remove('d-none')
-    userManagementAlerts.innerHTML = ''
-    userManagementAlerts.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+    addAlert('userManagementAlerts', message, type)
     userManagementAlerts.style.textAlign = 'center'
 }
 

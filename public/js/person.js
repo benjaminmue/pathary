@@ -4,12 +4,12 @@ function toggleBiography() {
         document.getElementById('biographyParagraph').classList.remove('truncated');
         expandContainer.getElementsByTagName('i')[0].classList.remove('bi-chevron-down');
         expandContainer.getElementsByTagName('i')[0].classList.add('bi-chevron-up');
-        expandContainer.children[1].innerHTML = 'Show less&#8230;';
+        expandContainer.children[1].textContent = expandContainer.dataset.showLess + '\u2026';
     } else {
         document.getElementById('biographyParagraph').classList.add('truncated');
         expandContainer.getElementsByTagName('i')[0].classList.add('bi-chevron-down');
         expandContainer.getElementsByTagName('i')[0].classList.remove('bi-chevron-up');
-        expandContainer.children[1].innerHTML = 'Show more&#8230;';
+        expandContainer.children[1].textContent = expandContainer.dataset.showMore + '\u2026';
     }
 }
 

@@ -1,30 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ locale() }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include 'partials/head_assets.twig' %}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}{{ applicationName ?? 'Pathary' }}{% endblock %}</title>
-    <link rel="shortcut icon" href="{{ applicationUrl }}/images/favicon.ico" type="image/x-icon">
-
-    <!-- Theme initialization (runs before page render to prevent flash) -->
-    <script>
-        (function() {
-            const saved = localStorage.getItem('theme');
-            const theme = saved || 'dark'; // dark is the default; light only if the user toggled it
-            document.documentElement.setAttribute('data-bs-theme', theme);
-        })();
-    </script>
-
-    <!-- Bootstrap CSS (Local) -->
-    <link href="{{ applicationUrl }}/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Global CSS -->
     <link rel="stylesheet" href="{{ applicationUrl }}/css/global.css?v={{ assetVersion }}">
-
-    <!-- Custom Theme CSS -->
-    <link rel="stylesheet" href="{{ applicationUrl }}/assets/css/theme.css?v={{ assetVersion }}">
 
     {% block stylesheets %}{% endblock %}
 </head>
@@ -47,9 +27,9 @@
     <!-- Global Health Status Notification -->
     <div id="health-alert" class="position-fixed top-0 end-0 m-3" style="z-index: 9999; display: none; min-width: 300px;">
         <div class="alert alert-danger alert-dismissible fade show shadow" role="alert">
-            <h6 class="alert-heading mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>System Health Alert</h6>
+            <h6 class="alert-heading mb-2"><i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>{{ t('health.alert_title') }}</h6>
             <div id="health-alert-message" class="small"></div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('common.close') }}"></button>
         </div>
     </div>
 
@@ -58,6 +38,7 @@
 
     <!-- Custom Components JS -->
     <script src="{{ applicationUrl }}/assets/js/popcorn.js?v={{ assetVersion }}"></script>
+    <script src="{{ applicationUrl }}/assets/js/dom.js?v={{ assetVersion }}"></script>
 
     <!-- Theme Toggle JS -->
     <script src="{{ applicationUrl }}/assets/js/theme.js?v={{ assetVersion }}"></script>
@@ -115,13 +96,18 @@
                     return;
                 }
 
-                let message = `<strong>${serviceName}:</strong> ${service.message}`;
+                const name = document.createElement('strong');
+                name.textContent = serviceName + ':';
+                const parts = [name, ' ' + (service.message ?? '')];
                 if (service.checked_at) {
                     const time = new Date(service.checked_at.replace(' ', 'T')).toLocaleTimeString();
-                    message += `<br><small class="text-muted">Last checked: ${time}</small>`;
+                    const checked = document.createElement('small');
+                    checked.className = 'text-muted';
+                    checked.textContent = {{ t('health.last_checked')|json_encode|raw }} + ' ' + time;
+                    parts.push(document.createElement('br'), checked);
                 }
 
-                messageDiv.innerHTML = message;
+                messageDiv.replaceChildren(...parts);
                 alertDiv.style.display = 'block';
             }
 
