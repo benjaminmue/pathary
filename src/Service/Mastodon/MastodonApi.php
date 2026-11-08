@@ -17,14 +17,12 @@ class MastodonApi
 
     public function createPost(string $apiToken, string $username, string $visibility, string $message) : void
     {
-        if (preg_match('/@.*@(.*)/', $username, $matches) === false) {
+        // preg_match() returns 0 (not false) when the username has no "@user@domain" form.
+        if (preg_match('/@.*@(.*)/', $username, $matches) !== 1 || $matches[1] === '') {
             throw new RuntimeException('Could not extract domain from username: ' . $username);
         }
 
         $domain = $matches[1];
-        if ($domain == null) {
-            throw new RuntimeException('Could not extract domain from username: ' . $username);
-        }
 
         $requestUrl = 'https://' . $domain . '/api/v1/statuses';
         $requestOptions = [

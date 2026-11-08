@@ -86,30 +86,16 @@ class RateMovieController
      */
     private function normalizeWatchedDate(?int $watchedYear, ?int $watchedMonth, ?int $watchedDay) : array
     {
-        // Validate date hierarchy: day requires month, month requires year
-        if ($watchedDay !== null && $watchedMonth === null) {
-            $watchedDay = null; // Invalid: day without month
+        // Each part needs its valid parent: no month without a valid year, no day
+        // without a valid month. An invalid part drops itself and everything below.
+        if ($watchedYear === null || $watchedYear < 1900 || $watchedYear > 2100) {
+            return [null, null, null];
         }
-        if ($watchedMonth !== null && $watchedYear === null) {
-            $watchedMonth = null; // Invalid: month without year
-            $watchedDay = null;
+        if ($watchedMonth === null || $watchedMonth < 1 || $watchedMonth > 12) {
+            return [$watchedYear, null, null];
         }
-
-        // Validate ranges
-        if ($watchedYear !== null && ($watchedYear < 1900 || $watchedYear > 2100)) {
-            $watchedYear = null;
-            $watchedMonth = null;
-            $watchedDay = null;
-        }
-        if ($watchedMonth !== null && ($watchedMonth < 1 || $watchedMonth > 12)) {
-            $watchedMonth = null;
-            $watchedDay = null;
-        }
-        if ($watchedDay !== null && $watchedYear !== null && $watchedMonth !== null) {
-            $maxDay = $this->getDaysInMonth($watchedYear, $watchedMonth);
-            if ($watchedDay < 1 || $watchedDay > $maxDay) {
-                $watchedDay = null;
-            }
+        if ($watchedDay === null || $watchedDay < 1 || $watchedDay > $this->getDaysInMonth($watchedYear, $watchedMonth)) {
+            return [$watchedYear, $watchedMonth, null];
         }
 
         return [$watchedYear, $watchedMonth, $watchedDay];
