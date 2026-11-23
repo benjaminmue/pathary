@@ -108,7 +108,7 @@ class OAuthConfigService
         $this->dbConnection->executeStatement('DELETE FROM `oauth_email_config`');
 
         // Insert new config
-        $this->dbConnection->prepare(
+        $this->dbConnection->executeStatement(
             <<<SQL
             INSERT INTO `oauth_email_config` (
                 `provider`,
@@ -122,16 +122,17 @@ class OAuthConfigService
                 `created_at`,
                 `updated_at`
             ) VALUES (?, ?, ?, ?, ?, ?, 'not_connected', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            SQL
-        )->executeStatement([
-            $provider,
-            $clientId,
-            $encrypted['encrypted'],
-            $encrypted['iv'],
-            $tenantId,
-            $fromAddress,
-            $secretExpiresAt,
-        ]);
+            SQL,
+            [
+                $provider,
+                $clientId,
+                $encrypted['encrypted'],
+                $encrypted['iv'],
+                $tenantId,
+                $fromAddress,
+                $secretExpiresAt,
+            ],
+        );
     }
 
     /**
@@ -151,7 +152,7 @@ class OAuthConfigService
         // Encrypt refresh token
         $encrypted = $this->encryptionService->encrypt($refreshToken);
 
-        $this->dbConnection->prepare(
+        $this->dbConnection->executeStatement(
             <<<SQL
             UPDATE `oauth_email_config`
             SET
@@ -164,13 +165,14 @@ class OAuthConfigService
                 `token_error` = NULL,
                 `updated_at` = CURRENT_TIMESTAMP
             WHERE `id` = ?
-            SQL
-        )->executeStatement([
-            $encrypted['encrypted'],
-            $encrypted['iv'],
-            $scopes,
-            $config->id,
-        ]);
+            SQL,
+            [
+                $encrypted['encrypted'],
+                $encrypted['iv'],
+                $scopes,
+                $config->id,
+            ],
+        );
     }
 
     /**
@@ -196,9 +198,10 @@ class OAuthConfigService
             throw new RuntimeException("Invalid status: {$status}");
         }
 
-        $this->dbConnection->prepare(
-            'UPDATE `oauth_email_config` SET `token_status` = ?, `token_error` = ?, `updated_at` = CURRENT_TIMESTAMP'
-        )->executeStatement([$status, $error]);
+        $this->dbConnection->executeStatement(
+            'UPDATE `oauth_email_config` SET `token_status` = ?, `token_error` = ?, `updated_at` = CURRENT_TIMESTAMP',
+            [$status, $error],
+        );
     }
 
     /**
@@ -323,7 +326,7 @@ class OAuthConfigService
             $sanitizedCode = $errorCode !== null ? substr($errorCode, 0, 100) : null;
             $sanitizedMessage = $errorMessage !== null ? substr($errorMessage, 0, 255) : null;
 
-            $this->dbConnection->prepare(
+            $this->dbConnection->executeStatement(
                 <<<SQL
                 UPDATE `oauth_email_config`
                 SET
@@ -333,13 +336,14 @@ class OAuthConfigService
                     `token_status` = IF(? = 1, 'expired', 'error'),
                     `reauth_required` = ?,
                     `updated_at` = CURRENT_TIMESTAMP
-                SQL
-            )->executeStatement([
-                $sanitizedCode,
-                $sanitizedMessage,
-                $reauthRequired ? 1 : 0,
-                $reauthRequired ? 1 : 0,
-            ]);
+                SQL,
+                [
+                    $sanitizedCode,
+                    $sanitizedMessage,
+                    $reauthRequired ? 1 : 0,
+                    $reauthRequired ? 1 : 0,
+                ],
+            );
         }
     }
 
@@ -356,9 +360,10 @@ class OAuthConfigService
             throw new RuntimeException("Invalid alert level: {$alertLevel}");
         }
 
-        $this->dbConnection->prepare(
-            'UPDATE `oauth_email_config` SET `alert_level` = ?, `next_notification_at` = ?, `updated_at` = CURRENT_TIMESTAMP'
-        )->executeStatement([$alertLevel, $nextNotificationAt]);
+        $this->dbConnection->executeStatement(
+            'UPDATE `oauth_email_config` SET `alert_level` = ?, `next_notification_at` = ?, `updated_at` = CURRENT_TIMESTAMP',
+            [$alertLevel, $nextNotificationAt],
+        );
     }
 
     /**

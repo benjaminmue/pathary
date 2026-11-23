@@ -67,9 +67,34 @@ class Request
         return $getParameters;
     }
 
+    /**
+     * getallheaders() exists under FPM and Apache, but not in the CLI SAPI. Until
+     * Guzzle 8 the ralouphie/getallheaders polyfill came in through guzzlehttp/psr7;
+     * without it, building a Request from a CLI command was a fatal error.
+     */
+    private static function readRawHeaders() : array
+    {
+        if (function_exists('getallheaders') === true) {
+            // PHP documents array|false; `?: []` covers both stubs PHPStan and Psalm use.
+            return getallheaders() ?: [];
+        }
+
+        $headers = [];
+        foreach ($_SERVER as $key => $value) {
+            if (str_starts_with($key, 'HTTP_') === true) {
+                $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))));
+                $headers[$name] = $value;
+            } elseif (in_array($key, ['CONTENT_TYPE', 'CONTENT_LENGTH', 'CONTENT_MD5'], true) === true) {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', $key))))] = $value;
+            }
+        }
+
+        return $headers;
+    }
+
     private static function extractHeaders() : array
     {
-        $headers = getallheaders();
+        $headers = self::readRawHeaders();
 
         // Normalize header names to handle case-insensitivity
         // HTTP headers are case-insensitive per RFC 7230, but PHP array keys are not

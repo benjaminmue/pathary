@@ -4,7 +4,7 @@ namespace Tests\Unit\Movary\Domain\Movie;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Movary\Domain\Movie\MovieRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -103,7 +103,7 @@ class MovieRepositoryTest extends TestCase
         $this->dbConnectionMock
             ->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn($isSqlite === true ? new SqlitePlatform() : new MySQLPlatform());
+            ->willReturn($isSqlite === true ? new SQLitePlatform() : new MySQLPlatform());
 
         $this->dbConnectionMock
             ->expects(self::once())
