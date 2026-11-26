@@ -3,7 +3,7 @@
 namespace Movary\Domain\Movie\Watchlist;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
@@ -104,7 +104,7 @@ class MovieWatchlistRepository
 
     public function fetchUniqueMovieReleaseYears(int $userId) : array
     {
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
             return $this->dbConnection->fetchFirstColumn(
                 <<<SQL
                 SELECT DISTINCT strftime('%Y',release_date)
@@ -149,7 +149,7 @@ class MovieWatchlistRepository
         $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
-            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
                 $whereQuery .= 'AND strftime(\'%Y\', m.release_date) = ? ';
             } else {
                 $whereQuery .= 'AND YEAR(m.release_date) = ? ';
@@ -215,7 +215,7 @@ class MovieWatchlistRepository
         $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
-            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
                 $whereQuery .= 'AND strftime("%Y",m.release_date) = ? ';
             } else {
                 $whereQuery .= 'AND YEAR(m.release_date) = ? ';

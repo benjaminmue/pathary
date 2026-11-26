@@ -88,7 +88,7 @@ class ImageCacheService
 
             $result = $this->dbConnection->executeQuery("SELECT id FROM $resourceType WHERE id = ?", [$resourceId]);
 
-            if (count($result->fetchAll()) > 0) {
+            if ($result->fetchOne() !== false) {
                 continue;
             }
 

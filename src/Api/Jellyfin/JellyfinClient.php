@@ -31,7 +31,7 @@ class JellyfinClient
     public function delete(Url $jellyfinServerUrl, ?array $query = [], ?JellyfinAccessToken $jellyfinAccessToken = null) : void
     {
         $options = [
-            'query' => $query,
+            'query' => $query ?? [],
             'headers' => $this->generateHeaders($jellyfinAccessToken)
         ];
 
@@ -45,7 +45,7 @@ class JellyfinClient
     public function get(Url $jellyfinServerUrl, ?array $query = [], ?JellyfinAccessToken $jellyfinAccessToken = null, ?int $timeout = null) : ?array
     {
         $options = [
-            'query' => $query,
+            'query' => $query ?? [],
             'headers' => $this->generateHeaders($jellyfinAccessToken),
             'connect_timeout' => $timeout ?? self::DEFAULT_TIMEOUT,
         ];
@@ -83,7 +83,7 @@ class JellyfinClient
     {
         $options = [
             'json' => $data,
-            'query' => $query,
+            'query' => $query ?? [],
             'headers' => $this->generateHeaders($jellyfinAccessToken)
         ];
 

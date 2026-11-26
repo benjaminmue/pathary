@@ -5,7 +5,7 @@ namespace Movary\Service;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 
 class GroupMovieService
 {
@@ -313,7 +313,7 @@ class GroupMovieService
         }
 
         // Neither MySQL nor SQLite share the same year-extraction syntax
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
             $whereConditions[] = "CAST(strftime('%Y', m.release_date) AS INTEGER) {$operator} ?";
         } else {
             $whereConditions[] = "YEAR(m.release_date) {$operator} ?";
@@ -381,7 +381,7 @@ class GroupMovieService
      */
     public function getReleaseYearRange() : array
     {
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
             $result = $this->dbConnection->fetchAssociative(
                 <<<SQL
                 SELECT
@@ -537,7 +537,7 @@ class GroupMovieService
      */
     public function getRandomComments(int $limit = 5) : array
     {
-        $randomFunction = $this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform
+        $randomFunction = $this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform
             ? 'RANDOM()'
             : 'RAND()';
 

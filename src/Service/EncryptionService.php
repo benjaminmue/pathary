@@ -287,11 +287,9 @@ class EncryptionService
     {
         $keyBase64 = base64_encode($key);
 
-        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')
-            ->executeStatement([self::DB_KEY_NAME]);
+        $this->dbConnection->executeStatement('DELETE FROM `server_setting` WHERE `key` = ?', [self::DB_KEY_NAME]);
 
-        $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')
-            ->executeStatement([$keyBase64, self::DB_KEY_NAME]);
+        $this->dbConnection->executeStatement('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)', [$keyBase64, self::DB_KEY_NAME]);
     }
 
     /**

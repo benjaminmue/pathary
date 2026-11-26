@@ -7,7 +7,6 @@ use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
-use RuntimeException;
 
 class JobQueueRepository
 {
@@ -28,12 +27,7 @@ class JobQueueRepository
             ],
         );
 
-        $lastInsertId = $this->dbConnection->lastInsertId();
-        if ($lastInsertId === false) {
-            throw new RuntimeException('Could not get last inserted id.');
-        }
-
-        return (int)$lastInsertId;
+        return (int)$this->dbConnection->lastInsertId();
     }
 
     public function fetchJobs(int $limit) : array

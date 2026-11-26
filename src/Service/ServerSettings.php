@@ -337,13 +337,13 @@ class ServerSettings
         $now = date('Y-m-d H:i:s');
 
         // Delete existing metadata
-        $this->dbConnection->prepare('DELETE FROM `server_setting_metadata` WHERE `key` = ?')
-            ->executeStatement([$dbKey]);
+        $this->dbConnection->executeStatement('DELETE FROM `server_setting_metadata` WHERE `key` = ?', [$dbKey]);
 
         // Insert new metadata
-        $this->dbConnection->prepare(
-            'INSERT INTO `server_setting_metadata` (`key`, `updated_at`, `updated_by_user_id`) VALUES (?, ?, ?)'
-        )->executeStatement([$dbKey, $now, $userId]);
+        $this->dbConnection->executeStatement(
+            'INSERT INTO `server_setting_metadata` (`key`, `updated_at`, `updated_by_user_id`) VALUES (?, ?, ?)',
+            [$dbKey, $now, $userId],
+        );
     }
 
     public function getTmdbApiKeyMetadata() : ?array
@@ -402,13 +402,13 @@ class ServerSettings
         $now = date('Y-m-d H:i:s');
 
         // Delete existing metadata
-        $this->dbConnection->prepare('DELETE FROM `server_setting_metadata` WHERE `key` = ?')
-            ->executeStatement([$dbKey]);
+        $this->dbConnection->executeStatement('DELETE FROM `server_setting_metadata` WHERE `key` = ?', [$dbKey]);
 
         // Insert new metadata
-        $this->dbConnection->prepare(
-            'INSERT INTO `server_setting_metadata` (`key`, `updated_at`, `updated_by_user_id`) VALUES (?, ?, ?)'
-        )->executeStatement([$dbKey, $now, $userId]);
+        $this->dbConnection->executeStatement(
+            'INSERT INTO `server_setting_metadata` (`key`, `updated_at`, `updated_by_user_id`) VALUES (?, ?, ?)',
+            [$dbKey, $now, $userId],
+        );
     }
 
     public function deleteTmdbApiKey() : void
@@ -416,12 +416,10 @@ class ServerSettings
         $dbKey = $this->convertEnvironmentKeyToDatabaseKey(self::TMDB_API_KEY);
 
         // Delete the key from server_setting
-        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')
-            ->executeStatement([$dbKey]);
+        $this->dbConnection->executeStatement('DELETE FROM `server_setting` WHERE `key` = ?', [$dbKey]);
 
         // Delete metadata
-        $this->dbConnection->prepare('DELETE FROM `server_setting_metadata` WHERE `key` = ?')
-            ->executeStatement([$dbKey]);
+        $this->dbConnection->executeStatement('DELETE FROM `server_setting_metadata` WHERE `key` = ?', [$dbKey]);
     }
 
     public function deleteOmdbApiKey() : void
@@ -429,12 +427,10 @@ class ServerSettings
         $dbKey = $this->convertEnvironmentKeyToDatabaseKey(self::OMDB_API_KEY);
 
         // Delete the key from server_setting
-        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')
-            ->executeStatement([$dbKey]);
+        $this->dbConnection->executeStatement('DELETE FROM `server_setting` WHERE `key` = ?', [$dbKey]);
 
         // Delete metadata
-        $this->dbConnection->prepare('DELETE FROM `server_setting_metadata` WHERE `key` = ?')
-            ->executeStatement([$dbKey]);
+        $this->dbConnection->executeStatement('DELETE FROM `server_setting_metadata` WHERE `key` = ?', [$dbKey]);
     }
 
     private function convertEnvironmentKeyToDatabaseKey(string $environmentKey) : string
@@ -507,7 +503,7 @@ class ServerSettings
     {
         $key = $this->convertEnvironmentKeyToDatabaseKey($environmentKey);
 
-        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')->executeStatement([$key]);
-        $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([(string)$value, $key]);
+        $this->dbConnection->executeStatement('DELETE FROM `server_setting` WHERE `key` = ?', [$key]);
+        $this->dbConnection->executeStatement('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)', [(string)$value, $key]);
     }
 }

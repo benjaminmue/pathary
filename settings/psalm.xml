@@ -53,11 +53,6 @@
             </errorLevel>
         </PossiblyUndefinedMethod>
 
-        <UndefinedMagicMethod>
-            <errorLevel type="suppress">
-                <directory name="tests/unit"/>
-            </errorLevel>
-        </UndefinedMagicMethod>
     </issueHandlers>
 
     <plugins>
