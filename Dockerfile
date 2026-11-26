@@ -3,7 +3,7 @@
 # =============================================================================
 # Stage 1: Build dependencies with Composer
 # =============================================================================
-FROM php:8.4.27-cli-alpine AS builder
+FROM php:8.4.28-cli-alpine AS builder
 
 # Install build dependencies for PHP extensions
 RUN apk add --no-cache \
@@ -53,7 +53,7 @@ RUN composer dump-autoload --optimize --no-dev
 # =============================================================================
 # Stage 2: Production image with Apache
 # =============================================================================
-FROM php:8.4.27-apache AS production
+FROM php:8.4.28-apache AS production
 
 # Set build arguments and labels
 ARG BUILD_DATE
@@ -148,8 +148,8 @@ RUN { \
 
 # Refuse to build on a PHP release older than the CVE-2026-109618/-109619 fix,
 # e.g. from a stale cache or a reverted base image tag.
-RUN php -r 'exit(version_compare(PHP_VERSION, "8.4.27", ">=") ? 0 : 1);' \
-    || { echo "PHP $(php -r 'echo PHP_VERSION;') is older than 8.4.27" >&2; exit 1; }
+RUN php -r 'exit(version_compare(PHP_VERSION, "8.4.28", ">=") ? 0 : 1);' \
+    || { echo "PHP $(php -r 'echo PHP_VERSION;') is older than 8.4.28" >&2; exit 1; }
 
 # Set working directory
 WORKDIR /app
