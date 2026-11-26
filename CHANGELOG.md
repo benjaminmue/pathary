@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.6](https://github.com/benjaminmue/pathary/compare/v0.7.5...v0.7.6) (2026-11-26)
+
+
+### Bug Fixes
+
+* **deps:** DBAL 4, Guzzle 8, PHPMailer 7, oauth2-google 5, PHP_CodeSniffer 4 (supersedes [#93](https://github.com/benjaminmue/pathary/issues/93)) ([#95](https://github.com/benjaminmue/pathary/issues/95)) ([cbbc72d](https://github.com/benjaminmue/pathary/commit/cbbc72d7f7e8a0a8bbdf9bad41b07518c7f406e2))
+* **docker:** PHP 8.4.28 for CVE-2026-129182, -129289, -129496 ([#96](https://github.com/benjaminmue/pathary/issues/96)) ([f17e933](https://github.com/benjaminmue/pathary/commit/f17e933cc1ba1282554effc024349ad617535dea))
+
 ## [0.7.5](https://github.com/benjaminmue/pathary/compare/v0.7.4...v0.7.5) (2026-11-08)
 
 
