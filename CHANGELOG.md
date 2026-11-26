@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.7](https://github.com/benjaminmue/pathary/compare/v0.7.6...v0.7.7) (2026-11-26)
+
+
+### Bug Fixes
+
+* **deps:** twig 3.31.1, otphp 11.5.1, league/csv 9.30.0 ([#98](https://github.com/benjaminmue/pathary/issues/98)) ([86bde69](https://github.com/benjaminmue/pathary/commit/86bde69fa2f6dffb0b1b8bf0d66cd6992fe9d20c))
+
 ## [0.7.6](https://github.com/benjaminmue/pathary/compare/v0.7.5...v0.7.6) (2026-11-26)
 
 
